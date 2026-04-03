@@ -208,6 +208,9 @@ __marimo__/
 
 # Project-specific: Personal planning docs (not architecture)
 SETUP_COMPLETE.md
+**/SETUP_COMPLETE.md
+TOOLING.md
+**/TOOLING.md
 PROJECT_MANAGEMENT.md
 **/PROJECT_MANAGEMENT.md
 IMMEDIATE_NEXT_STEPS.md
