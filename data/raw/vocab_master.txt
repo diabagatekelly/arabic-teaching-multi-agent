@@ -1,0 +1,2597 @@
+============================================================
+COMPLETE VOCABULARY LIST (PRIORITY SORTED)
+============================================================
+
+Total words: 2578
+
+Priority order:
+  1. Quran vocabulary (highest priority): 562 words
+  2. General vocabulary (sorted by frequency): 2016 words
+
+Format: english | arabic | transliteration
+
+============================================================
+
+# ========== QURAN VOCABULARY (HIGHEST PRIORITY) ==========
+
+this (masculine) | هذا
+that (masculine) | ذالك
+this (feminine) | هذه
+that (feminine) | تلك
+these | هؤلاء
+those (masculine) | اولئك
+he who | الذي
+she who | التي
+those who | الذين
+these (for broken plurals) | هذه
+those (for broken plurals) | تلك
+No, No!!! | لا
+except Allah | إلا الله
+never certainly not | كلا
+not (for future) | لن
+not (for past) | لم
+not | ما
+is not (masculine) | لَيْسَ
+is not (feminine) | لَيْسَتْ
+yes, indeed | بَلَى
+other than | غَيْر
+besides, less than | دون
+except, unless, if not | إلا
+yes | نَعَمْ
+Who? | مَنْ
+Whose? | لمن
+He (masculine) | هُوَ
+Them (masculine) | هُمْ
+you (masculine) | أَنْتَ
+you all (masculine) | أنتُم
+I (masculine/feminine) | أنا
+US (masculine/feminine) | نَحْنُ
+she | هي
+They (feminine) | هُنَّ
+you (feminine) | أنت
+his | ـه
+their (masculine) | هم
+your (masculine) | ك...
+Yours truly (masculine plural) | كُمْ
+my | ـي (ني)
+her | ها...
+their | ...هم
+Yours truly (feminine) | ك...
+those two | هُمَا
+you two | أَنْتُمَا
+where? | أَيْنَ
+above, up | فوق
+what / that which | ما
+who / the one who | مَنْ
+under | تحت
+when? | متى
+in front of | بَيْنَ يَدَيْ
+back, after | خلف
+how | كيف
+behind | وراء
+how many | كم
+right / oath | يَمِينِ
+which? | أَيُّ
+left | شمال
+wherefrom? / why? | أني
+around | حول
+Is / Am / Are / Do | أ / هل
+what | مَاذَا
+wherever | حيث
+why? | لمَ / لِمَاذَا
+if not, why not | لَوْلَا
+owner / endowed with | ذو / ذا / ذي
+before | قبل
+owner (feminine) | ذات
+after | بعد
+owners of / people of | أُوْلُوا
+time, period | حين
+family / relatives | أهل
+when (past) | إذ
+relatives / people | آل
+when (future) | إذا
+then | ثم / ف
+lo! / will not | ألا
+what an excellent | نعم
+what an evil | بئس
+evil is that which | بئسما
+near / with | عِنْدَ / لَدَى
+sth similar | مثل
+nothing but | إن ... إلا
+similitude | مثل / أمثال
+nothing but | ما ... إلا
+from those who | مِمَّنْ
+that..not / so as not to | أَلا / أَنْ لا
+with what; because | بما
+about what | عَمَّا
+in what | فيما
+as, just as | كما
+for what/that which | لما
+out of what | مما
+as to, as for | أما
+if; either / or | إما
+that | أَنَّمَا
+verily is but | إِنَّمَا
+as if | كأنما
+whenever | كُلِّمًا
+with, in, from | ب
+about | عَنْ
+in | في
+as, like | ك
+for | ل
+from | من
+towards | إلى
+by (of oath) | ت
+until | حتى
+on | على
+with | مع
+and by (of oath) | و
+has (with past tense) | قد
+surely (with present tense) | لـ
+will (for near future) | سـ
+will (for future) | سَوْفَ
+will surely | لـ...نّ
+indeed | لـ
+indeed, surely | لقد
+let sb do (imperative) | لـ
+the | ال
+alone | إيا
+verily, truly | إنَّ
+that | أَنَّ
+as if | كَأنَّ
+but, however | لَكِنَّ (لكن)
+perhaps, may be | لَعَلَّ
+that | أَنْ
+if | إنْ
+possibly | عسى / سی
+when | لَمَّا
+if | لَوْ
+O! | يَا، يَا أَيُّهَا
+or? (interrogative prefix) | أ
+or (in questions) | ام
+or | او
+when | اذ
+some of | بعض
+everyone; all | كل
+most severe | أشد
+higher, superior | أَعْلَى
+better-knowing | أعلم
+nearer | أقرب
+bigger | أكبر
+more; most | أكثر
+better | أحسن
+more entitled | أحق
+nearer: more likely | أدنى
+more unjust | أظلم
+better guided | أهدى
+nearer, closer: woe | أولى
+severe; strong | شديد
+high, exalted | عليّ
+knower | عليم
+near | قريب
+big | كبير
+plenty; much | كثير
+quick; swift; fast | سريع
+merciful | رحيم
+supreme | عظيم
+little | قليل
+noble; honorable; generous | كريم
+subtle | لطيف
+first | أول
+last | آخر
+other | آخر
+trustworthy | أمين
+one who sees clearly | بصير
+far | بعيد
+most forgiving (oft-returning) | تواب
+protector | حفيظ
+wise | حكيم
+forbearing | حليم
+praiseworthy | حميد
+warm (friend): boiling water | حميم
+knowing, ever aware | خبير
+Lord: Sustainer | رب
+Compassionate | رحمن
+peace | سلام
+one who listens | سميع
+grateful | شكور
+mighty | عزيز
+most forgiving | غفور
+All-powerful | قدير
+warner | نذير
+strong helper | نصير
+one who takes care of (disposer) | وكيل
+Messenger | رَسُول (pl: رُسُل)
+Prophet | نبي
+Prophets | نبيون، نبيين، أنبياء
+Adam | آدم
+Noah | نوح
+Abraham | إبراهيم
+Lot | لوط
+Ishmael | إسماعيل
+Isaac | إِسْحَاق
+Jacob | يَعْقُوب
+Joseph | يُوسُف
+Hud | هود
+Shu'ayb | شعیب
+Salih | صالح
+Moses | مُوسَى
+Jesus son of Mary | عِيسَى ابْنُ مَرْيَمَ
+Satan | شيطان (pl: شياطين)
+Pharaoh | فِرْعَوْن
+People of Hud | عاد
+People of Salih | ثمود
+sign | آية (pl: آيات)
+evidence | بينة (pl: بينات)
+Qur'an reading, recitation | قرآن
+cattle | أنْعَام
+mountain | جبل (pl: جبال)
+sea; large river | بحر
+sun | شمس
+moon | قمر
+night | ليل
+day | نهار
+earth | أرض
+sky | سماء (pl: سماوات)
+companion, fellow | صاحب (pl: أَصْحَاب)
+end | عَاقِبَة
+torment | عذاب
+chastisement | عقاب
+Resurrection | قيامة
+meeting | لقاء
+fixed | مسمی
+fire | نَار
+river | نَهْر (pl: أَنْهَار)
+woe unto... | وَيْل
+day | يَوْم (pl: أيام)
+that day | يَوْمَئِذٍ
+forever, ever | أَبَدًا
+reward | أجر (pl: أجور)
+term | أجل
+the Hereafter | الآخِرَة
+painful | أليم
+reward | ثواب
+hellfire | جحيم
+reward | جزاء
+garden | جَنَّة (pl: جَنَّات)
+the Hell | جَهَنَّم
+reckoning | حساب
+hour (day of resurrection) | ساعة
+matter; affair | أمر (pl: أمور)
+piety; fear; protection | تَقْوَى
+truth; true; right | حَقّ
+falsehood | باطل
+wisdom | حكمة
+praise | حمد
+religion; law; judgement | دين
+poor-due, charity | زكاة
+witness, present | شهید (pl: شُهَدَاء)
+prayer | صلاة
+clear, self-expressive | مبين
+light | نور
+one | أَحَد (fg: إِحْدَى)
+god; deity | إله (pl: آلِهَة)
+partner, associate | شريك (pl: شركاء)
+witness | شهادة
+throne | عرش
+unseen, hidden | غَيْب
+book | كتاب (pl: كُتُب)
+word | كلمة
+angel | ملك (pl: مَلَائِكَة)
+covenant, treaty | ميثاق
+one | واحد (fg: واحدة)
+actions, deeds, works | أَعْمَال
+good (deed) | حَسَنَة (pl: حَسَنَات)
+evil, bad | سيئة (pl: سَيِّئَات)
+good, better | خير
+evil, bad, worse | شر
+sin | إثم
+sin | ذَنْب (pl: ذُنُوب)
+sin | جناح
+unlawful | حرام
+name | اسم (pl: أَسْمَاء)
+discourse; speech | حديث (pl: أَحَادِيث)
+good | طيبة (pl: طَيِّبَات)
+favors | آلاء
+authority; warrant | سُلْطَان
+grace | فضل
+water | ماء
+dominion, reign | ملك
+favor | نعمة
+all | أَجْمَعُونَ / أَجْمَعِينَ
+permission | إذن
+punishment power; adversity | باس
+all, everybody | جميع
+same; equal; fair | سواء
+party, group | فريق
+mother | أُمّ (pl: أُمَّهَات)
+father | أَب (pl: آبَاء)
+wife; husband | زَوْج (pl: أَزْوَاج)
+man | رَجُل (pl: رِجَال)
+woman | امْرَأَة (pl: نِسَاء)
+child | وَلَد (pl: أَوْلَاد)
+father | وَالِد (dl: وَالِدَيْن)
+descendants; children | ذُرِّيَّة
+son | ابْن
+sons | بَنُونَ، بَنِينَ، أَبْنَاء
+brother | أَخ (أَخُو، أَخَا، أَخِي)
+brothers | إِخْوَان
+face | وَجْه (pl: وُجُوه)
+eye; spring | عَيْن (pl: أَعْيُن)
+sights | أَبْصَار
+mouths | أَفْوَاه
+tongue; language | لِسَان (pl: أَلْسِنَة)
+heart | قَلْب (pl: قُلُوب)
+breast | صَدْر (pl: صُدُور)
+hand | يَد (pl: أَيْدِي)
+foot | رِجْل (pl: أَرْجُل)
+soul | نَفْس (pl: أَنفُس)
+soul; spirit | رُوح
+power, strength | قُوَّة
+house | بَيْت (pl: بُيُوت)
+abode | دَار (pl: دِيَار)
+world | دُنْيَا
+way | سَبِيل (pl: سُبُل)
+path | صِرَاط
+world | عَالَم (pl: عَالَمِينَ)
+trial; persecution | فِتْنَة
+town | قَرْيَة (pl: قُرَى)
+wealth | مَال (pl: أَمْوَال)
+provision; enjoyment | مَتَاع
+mosque | مَسْجِد (pl: مَسَاجِد)
+place; abode | مَكَان (مَكَانَة)
+community | أُمَّة (pl: أُمَم)
+people | قَوْم
+man; human | إِنْسَان
+men; people | نَاس
+male | ذَكَر (pl: ذُكُور)
+female | أُنْثَى (pl: إِنَاث)
+slave | عَبْد (pl: عِبَاد)
+enemy | عَدُوّ (pl: أَعْدَاء)
+disbelievers | كُفَّار
+criminal | مُجْرِم
+chiefs; leaders | مَلَأ
+protecting friend; guardian | وَلِيّ (pl: أَوْلِيَاء)
+to do | فَعَلَ (يَفْعَلُ)
+to open; to give victory | فَتَحَ (يَفْتَحُ)
+to raise; to resurrect | بَعَثَ (يَبْعَثُ)
+to make; to place; to set up | جَعَلَ (يَجْعَلُ)
+to gather; to collect | جَمَعَ (يَجْمَعُ)
+to go | ذَهَبَ (يَذْهَبُ)
+to raise | رَفَعَ (يَرْفَعُ)
+to enchant; to bewitch | سَحَرَ (يَسْحَرُ)
+to act righteously | صَلَحَ (يَصْلَحُ)
+to curse | لَعَنَ (يَلْعَنُ)
+to profit | نَفَعَ (يَنْفَعُ)
+to help; to deliver | نَصَرَ (يَنْصُرُ)
+to reach | بَلَغَ (يَبْلُغُ)
+to leave | تَرَكَ (يَتْرُكُ)
+to gather; to bring together | حَشَرَ (يَحْشُرُ)
+to judge; to rule | حَكَمَ (يَحْكُمُ)
+to come out | خَرَجَ (يَخْرُجُ)
+to live forever | خَلَدَ (يَخْلُدُ)
+to create out of nothing | خَلَقَ (يَخْلُقُ)
+to enter | دَخَلَ (يَدْخُلُ)
+to remember | ذَكَرَ (يَذْكُرُ)
+to provide | رَزَقَ (يَرْزُقُ)
+to prostrate | سَجَدَ (يَسْجُدُ)
+to perceive | شَعَرَ (يَشْعُرُ)
+to be grateful | شَكَرَ (يَشْكُرُ)
+to be true; to say the truth | صَدَقَ (يَصْدُقُ)
+to worship; to serve | عَبَدَ (يَعْبُدُ)
+to transgress | فَسَقَ (يَفْسُقُ)
+to kill; to slay | قَتَلَ (يَقْتُلُ)
+to sit; to remain behind | قَعَدَ (يَقْعُدُ)
+to prescribe; to write | كَتَبَ (يَكْتُبُ)
+to disbelieve; to be ungrateful | كَفَرَ (يَكْفُرُ)
+to plot | مَكَرَ (يَمْكُرُ)
+to look; to wait | نَظَرَ (يَنْظُرُ)
+to strike | ضَرَبَ (يَضْرِبُ)
+to carry; to bear | حَمَلَ (يَحْمِلُ)
+to bear with patience | صَبَرَ (يَصْبِرُ)
+to wrong | ظَلَمَ (يَظْلِمُ)
+to recognize | عَرَفَ (يَعْرِفُ)
+to understand; to comprehend | عَقَلَ (يَعْقِلُ)
+to forgive; to cover | غَفَرَ (يَغْفِرُ)
+to decree; to have power | قَدَرَ (يَقْدِرُ)
+to lie | كَذَبَ (يَكْذِبُ)
+to earn | كَسَبَ (يَكْسِبُ)
+to possess | مَلَكَ (يَمْلِكُ)
+to live; to greet | حَيَّ (يَحْيَا)
+to give back; to return | رَدَّ (يَرُدُّ)
+to turn away; to hinder | صَدَّ (يَصُدُّ)
+to hurt; to harm | ضَرَّ (يضُرُّ)
+to go astray; to err; to waste | ضَلَّ (يضل)
+to think; to believe | ظَنَّ (يَظُنُّ)
+to count | عَدَّ (يَعُدُّ)
+to beguile | غَرَّ (يَغرُّ)
+to spread out; to stretch | مَدَّ (يَمُدُّ)
+to touch | مَسَّ (يَمَسُّ)
+to love; to wish | وَدَّ (يَوَدُّ)
+to leave behind | وَذَرَ (يَذْرُ)
+to put; to set | وَضَعَ (يَضَعُ)
+to befall | وَقَعَ (يَقَعُ)
+to grant | وَهَبَ (يَهَبُ)
+to find | وَجَدَ (يَجِدُ)
+to inherit | وَرَثَ (يَرِثُ)
+to bear a load | وَزَرَ (يَزْرُ)
+to describe; to ascribe | وَصَفَ (يَصفُ)
+to promise | وَعَدَ (يَعدُ)
+to protect; to save | وقى (يقي)
+to embrace; to comprehend | وَسِعَ (يَوْسَعُ)
+to repent | تَابَ (يَتُوبُ)
+to taste | ذَاقَ (يَذوق)
+to succeed; to gain victory | فَازَ (يَفُوزُ)
+to say | قَالَ (يَقُولُ)
+to stand up; to raise | قَامَ (يَقُومُ)
+to be | كَانَ (يَكُونُ)
+to die | مَاتَ (يَمُوتُ)
+to be afraid | خَافَ (يَخَافُ)
+to become nigh; to be close to | كَادَ (يَكَادُ)
+to plot against | كَادَ (يَكِيدُ)
+to increase | زَادَ (يَزِيدُ)
+to recite | تَلَا (يَتْلُو)
+to call; to pray | دَعَا (يَدْعُو)
+to forgo | عَفَا (يَعْفُو)
+to want; to seek | بَغَى (يَبْغِي)
+to flow | جَرَى (يَجْرِي)
+to reward | جَزَى (يَجْزِي)
+to decree; to fulfill | قَضَى (يَقْضِي)
+to suffice | كَفَى (يَكْفِي)
+to guide; to direct | هَدَى (يَهْدِي)
+to fear | خَشِيَ (يَخْشَى)
+to be satisfied/content | رَضِيَ (يَرْضَى)
+to forget | نَسِيَ (يَنْسَى)
+to ask | سَأَلَ (يَسْأَلُ)
+to read; to recite | قَرَأَ (يَقْرَأُ)
+to take; to catch | أَخَذَ (يَأْخُذُ)
+to eat | أَكَلَ (يَأْكُلُ)
+to command | أَمَرَ (يَأْمُرُ)
+to be safe; to trust | أَمِنَ (يَأْمَنُ)
+to refuse | أَبَى (يَأْبَى)
+to see | رَأَى (يَرَى)
+to come | أَتَى (يَأْتِي)
+to will; to wish | شَاءَ (يَشَاءُ)
+to be evil | سَاءَ (يَسُوءُ)
+to come | جَاءَ (يَجِيءُ)
+to declare; to apprise | نَبَّأَ (يُنَبِّئُ)
+to send down | نَزَّلَ (يُنَزِّلُ)
+to deliver; to rescue | نَجَّى (يُنَجِّي)
+to turn | وَلَّى (يُوَلِّي)
+to change | بَدَّلَ (يُبَدِّلُ)
+to give good news | بَشَّرَ (يُبَشِّرُ)
+to make clear | بَيَّنَ (يُبَيِّنُ)
+to adorn; make seem fair | زَيَّنَ (يُزَيِّنُ)
+to glorify; to praise | سَبَّحَ (يُسَبِّحُ)
+to bring under control | سَخَّرَ (يُسَخِّرُ)
+to be true; to confirm | صَدَّقَ (يُصَدِّقُ)
+to punish; to torment | عَذَّبَ (يُعَذِّبُ)
+to teach | عَلَّمَ (يُعَلِّمُ)
+to send forward | قَدَّمَ (يُقَدِّمُ)
+to accuse of falsehood | كَذَّبَ (يُكَذِّبُ)
+to struggle; to strive | جَاهَدَ (يُجَاهِدُ)
+to fight | قَاتَلَ (يُقَاتِلُ)
+to call out; to cry unto | نَادَى (يُنَادِي)
+to play hypocrisy | نَافَقَ (يُنَافِقُ)
+to migrate | هَاجَرَ (يُهَاجِرُ)
+to see; to watch | أَبْصَرَ (يُبْصِرُ)
+to do good; to do excellently | أَحْسَنَ (يُحْسَنُ)
+to bring forth | أَخْرَجَ (يُخْرِجُ)
+to make someone enter | أَدْخَلَ (يُدْخِلُ)
+to send back; to take back | أَرْجَعَ (يُرْجِعُ)
+to send | أَرْسَلَ (يُرْسِلُ)
+to exceed; to be extravagant | أَسْرَفَ (يُسْرِفُ)
+to submit; to surrender | أَسْلَمَ (يُسْلِمُ)
+to ascribe a partner | أَشْرَكَ (يُشْرِكُ)
+to become | أَصْبَحَ (يُصْبَحُ)
+to become good; to make good | أَصْلَحَ (يُصْلِحُ)
+to turn away; to backslide | أَعْرَضَ (يُعْرِضُ)
+to drown | أَغْرَقَ (يُغْرِقُ)
+to spread corruption | أَفْسَدَ (يُفْسِدُ)
+to be successful | أَفْلَحَ (يُفْلِحُ)
+to make something grow | أَثْبَتَ (يُنبتُ)
+to warn | أَنْذَرَ (يُنْذِرُ)
+to send down; to reveal | أَنْزَلَ (يُنْزِلُ)
+to produce; to create | أَنْشَأَ (يُنْشَى)
+to favor; to bestow grace | أَنْعَمَ (يُنْعمُ)
+to spend | أَنْفَقَ (يُنْفِقُ)
+to not recognize; to deny | أَنْكَرَ (يُنكر)
+to destroy | أَهْلَكَ (يُهْلِكُ)
+to complete | أَتمَّ (يتم)
+to love | أَحَبَّ (يُحِبُّ)
+to make lawful; to cause to dwell | أَحَلَّ (يُحلُّ)
+to conceal; to speak secretly | أَسَرَّ (يُسرُّ)
+to send astray; to leave in error | أَضَلَّ (يُضل)
+to prepare; to make something ready | أَعَدَّ (يُعدُّ)
+to make someone taste | أَذَاقَ (يُذيقُ)
+to intend; to wish | أَرَادَ (يُرِيدُ)
+to befall; to inflict | أَصَابَ (يُصيبُ)
+to obey | أَطَاعَ (يُطِيعُ)
+to establish; to set upright | أَقَامَ (يُقِيمُ)
+to cause someone to die | أَمَاتَ (يُمِيتُ)
+to give life | أَحْيَا (يُحْيِي)
+to conceal | أَخْفَى (يُخفي)
+to show | أَرَى (يُرِي)
+to enrich | أَغْنَى (يُغْنِي)
+to throw; to cast; to place | أَلْقَى (يُلقى)
+to rescue; to save; to deliver | أَنْجَى (يُنْجِي)
+to reveal; to inspire | أَوْحَى (يُوحِي)
+to fulfill | أَوْفَى (يُوفي)
+to believe | آمَنَ (يُؤْمِنُ)
+to give | آتَى (يُؤْتِي)
+to give trouble; to harm; to annoy | آذى (يُؤذي)
+to differ | اختَلَف (يَخْتَلفُ)
+to follow | اتَّبَعَ (يَتَّبِعُ)
+to take; to adopt | اتَّخذَ (يَتَّخِذَ)
+to be on guard; to protect | اتَّقَى (يَتَّقي)
+to fabricate a lie | افْتَرَى (يَفْتَرِي)
+to follow the right way | اهْتَدَى (يَهْتَدي)
+to seek | ابْتَغَى (يَبْتَغِي)
+to refrain; to end | انْتَهَى (يَنْتَهي)
+to turn around; to return | انقلب (ينقلب)
+to reflect; to think over | تَفَكَّرَ (يَتَفَكَّرُ)
+to receive admonition | تَذَكَّرَ (يَتَذَكَّرُ)
+to put one's trust | تَوَكَّلَ (يَتَوَكَّلُ)
+to become clear | تَبَيَّنَ (يَتَبَيَّنُ)
+to wait and watch for opportunity | تَربَّص (يَتَرَبَّصُ)
+to turn away; to take for a friend | تَوَلَّى (يَتَوَلَّى)
+to make someone die; to receive in full | تَوَفَّى (يَتَوَفَّى)
+to be blessed or exalted | تَبَارَكَ (يَتَبَارَكُ)
+to ask each other | تَسَاءَلَ (يَتَسَاءَلُ)
+to become black | اسْوَدَّ (يَسْوَدُّ)
+to become white | ابيض (يبيض)
+to seek something to hasten | استَعْجَلَ (يَسْتَعْجِلُ)
+to ask forgiveness | اسْتَغْفَرَ (يَسْتَغْفِرُ)
+to act arrogantly | اسْتَكْبَرَ (يَسْتَكْبَرُ)
+to mock at | اسْتَهْزَأَ (يَسْتَهْزِئُ)
+to respond; to accept | استجاب (يستجيب)
+to be able to | استطاع (يستطيع)
+to act straight | استَقامَ (يَسْتَقِيمُ)
+to bring (from أتى: to come) | أتى ب
+to oppress; be unjust (from بَغَى: to seek) | بَغَى على
+to repent to (from تاب: to repent) | تَابَ إِلَى
+(Allah) accepted the repentance of (from تاب: to repent) | تَابَ عَلَى
+to bring (from جاء: to come) | جاء ب
+to take away (from ذهب: to go) | ذهب ب
+to go away from (from ذهب: to go) | ذهَبَ عَنْ
+to be pleased with (from رَضِي: to be content) | رَضِي عَنْ
+to strive (from ضرب: to strike) | ضرب في
+to give an example (from ضرب: to strike) | ضَرَبَ مَثَلًا
+to overshadow (from ضرب: to strike) | ضَرَبَ عَلَى
+to judge (from قضى: to decree) | قضى بين
+to kill (from قضى: to decree) | قضى على
+to turn to (from ولى: to turn) | ولى إلى
+to turn away from (from ولى: to turn) | وَلَى عَنْ
+went forth; strove | ضرب في
+mentioned | ضَرب ل
+struck upon; overshadowed | ضَرَبَ عَلَى
+gave example | ضَرَبَ مَثَلًا
+abound | عفا
+forgave | عَفَا عَنْ
+decreed; fulfilled | قضى
+judged | قضى بين
+killed | قضى على
+put; laid down | وَضَعَ
+removed | وَضَعَ عَنْ
+turned; caused to turn | ولى
+turned to | ولى إلى
+turned away from | وَلَى عَنْ
+
+# ========== GENERAL VOCABULARY (SORTED BY FREQUENCY) ==========
+
+I | أنا | ana
+this | هذا | hadha
+we | نحن | nahnu
+he | هو | huwa
+Say! | قُلْ |
+and | و | wa
+but | لكن | lakin
+You have done well | أَحْسَنْتَ |
+He abandoned/left | ترك |
+He abandoned/left off | تَرَكَ |
+The Bestower of Mercy | الرَّحِيمُ |
+The five verb forms | الأَفْعَالُ الْخَمْسَةُ |
+Because you (m,sing.) | لأنك |
+Do you (sing.m) have...? | أعندك ...؟ |
+Do you (sing.m) have? | أَلَكَ ... |
+How are you? (sing. m) | كَيْفَ حَالُكَ؟ |
+How good you are | مَا أَطْيَبَكَ |
+May no harm come to you | لا بَأْسَ بكَ |
+Peace be upon you and Allah's mercy and his blessings | السَّلامُ عَلَيْكُمْ وَ رَحْمَةُ اللَّهِ وَ بَرَكَاتُهُ |
+You don't ask me | لَا تَسْأَلْنِي |
+I don't know | لا أَدْرِي |
+I forgot | نسيت |
+I have understood it well | فَهِمْتُهُ جَيِّداً |
+No, I don't have | لا ما عندي |
+He ends (come to end) | يَنْتَهِي |
+A number of questions | عِدَّةُ أَسْئِلَةٍ |
+Name of an idol | اسْمُ صَنَم |
+Hundred and nine (f) | مِائَةٌ وَتِسْعُ طَالِبَاتِ |
+Hundred and nine (m) | مِائَةً وَ تِسْعَةُ طُلاب |
+What is that? | ما ذلك؟ |
+He is asking | يَسْأَلُ |
+He is attending | يَحْضُرُ |
+He is bearing witness | يَشْهَدُ |
+He is doing | يَفْعَلُ |
+He is going | يَذْهَبُ |
+He is listening | يَسْمَعُ |
+He is seeking refuge | يَعُوْذُ |
+What is his name? | مَا اسْمُهُ |
+What is this? | ما هذا ...؟ |
+We begin | نَبْدَأُ |
+He abandons/leaves | يَتْرُكُ |
+He abandons/leaves off | يَتْرُكُ |
+He attended | حضر |
+He begins | يَبْدَأُ |
+He forgets | يَنْسَى |
+He forgives | يَعْفُو |
+He forgot | نَسِي |
+He gives water | يَسْقِي |
+He hit/beat | ضَرَبَ |
+He ironed | كوت |
+All parts of the world | جَمِيعُ أَنْحَاءِ الْعَالَمِ |
+Allah is the Greatest | الله أَكْبَرُ |
+Commentary of the Quran | التفسير |
+How numerous the stars are | مَا أَكْثَرَ النُّجُومَ |
+Middle of the night | مُنْتَصَفُ اللَّيْلِ |
+O Lord of the kabah | يَا رَبَّ الْكَعْبَةِ |
+The faculty of commerce | كُلِيَّةُ التَّجَارَةِ |
+The faculty of engineering | كُلِيَّةُ الهَنْدَسَة |
+The faculty of Islamic law | كلية الشريعة |
+The faculty of medicine | كلية الطب |
+The negative لا | لا النَّافِيَة |
+The next station/stop | الْمَحَطَّةِ الْقَادِمَةُ |
+The particle of futurity | حَرْفُ الإِسْتِقْبَالِ |
+The red Indians | الْهُنُودُ الْحُمْرُ |
+The second example | الْمِثَالُ الثَّانِي |
+The six authentic books | بینت الكتب السنة الصَّحِيحَةُ |
+The tongue of Arabs (dictionary) | لِسَانُ الْعَرَبِ |
+The verb of wonderment | فِعْلُ التَّعَجُّب |
+Tongue of the Arabs | لِسَانُ الْعَرَبِ |
+Visiting the sick | عِيَادَةٌ |
+All of you (pl.m) | كلكم |
+As if you (m,sing.) / (f, sing.) | كانك / كأَنَّكِ |
+how are you | كيف حالك | kayfa halak
+I am happy to meet you | أنا مَسْرُور بلقائك |
+I am happy with you | أَنَا مَسْرُورٌ بِكَ |
+Indeed you (f) | إِنَّكِ |
+Indeed you (f.pl) | إِنَّكُنَّ |
+Indeed you (m) | إِنَّكَ |
+Indeed you (m,pl) | إِنَّكُمْ |
+Than you (m.sing.) | مِنْكَ |
+You (sing.f) | أنت |
+You are not (f.sing) | لَسْتِ |
+You are not (m.sing) | لست |
+You need (want) (f.pl) | تُرِدْنَ |
+You stood | قُمْتَ |
+You want (f) | تُرِيدِينَ |
+You want (m) | تُرِيدُ |
+You want (m,pl) | تُرِيدُونَ |
+You wanted | أَرَدْتَ |
+You wanted (f) | أَرَدْتِ |
+You wanted (f.pl) | أَرَدْتُنَّ |
+You wanted (m.pl) | أَرَدْتُمْ |
+You went (f,sing.) | ذَهَبْتِ |
+You went (m,sing.) | ذَهَبْت |
+You went (sing.m) | ذهبت |
+you're welcome | عفوا | afwan
+Because I | لأَنَّني |
+He drinking (a-i) | يَشْرَبُ |
+He listened (i-a) | سمع |
+He understood (i-a) | فَهِمَ |
+Hi sat (a-i) | جَلَسَ |
+I am fine | أنا بخير |
+I am visiting | أَزُورُ |
+I eat | اكل |
+I feel pain | آه |
+I have | لي |
+I say | أَقُولُ |
+I stood | قُمْتُ |
+I take | أخُذُ |
+I think | أَظُنُّ |
+I want | أُرِيدُ |
+I wanted | أَرَدْتُ |
+I'm fine | أنا بخير | ana bikhayr
+Indeed I | إِنَّنِي إِنِّي |
+to have | يملك | yamlik
+To visit (a sick person) | لعِيادَة |
+$1/10^{th}$ of a riyaal | قرش |
+A number of books | عِدَّةُ كُتب |
+A type of silk | نُوْعٌ مِنَ الْحَرِيرِ |
+All of them (pl.m) | كُلُّهُمْ |
+First of it | أَوَّلُهُ - أَوَّلُهَا |
+mansoob and majzoom with omission of nun | تُنْصَبُ وَ تُجْزَمُ بِحَذْفِ النُّوْنِ |
+O son of my brother | يَا ابْنَ أَخِي |
+Hundred and eight (f) | مِائَةٌ وَثَمَانِي طَالِبَاتٍ |
+Hundred and eight (m) | مِائَةٌ وَ ثَمَانِيَةُ طُلاب |
+Hundred and five (f) | مِائَةٌ وَ خَمْسُ طَالِبَاتٍ |
+Hundred and five (m) | مِائَةٌ وَ خَمْسَةُ طُلاب |
+Hundred and one (f) | مِائَةُ طَالِبَةٍ وَطَالِبَةٌ |
+Hundred and one (m) | مِائَةُ طَالِبٍ وَ طَالِبٌ |
+Hundred and six (f) | مِائَةٌ وَسِتْ طَالِبَاتٍ |
+Hundred and six (m) | مِائَةٌ وَ سِتَّةُ طُلاب |
+He ate (a-u) | أكل |
+He prostrated (a-u) | سجد |
+In a dream | فِي الْمَنَامِ |
+Taking a vowel | متحرك |
+In it (f) | فيها |
+In it (m) | فيه |
+Repeating it.. | تَكْرَارُها |
+Is that..? | أ ذلك ..؟ |
+Isn't that so? | أَلَيْسَ كَذلِكَ؟ |
+Not that/except | الا |
+That is | تلك |
+So don't.../so does not | فلا |
+He is ascending | يَصْعَدُ |
+He is bowing | يَرْكَعُ |
+He is buying | يَشْتَرِي |
+He is coming | يَأْتِي |
+He is commencing | يَبْدَأُ |
+He is crying | يبكي |
+He is descending | يَنْزِلُ |
+He is dying | يَمُوتُ |
+He is eating | يَأْكُلُ |
+He is entering | يَدْخُلُ |
+He is explaining | يَشْرَحُ |
+He is hitting | يَضْرِبُ |
+He is laughing | يَضْحَكُ |
+He is leaving | يَخْرُجُ |
+He is looking | يَنْظُرُ |
+He is lying | يَكْذِبُ |
+He is memorising | يَحْفَظُ |
+He is mounting | يَرْكَبُ |
+He is patient | يصبر |
+He is performing umrah | يعتمر |
+He is playing | يَلْعَبُ |
+He is pointing | يُشيرُ |
+He is prostrating | يَسْجُدُ |
+He is raising | يرفع |
+He is requesting | يَرْجُو |
+He is returning | يَرْجِعُ |
+He is sitting | يَجْلِسُ |
+He is slaughtering | يَذْبَحُ |
+He is still studying | لا يَزَالُ يَدْرُسُ |
+He is studying | يَدْرُسُ |
+He is wearing/dressing | يَلْبَسُ |
+He is working | يَعْمَلُ |
+He is worshipping | يَعْبُدُ |
+He is writing | يكْتُبُ |
+How poor she is | مَا أَفْقَرَهَا |
+Who is this..? | مَنْ هَذا ...؟ |
+He looked for | بَحَتْ عَنْ |
+He searched for | بَحَثَ عَنْ |
+He searches for | يَبْحَثُ عَنْ |
+Or (for non-questioning) | أو |
+Or (for Questioning) | أَمْ |
+Indeed we | إِنَّنَا إِنَّا |
+Until we meet again | إلى اللقَاءِ |
+We stood | قُمْنَا |
+We want | نُرِيدُ |
+Will be | سَيَكُونُ |
+He was patient | صبر |
+Because he | لأَنَّهُ |
+He asked | سَأَلَ |
+He ate | أكل |
+He began | بدأ |
+He circumbulated | طاف |
+He circumbulates | يَطُوفُ |
+He comes | يَأْتِي |
+He complained | شکا |
+He complains | يَشْكُو |
+He created | خَلَقَ |
+He does not cease | لا يَزَالُ |
+He explained | شَرَحَ |
+He finds | يَجِدُ |
+He forgave | عفا |
+He gathered | جَمَعَ |
+He gathers | يَجْمَعُ |
+He gave water | سَقَى |
+He invited | دعا |
+He invites | يَدْعُو |
+He irons | يَكْوِي |
+He knows | يَعْرِفُ |
+He overcomes | يَغْلِبُ |
+He performed hajj | حج |
+He performed umrah | إِعْتَمَرَ |
+He performs hajj | يحج |
+He pretends | يَتَظَاهَرُ |
+He remained | بقي |
+He remains | يَبْقَى |
+He says | يَقُولُ |
+He shaved | حَلَقَ |
+He shaves | يَحْلِقُ |
+He showed/advised | دَلَّ |
+He shows/advises | يَدُلُّ |
+He spat | بصق |
+He speculates | ظَنَّ |
+He stood | قَامَ |
+He stood up | قَامَ |
+He thinks | يَظُنُّ |
+He took | أَخَذَ |
+He understood | فَهِمَ |
+He urinated | بال |
+He urinates | يَبُولُ |
+He wanted | أَرَادَ |
+He wants | يُرِيدُ |
+He will remain | سیبقی |
+Indeed he | إِنَّهُ |
+O my dear father | يَا أَبَتِ |
+Indeed they (m.pl) | إِنَّهُمْ |
+Indeed they (f.pl) | إِنَّهُنَّ |
+they (masculine) | هم | hum
+Hubal (an idols name) | هُبَلُ |
+Because she | لأَنَّهَا |
+Indeed she | إِنَّهَا |
+Or (questioning) | أَمْ |
+His (attached pronoun) | ه |
+His father | أَبُوهُ |
+Allah the most high and exalted | الله تعالى |
+The day | الْيَوْمُ |
+The first example | الْمِثَالُ الأَوَّلُ |
+The Most Merciful | الرَّحْمَنُ |
+The noble prophet | النَّبَوَيُّ الشَّريف |
+The paradise | الْجَنَّةُ |
+The prohibited لا | لا النَّاهِيَةُ |
+The prophets biography | السيرة |
+to | إلى | ila
+thank you | شكرا | shukran
+You (m) | أنت |
+You (pl.f) | أَنْتُنَّ |
+You (pl.m) | أَنْتُمْ |
+you (plural) | أنتم | antum
+You are not (f.pl) | لَسْتُنَّ |
+You are not (m.pl) | لَسْتُمْ |
+You hit him/it | ضَرَبْتُمُوهُ |
+You killed her/it | قَتَلْتُمُوهَا |
+You love | تحب |
+You said | قُلْتَ |
+You saw | رَأَيْتَ |
+You saw them | رَأَيْتُمُوْهُمْ |
+You visited | زُرْت |
+You went (f.pl) | ذَهَبْتُنَّ |
+You went (m,pl) | ذَهَبْتُمْ |
+You went (pl.m) | ذهبتم |
+You wish | تَشَاءُ |
+But I | لكني |
+He descended (a- i) | نَزَلَ |
+He drank (i-a) | شَرِبَ |
+He hit (i-a) | ضَرَبَ |
+He memorised (i- a) | حَفِظَ |
+He mounted (i-a) | ركب |
+He played (i-a) | لَعِبَ |
+He returned (a-i) | رَجَعَ |
+He washed (a-i) | غَسَلَ |
+Here I am | هأنذا |
+I am bored/ Annoyed | أف |
+I am like him | أنا كمثله |
+I am not | لستُ |
+I command | آمر |
+I hope/fear | لَعَلَّ |
+I live | أَسْكُنُ |
+I love | أحب |
+I request | أَرْجُو |
+I said | قلت |
+I saw | أَرَى |
+I saw her (f) | رَأَيْتُهَا |
+I saw him | رَأَيْتُهُ |
+I saw them (f.pl) | رأَيْتُهُنَّ |
+I saw them (m,pl) | رَأَيْتُهُمْ |
+I thought | ظننتُ |
+I visited | زُرْتُ |
+I went | ذهبت |
+I witness | أَشْهَدُ |
+All of us | كلنا |
+Hundred and four (f) | مِائَةً وَأَرْبَعُ طَالِبَاتٍ |
+Hundred and four (m) | مِائَةً وَ أَرْبَعَةُ طُلاب |
+Hundred and seven (f) | مِائَةٌ وَسَبْعُ طَالِبَاتٍ |
+Hundred and seven (m) | مِائَةٌ وَ سَبْعَةُ طُلاب |
+Hundred and ten (f) | مِائَةٌ وَعَشْرُ طَالِبَاتٍ |
+Hundred and three (f) | مِائَةٌ وَ ثَلاتُ طَالِبَاتٍ |
+Hundred and three (m) | مِائَةٌ وَ ثَلَاثَةُ طُلاب |
+Hundred and two (f) | مِائَةُ طَالِبَةٍ وَطَالِبَتَانِ |
+Hundred and two (m) | مِائَةُ طَالِبٍ وَطَالِبَانِ |
+A chair | كرسي |
+A fish | سمك |
+A flower | زَهْرَة |
+A short while | هنيهة |
+A sister | أُخت |
+He bowed (a-a) | رَكَعَ |
+He did (a-a) | فَعَلَ |
+He entered (a-u) | دَخَلَ |
+He left (a-u) | خَرَجَ |
+He opened (a-a) | فَتَحَ |
+He raised (a-a) | رَفَعَ |
+He read (a-a) | قَرَأَ |
+He went (a-a) | ذَهَبَ |
+He wrote (a-u) | كتب |
+But he/it | لَكِنَّهُ |
+But she/it | لَكِنَّهَا |
+He/it was | كان |
+Here it is (f) | هَا هِيَ ذِي |
+Here it is (m) | هَا هُوَ ذَا |
+It is necessary | يَجِبُ |
+It overturned | انقلب |
+It suffices me | يَكْفِينِي |
+It was necessary | وَجَبَ |
+It/She has | لها |
+She/it was | كانت |
+He is | يَكُونُ |
+He is able | يُمْكِنُ |
+He is about | يَكَادُ |
+He is absent | يَغِيبُ |
+He is quiet | يَسْكُتُ |
+He is sad | يَحْزَنُ |
+He is successful/passes | يَنْجَحُ |
+He is sufficient | كَفَى |
+He/Is not | لَيْسَ |
+Is this? | أَ هَذَا ...؟ |
+my name is | اسمي | ismi
+She is not | لیست |
+This is (dual f) | هاتان |
+This is (dual m) | هذان |
+This is (f) | هذه |
+This is (m) | هذا |
+As for | أَمَّا |
+Like this | هَكَذَا |
+We are not | لسنا |
+We love | تحب |
+We love him | تحبه |
+We said | قُلْنَا |
+We saw | تَرَى |
+We visited | زرنا |
+We went | ذَهَبْنَا |
+They are not (f.pl) | لَسْنَ |
+They are not (m.pl) | لَيْسُوا |
+He was | كان |
+He was able (possible) | أَمْكَنَ |
+He was about | كاد |
+He was absent | غَابَ |
+He was pleased | فَرِحَ |
+He was present | حضر |
+He was sad | حَزِنَ |
+She was pleased | فَرِحَتْ |
+As if he | كَأَنَّهُ |
+He abused | سب |
+He abuses | يَسُبُّ |
+He arrived | وَصَلَ |
+He arrives | يَصِلُ |
+He ascended | عَرَجَ |
+He ascends | صَعِدَ |
+he blocked | سد |
+He blocks | يَسُدُّ |
+He bore witness | شهد |
+He bought | اشْتَرَى |
+He broke | كَسَر |
+He builds | يَيْنِي |
+He built | بنی |
+He came | جَاءَ |
+He ceased | زَالَ |
+He ceases | يَزَالُ |
+He commenced | بدأ |
+He compiled | أَلْفَ |
+He compiles | يُؤَلِّفُ |
+He cooked | طَبَخَ |
+He cooks | يَطْبُخُ |
+He counted | عد |
+He counts | يَعُدُّ |
+He cried | بگی |
+He cries | يبكي |
+He cut | قَطَعَ |
+He cuts | يَقْطَعُ |
+He descended | نزل |
+He did not cease | مَا زَالَ |
+He died | مات |
+He dies | يَمُوتُ |
+He dragged/pulled | جر |
+He drags/pulls | يجر |
+He drank | شَرِبَ |
+He ended | انْتَهَى |
+He entered | دَخَلَ |
+He enters | يَلِجُ |
+He erased | محا |
+He erases | يَمْحُو |
+He failed | رَسَبَ |
+He fails | يَرْسُبُ |
+He falls | يَقَعُ |
+He falls sick | يَمْرَضُ |
+He fasted | صَامَ |
+He fasts | يَصُومُ |
+He feared | خاف |
+He fears | يَخَافُ |
+He fell | وَقَعَ |
+He fell sick | مرض |
+He folded | طَوَى |
+He folds | يَطْوِي |
+He followed | تَبِعَ |
+He follows | يَتْبَعُ |
+He found | وَجَدَ |
+He granted | وَهَبَ |
+He grants | يَهَبُ |
+He guided | هَدَى |
+He guides | يَهْدِي |
+He heard | سَمِعَ |
+He kept quiet | سكت |
+He killed | قَتَلَ |
+He knew | عرف |
+He laughed | ضَحِكَ |
+He left | خرج |
+He lied | كذب |
+He lies | يَكْذِبُ |
+He lived | سَكَنَ |
+He lives | يَسْكُنُ |
+He looked | نَظَرَ |
+He married | نَكَحَ |
+He marries | يَنْكِحُ |
+He measured | كال |
+He measures | يَكِيلُ |
+He memorised | حَفِظَ |
+He opened | فَتَحَ |
+He opens | يَفْتَحُ |
+He overcame | غَلَبَ |
+He passed | مَرَّ |
+He passes | يمر |
+He permits | يَسْمَحُ |
+He permitted | سمح |
+He placed | وَضَعَ |
+He places | يَضَعُ |
+He pleased | أَرْضَى |
+He pleases | يُرْضِي |
+He poured | صب |
+He pours | يصب |
+He prevented | مَنَعَ |
+He prevents | يَمْنَعُ |
+He promised | وَعَدَ |
+He promises | يَعِدُ |
+He pushed | دَفَعَ |
+He pushes | يَدْفَعُ |
+He raised | رَفَعَ |
+He ran | جرى |
+He read | قَرَأَ |
+He reads | يَقْرَأُ |
+He recited | تلا |
+He recites | يَتْلُو |
+He rejoiced | فَرِحَ |
+He repented | تاب |
+He repents | يَتُوبُ |
+He replied | رَدَّ |
+He replies | يرد |
+He requested | رَجَا |
+He returned | رجع |
+He returns | يَؤُوبُ |
+He said | قَالَ |
+He saw | رأَى |
+He sells | يَبِيعُ |
+He slaughtered | ذَبَحَ |
+He sleeps | يَنَامُ |
+He slept | نَامَ |
+He smells | يَشَمُّ |
+He smelt | شم |
+He sold | بَاعَ |
+He sought refuge | عَاذَ |
+He spits | يَبْصُقُ |
+He stands | يَقِفُ |
+He studied | درس |
+He succeeded/ passed | نَجَحَ |
+He swallowed | بَلِعَ |
+He swallows | يَبْلَعُ |
+He sweeps | يَكْنُسُ |
+He swept | كنس |
+He tasted | ذاق |
+He tastes | يَذُوقُ |
+He thanked | شكر |
+He thanks | يَشْكُرُ |
+He threw | رمى |
+He throws | يَرْمِي |
+He travelled | سار |
+He travels | يسير |
+He turned | دار |
+He turns | يدور |
+He understands | يَفْهَمُ |
+He visited | زار |
+He visits | يزور |
+He walked | مَشَى |
+He walks | يَسِيرُ |
+He washed | غَسَلَ |
+He washes | يَغْسِلُ |
+He weighed | وَزَنَ |
+He weighs | يَزِنُ |
+He went | ذهب |
+He wore/dressed | لبس |
+He worked | عَمِلَ |
+He worshipped | عبد |
+He wrote | كتب |
+My teacher | أستاذي |
+O my dear son | يَا بُنَيَّ |
+O my sons | يَا أَبْنَائِي |
+Did not... | ما |
+As if they (m.pl) | كَأَنَّهُمْ |
+They (dual m/f) | هُمَا |
+They (m) were pleased | فَرِحُوا |
+They (pl.m) | هُمْ |
+They went (m,pl) | ذَهَبوا |
+As if she | كَأَنَّهَا |
+As if they (f,pl) | كَأَنَّهُنَّ |
+There | هناك |
+They (pl.f) | هُنَّ |
+They went (f.pl) | ذَهَبْنَ |
+They went (pl.f) | ذَهَبْنَ |
+Al-hasan an Nadawi | الْحَسَنُ النَّدَوِيُّ |
+She came | جائت |
+She camel | ناقة |
+She died | ماتت |
+She enters | تَدْخُلُ |
+She left | خَرَجَتْ |
+She said | قالت |
+She went | ذَهَبَتْ |
+Hundred and eleven (f) | مِائَةٌ وَإِحْدَى عَشَرَةَ طالبة |
+A room | غرفة |
+A sun | شمس |
+A thousand students | ألف |
+A verb | فِعْلٌ |
+Accept (my prayer) | آمين |
+My people | قَوْمِي |
+Not yet | لَمَّا |
+In opposition to Numbered | عَكْسُ الْمَعْدُودِ |
+Particular to future tense | خَاصُّ بِالْمُسْتَقْبَلِ |
+Particular to past tense | خَاصُّ بِالْمَاضِي |
+Praise belongs to Allah | الحَمْدُ لله |
+Quarter to nine | التَّاسِعَةُ إِلَّا رُبْعاً |
+to listen | يستمع | yastami'
+Endings of present tense verbs | حَالَاتُ الْمُضَارِعِ الثلاث |
+Kingdom of Saudi Arabia | المملكة العربية السعودية |
+Meeting of two sukoons | الْتِقَاءُ السَّاكِنَيْنِ |
+Particle of present tense | حَرْفُ الْمُضَارِع |
+Which of them (dual) | أَيُّهُمَا |
+to answer | يجيب | yujib
+to drink | يشرب | yashrab
+To guide | تَدُلِّي |
+to hear | يسمع | yasma'
+to help | يساعد | yusa'id
+to know | يعرف | ya'rif
+to like | يحب | yuhibb
+to live | يعيش | ya'ish
+to make | يصنع | yasna'
+to need | يحتاج | yahtaj
+To pretend | يَتَظَاهِرُ |
+to sit | يجلس | yajlis
+to take | يأخذ | ya'khudh
+to think | يفكر | yufakkir
+To visit | الزيارة |
+to wait | يانتظر | yantazir
+to want | يريد | yurid
+To worship | لنَعْبُدُ |
+to write | يكتب | yaktub
+$1/10^{th}$ of riyaals | قُرُوش |
+Copies of Quran | مَصَاحِفُ |
+Direction of prayer | قبلة |
+Director of company | مدير الشركة |
+Faculty of literature | كلية الآداب |
+Faculty of science | كُلِّيَّةُ الْعُلُوْمِ |
+In front of me | بَيْنَ يَدَيَ |
+In place of/substitute | الْبَدَلُ |
+Indeed, of course, true | بَلَى |
+Letter (of alphabet) | حرف |
+Letter of alphabet | حَرْفٌ |
+Letters (of alphabet) | حروف |
+Ma of questioning | مَا الإِسْتِفْهَامِيَّة |
+O daughter of Bilaal | يَا بِنْتَ بِلالٍ |
+O sister of Haamid | يَا أُخْتَ حَامِدٍ |
+Piece of paper | وَرَقَةٌ |
+Principle of college | عَمِيدٌ |
+Second (unit of time) | ثَانِيَةٌ |
+Seconds (unit of time) | ثَوَانٍ |
+Sign of femininity | عَلَامَةُ التَّأْنِيثِ |
+Sign of plural | عَلَامَةُ الْجَمْعِ |
+Some of them (pl.f) | بعضهن |
+Some of them (pl.m) | بَعْضُهُمْ |
+Tin of sweets | عُلْبَةُ الْحَلْوَى |
+Weak of Ayn | الْمُعْتَلُ الْعَيْنِ |
+Weak of Fa | الْمُعْتَلُ الْفَاءِ |
+Weak of Lam | الْمُعْتَلُّ اللام |
+ما of negation | مَا النَّافِيَة |
+Caller to prayer | مُؤَذَنَ |
+to buy | يشتري | yashtari
+to clean | ينظف | yunazzif
+to close | يغلق | yughliq
+to cook | يطبخ | yatbukh
+to hate | يكره | yakrah
+to learn | يتعلم | yata'allam
+to look | ينظر | yanzur
+To meet | لِقَاء |
+to open | يفتح | yaftah
+to play | يلعب | yal'ab
+to read | يقرأ | yaqra'
+to run | يجري | yajri
+to sell | يبيع | yabi'
+to sleep | ينام | yanam
+to speak | يتكلم | yatakallam
+to stand | يقف | yaqif
+to study | يدرس | yadrus
+to understand | يفهم | yafham
+to wake up | يستيقظ | yastayqiz
+to walk | يمشي | yamshi
+to work | يعمل | ya'mal
+Copy of Quran | مُصْحَفُ |
+Faculty of commerce | كُلِّيَّةُ التَّجَارَةِ |
+Month of Rajab | شَهْرُ رَجَب |
+Of course | طبعاً |
+Presence of nun | ثَبُوْتُ النُّونِ |
+Verb of wonder | فِعْلُ التَّعَجُّب |
+Take | خُذْ |
+Go! | اذْهَبْ |
+Come! | تعال |
+Take! | خُذْ |
+no | لا | la
+Some | بَعْضٍ |
+Look! | انْظُرْ |
+In agreement toNumbered | وَقْفُ الْمَعْدُودِ |
+What is your (sing.m) language? | مَا لُغَتُكَ؟ |
+what is your name | ما اسمك | ma ismak
+May Allah increase your knowledge | زَادَكَ اللَّهُ عِلْمًا |
+Give me (f.s) | هَاتِي |
+Give me (m.s) | هَاتِ |
+In Allah's protection | فِي أَمَانِ الله |
+In front | أَمَامَ |
+Don't go | لا تَذْهَبْ |
+Emphasis for negative future | أبداً |
+Emphasis for negative past | قط |
+For what | لم |
+How much for | بِكُمْ |
+What...? | ؟..ا |
+Give me (f.pl) | هَاتِينَ |
+Give me (m.pl) | هَاتُوا |
+With me | بِي |
+Your (pl.m) (attached pronoun) | كُمْ |
+Your (sing.m) mother | أُمُّكَ |
+Your(sing.m) brother | أَخُوكَ |
+Your (attached pronoun pl.f) | كُنَّ |
+From them | منهم |
+Come along | هيا بنا |
+Between them | بَيْنَهُمَا |
+Its meaning | معناه |
+Its origin | أَصْلُهُ |
+People/companions | أَصْحَابُ |
+who | من | man
+why | لماذا | limadha
+Is so/likewise | كذلك |
+Show me | أَرَنِي |
+Other (m,pl) | آخِرُونَ |
+At ease | سَهْلاً |
+At home | أَهْلاً |
+May Allah cure him | شَفَاهُ الله |
+Than him | مِنْهُ |
+Than her | مِنْهَا |
+Take (command) | خُذْ |
+Take rest | استرح |
+Take rest (pl) | اسْتَرِيحُوا |
+excuse me | عفوا | afwan
+Now/just now | الآن |
+Than us | مِنَّا |
+What Allah wills | مَا شَاءَ الله |
+With what | لهم |
+Negative particle with present tense verb | لَمْ |
+Verb with double radical | الْفِعْلُ الْمُضَعَّفُ |
+Who/which (sing.f) | التي |
+Who/which (m.s) | الذي |
+From what | مِمَّ |
+marf'oo with fixed nun | تُرْفَعُ بِثَبُوتِ النُّوْنِ |
+Verb with weak 1st radical | الْفِعْلُ الْمِثَالُ |
+Verb with weak 2nd radical | الْفِعْلُ الأَجْوَفُ |
+Verb with weak 3rd radical | الْفِعْلُ النَّاقِصُ |
+With (restrictions) | عند |
+With (without restrictions) | مع |
+which | أي | ayy
+where | أين | ayna
+Where/wherever | حَيْثُ |
+Who (m.pl) | الَّذِينَ |
+How many/much | كم |
+how much | كم | kam
+Who (f.pl) | اللاتي |
+whose | لمن | liman
+Also | أيضاً |
+Is befitting | يَنْبَغِي |
+Twenty one (m) | وَاحِدٌ وَعِشْرُونَ |
+One eighth | ثُمْنٌ |
+One fifth | خُمْسٌ |
+One ninth | تسع |
+One sixth | سدس |
+One third | ثلث |
+Twenty one students | إِحْدَى وَ عِشْرُونَ طالبة |
+Hi is killing | يَقْتُلُ |
+Is about, almost, become | يَكَادُ |
+One (m) | واحد |
+One (f) | واحدة |
+One fourth | ربع |
+One hundred thousand | مِئَةُ أَلْفِ طَالِبٍ طَالِبَةٍ |
+One seventh | سبع |
+One tenth | عشر |
+Allah is our | الله رَبُّنَا |
+Here is | هَهُنَا |
+Is still | لا يَزَالُ |
+Is sufficient/enough | يَكْفِي |
+Islam is our | الإسلام ديننا |
+Muhammad is | محَمَّدٌ نَبِيُّنَا |
+Was about, almost, become | کاد |
+First (m) / (f) | الأَوَّلُ / الأولى |
+These (pl. m/f) | هؤلاء |
+By Allah... | وَاللَّهِ |
+Like.. | ك |
+because | لأن | li'anna
+Most beloved/dearest | أَحَبُّ |
+Most delicious | أَلَدُّ |
+O our Lord | يَا رَبَّنَا |
+Our house | بيتنا |
+Most famous | أَشْهَرُ |
+Here | هنا |
+Well | جيدًا |
+time | وقت | waqt
+Only | فقط |
+two | اثنان | ithnan
+Back | ظهر |
+Very | جدا |
+new | جديد | jadid
+year | سنة | sanah
+Many | كثيرة |
+Two windows | نافذتان |
+Two sukoons don't meet | لا يَلْتَقِي سَاكِنَانِ |
+good evening | مساء الخير | masa' al-khayr
+good morning | صباح الخير | sabah al-khayr
+Twenty two (m) | إِثْنَانِ وَعِشْرُونَ |
+Well known | مشهور |
+Her (attached pronoun) | ها |
+Afternoon/time | عصر |
+Twenty two students | اثْنَتَانِ وَ عِشْرُونَ طَالِبَةٌ |
+Two faced (hypocrite) | ذُو وَجْهَيْنِ |
+without | بدون | bidun
+Final/Last | أَخِيرٌ |
+between | بين | bayn
+Ask (s.f) | اسْأَلِي |
+Those (pl.m/f) | أُوْلَئِكَ |
+Two (m) | إثْنَانِ |
+Two hundred (m) students | مِائَنَا طَالِبٍ |
+Path/Way | طَرِيق |
+Two (f) | إثنتان |
+Two hundred | مائتان |
+Two hundred (f) students | مِائَتَا طَالِبَةٍ |
+Two hundred thousand | مِائَتَا أَلْفِ طَالِب طَالِبَةٍ |
+Two students | طالبان |
+Two thousand | أَلْفَانِ |
+Last night | بَارِحَةٌ |
+Last week | الأُسْبُوعُ الْمَاضِي |
+Many times | مرات |
+Sit! | اجلس |
+Eat! | كل |
+Work | عَمَلٌ |
+old | قديم | qadim
+Open | مَفْتُوحٌ |
+Run | اخر |
+Sell | بع |
+New (pl.m/f) | جدد |
+Very much/ many | كثيرا |
+New (f) | جديدة |
+New York | نِيُويُورك |
+May Allah grant success | وَفَقَكَ الله |
+Next year | الْعَامُ الْمُقْبِلُ |
+Open! | افْتَحْ |
+Play! | الْعَبْ |
+Read! | اقْرأْ |
+nine | تسعة | tis'a
+Don't drink | لا تشرب |
+Don't sit | لا تَجْلِس |
+Don't write | لا تكتب |
+five | خمسة | khamsa
+six | ستة | sitta
+Don't run | لَا تَجْرِ |
+Under/beneath | تحت |
+Stop/station | محطة |
+During | فِي أَثْنَاءِ |
+Drink! | اشْرَبْ |
+Teacher/ Professor | أسْتَاذُ |
+long | طويل | tawil
+four | أربعة | arba'a
+ten | عشرة | 'ashara
+Young man | فتی |
+Stand/stop! | قُمْ |
+Stop/stand! | قف |
+Head teacher | موجه |
+Watch | سَاعَةٌ |
+Middle school | الْمَدَرَسَةُ الْمُتَوَسِّطَةُ |
+Young woman | فتاة |
+Teacher (f) | مُدَرِّسَةٌ |
+Teacher | مدرس |
+bad | سيء | sayyi'
+Part | جُزْء |
+Few | قليلة |
+food | طعام | ta'am
+Old (pl.m/f) | قُدَامَى |
+Learned man/ Old man | عَالِمٌ |
+Work (pl) | أَعْمَالُ |
+Learned men/ Old men | عُلماء |
+school | مدرسة | madrasa
+Student (f) | طبيبة |
+Student | طالب |
+Twenty nine (m) | تِسْعَةٌ وَعِشْرُونَ |
+Five fathers | خَمْسَةُ آباء |
+Nine (f) | تسعة |
+Nine hundred students | تِسْعُمِائَةِ طَالِبٍ طَالِبَةٍ |
+Twenty nine students | تِسْعٌ وَ عِشْرُونَ طَالِبَةً |
+Nine thousand | تسعة آلاف |
+Five (m) | خَمْسَةٌ |
+Twenty eight (m) | ثَمَانِيَةٌ وَعِشْرُونَ |
+Twenty five (m) | خَمْسَةٌ وَعِشْرُونَ |
+Twenty four (m) | أَرْبَعَةٌ وَعِشْرُونَ |
+Twenty seven (m) | سَبْعَةٌ وَعِشْرُونَ |
+Twenty six (m) | سِيَّةٌ وَعِشْرُونَ |
+Twenty three (m) | ثَلاثَةٌ وَعِشْرُونَ |
+Six women | ست نساء |
+Three sons | ثلاثة أَبْنَاء |
+Twenty three students | ثَلاثَ وَ عِشْرُونَ طَالِبَةٌ |
+O dear father | يَا أَبَتِ |
+Six men | ستة رجال |
+Five hundred students | خَمْسُمِائَةِ طَالِبٍ طَالِبَةٍ |
+Five mothers | خَمْسُ أُمَّهَاتِ |
+Five thousand | خَمْسَةُ آلاف |
+Twenty five students | خَمْسٌ وَ عِشْرُونَ طالبة |
+Person/companion | صَاحِبٌ |
+Clinic/small hospital | مُسْتَوْصف |
+Small mountain | جُبَيْلٌ |
+Six (f) | ستة |
+Six hundred students | سِمِائَةِ طَالِبٍ طَالِبَةٍ |
+Six thousand | ستة آلاف |
+Twenty six students | سِتْ وَ عِشْرُونَ طَالِبَةٌ |
+Four brothers | أَرْبَعَةُ إِخْوَة |
+Four sisters | أَرْبَعُ أَخَوَاتِ |
+Twenty four students | أَرْبَعٌ وَ عِشْرُونَ طَالِبَةٌ |
+Twenty seven students | سَبْعٌ وَ عِشْرُونَ طَالِبَةٌ |
+eight | ثمانية | thamaniya
+Eight (f) | ثَمَانِيَةٌ |
+Eight houses | ثَمَانِيَةُ بُيُوتِ |
+Eight hundred students | ثَمَانِمِائَةِ طَالِبٍ طَالِبَةٍ |
+Eight rooms | ثَمَانِي غُرَف |
+Eight thousand | ثَمَانِيَةُ آلاف |
+Twenty eight students | ثَمَانٍ وَ عِشْرُونَ طَالِبَةٌ |
+$1^{s+}$ person | الْمُتَكَلِّمُ |
+week | أسبوع | usbu'
+Big (pl.m/f) | كبار |
+High, loud (m) | عال |
+Ten (m) | عشر |
+Right hand | يَمِينُ |
+Young women | فتيات |
+family | عائلة | 'a'ila
+three | ثلاثة | thalatha
+Three (f) | ثلاثة |
+Three daughters | ثلاث بنات |
+Three hundred students | ثَلَا تُمِائَةِ طَالِب طَالِبَةٍ |
+Three hundred thousand | ثَلاثَمِائَةِ أَلْفِ |
+Three thousand | ثلاثة آلاف |
+High loud (f) | عالية |
+Big (f) | كبيرة |
+Young men | فتية |
+friend | صديق | sadiq
+Friend (pl) | أصدقاء |
+$2^{nd}$ person | الْمُخَاطَبُ |
+$3^{rd}$ person | الْغَائِبُ |
+Small dog | كليب |
+Small river | نُهَير |
+Four (f) | أَرْبَعَةٌ |
+Four hundred students | أَرْبَعُمِائَةِ طَالِبٍ طَالِبَةٍ |
+Four hundred thousand | أَرْبَعُمِائَةِ أَلْفِ |
+Four thousand | أَرْبَعَةُ آلاف |
+seven | سبعة | sab'a
+Seven (f) | سبعة |
+Seven hundred students | سَبْعُمِائَةِ طَالِبٍ طَالِبَةٍ |
+Seven students | سَبْعَة طلاب |
+Seven students (f) | سبع طالبات |
+Seven thousand | سبعة آلاف |
+Ten (f) | عشرة |
+Ten thousand | عَشَرَةُ آلاف |
+easy | سهل | sahl
+hot | حار | harr
+Eye | عَيْنٌ |
+cold | بارد | barid
+red | أحمر | ahmar
+blue | أزرق | azraq
+sad | حزين | hazin
+Small (pl.m/f) | صغار |
+place | مكان | makan
+Prayer place | مُصلَّى |
+Small boy | ولَيْدٌ |
+small | صغير | saghir
+Small (f) | صغيرة |
+happy | سعيد | sa'id
+Cover (book) | غلاف |
+above | فوق | fawq
+Hundred | مائة |
+More beautiful | أَحْمَلُ |
+beautiful | جميل | jamil
+Number | رَقَمٌ |
+Next week | الأَسْبُوعُ الْقَادِمُ |
+Hard/difficult | صعبة |
+Public announcement | إِعْلان |
+White/black board | سبورة |
+Fifty | خَمْسُونَ |
+white | أبيض | abyad
+White (f) | بَيْضَاءُ |
+Forty | أَرْبَعُوْنَ |
+twenty | عشرون | 'ishrun
+Thirty | ثَلاثُونَ |
+fifteen | خمسة عشر | khamsa 'ashar
+fourteen | أربعة عشر | arba'a 'ashar
+thirteen | ثلاثة عشر | thalatha 'ashar
+twelve | اثنا عشر | ithna 'ashar
+Party/group | طائفة |
+Left hand | يَسارُ |
+black | أسود | aswad
+Black (f) | سَوْدَاءُ |
+Red (f) | حَمْرَاءُ |
+Blue (f) | زَرْقَاء |
+Green (f) | خَضْرَاءُ |
+Thousand | ألف |
+green | أخضر | akhdar
+eleven | أحد عشر | ahad 'ashar
+Firm/company | شركة |
+Indonesia | إندونيسيا |
+Going | ذَهَابٌ |
+Beginning | بدء |
+window | نافذة | nafidha
+Prisoner | أسير |
+Windows | نَوَافِذُ |
+Feminine | مُؤَنَّتْ |
+nineteen | تسعة عشر | tis'a 'ashar
+Ninety | تِسْعُونَ |
+Anything | شَيْءٌ |
+Business | متجر |
+Since | منذ |
+office | مكتب | maktab
+Question | سؤال |
+phone | هاتف | hatif
+morning | صباح | sabah
+Coming | مقبل |
+Everyone | جَمِيعٌ |
+Minutes | دقائق |
+Doctor | طبيب |
+Anyone | أَحَدٌ |
+minute | دقيقة | daqiqa
+Questions | أسئلة |
+Building | عِمَارَةٌ |
+Foreign! | أَجْنَبِيَّةٌ |
+Welcome | مَرْحَباً |
+Actions | أَعْمَالُ |
+China | الصين |
+History | تَارِيخ |
+dinner | عشاء | 'asha'
+evening | مساء | masa'
+Increase | مَزِيدٌ |
+Minister | وزير |
+goodbye | وداعا | wada'an
+Sitting | جالس |
+Standing | واقف |
+London | لَنْدَن |
+station | محطة | mahatta
+Mistake | خطأ |
+Sixty | سِتُّونَ |
+Director | موجه |
+India | الهند |
+Indian | هندي |
+eighteen | ثمانية عشر | thamaniya 'ashar
+Institute | مَعْهَدٌ |
+Lines | خُطُوط |
+Meaning | مَعْنَى |
+Train | قِطَارٌ |
+Believers | مُؤْمِنُونَ |
+Choosing | مُختار |
+Mountains | جبال |
+Religion | دين |
+Airlines | خُطُوطُ جَوِيَّةٍ |
+Category | قسم |
+Engineer | مهندس |
+Inspector | مفتش |
+Ministers | وزَرَاء |
+Sleeping | نَائِمٌ |
+Spring | الربيع |
+Stations | مَحَطَّاتُ |
+Stories | قصص |
+Telephone | هَاتِفُ |
+Visiting | زِيَارَةٌ |
+Weather | جو |
+Winter | الشتاء |
+Believer | مُؤْمِنٌ |
+Buildings | عَمَائِرُ |
+Clinic | مستوصف |
+Clothing | ثِياب |
+Finger | إصبع |
+Forbidden | ممنوع |
+Hussain | الْحُسَيْنُ |
+Magazine | مَجَلَّة |
+Magazines | مجلات |
+Medicine | دَوَاء |
+Medicines | أَدْوِيَةٌ |
+Reception | اسْتِقْبَالُ |
+Relative | قَرِيبٌ |
+Returning | رُجُوعٌ |
+Singular | الْمُفْرَدُ |
+sixteen | ستة عشر | sitta 'ashar
+Stone | حجر |
+Toilets | مَرَاحِيْضُ |
+Aaminah | آمنة |
+Ascending | صُعُود |
+Belgium | بلجيكا |
+Bowing | رُكُوعٌ |
+Doctors | أَطباء |
+Donkey | حمار |
+Donkeys | حمُرٌ حَميرٌ |
+Eighty | ثَمَانُونَ |
+Engineers | مُهَنْدِسُونَ |
+Exiting | خروج |
+Fathers | آباء |
+Fatimah | فاطمة |
+Indians | هنود |
+Lined | مُسَطر |
+Masculine | الْمُذَكِّرُ |
+Maternity | ولادة |
+Minaret | مَنَارَةٌ |
+Minarets | مَنَائِرُ |
+Monies | نُقُودٌ |
+Obligated | وَجَبَ |
+onion | بصل | basal
+Predicate | الْخَبَرُ |
+Relatives | أَقْرِبَاءُ |
+Scorpion | عَقْرَبُ |
+Scorpions | عَقَارِبُ |
+Sweetmeat | حَلْوَى |
+Toilet | مرحاض |
+Twins | تَوْءَمَانُ |
+Unmindful | غَافِلُ |
+Watches | ساعات |
+Wine (pl) | خمور |
+Zainab | زَيْنَبُ |
+Late (m) | متأخراً |
+Countries | بلاد |
+today | اليوم | al-yawm
+President | رئيس |
+hello | مرحبا | marhaba
+Further | أبْعَدُ |
+Radio set | مِدْيَاعٌ |
+Different | مختلف |
+Field | حقل |
+Others | آخَرُونَ |
+tomorrow | غدا | ghadan
+Africa | إفريقيا |
+Reason | سبب |
+Outside | خَارِجٌ |
+Story | قِصَّة |
+Times | أوقات |
+Late (f) | مُتَأَخِّرَةً |
+sister | أخت | ukht
+Available | موجود |
+Answer | جَوَابٌ |
+Period | لِمُدَّةِ |
+Sometimes | أحياناً |
+Age/tooth | مین |
+Dual form | التَّثْنِيَةُ |
+Married | ورر متزوج |
+Sick (pl) | مَرْضَى |
+Tooth/age | سن |
+Accident | حَادِتْ |
+Picture | صُورَةٌ |
+Stupid | أَحْمَقُ |
+Marriage | نكَاح |
+Sweet | حلو |
+afraid | خائف | kha'if
+coffee | قهوة | qahwa
+Dollars | دولارات |
+Numbers | أَرْقَامُ |
+Quiet! | اسكت |
+Voice | صوة |
+chair | كرسي | kursi
+dirty | وسخ | wasikh
+Middle | متوسط |
+month | شهر | shahr
+Paris | باريس |
+Stick | عصا |
+Strong | قوي |
+America | أَمْرِيكا |
+Hearts | قُلُوبٌ |
+Months | شهور ، ، اشهر |
+Pakistan | باكستان |
+Pupil (f) | تلْمِيذَةٌ |
+Rich (pl) | أَغْنِيَاءُ |
+tired | متعب | mut'ab
+Visit! | زر |
+Faith | إِيْمَانُ |
+hospital | مستشفى | mustashfa
+kitchen | مطبخ | matbakh
+Muslims | مُسْلِمُونَ |
+Piece | قِطْعَةٌ |
+Primary | الإبتدائية |
+shirt | قميص | qamis
+Sisters | أَخَوَاتُ |
+Spanish | إسبانية |
+airport | مطار | matar
+bedroom | غرفة نوم | ghurfat nawm
+chicken | دجاج | dajaj
+clothes | ملابس | malabis
+difficult | صعب | sa'b
+Distance | مسافة |
+Families | أسر |
+Heavy | ثقيل |
+Islamic | إسْلَامِيَّةٌ |
+Knowledge | عِلْمٌ |
+Kuwait | الْكُوَيْتُ |
+Nigeria | نيجيريا |
+Price | ثَمْنٌ |
+Sentence | جملة |
+store | متجر | matjar
+Syria | سُوريا |
+Tickets | تَذَاكِرُ |
+Treatment | علاج |
+Village | قَرْيَةٌ |
+Answers | أَحُوبَةٌ |
+bathroom | حمام | hammam
+Delicious | لذيذ |
+Easier | أَسْهَلُ |
+Fields | حُقُولٌ |
+Lessons | دروس |
+Medium | وَسِيْط |
+Noise | ضَوْضَاء |
+Pictures | صور |
+Secondary | ثانوية |
+Thief | لص |
+Weak (pl) | ضعاف |
+Wednesday | يَوْمُ الْأَرْبِعَاءِ |
+William | وِلْيَمُ |
+Button | زر |
+Chickens | دَجَاجَات |
+Copies | نُسَخ |
+Forest | غَابَةٌ |
+healthy | صحي | sihi
+Heavens | سَمَوَاتٌ |
+Hitler | هتلر |
+Istanbul | إصطنبول |
+library | مكتبة | maktaba
+Malaysia | ماليزيا |
+Saturday | يَوْمُ السَّبْت |
+softer | أَلْيَنُ |
+Sweep! | اكنس |
+Tongue | لِسَانُ |
+Voices | أَصْوَاتُ |
+Wheel | عجلة |
+Youth | شاب |
+Arabic | الْعَرَبِيَّةُ |
+Beard | لحية |
+Bells | أَجْرَاسُ |
+Buttons | أَزْرَار |
+Chairs | کراسی |
+Cheap | رَخِيْصَةٌ |
+cheese | جبن | jubn
+Chest | صدر |
+Christian | نَصْرَانِي |
+Egyptian | مِصْرِي |
+Factory | مصنع |
+Faisal | فَيْصَلِّ |
+Flies | ذُبَّان |
+fruit | فاكهة | fakihah
+Fruits | فَوَاكِهُ |
+Habits | عادات |
+juice | عصير | 'asir
+Lesson | درس |
+Libraries | مكتبات |
+Mirror | مراة |
+Mixed | مُخْتَلِطٌ |
+Monday | يَوْمُ الإِثْنَيْنِ |
+Muslim | مُسْلِمٌ |
+Neighbour | جَارُ |
+Pillow | مخدة |
+plate | صحن | sahn
+Pupil | تِلْمِيذُ |
+Pupils | تلامذة |
+rejoice | أَبْشر |
+Retired | مُتَقَاعِدٌ |
+Righteous | صالح |
+Riyadh | الرياض |
+Seats | مَقَاعِدُ |
+Spacious | واسع |
+Teachers | مُدَرِّسُوْنَ |
+Ticket | تَذْكِرَةٌ |
+Aa'isha | عَائِشَة |
+Airplane | طائرة |
+Airplanes | طائرات |
+Barber | حلاق |
+Barbers | حَلاقُوْنَ |
+Bashir | بشير |
+Bicycle | دَرَّاجَةٌ |
+Bikes | دراجات |
+Bilal | بلال |
+Cairo | القاهرة |
+Charity | صَدَقَاتُ |
+Cheaper | أَرْخَصُ |
+Dollar | دولار |
+Doors | أَبْوَبٌ |
+Driver | سَائِقُ |
+Expensive | غال |
+Faculties | كليات |
+Fattah | فَتْحَةٌ |
+Flats | شقق |
+Flower | زَهْرَةٌ |
+Friday | يَوْمُ الْجُمُعَةِ |
+Fridge | ثلاجة |
+Genitive | مجرور |
+Grandson | حفيد |
+Grandsons | حفدة |
+Haamid | حامد |
+Haashim | هَاشِمٌ |
+Habit | عَادَةٌ |
+Haroon | هَارُونَ |
+Headache | صُداعٌ |
+Hishaam | هِشَامٌ |
+Holiday | عطلة |
+Husayn | حُسَيْنُ |
+Iblees | إِبْلِيسُ |
+Ibraheem | إِبْرَاهِيمُ |
+Idrees | إِدْرِيسُ |
+Iqrimah | عكرمة |
+Ishaaq | إسْحَاقُ |
+Ismaeel | إِسْمَاعِيلَ |
+Jibraeel | جبرائيل |
+Khaalid | خالد |
+Khartoum | الْخُرْطُوْمُ |
+Kilogram | كِيلُو غِرَامٌ |
+Kilometre | كِيلُوْ مِتْرٌ |
+Knife | سكين |
+Laila | لَيْلَى |
+Lentil | عَدَس |
+Lewis | لويس |
+Likewise | كذلك |
+Lists | قَوَائِمُ |
+Memorise! | احْفَظْ |
+Midday | ظهر |
+Mikaeel | ميكائيل |
+Mirrors | مرايا |
+Mothers | أُمَّهَاتُ |
+Narrated | روى |
+Negated | مَنْفِي |
+Niche | محراب |
+Particle | الْحَرْفُ |
+Pathway | طريق |
+pencil | قلم رصاص | qalam rasas
+Pilgrim | حاج |
+Pilgrims | حجاج |
+Pillows | مَخَادٌ |
+Policeman | شرطی |
+Policemen | شرطة |
+potato | بطاطس | batatis
+Prize | جَائِزَةٌ |
+Prizes | جَوَائِزُ |
+Recite | اتْلُ |
+Rivers | أَنْهَارُ |
+Riyaals | ريالات |
+Riyal | ريال |
+Safiyyah | صفية |
+Saturn | زُحَلُ |
+seventeen | سبعة عشر | sab'a 'ashar
+Seventy | سبعون |
+Shirts | قُمْصَانٌ |
+Spoon | ملعقة |
+Staircase | سلم |
+Sulaiman | سُلَيْمَانُ |
+Tawheed | التَّوْحِيدُ |
+Thieves | لصوص |
+thirsty | عطشان | 'atshan
+tomato | طماطم | tamatim
+Turkish | تركية |
+Unmarried | عَرَبُ |
+vegetable | خضار | khudar
+Wheels | عجلات |
+Width | عَرْضُ |
+Wives | زَوْجَات |
+Yaasir | ياسر |
+Brown (m) | أَسْمَرُ |
+Early (m) | مبكراً |
+Much more | أكثر |
+Sa'd | سعد |
+sorry | آسف | asif
+please | من فضلك | min fadlak
+Never | أبداً |
+Thank! | اشْكُرْ |
+Years | سنوات |
+Women | نِسَاءً |
+Law court | مَحْكَمَةٌ |
+Always | دَائِماً |
+country | بلد | balad
+Level | مَرْحَلَةٌ |
+Thanks | شكرًا |
+daughter | بنت | bint
+Moment | لحظة |
+Address | عُنْوَانٌ |
+Return! | ارْجِعْ |
+Future | مُسْتَقْبَل |
+Agreement | وقف |
+Areas | أحياء |
+Hands | أَيْدٍ |
+Letter | رِسَالَةٌ |
+Sea (pl) | بحار |
+table | طاولة | tawila
+husband | زوج | zawj
+Early (f) | مُبَشِّرَةً |
+Example | مثال |
+Subject | الْمُبْتَدَأُ |
+Allah | الله |
+market | سوق | suq
+paper | ورق | waraq
+Several | عدة |
+clean | نظيف | nazif
+Closed | مُغْلَقٌ |
+dress | فستان | fustan
+lunch | غداء | ghada'
+Names | أَسْمَاءِ |
+George | جرج |
+Germany | أَلْمَانِيَا |
+Mouth | فم |
+Sa'ad | سَعَادٌ |
+Smell | رَائِحَةُ |
+Speech | كلام |
+yesterday | أمس | ams
+angry | غاضب | ghadib
+Europe | أُوْرُبا |
+Banks | مَصَارِفُ |
+Brown (f) | سَمْرَاءُ |
+Famous | شهير |
+hungry | جائع | ja'i'
+Leader | إِمَامٌ |
+Nurse | مُمَرِّضَةٌ |
+pants | بنطال | bantal
+Poor (pl) | فقَرَاء |
+short | قصير | qasir
+Tall (f) | طويلة |
+brown | بني | bunni
+church | كنيسة | kanisa
+Egypt | مصر |
+Entry | دُخُولٌ |
+France | فَرَنْسَا |
+Judge | قَاضِ |
+Language | لغة |
+Manner | خُلُق |
+Students | طلاب |
+Summer | الصيف |
+Tea cup | فنجان |
+Tea cups | فَنَاجِينُ |
+uncle | عم | 'amm
+Broken | مَكْسُورٌ |
+Complete | كَامِلٌ |
+Guests | ضيوف |
+Horse | حصان |
+hotel | فندق | funduq
+Lawyer | مُحَامٍ |
+Letters | رَسَائِلُ |
+Madam | سَيِّدَة |
+Parts | أَنْحَاءُ |
+Player | لاعب |
+Sample | نَمُوذَج |
+Schools | مَدَارِسُ |
+Search | بحث |
+Shops | دَكَاكِينُ |
+street | شارع | shari'
+Success | نَجَاحٌ |
+Sudan | السُّوْدَانُ |
+Taste! | دق |
+Teams | فُرَقَاءُ |
+Turkey | تركيا |
+Words | كلمات |
+breakfast | فطور | futur
+Dumb (pl) | أَغْبَيَاءُ |
+Enter! | ادْخُلْ |
+Football | كُرَةُ الْقَدَمِ |
+Houses | بيوت |
+Japan | الْيَابَانُ |
+Leg/foot | رجل |
+orange | برتقالي | burtuqali
+Rooms | غُرَفٌ |
+shoes | حذاء | hidha'
+Stars | نُجُوم |
+Addresses | عَنَاوِينُ |
+Autumn | الْخَرِيْفُ |
+Books | كتب |
+computer | حاسوب | hasub
+England | إِنْكَلْتَرًا |
+Examples | أَمْثَلَةٌ |
+Graves | قُبُورٌ |
+Greece | الْيُونَانُ |
+Length | طول |
+Meters | أَمْتَارُ |
+Older | أَقْدَمُ |
+Palms | أكف |
+Players | لاعِبُوْنَ |
+Pounds | جنيهات |
+Ramadan | رَمَضَانُ |
+Severe | شَدِيدٌ |
+Sharp | حاد |
+Slowly | مَهْلاً |
+Spouse | زوج |
+Steam | بُخَارٌ |
+Stranger | غَرِيبٌ |
+sugar | سكر | sukkar
+Sunday | يَوْمُ الْأَحَدِ |
+Valley | وَادٍ |
+Abdullah | عبد الله |
+Ahmad | أَحْمَدُ |
+apple | تفاح | tuffah
+brave | شجاع | shuja'
+bread | خبز | khubz
+Butter | زبد |
+Colder | أَبْرَدُ |
+Colours | أَلْوَانُ |
+Correct | صَحِيح |
+Embassy | سِفَارَةٌ |
+Erase | امْحُ |
+Farmer | فلاح |
+Faster | أَسْرَعُ |
+Females | إناث |
+Fever | بُخَار |
+Garbage | قُمَامةٌ |
+Gentleman | سيد |
+Glass | كُوبٌ |
+Horses | خُيُولٌ |
+Hu runs | يَجْرِي |
+Languages | لغات |
+Merchants | تجار |
+Museum | متحف |
+narrow | ضيق | dayyiq
+Newspaper | صحف |
+notebook | دفتر | daftar
+Object | مَفْعُولُ بِهِ |
+Passenger | راكب |
+Pocket | جيب |
+Rulers | مَسَاطِرُ |
+Scholars | شيوخ |
+Snake | حَيَّةٌ |
+Strangers | غُرَبَاءُ |
+Su'aad | سُعَادُ |
+Throw | ازم |
+Thursday | يَوْمُ الْخَمِيسِ |
+Tuesday | يَوْمُ الثَّلَاثَاءِ |
+yellow | أصفر | asfar
+Yemen | الْيَمَنُ |
+Absent | غائب |
+Abu Bakr | أبو بكر |
+Adhan | أَذَانٌ |
+Adnaan | عَدْنَانُ |
+Affaan | عفان |
+Akbar | أَكْبَرُ |
+Akhtar | أَخْتَرُ |
+Ameen | آمین |
+Ammaar | عَمَّارٌ |
+Anwar | أَنْوَرُ |
+Baghdad | بَغْدَادُ |
+banana | موز | mawz
+Bananas | موز |
+Bareerah | بَرِيرَةُ |
+Bayrum | بَيْرَمُ |
+Brocade | ديباج |
+Broom | مِكْنَسَةٌ |
+Brooms | مكانس |
+Buses | حافلات |
+Camel | جَمَل |
+Chalk | طَبَا شِيرُ |
+Classroom | فصل |
+Cleaner | أَنْظَفُ |
+Cloth | قماش |
+Cloths | اقْمِشَةٌ |
+Colour | لَوْنَ |
+Coloured | مُلَوَّنٌ |
+Combs | أَمْشَاط |
+Damascus | دمشق |
+Dammah | ضمَّةٌ |
+Dawud | دَاوُدُ |
+Desks | مكاتب |
+Dhul Qada | ذُو الْقَعْدَةِ |
+Edward | إِدْوَرْدُ |
+Envelope | ظرف |
+Envelopes | ظُرُوف |
+Farmers | فَلاحُوْنَ |
+Flour | دقيق |
+Garment | ثَوْبٌ |
+Garments | ثِيَابٌ |
+Ghana | غانا |
+Grapes | عِنَبُ |
+Grocer | بَقَالُ |
+Guest | ضيف |
+Hafsah | حَفْصَةُ |
+Halls | قاعات |
+Hamzah | حَمْزَةً |
+Homework | وَاحِبَاتٌ |
+Hostel | مَهْجَعُ |
+Hostels | مَهَاجِعُ |
+Hotels | فَنَادَقُ |
+Humaayun | هُمَا يُوْنُ |
+Husbands | أَزْوَاجٌ |
+Jafar | جَعْفَرٌ |
+Jeddah | جدة |
+Kabah | كَعْبَة |
+Kasrah | كَسْرَة |
+Khadeejah | خديجة |
+Kulthum | كلثوم |
+Labourer | عَامِلٌ |
+Labourers | عُمَّال |
+Layla | لَيْلَى |
+Mahmood | مَحْمُودٌ |
+Makkah | مكة |
+Males | ذُكور |
+Manners | أخلاق |
+Manzoor | مَنْظُور |
+Marwaan | مَرْوَانُ |
+Maryam | مریم |
+Masood | مسعود |
+Merchant | تاجر |
+Meter | متر |
+Mosques | مَسَاجِدُ |
+Muhammad | مُحَمَّدٌ |
+Museums | مَتَاحِفُ |
+Notebooks | دفاتر |
+Nu'maan | نَعْمَانُ |
+Nurses | مُمَرِّضَاتٌ |
+Pages | صفحات |
+Pharmacy | صَيدَلِيَّةٌ |
+Plural | الْجَمْعُ |
+Pockets | جيوب |
+Pound | جنيه |
+purple | بنفسجي | banafsaji
+Purse | مَحْفَظَةٌ |
+Quraan | قُرْآنٌ |
+Rakah | رَكْعَةٌ |
+Razor | مُوسَى |
+Regularly | بِانْتِظَامٍ |
+Repent! | تب |
+Rooster | ديك |
+Ruler | مسطرة |
+Rupee | رُونِيَّةٌ |
+Rupees | رُونِيَّاتٌ |
+Ruqayyah | رقَيَّةُ |
+Sa'eed | سعيد |
+Salma | سَلْمَى |
+Salmaa | سَلْمَى |
+Salman | سَلْمَانُ |
+Salwah | سَلْوَى |
+Samples | نَمَاذِجُ |
+Saudah | سَوْدَاءُ |
+Scholar | شيخ |
+Severest | أَشَدُّ |
+Shaytaan | شَيْطَانُ |
+shorter | أَقْصَرُ |
+Sleeve | كم |
+Sleeves | أَكْمَامٌ |
+Smaller | أَصْغَرُ |
+Snakes | حيات |
+Sparrow | عُصْفُورٌ |
+Spectacle | نَظَارَةٌ |
+Streets | شَوَارِعُ |
+Sufyaan | سُفْيَانُ |
+Sunset | مغرب |
+Supper | عَشَاءُ |
+Surah | سُوْرَةٌ |
+Surahs | سور |
+Talha | طَلْحَةُ |
+Taller | أَطْوَلُ |
+Telegram | بَرْقِيَّةٌ |
+Telegrams | بَرْقِيَّاتُ |
+Ubayd | عبيد |
+Usaamah | أَسَامَةُ |
+Uthmaan | عُثْمَانُ |
+Wages | أَجْرَتْ |
+Wounded | جَرِيحٌ |
+Yahya | يَحْيَى |
+Yaqub | يعقوب |
+Yunus | يُونُسُ |
+Yusuf | يُوسُفُ |
+Zafar | زُفَرُ |
+Zuhayr | زُهَيْرٌ |
+Indeed/maybe | قَدْ |
+Feminine form | التأنيث |
+Intelligent (f) | ذكِيَّةٌ |
+Nominal sentence | الْجُمْلَةُ الإِسْمِيَّةُ |
+Prisoner (pl) | أَسْرَى |
+Categories | أَقْسَامٌ |
+Intelligent | ذَكِيٌّ |
+Intelligent (pl) | أَذْكِيَاءُ |
+Intentions | نيات |
+Verb categories | أَقْسَامُ الْفِعْلِ |
+Fine | بخير |
+Iron | مكواة |
+Lion | اسد |
+pink | وردي | wardi
+Jinn | جان |
+Wine | خَمْرٌ |
+Don't throw | لَا تَرْمِ |
+Angry (m.sing.) | غَضْبَانُ |
+Eighth (m) / (f) | الثَّامِنُ / الثَّامِنَةُ |
+Hungry (m.sing.) | جَوْعَانُ |
+Lazy (m.sing.) | كسلان |
+Ninth (m) / (f) | التَّاسِعُ / التَّاسِعَةُ |
+Possess (m, sing) | ذُو |
+Sixth (m) / (f) | السَّادِسُ / السَّادِسَةُ |
+Thirsty (m.sing.) | عَطْشَانُ |
+United States | الوِلايَاتُ الْمُتَّحِدَةُ |
+Anything (pl) | أَشْياء |
+Once again | مَرَّةً أُخْرَى |
+Constitution (law) | دستور |
+Everything | كُلِّ شَيْءٍ |
+Money/cash | نقد |
+living room | غرفة جلوس | ghurfat julus
+Next/coming | قَادِمٌ |
+Airlines office | مَكْتَبُ خُطُوط جَوِيَّةٍ |
+post office | مكتب بريد | maktab barid
+Taking/eating | تَنَاوُلُ |
+Rang (phone) | يَرِنُّ |
+Bring (command) | هات |
+Doctor/professor | دكتور |
+Full/satisfied | شَبْعَانُ |
+Writing board | سبورة |
+Foreign minister | وَزِيْرُ الْخَارِجِيَّةِ |
+Definite form | التَّعْرِيفُ |
+Indefinite form | التنكير |
+Masculine form | التَّذْكِيرُ |
+Singular form | الإِفْرَادُ |
+Connection | علاقة |
+Lunch/dinner | غَدَاءٌ |
+Ring! | زِنْ |
+Principles | عُمَدَاءُ |
+Angry (f.sing.) | غَضَبي |
+Conversation | حَدِيث |
+Verily, indeed, | إِنَّ |
+Doctors (f.pl) | دكتورات |
+Hungry (f.sing.) | جَوْعَى |
+Lazy (f.sing.) | کسلي |
+Mistake (pl) | أَخْطَاء |
+Possess (f, sing) | ذَاتُ |
+Thirsty (f.sing.) | عَطْشَى |
+cousin (female) | بنت عم | bint 'amm
+Emphatic negative | لَنْ |
+Indian (pl) | هنود |
+Visiting card | بِطَاقَةٌ |
+cousin (male) | ابن عم | ibn 'amm
+Broadcasting, radio | إِذَاعَةٌ |
+grandfather | جد | jadd
+Pray direction | قبلة |
+Verification | تحقيق |
+Cooking pot | قدر |
+Examination | إختبار |
+Fixed/prescribed | مقررة |
+Hidden pronoun | ضَمِيرٌ مُسْتَتِرُ |
+Iron (metal) | حَدِيدٌ |
+Philippines | الفلبين |
+Useful/beneficial | مفيد |
+Visiting cards | بطاقات |
+Yugoslavia | يُوْغُسَلافيا |
+Arabic dictionary | الْمُعْجَمُ الوَسِيطُ |
+Connections | علاقات |
+Magazine/ Journal | مجلة |
+Magazines/ Journals | مجلات |
+Relative pronouns | الأَسْمَاءُ الْمَوْصُولَةُ |
+television | تلفزيون | tilfiziyun
+Washington | وَاشْنْطُنُ |
+Accusative | مَنْصُوبٌ |
+Aunties (maternal) | حالات |
+Aunties (paternal) | عَمَّاتُ |
+Circumbulate! | طف |
+Clarifies/refines | تُخَلِّص |
+Declension | الإِعْرَابُ |
+Descending | نُزُولُ |
+Dictionaries | مَعَاجِمُ |
+Dictionary | مُعْجَمٌ |
+Disbeliever | كَافِرُ |
+Distinguish (Amr) | میز |
+Drain/sewer | بَالُوْعَةٌ |
+Handwriting | خط |
+Hardworking | مجتهد |
+Hardworking (pl) | مُجْتَهِدُونَ |
+Illuminated | ور منورة |
+indeclinable | مَبْنِي |
+Nominative | مَرْفُوعٌ |
+Packet, tins | علبة |
+Packets, tins | علب |
+Prostration | سجود |
+Quadrilateral | الرباعي |
+Sweetmeats | حَلاوَى |
+Telephones | هَوَاتِفُ |
+Vocative particle | حَرْفُ النَّدَاءِ |
+Kilogram's | كِيلُو غِرَامَاتٌ |
+Tired (m.s) | متعب |
+God | إِلَهُ |
+Sir | سيد |
+Head | رأس |
+baby | رضيع | radi'
+Best | أَطْيَبُ |
+wife | زوجة | zawjah
+Once | مَرَّة مره |
+city | مدينة | madina
+Hair | شعر |
+Air | هَوَاء |
+bed | سرير | sarir
+sick | مريض | marid
+West | مغرب |
+door | باب | bab
+List | قَائِمَةٌ |
+Iraq | العراق |
+Gold | ذَهَبٌ |
+Rich | غَنِيٌّ |
+wide | عريض | 'arid
+Dog | كلب |
+fish | سمك | samak
+meat | لحم | lahm
+Cat | قط |
+Gift | هَدِيَّةٌ |
+oil | زيت | zayt
+Bird | طائر |
+Dogs | كلاب |
+Flat | شقة |
+Iran | إِيْرَانُ |
+Seat | مَقْعَدُ |
+Weak | ضعيف |
+Ali | علي |
+File | ملف |
+hat | قبعة | qubba'a
+milk | حليب | halib
+Soft | لين |
+Asia | آسيا |
+Nail | ظفر |
+rice | أرز | aruzz
+Taxi | سَيَّارَةُ الأُخْرَةِ |
+Beds | سرر |
+Bell | جرس |
+coat | معطف | mi'taf
+Fig | تين |
+Figh | الْفِقْه |
+Gods | آلِهَةٌ |
+Silk | حرير |
+Taif | الطَّائِفُ |
+Tens | عقود |
+Torn | مُمَزَّق |
+Another (m) | آخر |
+Fifth (m) / (f) | الْخَامِسُ / الخَامِسَةُ |
+Fourth (m) / (f) | الرابع / الرَّابِعَةُ |
+Second (m) / (f) | الثَّانِي / الثانية |
+Seventh (m) / (f) | السَّابِعُ / السَّابِعَةُ |
+Tenth (m) / (f) | الْعَاشِرُ / الْعَاشِرَةُ |
+Third (m) / (f) | الثالث / الثَّالِثَةُ |
+Thirst (m+f.pl) | عطاش |
+More better | أَحْسَنُ |
+More difficult | أَصْعَبُ |
+More spacious | أَوْسَعُ |
+Another (dl) | أُخْرَيَانِ |
+Another (f) | أُخْرَى |
+Girl/daughter | بنت |
+Return air ticket | تَذْكِرَةُ الطَّائِرَةِ ذَهَابَاً وإيابًا |
+Daughters/ girls | بنات |
+Present tense | الْمُضَارِعُ |
+Full brother | شَقِيق |
+Full brothers | أَشِقَاءُ |
+Middle/half/mid | منتصف |
+Capital City | عَاصِمَةٌ |
+City district | حَى |
+Taif (City) | الطائف |
+Childhood period | صغر |
+Dear/beloved | حبيب |
+Plural form | الْجَمْعُ |
+Past tense | الْمَاضِي |
+Subject (Verb doer) | فَاعِلٌ |
+Strong, fast | قُوَّة |
+Strong, fast (pl) | قُوَّاتٌ |
+Stupid (pl) | حَمْقَاءُ |
+Difference | فرق |
+Ride! | اركب |
+Calm, quiet | هُدُوء |
+Earth/soil | تُرَابُ |
+English language | اللغة الإنجليزية |
+Voice/ volume | صوت |
+Strong (pl) | أَقْوِيَاء |
+Lady professor | دكتورة |
+Maternal aunt | خالة |
+Muslim (f) | مُسْلِمَةٌ |
+Muslims (f.pl) | مسلمات |
+Neighbour (f) | جَارَةٌ |
+Paternal aunt | عَمَّةٌ |
+Pupil (f.pl) | تِلْمِيذَاتُ |
+Teachers (f.pl) | مُدَرِّسَات |
+university | جامعة | jami'a
+Firms/ Companies | شركات |
+Maternal uncle | خال |
+Paternal uncle | عم |
+Summer holidays | عُطْلَةُ الصَّيْفِ |
+Turkish (language) | تُرْكِيَّة |
+Turkish language | اللُّغَةُ التَّرْكِيَّةُ |
+2 brothers | أَخَوَانٌ |
+grandmother | جدة | jaddah
+Organised/salary | مُرتب |
+Verbal sentence | الْجُمْلَةُ الْفِعْلِيَّةُ |
+Active particle | اسْمُ الْفَاعِل |
+Ambassador | سفير |
+Presidents | رُوَسَاءُ |
+Switzerland | سُويْسَرَا |
+Christians | نَصَارَى |
+Fruit seller | فَاكِهَانِي |
+Garden/paradise | جنة |
+Killed (pl) | قَتْلَى |
+Paradise/ garden | جَنَّةٌ |
+Basketball | كُرَةُ السَّلةِ |
+Beard (pl) | لُحِي |
+Cheese (pl) | حين |
+Fewer/lesser | أَقَلُّ |
+Maid servant | حَادِمَةٌ |
+Neighbours | حِيْرَانُ |
+Paradise/ gardens | جنات |
+Prostrate! | اسْجُد |
+sufficient | كَفَى |
+Ambassadors | سُفَرَاءُ |
+Calmly, quietly | بِهُدُوء |
+Centimetre | سنتيمتر |
+Centimetres | سنتيمترات |
+Colloquial | العامية |
+Differences | فروق |
+Eid ul adha | عيد الأَضْحَى |
+Eid ul fitr | عيد الفطر |
+Handkerchief | منديل |
+Handkerchiefs | مناديل |
+Headmaster | مدير |
+Headmistress | مُدِيرَةٌ |
+Kill! | اقتل |
+Kilometres | كِيلُوْ مِتْرَاتٌ |
+Lesser pilgrimage | عُمْرَةٌ |
+Mu'aawiyah | مُعَاوِيَةُ |
+Municipality | بَلَدِيَّةٌ |
+Pakistanis | بَاكِسْتَانِيُّونَ |
+Paternal aunts | عَمَّاتُ |
+Paternal uncles | أَعْمَامٌ |
+Permissible | يَجُوزُ |
+Similarity | شبه |
+Sour/bitter | دمن |
+Staircases | سَلَالِمُ |
+Tablet/disk | قُرْص |
+Tablets/disks | أقراص |
+Universities | جامعات |
+Virtuous/noble | فَضِيلَةٌ |
+room | غرفة | ghurfa
+Men | رجال |
+Days | أَيَّامٌ |
+Boy | وَلَدٌ |
+car | سيارة | sayyara
+Area | حي |
+Lord | رَبِّ |
+Full | ملان |
+Half | نصف |
+Team | فَرِيقٌ |
+News | أخبار |
+Sea | بحر |
+bank | بنك | bank
+East | مشرق |
+Key | مفتاح |
+Boys | أَوْلاد |
+fast | سريع | sari'
+hour | ساعة | sa'a
+Bus | حافلة |
+Dark | مُظْلِم |
+aunt | عمة | 'ammah
+Page | صفحة |
+Poor | فقير |
+slow | بطيء | bati'
+Busy | مَشْغُولُ |
+tea | شاي | shay
+Cars | سَيَّارَاتٌ |
+Cup | كُوبٌ |
+Hall | قَاعَةٌ |
+park | حديقة | hadiqa
+bag | حقيبة | haqibah
+Copy | نُسْخَةٌ |
+Cure | شفاء |
+Desk | مكتب |
+Dumb | غَبِيٌّ |
+egg | بيض | bayd
+Eggs | بيض |
+Nose | أنْفُ |
+Shoe | حِذَاء |
+Shop | دكان |
+ugly | قبيح | qabih
+Fly | ذُبَابٌ |
+Tree | شَجَرَةٌ |
+zero | صفر | sifr
+Cow | بقرة |
+Dust | تُرَاب |
+Fan | مروحة |
+Lazy | كسلان |
+Mud | طين |
+Musa | مُوسَى |
+Palm | كف |
+pen | قلم | qalam
+Pens | أَقْلَامٌ |
+Star | نَجْمٌ |
+tall | طويل | tawil
+Amr | عَمْرُو |
+Anas | أنس |
+Ayah | آية |
+Ayub | أَيُّوبُ |
+Comb | مشط |
+Dawn | فجر |
+Dual | الْمُثَنَّى |
+Duck | بطة |
+Ear | أذن |
+Eesa | عيسى |
+Jew | یهودی |
+Jews | يهود |
+Keys | مفاتيح |
+Khan | خان |
+Lut | لوط |
+Noun | الاسم |
+Nuh | نُوح |
+Row | صف |
+Rows | صُفُوف |
+salt | ملح | milh
+Soap | صَابُوْنَ |
+Urdu | الأَرْدِيَّةُ |
+Verb | الْفِعْلُ |
+Zoo | حَدِيقَةُ الْحَيَوَانَاتِ |
+110 students (m) | مِائَةٌ وَ عَشَرَةُ طُلاب |
+111 students (m) | مِائَةٌ وَ أَحَدَ عَشَرَ طَالِبًا |
+Absent (m) | غَائِبٌ |
+Angry (m+f.pl) | غضَابٌ |
+Hungry (m+f.pl) | حِيَاعٌ |
+Lazy (m+f.pl) | كُسَالَى |
+Lazy (m,sl) | كَسْلانُ |
+Possess (m,pl) | ذَوُو |
+Short (pl.m/f) | قصار |
+Sleepy (m) | نَعْسَانُ |
+Tall (pl.m/f) | طوال |
+Put! | ضَعْ |
+French (language) | فَرَنْسِيَّةٌ |
+Teeth/age (pl) | أَسْنَانُ |
+Fast! | صم |
+O Abu Bakr | يَا أَبَا بَكْرٍ |
+Fear (command) | خَفْ |
+Fear! | خَفْ |
+Absent (f) | غَائِبَةٌ |
+Faculty/college | كلية |
+Lazy (f,sl) | کسلی |
+Possess (f,pl) | ذَوَاتُ |
+Sleepy (f) | نَعْسَى |
+Students (f.pl) | طبيبات |
+Yellow (f) | صَفْرَاء |
+German language | اللُّغَةُ الْمَانِيَةُ |
+Japanese (language) | الْيَابَانِيَّةُ |
+Parts/corners | أَنْحَاءُ |
+Successful | نَاحِح |
+Successful (pl) | نَاجِحُونَ |
+Wash! | اغسل |
+Glass (pl) | أَكْوَابٌ |
+Passengers | ركاب |
+Playground | مَلْعَبٌ |
+restaurant | مطعم | mat'am
+Verbal noun | مَصْدَر |
+Abdur Rahmaan | عَبْدُ الرَّحْمَانِ |
+Absent (pl) | غَائِبُونَ |
+Blood clot | عَلَى |
+Classrooms | فُصُولٌ |
+Dhul-Qadah | ذُو الْقَعْدَةِ |
+Overturned | يَنْقَلِبُ |
+Poorest/ Poorer | أَفْقَرُ |
+Rakah (pl) | ركعات |
+Rang (verb) | رَنَّ |
+Spectacles | نَظَارَاتٌ |
+Unpleasant | كرية |
+Wounded (pl) | جَرْحَى |
+Present tense accusative | الْمُضَارِعُ الْمَنْصُوبُ |
+Present tense nominative | الْمُضَارِعُ الْمَرْفُوْعُ |
+Commencing/ beginning | بدء |
+Slowly, please, don't hurry | مَهْلاً |
+Full/satisfied (m+f.pl) | شبَاعٌ |
+Full/satisfied (m.sing.) | شَبْعَانُ |
+Present tense jussive | الْمُضَارِعُ الْمَجْزُوا |
+Full satisfied (f.sing.) | شیعی |
+Prescribed text books | كُتب مُقَرَّرَةٌ |
+Figure/built/ stature | قَامَةٌ |
+Comparative/ Superlative | فِعْلُ التَّفْضِيل |
+Grammar/ explanation | النَّحو |
+Festival/ Celebration | عيد |
+Broadcasting, radios | إِذَاعَاتُ |
+Justification motivation | التَّعْلِيلُ |
+Present jussive verb | الْمُضَارِعُ الْمَجْزُومِ |
+Al-Azhar (university) | الأَزْهَرُ |
+Classmate/ Colleague | زميل |
+Colleague/ classmate | زميل |
+Classmates/ Colleagues | زملاء |
