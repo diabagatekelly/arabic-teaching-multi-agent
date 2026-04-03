@@ -205,3 +205,20 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project-specific: Personal planning docs (not architecture)
+SETUP_COMPLETE.md
+PROJECT_MANAGEMENT.md
+IMMEDIATE_NEXT_STEPS.md
+docs/IMPLEMENTATION_PLAN_V2.md
+docs/DUAL_TRACK_STRATEGY.md
+
+# Project-specific: Large files
+models/*.bin
+models/*.safetensors
+models/*.pth
+data/vectorstore/
+data/raw/*.txt
+
+# Project-specific: OS
+.DS_Store

@@ -214,16 +214,38 @@ class VocabularyTeacher:
 - Lines reduced: 12 → 6
 ```
 
-## Integration with Sourcery
+## Integration with Automated Tools
 
-This skill complements Sourcery by focusing on:
-- **Comment quality** (Sourcery doesn't check this)
-- **Function length** (architectural concern)
-- **Architecture patterns** (higher-level than Sourcery)
+This skill complements automated tooling:
 
-Use both:
+**Ruff** (linting + formatting):
+```bash
+ruff check .          # Lint
+ruff format .         # Format
+ruff check --fix .    # Auto-fix
+```
+
+**Mypy** (type checking):
+```bash
+mypy agents/ orchestration/ rag/
+```
+
+**Pre-commit** (runs both automatically):
+```bash
+pre-commit run --all-files
+```
+
+**This skill focuses on:**
+- Comment quality (tools don't check this)
+- Function length (architectural concern)
+- Architecture patterns (higher-level than tools)
+- Code readability (tools can't judge this)
+
+**Workflow:**
 1. Run `/review` for architecture & comment checks
-2. Sourcery handles code smells & refactoring suggestions
+2. Run `ruff check --fix .` for linting
+3. Run `mypy .` for type checking
+4. Sourcery for advanced refactoring (optional)
 
 ## Notes
 
