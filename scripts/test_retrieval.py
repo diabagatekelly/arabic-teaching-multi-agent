@@ -10,7 +10,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from rag.retriever import ExerciseRetriever
+from rag.retriever import ExerciseRetriever  # noqa: E402
 
 
 def print_result(result_num: int, result: any) -> None:

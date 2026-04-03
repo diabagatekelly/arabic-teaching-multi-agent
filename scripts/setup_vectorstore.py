@@ -10,8 +10,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from rag.ingestion import load_templates, prepare_for_ingestion
-from rag.vectorstore import VectorStore
+from rag.ingestion import load_templates, prepare_for_ingestion  # noqa: E402
+from rag.vectorstore import VectorStore  # noqa: E402
 
 
 def main() -> None:

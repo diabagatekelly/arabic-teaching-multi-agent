@@ -93,6 +93,7 @@ class ExerciseRetriever:
             raw_results["documents"][0],
             raw_results["metadatas"][0],
             raw_results["distances"][0],
+            strict=True,
         ):
             results.append(
                 RetrievalResult(
@@ -134,7 +135,7 @@ class ExerciseRetriever:
         )
 
         formatted = []
-        for doc, metadata in zip(results["documents"], results["metadatas"]):
+        for doc, metadata in zip(results["documents"], results["metadatas"], strict=True):
             formatted.append(
                 RetrievalResult(
                     content=doc,
