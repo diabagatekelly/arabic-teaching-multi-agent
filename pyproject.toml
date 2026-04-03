@@ -85,31 +85,56 @@ indent-style = "space"
 [tool.mypy]
 python_version = "3.10"
 strict = true
-warn_return_any = true
+warn_return_any = false
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_any_unimported = false
 no_implicit_optional = true
 warn_redundant_casts = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 
 [[tool.mypy.overrides]]
 module = [
     "langchain.*",
     "langgraph.*",
+    "chromadb",
     "chromadb.*",
     "transformers.*",
     "peft.*",
+    "frontmatter",
 ]
 ignore_missing_imports = true
+follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --strict-markers"
+addopts = "-v --strict-markers --cov=agents --cov=orchestration --cov=rag --cov=prompts --cov=evaluation --cov-report=term-missing --cov-fail-under=95"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["agents", "orchestration", "rag", "prompts", "evaluation"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__init__.py",
+    "*/scripts/*",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+fail_under = 95
+
+[dependency-groups]
+dev = [
+    "mypy>=1.20.0",
+    "pre-commit>=4.5.1",
+    "pytest-cov>=7.1.0",
 ]

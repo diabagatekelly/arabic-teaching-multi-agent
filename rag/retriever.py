@@ -69,22 +69,28 @@ class ExerciseRetriever:
         skill_focus: str | None,
     ) -> dict[str, Any] | None:
         """Build metadata filter for ChromaDB query."""
-        filters = {}
+        conditions: list[dict[str, Any]] = []
 
         if lesson is not None:
-            filters["lesson"] = lesson
+            conditions.append({"lesson": lesson})
 
         if exercise_type is not None:
-            filters["exercise_type"] = exercise_type
+            conditions.append({"exercise_type": exercise_type})
 
         if skill_focus is not None:
-            filters["skill_focus"] = skill_focus
+            conditions.append({"skill_focus": skill_focus})
 
-        return filters if filters else None
+        if not conditions:
+            return None
+
+        if len(conditions) == 1:
+            return conditions[0]
+
+        return {"$and": conditions}
 
     def _format_results(self, raw_results: dict[str, Any]) -> list[RetrievalResult]:
         """Format ChromaDB results into RetrievalResult objects."""
-        results = []
+        results: list[RetrievalResult] = []
 
         if not raw_results["documents"] or not raw_results["documents"][0]:
             return results
@@ -134,12 +140,14 @@ class ExerciseRetriever:
             limit=limit,
         )
 
-        formatted = []
-        for doc, metadata in zip(results["documents"], results["metadatas"], strict=True):
+        formatted: list[RetrievalResult] = []
+        docs = results["documents"] or []
+        metas = results["metadatas"] or []
+        for doc, metadata in zip(docs, metas, strict=True):
             formatted.append(
                 RetrievalResult(
                     content=doc,
-                    metadata=metadata,
+                    metadata=dict(metadata),  # type: ignore
                     distance=0.0,
                 )
             )

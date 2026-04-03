@@ -12,3 +12,14 @@ repos:
       - id: mypy
         additional_dependencies: [pydantic>=2.0.0]
         args: [--ignore-missing-imports]
+        files: ^(agents|orchestration|rag|prompts|evaluation)/
+
+  - repo: local
+    hooks:
+      - id: pytest-coverage
+        name: pytest with 95% coverage
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]

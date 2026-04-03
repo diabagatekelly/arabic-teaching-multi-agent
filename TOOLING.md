@@ -105,53 +105,87 @@ See `pyproject.toml`:
 **Why pytest?**
 - Simple, powerful, extensible
 - Industry standard
+- Excellent coverage reporting with pytest-cov
 
 ### Commands
 
 ```bash
 # Run all tests
-pytest
+uv run pytest
+
+# Run with coverage (default in pre-push hook)
+uv run pytest --cov=rag --cov=agents --cov-report=term-missing
 
 # Run specific test file
-pytest tests/test_agents.py
-
-# Run with coverage
-pytest --cov=agents
+uv run pytest tests/test_rag_retriever.py
 
 # Run only fast tests (skip slow ones)
-pytest -m "not slow"
+uv run pytest -m "not slow"
+
+# Run with verbose output
+uv run pytest -v
+
+# Run tests and stop at first failure
+uv run pytest -x
 ```
+
+### Coverage Configuration
+
+Configured in `pyproject.toml`:
+- **Minimum coverage:** 95%
+- **Reports missing lines** for easy identification
+- **Excludes:** tests/, scripts/, __init__.py
+- **Enforced on pre-push** via git hooks
 
 ---
 
 ## 🪝 Pre-commit Hooks
 
-**Automated checks before every commit**
+**Automated checks before every commit and push**
 
 ### Setup (one-time)
 
 ```bash
-pip install pre-commit
-pre-commit install
+uv add --dev pre-commit
+uv run pre-commit install
+uv run pre-commit install --hook-type pre-push
 ```
 
 ### What it does
 
-On every `git commit`:
-1. Runs `ruff check --fix` (linting)
+**On every `git commit`:**
+1. Runs `ruff check --fix` (linting with auto-fix)
 2. Runs `ruff format` (formatting)
-3. Runs `mypy` (type checking)
+3. Runs `mypy` on agents/, orchestration/, rag/, prompts/, evaluation/ (type checking)
 4. Blocks commit if checks fail
+
+**On every `git push`:**
+1. Runs full test suite with pytest
+2. Enforces 95% code coverage minimum
+3. Blocks push if coverage is below threshold
+4. Blocks push if any tests fail
 
 ### Manual run
 
 ```bash
-# Run on all files
+# Run pre-commit checks on all files
 pre-commit run --all-files
 
-# Skip hooks for emergency commit
+# Run pre-push checks
+pre-commit run --hook-type pre-push
+
+# Skip hooks for emergency commit (not recommended)
 git commit --no-verify
+
+# Skip hooks for emergency push (not recommended)
+git push --no-verify
 ```
+
+### Coverage Requirements
+
+- **Minimum coverage:** 95%
+- **Measured modules:** agents/, orchestration/, rag/, prompts/, evaluation/
+- **Excluded:** tests/, scripts/, __init__.py files
 
 ---
 
@@ -193,20 +227,42 @@ cd ~/Documents/LLMCourse/arabic-teaching-multi-agent
 ### Before committing
 
 ```bash
-# Option 1: Let pre-commit handle it
+# Option 1: Let pre-commit handle it (recommended)
 git add .
 git commit -m "feat: add feature"
-# Pre-commit runs automatically
+# Pre-commit runs automatically: ruff + mypy
 
 # Option 2: Run manually first
-ruff check --fix . && ruff format .
-mypy .
-pytest
-
-# Then commit
+uv run ruff check --fix . && uv run ruff format .
+uv run pytest --cov
 git add .
 git commit -m "feat: add feature"
 ```
+
+### Before pushing
+
+```bash
+# Option 1: Let pre-push handle it (recommended)
+git push
+# Pre-push runs full test suite with 95% coverage requirement
+
+# Option 2: Run tests manually first
+uv run pytest --cov
+git push
+```
+
+### If pre-commit/pre-push blocks you
+
+**Pre-commit blocked:**
+- Fix linting errors: `uv run ruff check --fix .`
+- Fix type errors: `uv run mypy rag/ agents/`
+- Review changes and recommit
+
+**Pre-push blocked:**
+- Tests failing: Fix the failing tests
+- Coverage below 95%: Add tests for uncovered code
+- Check coverage report: `uv run pytest --cov --cov-report=html`
+- Open `htmlcov/index.html` to see exactly what's missing
 
 ### Adding dependencies
 

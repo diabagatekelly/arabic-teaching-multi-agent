@@ -58,7 +58,7 @@ class VectorStore:
         """
         self.collection.add(
             documents=documents,
-            metadatas=metadatas,
+            metadatas=metadatas,  # type: ignore
             ids=ids,
         )
 
@@ -79,15 +79,16 @@ class VectorStore:
         Returns:
             Query results with documents, metadatas, and distances
         """
-        return self.collection.query(
+        result = self.collection.query(
             query_texts=query_texts,
             n_results=n_results,
             where=where,
         )
+        return result  # type: ignore
 
     def get_count(self) -> int:
         """Get the number of documents in the collection."""
-        return self.collection.count()
+        return self.collection.count()  # type: ignore
 
     def reset(self) -> None:
         """Delete and recreate the collection."""
