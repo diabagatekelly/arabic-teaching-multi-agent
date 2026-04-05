@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from prompts.base import SimplePromptTemplate
 from prompts.registry import PromptRegistry, get_registry
 

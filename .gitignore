@@ -226,3 +226,6 @@ data/raw/*.txt
 
 # Project-specific: OS
 .DS_Store
+
+# v2 Development (in progress - will be uncommented when ready)
+src/
