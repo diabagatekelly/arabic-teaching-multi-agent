@@ -1,97 +1,121 @@
-# Arabic Teaching Multi-Agent System
+# Arabic Teaching Multi-Agent System v2
 
-**Production-grade multi-agent RAG system for Arabic language teaching**
+**Production-grade multi-agent RAG system for Arabic language teaching with eval-driven development**
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![LangChain](https://img.shields.io/badge/LangChain-v0.1+-green.svg)](https://github.com/langchain-ai/langchain)
+[![LangGraph](https://img.shields.io/badge/LangGraph-latest-green.svg)](https://github.com/langchain-ai/langgraph)
 
 ---
 
 ## 🎯 Project Overview
 
-An intelligent Arabic language teaching system built with **multi-agent orchestration**, **RAG (Retrieval-Augmented Generation)**, and **fine-tuned LLMs**. The system coordinates specialized agents to deliver personalized, adaptive Arabic lessons with real-time error correction and dynamic exercise generation.
+An intelligent Arabic language teaching system built with **multi-agent orchestration**, **RAG (Retrieval-Augmented Generation)**, and **fine-tuned LLMs**. The system coordinates three specialized agents to deliver personalized Arabic lessons with vocabulary teaching, grammar instruction, error detection, and dynamic exercise generation.
 
-### Architecture
+**Key Innovation:** Separates **content** (RAG) from **style** (fine-tuning) for true scalability—add new grammar lessons without retraining models.
+
+### Architecture v2
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│          LESSON COORDINATOR (LangGraph)                  │
-│     Orchestrates workflow, manages conversation state    │
+│          ORCHESTRATOR (LangGraph)                        │
+│     State management, agent routing, session tracking    │
 └─────────────────────────────────────────────────────────┘
                           │
-        ┌─────────────────┼────────────────┬────────────┐
-        ▼                 ▼                ▼            ▼
-   ┌─────────┐      ┌──────────┐     ┌──────────┐  ┌───────────┐
-   │  VOCAB  │      │ GRAMMAR  │     │EXERCISE  │  │ EVALUATOR │
-   │ TEACHER │      │ TEACHER  │     │GENERATOR │  │   AGENT   │
-   └─────────┘      └──────────┘     └──────────┘  └───────────┘
-        │                │                 │             │
-   Fine-tuned       Fine-tuned      RAG Pipeline    Rule-based
-   Qwen2.5-3B       Qwen2.5-3B      + ChromaDB     + LLM
-   (LoRA)           (LoRA)          + Embeddings   Validation
+        ┌─────────────────┼────────────────────┐
+        ▼                 ▼                    ▼
+   ┌──────────┐      ┌──────────┐      ┌──────────────┐
+   │ AGENT 1  │      │ AGENT 2  │      │   AGENT 3    │
+   │ Teaching │      │  Error   │      │   Content    │
+   │  (Face)  │      │Detection │      │  Retrieval   │
+   └──────────┘      └──────────┘      └──────────────┘
+        │                 │                    │
+   Fine-tuned        Fine-tuned          RAG Pipeline
+   Qwen2.5-3B       Qwen2.5-3B          + Pinecone
+   (Teaching         (Strict JSON        + Embeddings
+    style)            grading)           + LLM for
+                                          generation
 ```
+
+**Design Philosophy:**
+- **Agent 1:** All user-facing text (teaching, feedback)
+- **Agent 2:** Strict grading (JSON in → JSON out)
+- **Agent 3:** Content retrieval + holds in memory (no repeated RAG queries)
+- **One Model:** Single Qwen2.5-3B fine-tuned for all three agent modes
 
 ---
 
 ## 🚀 Key Features
 
+### **Eval-Driven Development**
+- **75 test cases** defined BEFORE building agents
+- **DeepEval pipeline** with automated metrics (sentiment, accuracy, JSON validity)
+- **Baseline testing** to prove fine-tuning effectiveness
+- Test-Driven Development (TDD) approach for AI systems
+
+### **True Scalability**
+- Add new grammar lessons by uploading markdown (< 5 min, **no retraining**)
+- Grammar rules stored in RAG, not model weights
+- Supports 100+ lessons without model degradation
+- Content lives in Pinecone vector database
+
 ### **Multi-Agent Orchestration**
-- **5 specialized agents** coordinated via LangGraph state machine
-- Autonomous task delegation with human-in-the-loop checkpoints
-- Conversation state management across agents
-- Intent routing based on lesson phase and student performance
+- **3 specialized agents** with clear separation of concerns
+- LangGraph state machine for complex conversation flows
+- Session management with vocabulary/grammar progress tracking
+- Pre-loading strategy for fast quiz responses
 
-### **Intelligent RAG Pipeline**
-- **ChromaDB** vector store with 50+ exercise templates
-- Semantic search using OpenAI embeddings
-- Hybrid retrieval (keyword + semantic)
-- Dynamic exercise generation adapted to lesson vocabulary
-- Metadata filtering by grammar focus, difficulty, and lesson number
+### **Vocabulary + Grammar Teaching**
+- **Vocabulary:** 10 words in batches (3-3-3-1), user-paced quizzes, flashcard integration
+- **Grammar:** Multiple topics per lesson, 5-question quizzes, review suggestions if ≥2 wrong
+- Immediate per-question feedback with encouraging tone
+- Running score tracking
 
-### **Fine-Tuned Language Models**
-- **Qwen2.5-3B** fine-tuned with LoRA (16-bit quantization)
-- 113 training conversations across vocabulary and grammar teaching
-- Specialized for pedagogical interactions in Arabic
-- Deterministic evaluation mode (do_sample=False)
-
-### **Self-Correction & Validation**
-- Retry loops with evaluator feedback
-- Multi-metric evaluation (accuracy, consistency, safety)
-- 25+ automated tests across 4 capability areas
-- Real-time error detection and correction
-
-### **Production API & UI**
-- **FastAPI** backend with RESTful endpoints
-- **Streamlit** interactive frontend with real-time chat
-- Agent activity visualization
-- Lesson progress tracking
-- Evaluation dashboard
+### **Single Fine-Tuned Model**
+- **Qwen2.5-3B-Instruct** fine-tuned once (~110-120 conversations)
+- Three modes controlled by system prompts (Teaching, Grading, Exercise Generation)
+- 4-bit quantization (~2GB memory)
+- LoRA rank=32 for efficient fine-tuning
 
 ---
 
 ## 🛠️ Technology Stack
 
 **Core Framework:**
-- [LangChain](https://github.com/langchain-ai/langchain) - LLM application framework
 - [LangGraph](https://github.com/langchain-ai/langgraph) - Multi-agent orchestration
-- [ChromaDB](https://www.trychroma.com/) - Vector database
-- [OpenAI API](https://platform.openai.com/) - Embeddings
+- [LangChain](https://github.com/langchain-ai/langchain) - Prompt assembly
+- [Pinecone](https://www.pinecone.io/) - Vector database (cloud)
+- [DeepEval](https://github.com/confident-ai/deepeval) - LLM evaluation framework
 
 **Models:**
 - [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) - Base model
+- [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) - Embeddings (384-dim)
 - [PEFT](https://github.com/huggingface/peft) - LoRA fine-tuning
 - [Transformers](https://github.com/huggingface/transformers) - Model inference
 
 **API & UI:**
 - [FastAPI](https://fastapi.tiangolo.com/) - High-performance API
-- [Streamlit](https://streamlit.io/) - Interactive web interface
+- [Streamlit](https://streamlit.io/) - Interactive web interface (optional)
 - [Pydantic](https://docs.pydantic.dev/) - Data validation
 
 **Development:**
 - Python 3.10+
-- Poetry / pip for dependency management
-- pytest for testing
+- pytest for testing (95%+ coverage target)
+- ruff for linting
+- pre-commit hooks
+
+---
+
+## 📖 Documentation
+
+### v2 Architecture (Current)
+- **[ARCHITECTURE.md](docs/v2/ARCHITECTURE.md)** - Agent specs, model strategy, design decisions
+- **[IMPLEMENTATION_PLAN.md](docs/v2/IMPLEMENTATION_PLAN.md)** - TDD checklist with phases
+- **[INTERACTION_FLOWS.md](docs/v2/INTERACTION_FLOWS.md)** - Visual flows with mermaid diagrams
+- **[API_CONTRACT.md](docs/v2/API_CONTRACT.md)** - Complete API specification
+
+### v1 (Archived)
+- See `v1/` folder and `docs/v1/` for previous implementation
 
 ---
 
@@ -99,7 +123,7 @@ An intelligent Arabic language teaching system built with **multi-agent orchestr
 
 ### Prerequisites
 - Python 3.10+
-- OpenAI API key
+- Pinecone API key (free tier)
 - Git
 
 ### Installation
@@ -112,39 +136,57 @@ cd arabic-teaching-multi-agent
 
 2. **Create virtual environment:**
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Mac/Linux
-# venv\Scripts\activate   # On Windows
+python -m venv .venv
+source .venv/bin/activate  # On Mac/Linux
+# .venv\Scripts\activate   # On Windows
 ```
 
 3. **Install dependencies:**
 ```bash
 pip install -r requirements.txt
+# OR use uv for faster installation
+uv pip install -r requirements.txt
 ```
 
 4. **Set up environment variables:**
 ```bash
 cp .env.example .env
-# Edit .env and add your OpenAI API key
+# Edit .env and add:
+# - PINECONE_API_KEY
+# - PINECONE_ENVIRONMENT
+# - (Optional) OPENAI_API_KEY for embeddings
 ```
 
-5. **Initialize vector store:**
+5. **Run tests:**
 ```bash
-python scripts/setup_vectorstore.py
+pytest tests/
 ```
 
-6. **Run the application:**
-```bash
-# Start FastAPI backend
-uvicorn api.main:app --reload --port 8000
+---
 
-# In another terminal, start Streamlit UI
-streamlit run ui/app.py --server.port 8501
-```
+## 🗓️ Development Status
 
-7. **Access the application:**
-- UI: http://localhost:8501
-- API docs: http://localhost:8000/docs
+**Current Phase:** Phase 1 - Foundation (Define Success First)
+
+**Architecture:** ✅ Complete
+- [x] Agent specifications documented
+- [x] Interaction flows defined
+- [x] API contract established
+- [x] Evaluation test cases created (75 total)
+
+**Implementation Progress:**
+- [x] Task 1.1: Create evaluation dataset (75 test cases)
+- [ ] Task 1.2: Set up DeepEval pipeline
+- [ ] Task 1.3: Build RAG database schema
+- [ ] Task 1.4: Set up Pinecone + embeddings
+
+**Roadmap:**
+- **Phase 1:** Foundation (eval-first, RAG setup) - *In Progress*
+- **Phase 2:** Core Components (training data, fine-tuning, agents with TDD)
+- **Phase 3:** Integration (orchestrator, LangGraph)
+- **Phase 4:** Scale Testing (add Lessons 4-5 without retraining)
+
+See [IMPLEMENTATION_PLAN.md](docs/v2/IMPLEMENTATION_PLAN.md) for detailed checklist.
 
 ---
 
@@ -152,40 +194,84 @@ streamlit run ui/app.py --server.port 8501
 
 **This project demonstrates:**
 
-✅ **Multi-agent systems** - LangGraph orchestration with 5 specialized agents  
-✅ **RAG implementation** - Production ChromaDB pipeline with semantic search  
-✅ **Fine-tuning** - LoRA fine-tuning on specialized teaching dataset  
-✅ **Prompt engineering** - Systematic prompt library with few-shot & CoT patterns  
-✅ **Evaluation frameworks** - 25+ automated tests with multi-metric assessment  
-✅ **Self-correction** - Retry loops with evaluator feedback  
-✅ **API development** - FastAPI with RESTful endpoints  
-✅ **Production UI** - Interactive Streamlit interface  
-✅ **Documentation** - Architecture diagrams, API specs, model cards  
+✅ **Eval-Driven Development** - 75 test cases defined before building agents  
+✅ **Multi-agent systems** - LangGraph orchestration with clear separation of concerns  
+✅ **Scalable RAG** - Add content without retraining models  
+✅ **Fine-tuning strategy** - Content vs. style separation  
+✅ **Production API design** - Complete API contract with error handling  
+✅ **TDD for AI** - Test cases, metrics, baseline comparisons  
+✅ **Clean architecture** - Well-documented design decisions  
+✅ **State management** - Complex conversation flows with vocabulary/grammar tracking  
 
 ---
 
-## 📖 Documentation
+## 📊 Metrics & Goals
 
-- **[Architecture](docs/ARCHITECTURE.md)** - System design and agent interactions
-- **[RAG Pipeline](docs/RAG_PIPELINE.md)** - Retrieval implementation details
-- **[Agent Design](docs/AGENT_DESIGN.md)** - Agent responsibilities and interfaces
-- **[Prompt Engineering](docs/PROMPT_ENGINEERING.md)** - Prompt strategy and patterns
-- **[Evaluation](docs/EVALUATION.md)** - Testing methodology and metrics
-- **[API Specification](docs/API_SPECS.md)** - Complete API reference
-- **[Model Card](docs/MODEL_CARD.md)** - Responsible AI documentation
-- **[Deployment](docs/DEPLOYMENT.md)** - Production deployment guide
+### Agent 1 (Teaching)
+- Sentiment score: >0.9 for teaching, >0.8 for feedback
+- Includes all required elements (Arabic, transliteration, English)
+- Asks comprehension questions
+
+### Agent 2 (Error Detection)
+- Accuracy: >90% correct/incorrect classification
+- Error type identification: >80% accuracy
+- Valid JSON output: 100%
+
+### Agent 3 (Content Retrieval + Generation)
+- Retrieval relevance: >90%
+- Retrieval latency: <500ms
+- Exercise faithfulness to template: >90%
+
+### Scalability
+- Add new lesson in <10 minutes (no retraining)
+- Support 100+ grammar points without degradation
 
 ---
 
-## 🗓️ Development Status
+## 📁 Project Structure
 
-**Current Phase:** Week 1 - RAG Pipeline & Agent Implementation
+```
+arabic-teaching-multi-agent/
+├── docs/
+│   ├── v1/                    # Archived v1 documentation
+│   └── v2/                    # Current v2 architecture
+│       ├── ARCHITECTURE.md
+│       ├── IMPLEMENTATION_PLAN.md
+│       ├── INTERACTION_FLOWS.md
+│       └── API_CONTRACT.md
+├── v1/                        # Archived v1 code
+│   ├── agents/
+│   ├── prompts/
+│   ├── rag/
+│   └── tests/
+├── src/                       # v2 development (gitignored until ready)
+│   ├── agents/
+│   ├── orchestration/
+│   ├── rag/
+│   └── evaluation/
+├── data/
+│   └── evaluation/
+│       └── test_cases.json    # 75 eval test cases
+├── tests/                     # v2 tests
+├── pyproject.toml
+└── README.md
+```
 
-**Timeline:**
-- ✅ Week 0: Project setup & planning
-- 🔄 Week 1: RAG pipeline + agent implementations (in progress)
-- ⏳ Week 2: LangGraph orchestration + evaluation framework
-- ⏳ Week 3: API, UI, and documentation
+---
+
+## 🔄 Development Workflow
+
+**Branch Strategy:**
+- `main` - Stable, reviewed code only
+- `dev` - Integration branch
+- `phase-N/*` - Feature branches for each phase/task
+
+**Process:**
+1. Create feature branch from `dev`
+2. Implement with TDD (tests first)
+3. Create PR to `dev` (triggers Sourcery + /review skill)
+4. Merge to `dev` after approval
+5. Periodically merge `dev` → `main`
 
 ---
 
@@ -193,7 +279,7 @@ streamlit run ui/app.py --server.port 8501
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-**Note:** This is an educational/portfolio project demonstrating GenAI engineering capabilities.
+**Note:** This is an educational/portfolio project demonstrating GenAI engineering capabilities and production-ready multi-agent system design.
 
 ---
 
@@ -202,8 +288,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Kelly Diabagate**
 
 - GitHub: [@diabagatekelly](https://github.com/diabagatekelly)
-- LinkedIn: [Add your LinkedIn]
-- Email: [Add your email]
+- Portfolio: [Link to your portfolio]
 
 ---
 
@@ -211,8 +296,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **LangChain/LangGraph** for multi-agent framework
 - **Qwen Team** for Qwen2.5 base model
-- **Tatoeba Project** for Arabic example sentences
-- **OpenAI** for embeddings API
+- **DeepEval** for LLM evaluation tools
+- **Pinecone** for vector database
 
 ---
 
@@ -220,4 +305,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-*Last updated: April 3, 2026*
+*Last updated: April 5, 2026*
