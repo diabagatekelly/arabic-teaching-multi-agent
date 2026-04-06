@@ -144,7 +144,3 @@ results = pipeline.evaluate_teaching_mode(responses)
 3. Proceed to Phase 2: Create training data and fine-tune
 4. Re-run evaluation with fine-tuned model
 5. Compare: fine-tuned vs baseline
-
----
-
-**See:** `docs/v2/IMPLEMENTATION_PLAN.md` - Phase 1, Task 1.2

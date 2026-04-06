@@ -216,6 +216,10 @@ PROJECT_MANAGEMENT.md
 IMMEDIATE_NEXT_STEPS.md
 docs/IMPLEMENTATION_PLAN_V2.md
 docs/DUAL_TRACK_STRATEGY.md
+docs/IMPLEMENTATION_PLAN.md
+docs/CURRICULUM_SEQUENCE.md
+docs/INTERACTION_FLOWS.md
+docs/data/
 
 # Project-specific: Large files
 models/*.bin

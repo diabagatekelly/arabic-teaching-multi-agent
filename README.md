@@ -108,14 +108,10 @@ An intelligent Arabic language teaching system built with **multi-agent orchestr
 
 ## 📖 Documentation
 
-### v2 Architecture (Current)
-- **[ARCHITECTURE.md](docs/v2/ARCHITECTURE.md)** - Agent specs, model strategy, design decisions
-- **[IMPLEMENTATION_PLAN.md](docs/v2/IMPLEMENTATION_PLAN.md)** - TDD checklist with phases
-- **[INTERACTION_FLOWS.md](docs/v2/INTERACTION_FLOWS.md)** - Visual flows with mermaid diagrams
-- **[API_CONTRACT.md](docs/v2/API_CONTRACT.md)** - Complete API specification
-
-### v1 (Archived)
-- See `v1/` folder and `docs/v1/` for previous implementation
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Agent specs, model strategy, design decisions
+- **[API_CONTRACT.md](docs/API_CONTRACT.md)** - Complete API specification
+- **[WORKFLOW.md](docs/WORKFLOW.md)** - Git workflow and development process
+- **[TOOLING.md](docs/TOOLING.md)** - Development tooling (uv, ruff, mypy, pytest)
 
 ---
 
@@ -176,17 +172,17 @@ pytest tests/
 
 **Implementation Progress:**
 - [x] Task 1.1: Create evaluation dataset (75 test cases)
-- [ ] Task 1.2: Set up DeepEval pipeline
-- [ ] Task 1.3: Build RAG database schema
-- [ ] Task 1.4: Set up Pinecone + embeddings
+- [x] Task 1.2: Set up DeepEval pipeline
+- [x] Task 1.3: Custom metrics (Sentiment, JSON Validity, Accuracy, Faithfulness)
+- [ ] Task 1.4: Run baseline evaluation
+- [ ] Task 1.5: Build RAG database schema
+- [ ] Task 1.6: Set up Pinecone + embeddings
 
 **Roadmap:**
 - **Phase 1:** Foundation (eval-first, RAG setup) - *In Progress*
 - **Phase 2:** Core Components (training data, fine-tuning, agents with TDD)
 - **Phase 3:** Integration (orchestrator, LangGraph)
 - **Phase 4:** Scale Testing (add Lessons 4-5 without retraining)
-
-See [IMPLEMENTATION_PLAN.md](docs/v2/IMPLEMENTATION_PLAN.md) for detailed checklist.
 
 ---
 
@@ -233,27 +229,24 @@ See [IMPLEMENTATION_PLAN.md](docs/v2/IMPLEMENTATION_PLAN.md) for detailed checkl
 ```
 arabic-teaching-multi-agent/
 ├── docs/
-│   ├── v1/                    # Archived v1 documentation
-│   └── v2/                    # Current v2 architecture
-│       ├── ARCHITECTURE.md
-│       ├── IMPLEMENTATION_PLAN.md
-│       ├── INTERACTION_FLOWS.md
-│       └── API_CONTRACT.md
-├── v1/                        # Archived v1 code
-│   ├── agents/
-│   ├── prompts/
-│   ├── rag/
-│   └── tests/
-├── src/                       # v2 development (gitignored until ready)
-│   ├── agents/
-│   ├── orchestration/
-│   ├── rag/
+│   ├── ARCHITECTURE.md        # Agent specifications & design
+│   ├── API_CONTRACT.md        # API specification
+│   ├── WORKFLOW.md            # Git workflow
+│   ├── TOOLING.md             # Development tools
 │   └── evaluation/
+│       └── README.md          # Evaluation framework docs
+├── src/
+│   └── evaluation/            # DeepEval pipeline & custom metrics
+│       ├── metrics.py
+│       ├── deepeval_pipeline.py
+│       └── baseline.py
 ├── data/
 │   └── evaluation/
 │       └── test_cases.json    # 75 eval test cases
-├── tests/                     # v2 tests
+├── tests/
+│   └── evaluation/            # Tests for evaluation module
 ├── pyproject.toml
+├── uv.lock
 └── README.md
 ```
 
