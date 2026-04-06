@@ -19,6 +19,9 @@ class SentimentMetric(BaseMetric):
     Target: >0.9 for teaching mode, >0.8 for feedback mode.
     """
 
+    # Class-level singleton: shared sentiment pipeline across all instances
+    _shared_sentiment_pipeline = None
+
     def __init__(self, threshold: float = 0.9, mode: str = "teaching") -> None:
         """
         Initialize sentiment metric.
@@ -33,13 +36,14 @@ class SentimentMetric(BaseMetric):
         self.reason = ""
         self.success = False
 
-        # Cache sentiment pipeline to avoid reloading on every measure() call
-        logger.info("Loading sentiment analysis model...")
-        self._sentiment_pipeline = pipeline(
-            "sentiment-analysis",
-            model="distilbert-base-uncased-finetuned-sst-2-english",
-        )
-        logger.info("Sentiment model loaded")
+        # Load sentiment pipeline once at class level (singleton pattern)
+        if SentimentMetric._shared_sentiment_pipeline is None:
+            logger.info("Loading sentiment analysis model (first time)...")
+            SentimentMetric._shared_sentiment_pipeline = pipeline(
+                "sentiment-analysis",
+                model="distilbert-base-uncased-finetuned-sst-2-english",
+            )
+            logger.info("Sentiment model loaded and cached")
 
     def measure(self, test_case: LLMTestCase) -> float:
         """
@@ -52,8 +56,8 @@ class SentimentMetric(BaseMetric):
             Sentiment score (0-1, where 1 is most positive)
         """
         try:
-            # Use cached sentiment pipeline
-            result = self._sentiment_pipeline(test_case.actual_output)[0]
+            # Use class-level shared sentiment pipeline (singleton)
+            result = SentimentMetric._shared_sentiment_pipeline(test_case.actual_output)[0]
 
             # Convert to 0-1 scale (positive sentiment)
             if result["label"] == "POSITIVE":
@@ -110,14 +114,16 @@ class JSONValidityMetric(BaseMetric):
         text = text.strip()
 
         # Check for ```json code blocks
+        # Match everything after ```json up to the next ``` or end of string
         if "```json" in text:
-            match = re.search(r"```json\s*\n(.*?)\n```", text, re.DOTALL)
+            match = re.search(r"```json\s*(.*?)(?:```|$)", text, re.DOTALL)
             if match:
                 return match.group(1).strip()
 
         # Check for generic ``` code blocks
+        # Match everything after ``` up to the next ``` or end of string
         if "```" in text:
-            match = re.search(r"```\s*\n(.*?)\n```", text, re.DOTALL)
+            match = re.search(r"```\s*(.*?)(?:```|$)", text, re.DOTALL)
             if match:
                 return match.group(1).strip()
 
@@ -163,17 +169,12 @@ class AccuracyMetric(BaseMetric):
     """
     Evaluates accuracy for Agent 2 (Grading) correct/incorrect classification.
 
-    Target: >90% accuracy.
+    Returns 1.0 for correct classification, 0.0 for incorrect.
+    Aggregate accuracy across multiple test cases should exceed 90%.
     """
 
-    def __init__(self, threshold: float = 0.9) -> None:
-        """
-        Initialize accuracy metric.
-
-        Args:
-            threshold: Minimum accuracy required (default 0.9 = 90%)
-        """
-        self.threshold = threshold
+    def __init__(self) -> None:
+        """Initialize accuracy metric."""
         self.score = 0.0
         self.reason = ""
         self.success = False
@@ -225,7 +226,7 @@ class AccuracyMetric(BaseMetric):
             return 0.0
 
     def is_successful(self) -> bool:
-        """Check if accuracy meets threshold."""
+        """Check if this test case was classified correctly."""
         return self.success
 
     @property

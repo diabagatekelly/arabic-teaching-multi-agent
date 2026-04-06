@@ -246,7 +246,7 @@ class EvaluationPipeline:
             json_score = json_metric.measure(test_case)
 
             # Check accuracy
-            accuracy_metric = AccuracyMetric(threshold=0.9)
+            accuracy_metric = AccuracyMetric()
             accuracy_score = accuracy_metric.measure(test_case)
 
             results["total"] += 1
@@ -300,7 +300,7 @@ class EvaluationPipeline:
             json_score = json_metric.measure(test_case)
 
             # Check accuracy
-            accuracy_metric = AccuracyMetric(threshold=0.9)
+            accuracy_metric = AccuracyMetric()
             accuracy_score = accuracy_metric.measure(test_case)
 
             results["total"] += 1

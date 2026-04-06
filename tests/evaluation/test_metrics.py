@@ -65,21 +65,26 @@ class TestSentimentMetric:
             assert low_threshold_metric.is_successful()
 
     def test_sentiment_pipeline_cached(self):
-        """Test that sentiment pipeline is cached, not recreated."""
-        metric = SentimentMetric(threshold=0.9, mode="teaching")
+        """Test that sentiment pipeline is a class-level singleton."""
+        # Create first instance - should load pipeline
+        metric1 = SentimentMetric(threshold=0.9, mode="teaching")
 
-        # Pipeline should be cached in __init__
-        assert hasattr(metric, "_sentiment_pipeline")
-        assert metric._sentiment_pipeline is not None
+        # Pipeline should be at class level
+        assert SentimentMetric._shared_sentiment_pipeline is not None
 
-        # Measure multiple times
+        # Store reference to the pipeline
+        pipeline_instance = SentimentMetric._shared_sentiment_pipeline
+
+        # Create second instance - should NOT reload pipeline
+        metric2 = SentimentMetric(threshold=0.8, mode="feedback")
+
+        # Should still be the same pipeline instance (singleton)
+        assert SentimentMetric._shared_sentiment_pipeline is pipeline_instance
+
+        # Both metrics should use the same pipeline
         test_case = LLMTestCase(input="test", actual_output="Great!", expected_output="positive")
-
-        pipeline_instance = metric._sentiment_pipeline
-        metric.measure(test_case)
-
-        # Should still be the same instance
-        assert metric._sentiment_pipeline is pipeline_instance
+        metric1.measure(test_case)
+        metric2.measure(test_case)
 
     def test_metric_name(self):
         """Test metric name property."""
@@ -184,7 +189,7 @@ class TestAccuracyMetric:
 
     def test_correct_classification_as_correct(self):
         """Test correct answer classified as correct."""
-        metric = AccuracyMetric(threshold=0.9)
+        metric = AccuracyMetric()
         test_case = LLMTestCase(
             input="test_input",
             actual_output='{"correct": true}',
@@ -201,7 +206,7 @@ class TestAccuracyMetric:
 
     def test_correct_classification_as_incorrect(self):
         """Test incorrect answer classified as incorrect."""
-        metric = AccuracyMetric(threshold=0.9)
+        metric = AccuracyMetric()
         test_case = LLMTestCase(
             input="test_input", actual_output='{"correct": false}', expected_output="false"
         )
@@ -215,7 +220,7 @@ class TestAccuracyMetric:
 
     def test_wrong_classification_correct_as_incorrect(self):
         """Test misclassification: correct answer marked as incorrect."""
-        metric = AccuracyMetric(threshold=0.9)
+        metric = AccuracyMetric()
         test_case = LLMTestCase(
             input="test_input", actual_output='{"correct": false}', expected_output="true"
         )
@@ -229,7 +234,7 @@ class TestAccuracyMetric:
 
     def test_wrong_classification_incorrect_as_correct(self):
         """Test misclassification: incorrect answer marked as correct."""
-        metric = AccuracyMetric(threshold=0.9)
+        metric = AccuracyMetric()
         test_case = LLMTestCase(
             input="test_input", actual_output='{"correct": true}', expected_output="false"
         )
@@ -243,7 +248,7 @@ class TestAccuracyMetric:
 
     def test_invalid_json_format(self):
         """Test that invalid JSON returns 0 score."""
-        metric = AccuracyMetric(threshold=0.9)
+        metric = AccuracyMetric()
         test_case = LLMTestCase(
             input="test_input",
             actual_output='{"correct": true',  # Invalid JSON
@@ -259,7 +264,7 @@ class TestAccuracyMetric:
 
     def test_non_dict_output(self):
         """Test that non-dict JSON output fails."""
-        metric = AccuracyMetric(threshold=0.9)
+        metric = AccuracyMetric()
         test_case = LLMTestCase(
             input="test_input",
             actual_output='["correct", "answer"]',  # Valid JSON but not a dict
@@ -275,7 +280,7 @@ class TestAccuracyMetric:
 
     def test_metric_name(self):
         """Test metric name property."""
-        metric = AccuracyMetric(threshold=0.9)
+        metric = AccuracyMetric()
         assert metric.__name__ == "Accuracy"
 
 

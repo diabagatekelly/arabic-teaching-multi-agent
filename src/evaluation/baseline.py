@@ -99,6 +99,10 @@ class BaselineEvaluator:
         """
         Run baseline evaluation on teaching mode test cases.
 
+        Note: Currently only evaluates vocabulary_batch_introduction category.
+        Grammar explanation and quiz feedback categories are not included in baseline
+        to keep evaluation time manageable. Extend this method if full coverage is needed.
+
         Args:
             sample_size: Number of test cases to evaluate per category (for speed)
 
@@ -145,6 +149,10 @@ Present these words to the student in an encouraging way:
     ) -> tuple[dict[str, str], dict]:
         """
         Run baseline evaluation on grading mode test cases.
+
+        Note: Currently only evaluates vocabulary_grading category.
+        Grammar grading is not included in baseline to keep evaluation time manageable.
+        Extend this method if full coverage is needed.
 
         Args:
             sample_size: Number of test cases to evaluate per category
