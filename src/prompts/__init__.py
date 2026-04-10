@@ -1,5 +1,13 @@
 """Prompt templates for the Arabic Teaching Multi-Agent system."""
 
+from .formatters import (
+    flatten_nested_input,
+    format_answers_list,
+    format_examples_list,
+    format_learned_items,
+    format_topics_list,
+    format_words_list,
+)
 from .templates import (
     # Agent 3: Generation prompts
     EXERCISE_GENERATION,
@@ -45,6 +53,13 @@ __all__ = [
     "MODE_GRADING_VOCAB",
     "MODE_GRADING_GRAMMAR",
     "MODE_EXERCISE_GENERATION",
+    # Formatters
+    "flatten_nested_input",
+    "format_answers_list",
+    "format_examples_list",
+    "format_learned_items",
+    "format_topics_list",
+    "format_words_list",
     # Agent 1
     "LESSON_WELCOME",
     "VOCAB_OVERVIEW",
