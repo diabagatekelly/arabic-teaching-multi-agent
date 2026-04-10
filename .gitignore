@@ -227,5 +227,17 @@ data/raw/*.txt
 # Project-specific: OS
 .DS_Store
 
-# v2 Development (in progress - will be uncommented when ready)
-src/
+# Project-specific: Learning notes
+.notes/
+
+# Project-specific: Session tracking (personal development)
+NEXT.md
+
+# Project-specific: Claude Code artifacts
+.claude/
+
+# Project-specific: User-specific workspace files
+*.code-workspace
+
+# v2 Development - uncommenting src/ as we build modules
+# src/  # Re-enable when needed
