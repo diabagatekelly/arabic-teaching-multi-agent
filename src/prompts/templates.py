@@ -5,7 +5,7 @@ All prompts follow the design specifications in docs/PROMPT_DESIGN.md
 Total: 21 prompts across 3 agents
 """
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 # =============================================================================
 # MODE CONSTANTS
