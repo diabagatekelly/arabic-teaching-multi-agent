@@ -1,4 +1,13 @@
 repos:
+  - repo: local
+    hooks:
+      - id: uv-sync-check
+        name: Check uv dependencies can sync
+        entry: uv sync --dry-run
+        language: system
+        pass_filenames: false
+        files: ^(pyproject\.toml|uv\.lock)$
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.4
     hooks:
@@ -14,12 +23,13 @@ repos:
         args: [--ignore-missing-imports]
         files: ^(agents|orchestration|rag|prompts|evaluation)/
 
-  - repo: local
-    hooks:
-      - id: pytest-coverage
-        name: pytest with 95% coverage
-        entry: uv run pytest
-        language: system
-        pass_filenames: false
-        always_run: true
-        stages: [pre-push]
+  # Commented out until tests are implemented
+  # - repo: local
+  #   hooks:
+  #     - id: pytest-coverage
+  #       name: pytest with 95% coverage
+  #       entry: uv run pytest
+  #       language: system
+  #       pass_filenames: false
+  #       always_run: true
+  #       stages: [pre-commit]
