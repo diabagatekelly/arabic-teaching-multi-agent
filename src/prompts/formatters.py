@@ -37,7 +37,7 @@ def format_words_list(words: list[dict[str, str]]) -> str:
         2. قَلَم (qalam) - pen
     """
     return "\n".join(
-        f"{i}. {w['arabic']} ({w['transliteration']}) - {w['english']}"
+        f"{i}. {w.get('arabic', '')} ({w.get('transliteration', '')}) - {w.get('english', '')}"
         for i, w in enumerate(words, 1)
     )
 
@@ -71,7 +71,7 @@ def format_examples_list(examples: list[dict[str, str]]) -> str:
     """
     lines = []
     for example in examples:
-        line = f"- {example['arabic']} ({example['transliteration']}) - {example['english']}"
+        line = f"- {example.get('arabic', '')} ({example.get('transliteration', '')}) - {example.get('english', '')}"
         lines.append(line)
         if "note" in example:
             lines.append(f"  Note: {example['note']}")
@@ -115,10 +115,10 @@ def format_answers_list(answers: list[dict[str, str]]) -> str:
     blocks = []
     for i, answer in enumerate(answers, 1):
         block = [
-            f"Question {i} (ID: {answer['question_id']}):",
-            f"Q: {answer['question']}",
-            f'Student: "{answer["student_answer"]}"',
-            f'Correct: "{answer["correct_answer"]}"',
+            f"Question {i} (ID: {answer.get('question_id', '')}):",
+            f"Q: {answer.get('question', '')}",
+            f'Student: "{answer.get("student_answer", "")}"',
+            f'Correct: "{answer.get("correct_answer", "")}"',
         ]
         blocks.append("\n".join(block))
     return "\n\n".join(blocks)
@@ -181,16 +181,28 @@ def _flatten_vocab_summary(input_data: dict[str, Any], flattened: dict[str, Any]
 
 
 def _flatten_grammar_summary(input_data: dict[str, Any], flattened: dict[str, Any]) -> None:
-    """Extract and flatten grammar_summary fields."""
+    """
+    Extract and flatten grammar_summary fields.
+
+    Creates both comma-separated string and formatted versions of topics list.
+    """
     if grammar := input_data.get("grammar_summary"):
         if "topics_count" in grammar:
             flattened["topics_count"] = grammar["topics_count"]
         if "topics" in grammar:
-            flattened["grammar_topics"] = ", ".join(grammar["topics"])
+            topics_list = grammar["topics"]
+            flattened["grammar_topics"] = ", ".join(topics_list)
+            flattened["grammar_topics_formatted"] = format_topics_list(topics_list)
 
 
 def _format_list_fields(input_data: dict[str, Any], flattened: dict[str, Any]) -> None:
-    """Format list fields using their corresponding formatters."""
+    """
+    Format top-level list fields using their corresponding formatters.
+
+    Note: grammar_topics from grammar_summary is already handled by
+    _flatten_grammar_summary, so we only format it if it's a top-level list
+    and hasn't been formatted yet.
+    """
     list_formatters: dict[str, Callable[[list], str]] = {
         "words": format_words_list,
         "examples": format_examples_list,
@@ -200,11 +212,19 @@ def _format_list_fields(input_data: dict[str, Any], flattened: dict[str, Any]) -
     }
 
     for field, formatter in list_formatters.items():
-        if (value := input_data.get(field)) and isinstance(value, list):
+        value = input_data.get(field)
+        formatted_key = f"{field}_formatted"
+
+        if isinstance(value, list):
+            # Skip if already formatted (e.g., from grammar_summary)
+            if formatted_key in flattened:
+                continue
+
             # Special case: words needs both original and formatted
             if field == "words":
                 flattened["words"] = value
-            flattened[f"{field}_formatted"] = formatter(value)
+
+            flattened[formatted_key] = formatter(value)
 
 
 def flatten_nested_input(input_data: dict[str, Any]) -> dict[str, Any]:
@@ -243,9 +263,10 @@ def flatten_nested_input(input_data: dict[str, Any]) -> dict[str, Any]:
     """
     flattened = {}
 
-    # Copy top-level scalars (non-dict values)
+    # Copy top-level scalars (non-dict, non-list values)
+    # Lists are handled explicitly by _format_list_fields to avoid exposing raw + formatted
     for key, value in input_data.items():
-        if not isinstance(value, dict):
+        if not isinstance(value, dict | list):
             flattened[key] = value
 
     # Flatten vocab_summary
