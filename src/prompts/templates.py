@@ -64,17 +64,19 @@ Or tell me what you'd like to do.""",
 VOCAB_OVERVIEW = PromptTemplate(
     template="""Mode: teaching_vocab
 
-Lesson {lesson_number} - Vocabulary Section
+Lesson {lesson_number} - Vocabulary Overview
 
-Total Words: {total_words}
-Batches: {batches_count}
+Words you'll learn:
+{words_formatted}
 
-Present the vocabulary section overview. Explain we'll learn words in batches. Offer options:
-1. Start learning (Batch 1)
-2. Skip to final test
+These are divided into {batches_count} batches for easier learning.
 
-Or tell me what you'd like to do.""",
-    input_variables=["lesson_number", "total_words", "batches_count"],
+Present all words and explain options:
+1. Learn in batches (I'll teach each batch, then quiz you)
+2. Skip to final test (test yourself on all {total_words} words now)
+
+Format with numbered options and mention they can request something else.""",
+    input_variables=["lesson_number", "words_formatted", "batches_count", "total_words"],
 )
 
 VOCAB_BATCH_INTRO = PromptTemplate(
@@ -162,17 +164,17 @@ Or tell me what you'd like to do.""",
 GRAMMAR_EXPLANATION = PromptTemplate(
     template="""Mode: teaching_grammar
 
-Lesson {lesson_number} - {topic_name}
+Lesson {lesson_number}
 
-Grammar Rule: {grammar_rule}
+Topic: {topic_name}
+
+Rule: {grammar_rule}
 
 Examples:
-{examples}
+{examples_formatted}
 
-Topics Remaining: {topics_remaining}
-
-Explain the grammar concept clearly with examples. Include Arabic with transliteration. Ask a comprehension question at the end.""",
-    input_variables=["lesson_number", "topic_name", "grammar_rule", "examples", "topics_remaining"],
+Explain this grammar topic to the student in an encouraging way. End by mentioning the quiz is next.""",
+    input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
 GRAMMAR_QUIZ_QUESTION = PromptTemplate(
@@ -324,21 +326,22 @@ Lesson {lesson_number} - Final Test Grading
 
 Grade the following answers:
 
-{answers}
+{answers_formatted}
 
 For each answer, evaluate correctness with flexibility (accept typos, synonyms, abbreviations).
 
-Return JSON:
+Return JSON with results for each question. The "correct" field should be true or false (boolean values):
 {{
   "total_score": "X/Y",
   "results": [
-    {{"question_id": "q1", "correct": true/false}},
+    {{"question_id": "q1", "correct": true}},
+    {{"question_id": "q2", "correct": false}},
     ...
   ]
 }}
 
 Response:""",
-    input_variables=["lesson_number", "answers"],
+    input_variables=["lesson_number", "answers_formatted"],
 )
 
 
@@ -351,24 +354,18 @@ EXERCISE_GENERATION = PromptTemplate(
     template="""Mode: exercise_generation
 
 Lesson {lesson_number}
-Exercise Type: {exercise_type}
-Content Type: {content_type}
+Type: {exercise_type}
+Content: {content_type}
 Count: {count}
 
-Learned Items:
-{learned_items}
+Learned items:
+{learned_items_formatted}
 
-{grammar_context}
-
-Generate {count} {exercise_type} exercises using the learned vocabulary. Focus on {content_type}.
-
-Return JSON array:
+Generate {count} practice exercises. Return JSON list:
 [
   {{
-    "question": "...",
-    "answer": "...",
-    "options": [...] (if multiple choice),
-    "explanation": "..."
+    "question": "question text here",
+    "answer": "correct answer here"
   }},
   ...
 ]
@@ -379,52 +376,46 @@ Response:""",
         "exercise_type",
         "content_type",
         "count",
-        "learned_items",
-        "grammar_context",
+        "learned_items_formatted",
     ],
 )
 
 QUIZ_QUESTION_GENERATION = PromptTemplate(
     template="""Mode: exercise_generation
 
-Lesson {lesson_number}
-Topic: {topic_name}
+Lesson {lesson_number} - {topic_name} Quiz Generation
+
 Grammar Rule: {grammar_rule}
-Count: {count}
 
-Learned Items:
-{learned_items}
+Examples:
+{examples_formatted}
 
-Generate {count} quiz questions that test understanding of: {grammar_rule}
-
-Use the provided vocabulary in questions. Vary question types.
-
-Return JSON array:
+Generate {count} quiz questions to test understanding of this rule. Return JSON list:
 [
   {{
-    "question": "...",
-    "answer": "...",
-    "explanation": "..."
+    "question": "question text",
+    "answer": "correct answer",
+    "explanation": "why this is the answer"
   }},
   ...
 ]
 
 Response:""",
-    input_variables=["lesson_number", "topic_name", "grammar_rule", "count", "learned_items"],
+    input_variables=["lesson_number", "topic_name", "grammar_rule", "count", "examples_formatted"],
 )
 
 TEST_COMPOSITION = PromptTemplate(
     template="""Mode: exercise_generation
 
-Lesson {lesson_number} - Final Test Generation
+Lesson {lesson_number} - Final Test Composition
 
-Grammar Topics: {grammar_topics}
-Question Count: {question_count}
-Question Types: {question_types}
+Grammar topics to cover:
+{grammar_topics_formatted}
 
-Generate a mixed test covering all grammar topics with variety in question types.
+Question count: {question_count}
+Question types: {question_types}
 
-Return JSON:
+Generate a mixed test covering all topics. Return JSON:
 {{
   "test_id": "lesson_{lesson_number}_test",
   "total_questions": {question_count},
@@ -434,12 +425,17 @@ Return JSON:
       "type": "...",
       "question": "...",
       "answer": "...",
-      "grammar_point": "..."
+      "grammar_topic": "..."
     }},
     ...
   ]
 }}
 
 Response:""",
-    input_variables=["lesson_number", "grammar_topics", "question_count", "question_types"],
+    input_variables=[
+        "lesson_number",
+        "grammar_topics_formatted",
+        "question_count",
+        "question_types",
+    ],
 )
