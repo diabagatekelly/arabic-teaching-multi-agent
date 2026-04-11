@@ -11,6 +11,39 @@ from transformers import pipeline
 logger = logging.getLogger(__name__)
 
 
+def extract_json(text: str) -> str:
+    """
+    Extract JSON from text, handling markdown code blocks.
+
+    This is a shared helper used by all metrics to ensure consistent
+    JSON extraction, especially for models that may return JSON wrapped
+    in markdown fences (```json ... ```).
+
+    Args:
+        text: Text that may contain JSON with or without markdown blocks
+
+    Returns:
+        Extracted JSON string
+    """
+    text = text.strip()
+
+    # Check for ```json code blocks
+    # Match everything after ```json up to the next ``` or end of string
+    if "```json" in text:
+        match = re.search(r"```json\s*(.*?)(?:```|$)", text, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+
+    # Check for generic ``` code blocks
+    # Match everything after ``` up to the next ``` or end of string
+    if "```" in text:
+        match = re.search(r"```\s*(.*?)(?:```|$)", text, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+
+    return text
+
+
 class SentimentMetric(BaseMetric):
     """
     Evaluates sentiment score for Agent 1 (Teaching) responses.
@@ -99,34 +132,6 @@ class JSONValidityMetric(BaseMetric):
         self.reason = ""
         self.success = False
 
-    def _extract_json(self, text: str) -> str:
-        """
-        Extract JSON from text, handling markdown code blocks.
-
-        Args:
-            text: Text that may contain JSON with or without markdown blocks
-
-        Returns:
-            Extracted JSON string
-        """
-        text = text.strip()
-
-        # Check for ```json code blocks
-        # Match everything after ```json up to the next ``` or end of string
-        if "```json" in text:
-            match = re.search(r"```json\s*(.*?)(?:```|$)", text, re.DOTALL)
-            if match:
-                return match.group(1).strip()
-
-        # Check for generic ``` code blocks
-        # Match everything after ``` up to the next ``` or end of string
-        if "```" in text:
-            match = re.search(r"```\s*(.*?)(?:```|$)", text, re.DOTALL)
-            if match:
-                return match.group(1).strip()
-
-        return text
-
     def measure(self, test_case: LLMTestCase) -> float:
         """
         Check if output is valid JSON.
@@ -139,7 +144,7 @@ class JSONValidityMetric(BaseMetric):
         """
         try:
             # Extract JSON (handles markdown code blocks)
-            json_str = self._extract_json(test_case.actual_output)
+            json_str = extract_json(test_case.actual_output)
             json.loads(json_str)  # Just check if parseable
 
             self.score = 1.0
@@ -221,8 +226,9 @@ class StructureMetric(BaseMetric):
             1.0 if structure is valid, 0.0 otherwise
         """
         try:
-            # Parse JSON
-            parsed = json.loads(test_case.actual_output)
+            # Extract and parse JSON (handles markdown code blocks)
+            json_str = extract_json(test_case.actual_output)
+            parsed = json.loads(json_str)
 
             # Check 1: Top-level type
             if not isinstance(parsed, self.expected_type):
@@ -340,8 +346,9 @@ class AccuracyMetric(BaseMetric):
             1.0 if correct classification, 0.0 otherwise
         """
         try:
-            # Parse actual output JSON
-            actual = json.loads(test_case.actual_output)
+            # Extract and parse actual output JSON (handles markdown code blocks)
+            json_str = extract_json(test_case.actual_output)
+            actual = json.loads(json_str)
             expected_correct = test_case.expected_output
 
             # Structure is guaranteed valid by StructureMetric, safe to access
@@ -435,9 +442,11 @@ class AlignmentMetric(BaseMetric):
             logger.info("LLM judge loaded and cached")
 
         try:
-            # Parse input requirements and actual output
-            input_data = json.loads(test_case.input)
-            generated_exercises = json.loads(test_case.actual_output)
+            # Extract and parse input requirements and actual output (handles markdown code blocks)
+            input_json = extract_json(test_case.input)
+            output_json = extract_json(test_case.actual_output)
+            input_data = json.loads(input_json)
+            generated_exercises = json.loads(output_json)
 
             # Build judge prompt
             judge_prompt = self._build_judge_prompt(input_data, generated_exercises)
