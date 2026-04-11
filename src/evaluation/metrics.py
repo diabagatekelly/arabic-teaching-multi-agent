@@ -229,7 +229,7 @@ class StructureMetric(BaseMetric):
                 self.score = 0.0
                 self.success = False
                 self.reason = (
-                    f"✗ Expected {self.expected_type.__name__}, " f"got {type(parsed).__name__}"
+                    f"✗ Expected {self.expected_type.__name__}, got {type(parsed).__name__}"
                 )
                 return 0.0
 
@@ -479,10 +479,10 @@ class AlignmentMetric(BaseMetric):
         prompt = f"""You are an expert judge evaluating the alignment between exercise requirements and generated exercises.
 
 Requirements:
-- Exercise type: {input_data.get('exercise_type', 'N/A')}
-- Learned vocabulary: {input_data.get('learned_vocab', [])}
-- Grammar rule: {input_data.get('grammar_rule', 'N/A')}
-- Question count: {input_data.get('question_count', 'N/A')}
+- Exercise type: {input_data.get("exercise_type", "N/A")}
+- Learned vocabulary: {input_data.get("learned_vocab", [])}
+- Grammar rule: {input_data.get("grammar_rule", "N/A")}
+- Question count: {input_data.get("question_count", "N/A")}
 
 Generated Exercises:
 {json.dumps(generated_exercises, indent=2, ensure_ascii=False)}

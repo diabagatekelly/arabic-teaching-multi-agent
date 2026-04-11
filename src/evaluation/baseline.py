@@ -597,9 +597,7 @@ def main() -> None:
             mode_results["passed"], mode_results["total"]
         )
         logger.info(f"\n{mode_name.replace('_', ' ').title()} Results:")
-        logger.info(
-            f"  Passed: {mode_results['passed']}/{mode_results['total']} " f"({mode_pct:.1f}%)"
-        )
+        logger.info(f"  Passed: {mode_results['passed']}/{mode_results['total']} ({mode_pct:.1f}%)")
 
     # Calculate overall statistics
     total_cases = sum(r["total"] for r in results_by_mode.values())
