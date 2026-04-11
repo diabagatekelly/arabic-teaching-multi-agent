@@ -18,6 +18,88 @@
 
 ---
 
+## Why This Approach?
+
+### Evolution: From Single Model to Multi-Agent
+
+**Initial approach:** Single Qwen2.5-3B fine-tuned to do everything
+- Teaching with encouraging tone
+- Grading student answers
+- Managing grammar facts
+
+**Problems encountered:**
+1. **Conflicting objectives:** Model struggled to balance encouraging tone while correcting errors properly
+2. **Catastrophic forgetting:** As grammar rules expanded, model couldn't retain earlier lessons without massive retraining
+3. **Content vs. style:** Model was memorizing specific grammar facts instead of learning teaching patterns
+
+**Solution:** Separate models with dedicated responsibilities + RAG for facts
+
+### Why Multi-Agent Architecture?
+
+The three-agent split maps directly to the three problems the single model couldn't solve:
+
+**Agent 1 (Teaching):** Handles tone and user interaction
+- Fine-tuned purely for pedagogical style
+- No grammar facts in training data (comes via variables from Agent 3)
+- Single focus: be encouraging and structured
+
+**Agent 2 (Grading):** Handles error identification and correctness
+- Factual, no tone requirements (Agent 1 wraps the output)
+- Can focus entirely on semantic accuracy
+- Uses larger model (7B) for better reasoning
+
+**Agent 3 (Content Retrieval):** Handles grammar facts via RAG
+- No fine-tuning needed (facts are data, not weights)
+- Expandable without retraining (add markdown files)
+- Eliminates catastrophic forgetting risk
+
+**Trade-offs:**
+- ✅ Solves all three core problems
+- ⚠️ More complex architecture to orchestrate
+- ⚠️ May have higher latency (multiple model calls)
+- ⚠️ Higher total cost (two models running)
+
+### Why Dual-Model Strategy (3B + 7B)?
+
+**Why not 3B for everything?**
+- Grading is the most critical component of the system
+- Incorrect grading breaks trust and learning effectiveness
+- Flexible grading (typos, synonyms, semantic matching) requires stronger reasoning
+- Testing showed 3B struggled with semantic comparison tasks
+
+**Why not 7B for everything?**
+- Memory conscious: 7GB total (3B + 7B) vs. 8GB for two 7B models
+- Teaching and generation are simpler tasks - 3B is sufficient
+- 3B inference is faster and cheaper for user-facing interactions
+
+**Result:** Use the right model for each task's complexity
+
+### Why Eval-First Development?
+
+**Background:** Test-Driven Development (TDD) practitioner in traditional software engineering
+
+**Reasoning:** If TDD works for deterministic code, evaluation-driven should work for non-deterministic LLM outputs
+- Define success criteria before building
+- Catch regressions immediately when changing prompts or models
+- Quantify improvement claims with numbers
+
+**Validation:** Later learned this is emerging industry best practice (DeepEval, LangSmith, etc.)
+
+**Experience:** Initial single-model attempt failed specifically because there were no clear success metrics - just "seems encouraging" or "mostly correct". Eval-first approach would have caught the conflicting objectives earlier.
+
+### What Makes This Different?
+
+**vs. Duolingo and similar apps:**
+1. **Explicit grammar teaching:** Focuses on understanding rules, not just learning phrases through conversation
+2. **Targeted practice:** Users can focus on specific vocabulary or grammar points they're struggling with
+3. **Arabic language support:** Built specifically for Arabic with transliteration, not adapted from Romance languages
+4. **Immediate, intelligent feedback:** Accepts typos, synonyms, and alternate phrasings (semantic grading vs. exact string matching)
+5. **Blended approach:** Can do guided full course (vocab + grammar from lesson 1) or targeted practice
+
+**Engineering approach:** This is good engineering with industry-standard patterns (multi-agent, RAG, eval-driven), not claiming novel research. The value is in thoughtful application of modern best practices to solve a real pedagogical problem.
+
+---
+
 ## Agent Architecture
 
 ### 🎭 Agent 1: Teaching/Presentation Agent (The "Face")
