@@ -90,7 +90,7 @@
 
 **Tools:**
 1. **LangChain PromptTemplate** - Formats variables into structured prompt
-2. **Fine-tuned LLM** (Qwen 7B - teaching style) - Adds pedagogical style
+2. **Fine-tuned LLM** (Qwen2.5-3B - teaching style) - Adds pedagogical style
 
 **Process:**
 ```python
@@ -295,15 +295,23 @@ Errors ordered by: (1) question order, (2) occurrence in answer
 **Tools:**
 1. **Pre-loaded grammar rules** - Received from Agent 3 at lesson start
 2. **LangChain PromptTemplate** - Formats grading instructions + rules + answers
-3. **Fine-tuned LLM** (Qwen 7B - strict grading style) - Returns structured JSON
+3. **Base LLM** (Qwen2.5-7B - better reasoning) - Returns structured JSON
 
-**Why Both Fine-Tuning AND Prompt?**
+**Why 7B Base Model (Not Fine-Tuned)?**
 
-Fine-tuning teaches **behavior:**
-- ✅ Output JSON format
-- ✅ Strict grading style (no encouragement)
-- ✅ How to identify error patterns WHEN GIVEN A RULE
-- ✅ Error categorization
+The base Qwen2.5-7B provides:
+- ✅ Strong reasoning for semantic comparison (typos, synonyms, abbreviations)
+- ✅ Good Arabic comprehension
+- ✅ Reliable JSON output with proper prompting
+- ✅ No fine-tuning needed initially (prompting is sufficient)
+- ⚠️ May fine-tune later if grading accuracy needs improvement
+
+**Flexible Grading:**
+Prompt instructs model to accept:
+- Minor typos (e.g., "scool" for "school")
+- Synonyms (e.g., "instructor" for "teacher")
+- Alternate phrasings with same meaning
+- Abbreviated forms for grammar (e.g., "m" for "masculine")
 
 Prompt provides **content:**
 - ✅ Specific grammar rules for this lesson
@@ -331,11 +339,7 @@ Be strict and factual.""",
 )
 ```
 
-**Fine-tuned On:**
-- Strict grading patterns (~40 conversations)
-- JSON output format
-- Error type identification
-- **Generic** error patterns (not specific grammar rules - those come via prompt)
+**Note:** Using base model with good prompting initially. Will fine-tune only if baseline evaluation shows grading accuracy needs improvement.
 
 ---
 
@@ -628,11 +632,11 @@ test = lightweight_llm.generate_test(test_content)
 ```
 
 **LLM Choice for Agent 3:**
-- **Option A:** Same fine-tuned Qwen 7B (reuse Agent 1/2 model)
-- **Option B:** Smaller model like GPT-3.5-turbo or Qwen 1.5B (cheaper/faster for simple generation)
-- **Option C:** Fine-tune separate small model just for exercise generation
+- **Option A:** Fine-tuned Qwen2.5-3B (same as Agent 1, optimized for exercise generation patterns)
+- **Option B:** Base Qwen2.5-3B with prompting (no fine-tuning, simpler approach)
+- **Option C:** Base Qwen2.5-7B (same as Agent 2, better reasoning for complex generation)
 
-**Recommendation:** Start with Option B (GPT-3.5-turbo) - simple generation doesn't need fine-tuning
+**Recommendation:** Start with Option B (base 3B with prompting). Fine-tune later if exercise quality needs improvement.
 
 ---
 
@@ -793,24 +797,23 @@ state = {
 
 ## Training Data Strategy
 
-**One Model, Three Modes:** Single combined dataset trains one Qwen2.5-3B model that can operate in three different modes based on system prompts.
+**Initial Approach:** Fine-tune only Agent 1 (Teaching). Use base models with prompting for Agent 2 (Grading) and Agent 3 (Generation).
 
-### Combined Training Dataset
+### Teaching Agent Training Dataset
 
-**Total Size:** 110-120 conversations
+**Total Size:** ~40 conversations
 
 ```
-combined_training_data.jsonl
-├─ Teaching Mode (~40 conversations)
-│  ├─ Vocabulary batch introduction (~10)
-│  ├─ Vocabulary quiz feedback (~10)
-│  ├─ Grammar explanation (~15)
-│  └─ Grammar quiz feedback (~5)
-├─ Grading Mode (~40 conversations)
-│  ├─ Vocabulary grading (~15)
-│  └─ Grammar grading (~25)
-└─ Exercise Generation Mode (~30 conversations)
+teaching_training_data.jsonl
+├─ Vocabulary batch introduction (~10 conversations)
+├─ Vocabulary quiz feedback (~10 conversations)
+├─ Grammar explanation (~15 conversations)
+└─ Grammar quiz feedback (~5 conversations)
 ```
+
+**Optional Future Fine-Tuning:**
+- Agent 2 (Grading): If baseline evaluation shows accuracy issues (~40 grading conversations)
+- Agent 3 (Generation): If exercise quality needs improvement (~30 generation conversations)
 
 ---
 
@@ -881,110 +884,25 @@ Examples: {examples}
 
 ---
 
-### Mode 2: Grading Style (~40 conversations)
+### Agent 2 & 3: Base Models with Prompting (Not Fine-Tuned Initially)
 
-**Focus:** Strict JSON output, error identification, no encouragement
+**Agent 2 (Grading) - Qwen2.5-7B Base:**
+- Uses detailed prompts with grammar rules and flexible matching instructions
+- Accepts typos, synonyms, abbreviations through prompt guidance
+- Returns JSON with grading results
+- Will fine-tune only if baseline evaluation shows accuracy issues
 
-**System prompt pattern:**
-```
-Mode: Grading
-Lesson: {lesson_number}
-Grammar Rules: {rules_with_detection_patterns}
-```
+**Agent 3 (Generation) - Qwen2.5-3B Base:**
+- Uses prompts with exercise templates and cached vocabulary
+- Generates varied exercises from templates
+- Returns JSON array of exercises
+- Will fine-tune only if exercise quality needs improvement
 
-**Example conversation (correct answer):**
-```json
-{
-  "messages": [
-    {
-      "role": "system",
-      "content": "Mode: Grading\nLesson: 3\nRule: Adjectives must match noun gender\nPattern: If noun.gender ≠ adj.gender → error"
-    },
-    {
-      "role": "user",
-      "content": "{\"answers\": [{\"answer_id\": \"q1\", \"student_answer\": \"كتاب كبير\", \"expected_pattern\": \"كتاب كبير\", \"grammar_points\": [\"gender_agreement\"]}]}"
-    },
-    {
-      "role": "assistant",
-      "content": "{\"results\": [{\"answer_id\": \"q1\", \"correct\": true, \"errors\": [], \"total_errors\": 0}]}"
-    }
-  ]
-}
-```
-
-**Example conversation (incorrect answer):**
-```json
-{
-  "messages": [
-    {
-      "role": "system",
-      "content": "Mode: Grading\nLesson: 3\nRule: Adjectives must match noun gender"
-    },
-    {
-      "role": "user",
-      "content": "{\"answers\": [{\"answer_id\": \"q1\", \"student_answer\": \"كتاب كبيرة\", \"expected_pattern\": \"كتاب كبير\", \"grammar_points\": [\"gender_agreement\"]}]}"
-    },
-    {
-      "role": "assistant",
-      "content": "{\"results\": [{\"answer_id\": \"q1\", \"correct\": false, \"errors\": [{\"error_type\": \"gender_mismatch\", \"grammar_point\": \"noun_adjective_agreement\", \"details\": \"كتاب (masculine) paired with كبيرة (feminine)\", \"correction\": \"Use كبير (masculine) to match كتاب\"}], \"total_errors\": 1, \"correct_form\": \"كتاب كبير\"}]}"
-    }
-  ]
-}
-```
-
-**Mix includes:**
-- Correct answers (output correct: true)
-- Gender errors
-- Definiteness errors
-- Verb errors
-- Multiple errors in one answer
-- Generic error patterns (not specific grammar rules)
+**Note:** Both agents rely on good prompting initially. Fine-tuning is optional based on baseline evaluation results.
 
 ---
 
-### Mode 3: Exercise Generation (~30 conversations)
-
-**Focus:** Generate exercises from templates using provided vocabulary
-
-**System prompt pattern:**
-```
-Mode: Exercise Generation
-Lesson: {lesson_number}
-Template: {exercise_template}
-Primary Vocabulary: {student_vocab}
-Additional Vocabulary: {optional_extra_words}
-```
-
-**Example conversation:**
-```json
-{
-  "messages": [
-    {
-      "role": "system",
-      "content": "Mode: Exercise Generation\nLesson: 3\nTemplate: Fill-in-blank with gender agreement\nPrimary Vocabulary: كبير, صغير, جميل\nGrammar Focus: Adjective must match noun gender"
-    },
-    {
-      "role": "user",
-      "content": "Generate 3 fill-in-blank exercises"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"question\": \"Complete: كِتَاب ___\", \"answer\": \"كَبِير\", \"options\": [\"كَبِير\", \"كَبِيرَة\"], \"explanation\": \"كتاب is masculine\"}, {\"question\": \"Complete: مَدْرَسَة ___\", \"answer\": \"كَبِيرَة\", \"options\": [\"كَبِير\", \"كَبِيرَة\"], \"explanation\": \"مدرسة is feminine\"}, {\"question\": \"Complete: بَيْت ___\", \"answer\": \"صَغِير\", \"options\": [\"صَغِير\", \"صَغِيرَة\"], \"explanation\": \"بيت is masculine\"}]"
-    }
-  ]
-}
-```
-
-**Variety includes:**
-- Fill-in-blank
-- Translation
-- Correction exercises
-- Multiple choice
-- Different grammar points
-
----
-
-## Scalability: Alooks gooddding New Grammar
+## Scalability: Adding New Grammar
 
 **Old approach (v1):**
 1. Write 20-30 new training examples
@@ -1021,51 +939,56 @@ If negation particle doesn't match tense → ERROR
 
 ## Model Strategy
 
-### Single Model for All Agents
+### Two-Model Architecture
 
-**Model:** Qwen2.5-3B-Instruct (fine-tuned once)
+**Agent 1 (Teaching):** Qwen2.5-3B-Instruct (fine-tuned)
+- Fine-tuned on ~40 teaching conversations
+- Optimized for encouraging tone and pedagogical structure
+- Lightweight (2GB with 4-bit quantization)
+- Fast inference for real-time teaching interactions
 
-**Why One Model:**
-- ✅ Free (run locally)
-- ✅ Small enough (2GB with 4-bit quantization)
-- ✅ Sufficient for style learning (not memorizing grammar rules)
-- ✅ One training run (~20 min)
-- ✅ Load once, use for all three agents
+**Agent 2 (Grading):** Qwen2.5-7B-Instruct (base, not fine-tuned)
+- Better reasoning for semantic comparison
+- Strong Arabic comprehension
+- Handles flexible grading (typos, synonyms, abbreviations)
+- Base model sufficient with good prompting
+- May fine-tune later if accuracy needs improvement
 
-**Training Strategy:**
+**Agent 3 (Generation):** Qwen2.5-3B-Instruct (base with prompting)
+- Uses base 3B model initially (no fine-tuning needed)
+- Can fine-tune later for exercise generation patterns if needed
+- Generates exercises from templates using cached vocabulary
+
+**Why Two Different Models:**
+- **Teaching needs fine-tuning:** Specific tone/style requirements for user-facing content
+- **Grading needs reasoning:** 7B provides better semantic understanding for flexible matching
+- **Separation of concerns:** Teaching optimized for friendliness, grading optimized for accuracy
+
+**Training Strategy (Agent 1 Only):**
 ```
-One combined dataset (110-120 conversations):
-├─ Teaching style (~40 conversations)
-│  └─ System: "Mode: Teaching" → Encouraging, structured
-├─ Grading style (~40 conversations)
-│  └─ System: "Mode: Grading" → Strict JSON output
-└─ Exercise generation (~30 conversations)
-   └─ System: "Mode: Exercise Generation" → Template filling
-```
-
-**Behavior Control:**
-Different system prompts at inference time control which "mode" the model uses.
-
-```python
-# Agent 1: Teaching mode
-system_prompt = "Mode: Teaching\nBe encouraging and structured."
-
-# Agent 2: Grading mode
-system_prompt = "Mode: Grading\nOutput strict JSON with error analysis."
-
-# Agent 3: Exercise generation mode
-system_prompt = "Mode: Exercise Generation\nGenerate exercises from templates."
+Fine-tune Qwen2.5-3B on teaching conversations (~40 total):
+├─ Vocabulary batch introduction (~10 conversations)
+├─ Vocabulary quiz feedback (~10 conversations)
+├─ Grammar explanation (~15 conversations)
+└─ Grammar quiz feedback (~5 conversations)
 ```
 
 **Memory Requirements:**
-- Model (4-bit): ~2GB
-- Context (1536 tokens): ~1GB
-- Total: ~3GB RAM
+- 3B Model (4-bit): ~2GB
+- 7B Model (4-bit): ~4GB
+- Context (1536 tokens): ~1GB per model
+- Total: ~7GB RAM (both models loaded)
 
-**Why 3B (not 1.5B or 7B):**
-- 1.5B: Too small for reliable JSON output
-- 3B: Sweet spot (v6/v7 showed good results)
-- 7B: Unnecessary for style-only learning, uses more memory
+**Why 3B for Teaching:**
+- Sufficient for style learning (not memorizing content)
+- Fast inference for interactive teaching
+- Small training dataset (40 conversations)
+
+**Why 7B for Grading:**
+- Better reasoning for semantic comparison
+- Stronger Arabic language understanding
+- More reliable for critical grading decisions
+- Reduces false negatives/positives
 
 ---
 
@@ -1074,11 +997,13 @@ system_prompt = "Mode: Exercise Generation\nGenerate exercises from templates."
 | Component | Tool | Why |
 |-----------|------|-----|
 | Orchestration | LangGraph | State management, agent routing |
-| **All Agents LLM** | **Qwen2.5-3B (fine-tuned once)** | **Teaching, grading, generation styles** |
+| **Agent 1 LLM** | **Qwen2.5-3B (fine-tuned)** | **Teaching style - encouraging, structured** |
+| **Agent 2 LLM** | **Qwen2.5-7B (base)** | **Grading - better reasoning, Arabic comprehension** |
+| **Agent 3 LLM** | **Qwen2.5-3B (base)** | **Exercise generation - prompting sufficient** |
 | Agent 3 RAG | Pinecone | Cloud vector database, scalable retrieval |
 | Prompt Assembly | LangChain PromptTemplate | Variable formatting for all agents |
 | Vector Embeddings | `all-MiniLM-L6-v2` (sentence-transformers) | Free, 384-dim embeddings, used in assignment 8 |
-| Evaluation | DeepEval | Automated quality testing with LLM-as-a-Judge |
+| Evaluation | DeepEval + Qwen2.5-7B | Automated testing with LLM-as-a-Judge for alignment |
 
 ---
 
@@ -1116,11 +1041,12 @@ Following modern **Eval-Driven Development** approach (2026 best practices):
 3. **Build RAG database** - Lessons 1-8 grammar rules and templates
 
 ### Phase 2: Core Components (Build & Measure)
-4. **Create training data** - 110 conversations (teaching + grading + generation)
-5. **Fine-tune Qwen2.5-3B** - Single model, three modes
-6. **Build Agent 2** (Error Detection) - Test in isolation against evals
-7. **Build Agent 3** (Content Retrieval + Generation) - Test in isolation
-8. **Build Agent 1** (Teaching Presentation) - Test in isolation
+4. **Create training data** - 40 teaching conversations for Agent 1
+5. **Fine-tune Qwen2.5-3B** - Agent 1 teaching style only
+6. **Build Agent 2** (Grading) - Use base Qwen2.5-7B with prompting, test against evals
+7. **Build Agent 3** (Content Retrieval + Generation) - Use base Qwen2.5-3B with prompting, test in isolation
+8. **Build Agent 1** (Teaching Presentation) - Use fine-tuned 3B, test in isolation
+9. **Evaluate grading accuracy** - If <90%, create grading training data and fine-tune 7B
 
 ### Phase 3: Integration (Orchestrate)
 9. **Build simple orchestrator** - Basic routing between agents

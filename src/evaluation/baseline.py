@@ -6,6 +6,19 @@ from pathlib import Path
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from src.evaluation.deepeval_pipeline import EvaluationPipeline
+from src.prompts.formatters import flatten_nested_input
+from src.prompts.templates import (
+    EXERCISE_GENERATION,
+    FEEDBACK_GRAMMAR_CORRECT,
+    FEEDBACK_GRAMMAR_INCORRECT,
+    FEEDBACK_VOCAB_CORRECT,
+    FEEDBACK_VOCAB_INCORRECT,
+    GRADING_GRAMMAR_QUIZ,
+    GRADING_VOCAB,
+    GRAMMAR_EXPLANATION,
+    LESSON_WELCOME,
+    VOCAB_BATCH_INTRO,
+)
 
 # Constants
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -20,44 +33,61 @@ logger = logging.getLogger(__name__)
 
 class BaselineEvaluator:
     """
-    Evaluates base Qwen2.5-3B model (no fine-tuning) against test cases.
+    Evaluates base models (no fine-tuning) against test cases.
 
-    Goal: Establish baseline scores that fine-tuned model should beat.
+    Model Strategy (matches production architecture):
+    - Agent 1 (Teaching/Feedback): Base Qwen2.5-3B → Fine-tuned 3B
+    - Agent 2 (Grading): Base Qwen2.5-7B (not fine-tuned initially)
+    - Agent 3 (Generation): Base Qwen2.5-3B (not fine-tuned initially)
+
+    Available baseline methods (8/8 modes - COMPLETE COVERAGE):
+    1. run_lesson_start_baseline() - Prompt #1 (3B)
+    2. run_teaching_vocab_baseline() - Prompts #2-6, #8 (3B, batch_introduction only)
+    3. run_teaching_grammar_baseline() - Prompts #9-12, #14 (3B, topic_explanation only)
+    4. run_feedback_vocab_baseline() - Prompts #6, #7 (3B)
+    5. run_feedback_grammar_baseline() - Prompts #12, #13 (3B)
+    6. run_grading_vocab_baseline() - Prompt #15 (7B)
+    7. run_grading_grammar_baseline() - Prompts #16, #17 (7B, quiz_grading only)
+    8. run_exercise_generation_baseline() - Prompts #19, #20, #21 (3B, exercise_gen only)
+
+    Note: Some modes only evaluate primary sub-groups for speed (marked above).
+    To evaluate all sub-groups, extend the relevant method to sample from more sub-groups.
+
+    Pattern for each method:
+    1. Sample test cases from self.pipeline.test_cases[mode_name]
+    2. Use flatten_nested_input() to prepare data
+    3. Use prompt templates to generate prompts
+    4. Call self.generate_response() with appropriate model
+    5. Return (model_responses, results) tuple
     """
 
     def __init__(
         self,
-        model_name: str = "Qwen/Qwen2.5-3B-Instruct",
+        model_3b_name: str = "Qwen/Qwen2.5-3B-Instruct",
+        model_7b_name: str = "Qwen/Qwen2.5-7B-Instruct",
         test_cases_path: str | Path | None = None,
     ) -> None:
         """
-        Initialize baseline evaluator.
+        Initialize baseline evaluator with both 3B and 7B models.
 
         Args:
-            model_name: HuggingFace model ID
+            model_3b_name: HuggingFace model ID for 3B model (teaching, feedback, generation)
+            model_7b_name: HuggingFace model ID for 7B model (grading)
             test_cases_path: Path to test cases JSON (defaults to PROJECT_ROOT/data/evaluation/test_cases.json)
 
         Raises:
             RuntimeError: If model loading fails
             FileNotFoundError: If test cases file not found
         """
-        self.model_name = model_name
+        self.model_3b_name = model_3b_name
+        self.model_7b_name = model_7b_name
         self.test_cases_path = Path(test_cases_path) if test_cases_path else DEFAULT_TEST_CASES_PATH
 
-        try:
-            logger.info(f"Loading base model: {model_name}...")
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                device_map="auto",
-                torch_dtype="auto",
-            )
-            logger.info("✓ Model loaded successfully")
-
-        except Exception as e:
-            error_msg = f"Failed to load model {model_name}: {e}"
-            logger.error(error_msg)
-            raise RuntimeError(error_msg) from e
+        # Lazy loading - models loaded on first access
+        self._model_3b = None
+        self._tokenizer_3b = None
+        self._model_7b = None
+        self._tokenizer_7b = None
 
         try:
             self.pipeline = EvaluationPipeline(self.test_cases_path)
@@ -65,27 +95,88 @@ class BaselineEvaluator:
             logger.error(f"Test cases file not found: {self.test_cases_path}")
             raise
 
-    def generate_response(self, prompt: str, max_new_tokens: int = DEFAULT_MAX_TOKENS) -> str:
+    @property
+    def model_3b(self):
+        """Lazy load 3B model on first access."""
+        if self._model_3b is None:
+            try:
+                logger.info(f"Loading 3B model: {self.model_3b_name}...")
+                self._model_3b = AutoModelForCausalLM.from_pretrained(
+                    self.model_3b_name,
+                    device_map="auto",
+                    torch_dtype="auto",
+                )
+                logger.info("✓ 3B model loaded successfully")
+            except Exception as e:
+                error_msg = f"Failed to load 3B model {self.model_3b_name}: {e}"
+                logger.error(error_msg)
+                raise RuntimeError(error_msg) from e
+        return self._model_3b
+
+    @property
+    def tokenizer_3b(self):
+        """Lazy load 3B tokenizer on first access."""
+        if self._tokenizer_3b is None:
+            self._tokenizer_3b = AutoTokenizer.from_pretrained(self.model_3b_name)
+        return self._tokenizer_3b
+
+    @property
+    def model_7b(self):
+        """Lazy load 7B model on first access."""
+        if self._model_7b is None:
+            try:
+                logger.info(f"Loading 7B model: {self.model_7b_name}...")
+                self._model_7b = AutoModelForCausalLM.from_pretrained(
+                    self.model_7b_name,
+                    device_map="auto",
+                    torch_dtype="auto",
+                )
+                logger.info("✓ 7B model loaded successfully")
+            except Exception as e:
+                error_msg = f"Failed to load 7B model {self.model_7b_name}: {e}"
+                logger.error(error_msg)
+                raise RuntimeError(error_msg) from e
+        return self._model_7b
+
+    @property
+    def tokenizer_7b(self):
+        """Lazy load 7B tokenizer on first access."""
+        if self._tokenizer_7b is None:
+            self._tokenizer_7b = AutoTokenizer.from_pretrained(self.model_7b_name)
+        return self._tokenizer_7b
+
+    def generate_response(
+        self, prompt: str, max_new_tokens: int = DEFAULT_MAX_TOKENS, use_7b: bool = False
+    ) -> str:
         """
-        Generate response from base model.
+        Generate response from base model (3B or 7B).
 
         Args:
             prompt: Input prompt
             max_new_tokens: Maximum tokens to generate
+            use_7b: If True, use 7B model; if False, use 3B model (default)
 
         Returns:
             Generated text
         """
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        # Select model and tokenizer
+        if use_7b:
+            model = self.model_7b
+            tokenizer = self.tokenizer_7b
+        else:
+            model = self.model_3b
+            tokenizer = self.tokenizer_3b
 
-        outputs = self.model.generate(
+        inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+
+        outputs = model.generate(
             **inputs,
             max_new_tokens=max_new_tokens,
             do_sample=False,  # Deterministic for evaluation
-            pad_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=tokenizer.eos_token_id,
         )
 
-        response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
         # Remove the prompt from response
         if response.startswith(prompt):
@@ -93,121 +184,347 @@ class BaselineEvaluator:
 
         return response
 
-    def run_teaching_mode_baseline(
+    def run_lesson_start_baseline(
         self, sample_size: int = DEFAULT_SAMPLE_SIZE
     ) -> tuple[dict[str, str], dict]:
         """
-        Run baseline evaluation on teaching mode test cases.
-
-        Note: Currently only evaluates vocabulary_batch_introduction category.
-        Grammar explanation and quiz feedback categories are not included in baseline
-        to keep evaluation time manageable. Extend this method if full coverage is needed.
+        Run baseline evaluation on lesson_start mode (Prompt #1).
 
         Args:
-            sample_size: Number of test cases to evaluate per category (for speed)
+            sample_size: Number of test cases to evaluate
 
         Returns:
             Tuple of (model_responses, evaluation_results)
         """
-        logger.info("\n=== Running Teaching Mode Baseline ===\n")
+        logger.info("\n=== Running Lesson Start Baseline ===\n")
 
         model_responses = {}
-        teaching_cases = self.pipeline.test_cases["teaching_mode"]
+        lesson_start_cases = self.pipeline.test_cases["lesson_start"]["test_cases"][:sample_size]
 
-        # Sample vocab batch introduction cases
-        for test_case in teaching_cases["vocabulary_batch_introduction"][:sample_size]:
+        for test_case in lesson_start_cases:
             test_id = test_case["test_id"]
             input_data = test_case["input"]
 
-            # Create prompt using list join for efficiency
-            word_lines = [
-                f"- {word['arabic']} ({word['transliteration']}) - {word['english']}"
-                for word in input_data["words"]
-            ]
-            words_section = "\n".join(word_lines)
+            # Use formatter to flatten nested input
+            flattened = flatten_nested_input(input_data)
 
-            prompt = f"""Mode: {input_data['mode']}
-
-Lesson {input_data['lesson_number']}, Batch {input_data['batch_number']}
-
-Words to teach:
-{words_section}
-
-Present these words to the student in an encouraging way:
-"""
+            # Use template to generate prompt
+            prompt = LESSON_WELCOME.format(**flattened)
 
             logger.info(f"Evaluating {test_id}...")
             response = self.generate_response(prompt)
             model_responses[test_id] = response
 
         # Run evaluation
-        results = self.pipeline.evaluate_teaching_mode(model_responses)
+        results = self.pipeline.evaluate_lesson_start(model_responses)
         return model_responses, results
 
-    def run_grading_mode_baseline(
+    def run_teaching_vocab_baseline(
         self, sample_size: int = DEFAULT_SAMPLE_SIZE
     ) -> tuple[dict[str, str], dict]:
         """
-        Run baseline evaluation on grading mode test cases.
+        Run baseline evaluation on teaching_vocab mode (batch_introduction only).
 
-        Note: Currently only evaluates vocabulary_grading category.
-        Grammar grading is not included in baseline to keep evaluation time manageable.
-        Extend this method if full coverage is needed.
+        Note: Only evaluates batch_introduction for speed.
+        Extend to other sub-groups (vocab_overview, list_view, etc.) if needed.
 
         Args:
-            sample_size: Number of test cases to evaluate per category
+            sample_size: Number of test cases to evaluate
 
         Returns:
             Tuple of (model_responses, evaluation_results)
         """
-        logger.info("\n=== Running Grading Mode Baseline ===\n")
+        logger.info("\n=== Running Teaching Vocab Baseline ===\n")
 
         model_responses = {}
-        grading_cases = self.pipeline.test_cases["grading_mode"]
+        vocab_cases = self.pipeline.test_cases["teaching_vocab"]["batch_introduction"][:sample_size]
 
-        # Sample vocabulary grading cases
+        for test_case in vocab_cases:
+            test_id = test_case["test_id"]
+            input_data = test_case["input"]
+
+            # Use formatter to flatten and format words list
+            flattened = flatten_nested_input(input_data)
+
+            # Use template to generate prompt
+            prompt = VOCAB_BATCH_INTRO.format(**flattened)
+
+            logger.info(f"Evaluating {test_id}...")
+            response = self.generate_response(prompt)
+            model_responses[test_id] = response
+
+        # Run evaluation
+        results = self.pipeline.evaluate_teaching_vocab(model_responses)
+        return model_responses, results
+
+    def run_grading_vocab_baseline(
+        self, sample_size: int = DEFAULT_SAMPLE_SIZE
+    ) -> tuple[dict[str, str], dict]:
+        """
+        Run baseline evaluation on grading_vocab mode (Prompt #15).
+
+        Uses 7B model (Agent 2 - Grading).
+
+        Args:
+            sample_size: Number of test cases to evaluate per sub-group
+
+        Returns:
+            Tuple of (model_responses, evaluation_results)
+        """
+        logger.info("\n=== Running Grading Vocab Baseline ===\n")
+
+        model_responses = {}
+        grading_mode = self.pipeline.test_cases["grading_vocab"]
+
+        # Sample from both correct and incorrect translations
         vocab_cases = (
-            grading_cases["vocabulary_grading"]["correct_translations"][:sample_size]
-            + grading_cases["vocabulary_grading"]["incorrect_translations"][:sample_size]
+            grading_mode["correct_translations"][:sample_size]
+            + grading_mode["incorrect_translations"][:sample_size]
         )
 
         for test_case in vocab_cases:
             test_id = test_case["test_id"]
             input_data = test_case["input"]
 
-            # Create prompt
-            prompt = f"""Mode: {input_data['mode']}
-
-Question: What does "{input_data['word']}" mean?
-Student Answer: "{input_data['student_answer']}"
-Correct Answer: "{input_data['correct_answer']}"
-
-Evaluate if the student's answer is correct. Return JSON:
-{{"correct": true}} or {{"correct": false}}
-
-Response:
-"""
+            # Use template to generate prompt
+            prompt = GRADING_VOCAB.format(**input_data)
 
             logger.info(f"Evaluating {test_id}...")
-            response = self.generate_response(prompt, max_new_tokens=GRADING_MAX_TOKENS)
+            # Use 7B model for grading (Agent 2)
+            response = self.generate_response(
+                prompt, max_new_tokens=GRADING_MAX_TOKENS, use_7b=True
+            )
             model_responses[test_id] = response
 
         # Run evaluation
-        results = self.pipeline.evaluate_grading_mode(model_responses)
+        results = self.pipeline.evaluate_grading_vocab(model_responses)
+        return model_responses, results
+
+    def run_teaching_grammar_baseline(
+        self, sample_size: int = DEFAULT_SAMPLE_SIZE
+    ) -> tuple[dict[str, str], dict]:
+        """
+        Run baseline evaluation on teaching_grammar mode (topic_explanation only).
+
+        Note: Only evaluates topic_explanation for speed.
+        Extend to other sub-groups (grammar_overview, quiz_question, topic_summary) if needed.
+
+        Args:
+            sample_size: Number of test cases to evaluate
+
+        Returns:
+            Tuple of (model_responses, evaluation_results)
+        """
+        logger.info("\n=== Running Teaching Grammar Baseline ===\n")
+
+        model_responses = {}
+        grammar_cases = self.pipeline.test_cases["teaching_grammar"]["topic_explanation"][
+            :sample_size
+        ]
+
+        for test_case in grammar_cases:
+            test_id = test_case["test_id"]
+            input_data = test_case["input"]
+
+            # Use formatter to flatten and format examples
+            flattened = flatten_nested_input(input_data)
+
+            # Use template to generate prompt
+            prompt = GRAMMAR_EXPLANATION.format(**flattened)
+
+            logger.info(f"Evaluating {test_id}...")
+            response = self.generate_response(prompt)
+            model_responses[test_id] = response
+
+        # Run evaluation
+        results = self.pipeline.evaluate_teaching_grammar(model_responses)
+        return model_responses, results
+
+    def run_feedback_vocab_baseline(
+        self, sample_size: int = DEFAULT_SAMPLE_SIZE
+    ) -> tuple[dict[str, str], dict]:
+        """
+        Run baseline evaluation on feedback_vocab mode.
+
+        Args:
+            sample_size: Number of test cases to evaluate per sub-group
+
+        Returns:
+            Tuple of (model_responses, evaluation_results)
+        """
+        logger.info("\n=== Running Feedback Vocab Baseline ===\n")
+
+        model_responses = {}
+        feedback_mode = self.pipeline.test_cases["feedback_vocab"]
+
+        # Sample from correct feedback
+        for test_case in feedback_mode["correct_feedback"][:sample_size]:
+            test_id = test_case["test_id"]
+            input_data = test_case["input"]
+
+            # Use correct feedback template
+            prompt = FEEDBACK_VOCAB_CORRECT.format(**input_data)
+
+            logger.info(f"Evaluating {test_id}...")
+            response = self.generate_response(prompt)
+            model_responses[test_id] = response
+
+        # Sample from incorrect feedback
+        for test_case in feedback_mode["incorrect_feedback"][:sample_size]:
+            test_id = test_case["test_id"]
+            input_data = test_case["input"]
+
+            # Use incorrect feedback template
+            prompt = FEEDBACK_VOCAB_INCORRECT.format(**input_data)
+
+            logger.info(f"Evaluating {test_id}...")
+            response = self.generate_response(prompt)
+            model_responses[test_id] = response
+
+        # Run evaluation
+        results = self.pipeline.evaluate_feedback_vocab(model_responses)
+        return model_responses, results
+
+    def run_feedback_grammar_baseline(
+        self, sample_size: int = DEFAULT_SAMPLE_SIZE
+    ) -> tuple[dict[str, str], dict]:
+        """
+        Run baseline evaluation on feedback_grammar mode.
+
+        Args:
+            sample_size: Number of test cases to evaluate per sub-group
+
+        Returns:
+            Tuple of (model_responses, evaluation_results)
+        """
+        logger.info("\n=== Running Feedback Grammar Baseline ===\n")
+
+        model_responses = {}
+        feedback_mode = self.pipeline.test_cases["feedback_grammar"]
+
+        # Sample from correct feedback
+        for test_case in feedback_mode["correct_feedback"][:sample_size]:
+            test_id = test_case["test_id"]
+            input_data = test_case["input"]
+
+            # Use correct feedback template
+            prompt = FEEDBACK_GRAMMAR_CORRECT.format(**input_data)
+
+            logger.info(f"Evaluating {test_id}...")
+            response = self.generate_response(prompt)
+            model_responses[test_id] = response
+
+        # Sample from incorrect feedback
+        for test_case in feedback_mode["incorrect_feedback"][:sample_size]:
+            test_id = test_case["test_id"]
+            input_data = test_case["input"]
+
+            # Use incorrect feedback template
+            prompt = FEEDBACK_GRAMMAR_INCORRECT.format(**input_data)
+
+            logger.info(f"Evaluating {test_id}...")
+            response = self.generate_response(prompt)
+            model_responses[test_id] = response
+
+        # Run evaluation
+        results = self.pipeline.evaluate_feedback_grammar(model_responses)
+        return model_responses, results
+
+    def run_grading_grammar_baseline(
+        self, sample_size: int = DEFAULT_SAMPLE_SIZE
+    ) -> tuple[dict[str, str], dict]:
+        """
+        Run baseline evaluation on grading_grammar mode (quiz_grading only).
+
+        Uses 7B model (Agent 2 - Grading).
+
+        Note: Only evaluates quiz_grading for speed.
+        Extend to test_grading if needed (which uses different template).
+
+        Args:
+            sample_size: Number of test cases to evaluate
+
+        Returns:
+            Tuple of (model_responses, evaluation_results)
+        """
+        logger.info("\n=== Running Grading Grammar Baseline ===\n")
+
+        model_responses = {}
+        grading_mode = self.pipeline.test_cases["grading_grammar"]
+
+        # Sample quiz_grading cases
+        grammar_cases = grading_mode["quiz_grading"][:sample_size]
+
+        for test_case in grammar_cases:
+            test_id = test_case["test_id"]
+            input_data = test_case["input"]
+
+            # Use template to generate prompt
+            prompt = GRADING_GRAMMAR_QUIZ.format(**input_data)
+
+            logger.info(f"Evaluating {test_id}...")
+            # Use 7B model for grading (Agent 2)
+            response = self.generate_response(
+                prompt, max_new_tokens=GRADING_MAX_TOKENS, use_7b=True
+            )
+            model_responses[test_id] = response
+
+        # Run evaluation
+        results = self.pipeline.evaluate_grading_grammar(model_responses)
+        return model_responses, results
+
+    def run_exercise_generation_baseline(
+        self, sample_size: int = DEFAULT_SAMPLE_SIZE
+    ) -> tuple[dict[str, str], dict]:
+        """
+        Run baseline evaluation on exercise_generation mode (exercise_gen only).
+
+        Note: Only evaluates exercise_gen sub-group for speed.
+        AlignmentMetric will use Qwen2.5-7B as judge.
+
+        Args:
+            sample_size: Number of test cases to evaluate
+
+        Returns:
+            Tuple of (model_responses, evaluation_results)
+        """
+        logger.info("\n=== Running Exercise Generation Baseline ===\n")
+
+        model_responses = {}
+        exercise_mode = self.pipeline.test_cases["exercise_generation"]
+
+        # Sample exercise_gen cases
+        exercise_cases = exercise_mode["exercise_gen"][:sample_size]
+
+        for test_case in exercise_cases:
+            test_id = test_case["test_id"]
+            input_data = test_case["input"]
+
+            # Use formatter to flatten input
+            flattened = flatten_nested_input(input_data)
+
+            # Use template to generate prompt
+            prompt = EXERCISE_GENERATION.format(**flattened)
+
+            logger.info(f"Evaluating {test_id}...")
+            response = self.generate_response(prompt, max_new_tokens=DEFAULT_MAX_TOKENS)
+            model_responses[test_id] = response
+
+        # Run evaluation (includes AlignmentMetric with 7B judge)
+        results = self.pipeline.evaluate_exercise_generation(model_responses)
         return model_responses, results
 
     def save_baseline_report(
         self,
-        teaching_results: dict,
-        grading_results: dict,
+        results_by_mode: dict[str, dict],
         output_path: str | Path | None = None,
     ) -> None:
         """
-        Save baseline evaluation report.
+        Save baseline evaluation report for all evaluated modes.
 
         Args:
-            teaching_results: Teaching mode evaluation results
-            grading_results: Grading mode evaluation results
+            results_by_mode: Dict mapping mode names to their evaluation results
+                Example: {"lesson_start": {...}, "teaching_vocab": {...}, "grading_vocab": {...}}
             output_path: Output file path (defaults to PROJECT_ROOT/data/evaluation/baseline_report.md)
         """
         output_file = Path(output_path) if output_path else DEFAULT_BASELINE_REPORT_PATH
@@ -215,8 +532,10 @@ Response:
         report = [
             "# Baseline Evaluation Report",
             "",
-            f"**Model:** {self.model_name}",
-            "**Fine-tuning:** None (base model)",
+            "**Models:**",
+            f"- Teaching/Feedback/Generation: {self.model_3b_name} (3B)",
+            f"- Grading: {self.model_7b_name} (7B)",
+            "**Fine-tuning:** None (base models)",
             "",
             "## Purpose",
             "",
@@ -227,16 +546,13 @@ Response:
             "",
         ]
 
-        # Teaching mode report
-        teaching_report = self.pipeline.generate_report(teaching_results, "teaching")
-        report.append(teaching_report)
-        report.append("")
-        report.append("---")
-        report.append("")
-
-        # Grading mode report
-        grading_report = self.pipeline.generate_report(grading_results, "grading")
-        report.append(grading_report)
+        # Add report for each mode
+        for mode_name, mode_results in results_by_mode.items():
+            mode_report = self.pipeline.generate_report(mode_results, mode_name)
+            report.append(mode_report)
+            report.append("")
+            report.append("---")
+            report.append("")
 
         # Save report
         output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -248,41 +564,54 @@ Response:
 
 
 def main() -> None:
-    """Run baseline evaluation."""
+    """Run baseline evaluation across all 8 modes."""
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     logger.info("=== Baseline Evaluation ===")
-    logger.info("Testing base Qwen2.5-3B (no fine-tuning) against evaluation dataset\n")
+    logger.info("Testing base Qwen2.5-3B (no fine-tuning) against evaluation dataset")
+    logger.info("Evaluating all 8 modes with sample_size=5 per mode\n")
 
     evaluator = BaselineEvaluator()
+    results_by_mode = {}
 
-    # Run teaching mode baseline (uses DEFAULT_SAMPLE_SIZE)
-    teaching_responses, teaching_results = evaluator.run_teaching_mode_baseline()
+    # Define all baseline methods to run
+    baseline_methods = [
+        ("lesson_start", evaluator.run_lesson_start_baseline),
+        ("teaching_vocab", evaluator.run_teaching_vocab_baseline),
+        ("teaching_grammar", evaluator.run_teaching_grammar_baseline),
+        ("feedback_vocab", evaluator.run_feedback_vocab_baseline),
+        ("feedback_grammar", evaluator.run_feedback_grammar_baseline),
+        ("grading_vocab", evaluator.run_grading_vocab_baseline),
+        ("grading_grammar", evaluator.run_grading_grammar_baseline),
+        ("exercise_generation", evaluator.run_exercise_generation_baseline),
+    ]
 
-    teaching_pct = EvaluationPipeline._safe_percentage(
-        teaching_results["passed"], teaching_results["total"]
-    )
-    logger.info("\nTeaching Mode Results:")
-    logger.info(
-        f"  Passed: {teaching_results['passed']}/{teaching_results['total']} "
-        f"({teaching_pct:.1f}%)"
-    )
+    # Run all baselines and collect results
+    for mode_name, baseline_method in baseline_methods:
+        _, mode_results = baseline_method()
+        results_by_mode[mode_name] = mode_results
 
-    # Run grading mode baseline
-    grading_responses, grading_results = evaluator.run_grading_mode_baseline()
+        mode_pct = EvaluationPipeline._safe_percentage(
+            mode_results["passed"], mode_results["total"]
+        )
+        logger.info(f"\n{mode_name.replace('_', ' ').title()} Results:")
+        logger.info(
+            f"  Passed: {mode_results['passed']}/{mode_results['total']} " f"({mode_pct:.1f}%)"
+        )
 
-    grading_pct = EvaluationPipeline._safe_percentage(
-        grading_results["passed"], grading_results["total"]
-    )
-    logger.info("\nGrading Mode Results:")
-    logger.info(
-        f"  Passed: {grading_results['passed']}/{grading_results['total']} " f"({grading_pct:.1f}%)"
-    )
+    # Calculate overall statistics
+    total_cases = sum(r["total"] for r in results_by_mode.values())
+    total_passed = sum(r["passed"] for r in results_by_mode.values())
+    overall_pct = EvaluationPipeline._safe_percentage(total_passed, total_cases)
 
-    # Save report
-    evaluator.save_baseline_report(teaching_results, grading_results)
+    logger.info("\n" + "=" * 60)
+    logger.info(f"Overall: {total_passed}/{total_cases} passed ({overall_pct:.1f}%)")
+    logger.info("=" * 60)
+
+    # Save comprehensive report
+    evaluator.save_baseline_report(results_by_mode)
 
     logger.info("\n=== Baseline Evaluation Complete ===")
 

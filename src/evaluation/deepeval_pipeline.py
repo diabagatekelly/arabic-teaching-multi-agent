@@ -5,13 +5,15 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 
 from src.evaluation.metrics import (
     AccuracyMetric,
-    FaithfulnessMetric,
+    AlignmentMetric,
     JSONValidityMetric,
     SentimentMetric,
+    StructureMetric,
 )
 
 __all__ = ["EvaluationPipeline"]
@@ -49,8 +51,17 @@ class EvaluationPipeline:
             with open(self.test_cases_path) as f:
                 test_cases = json.load(f)
 
-            # Validate structure
-            required_keys = ["teaching_mode", "grading_mode", "exercise_generation"]
+            # Validate structure - check for all 8 mode keys
+            required_keys = [
+                "lesson_start",
+                "teaching_vocab",
+                "teaching_grammar",
+                "feedback_vocab",
+                "feedback_grammar",
+                "grading_vocab",
+                "grading_grammar",
+                "exercise_generation",
+            ]
             for key in required_keys:
                 if key not in test_cases:
                     raise ValueError(f"Missing required key in test cases: {key}")
@@ -74,331 +85,419 @@ class EvaluationPipeline:
         """
         return (numerator / denominator * 100) if denominator > 0 else 0.0
 
-    def evaluate_teaching_mode(self, model_responses: dict[str, str]) -> dict[str, Any]:
+    def _create_test_case(
+        self,
+        test_case_data: dict,
+        actual_output: str,
+        expected_output: Any | None = None,
+    ) -> LLMTestCase:
         """
-        Evaluate teaching mode responses.
+        Create LLMTestCase from test data and model response.
+
+        Args:
+            test_case_data: Test case data from JSON
+            actual_output: Model's generated output
+            expected_output: Optional override for expected output (will be set after creation)
+
+        Returns:
+            LLMTestCase ready for metric evaluation
+
+        Note:
+            DeepEval requires expected_output to be a string, but our metrics expect
+            specific types (bool, list, etc.). We use empty string as placeholder,
+            then immediately override expected_output with the actual value for our metrics.
+        """
+        if expected_output is None:
+            expected_output = test_case_data["expected_output"]
+
+        # Create test case with placeholder for DeepEval, then override for our metrics
+        test_case = LLMTestCase(
+            input=json.dumps(test_case_data["input"]),
+            actual_output=actual_output,
+            expected_output="",  # Placeholder for DeepEval
+        )
+
+        # Override with actual type for our metrics
+        test_case.expected_output = expected_output
+
+        return test_case
+
+    @staticmethod
+    def _get_metric_name(metric: BaseMetric) -> str:
+        """
+        Get metric name for results dictionary.
+
+        Args:
+            metric: Metric instance
+
+        Returns:
+            Metric name in snake_case (e.g., "json_validity", "sentiment")
+        """
+        # Use metric's __name__ property, convert to snake_case
+        name = metric.__name__
+        # Simple conversion: "JSON Validity" -> "json_validity"
+        return name.lower().replace(" ", "_").replace("(", "").replace(")", "")
+
+    def _run_metrics(
+        self,
+        test_case: LLMTestCase,
+        metrics: list[BaseMetric],
+        test_id: str,
+        results: dict[str, Any],
+    ) -> None:
+        """
+        Run multiple metrics on a test case and record results.
+
+        Args:
+            test_case: Test case to evaluate
+            metrics: List of metrics to run
+            test_id: Test case identifier
+            results: Results dictionary to update (modified in place)
+        """
+        all_passed = True
+
+        for metric in metrics:
+            score = metric.measure(test_case)
+            metric_name = self._get_metric_name(metric)
+
+            # Ensure metric key exists in results
+            if metric_name not in results["metrics"]:
+                results["metrics"][metric_name] = []
+
+            results["metrics"][metric_name].append(
+                {
+                    "test_id": test_id,
+                    "score": score,
+                    "passed": metric.is_successful(),
+                    "reason": metric.reason,
+                }
+            )
+
+            if not metric.is_successful():
+                all_passed = False
+
+        results["total"] += 1
+        if all_passed:
+            results["passed"] += 1
+        else:
+            results["failed"] += 1
+
+    def _init_results(self, metric_names: list[str]) -> dict[str, Any]:
+        """
+        Initialize results dictionary with metric placeholders.
+
+        Args:
+            metric_names: List of metric names to track
+
+        Returns:
+            Results dictionary structure
+        """
+        return {
+            "total": 0,
+            "passed": 0,
+            "failed": 0,
+            "metrics": {name: [] for name in metric_names},
+        }
+
+    def _evaluate_teaching_test_cases(
+        self,
+        test_cases: list[dict],
+        model_responses: dict[str, str],
+        results: dict[str, Any],
+        threshold: float,
+        mode: str,
+        dynamic_threshold_fn=None,
+    ) -> None:
+        """
+        Process a list of teaching test cases.
+
+        Args:
+            test_cases: List of test case data dictionaries
+            model_responses: Dict mapping test_id to model output
+            results: Results dictionary to update (modified in place)
+            threshold: Default sentiment threshold
+            mode: Sentiment mode ("teaching" or "feedback")
+            dynamic_threshold_fn: Optional function to compute threshold per test case
+        """
+        for test_case_data in test_cases:
+            test_id = test_case_data["test_id"]
+            if test_id not in model_responses:
+                continue
+
+            test_case = self._create_test_case(test_case_data, model_responses[test_id])
+
+            # Use dynamic threshold if provided, otherwise use default
+            if dynamic_threshold_fn:
+                threshold = dynamic_threshold_fn(test_case_data)
+
+            metrics = [SentimentMetric(threshold=threshold, mode=mode)]
+            self._run_metrics(test_case, metrics, test_id, results)
+
+    def evaluate_lesson_start(self, model_responses: dict[str, str]) -> dict[str, Any]:
+        """
+        Evaluate lesson_start mode responses (Prompt #1).
 
         Args:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with metrics
+            Evaluation results with sentiment metric
         """
-        results = {
-            "total": 0,
-            "passed": 0,
-            "failed": 0,
-            "metrics": {
-                "sentiment": [],
-                "completeness": [],
-                "format": [],
-            },
-        }
+        results = self._init_results(["sentiment"])
+        lesson_start_cases = self.test_cases["lesson_start"]["test_cases"]
 
-        # Get teaching mode test cases
-        teaching_cases = self.test_cases["teaching_mode"]
+        self._evaluate_teaching_test_cases(
+            lesson_start_cases,
+            model_responses,
+            results,
+            threshold=0.9,
+            mode="teaching",
+        )
 
-        # Vocab batch introduction
-        for test_case_data in teaching_cases["vocabulary_batch_introduction"]:
-            test_id = test_case_data["test_id"]
+        return results
 
-            if test_id not in model_responses:
-                continue
+    def evaluate_teaching_vocab(self, model_responses: dict[str, str]) -> dict[str, Any]:
+        """
+        Evaluate teaching_vocab mode responses (Prompts #2-6, #8).
 
-            # Create LLMTestCase
-            test_case = LLMTestCase(
-                input=json.dumps(test_case_data["input"]),
-                actual_output=model_responses[test_id],
-                expected_output=test_case_data["expected_output"],
-            )
+        Args:
+            model_responses: Dict mapping test_id to model output
 
-            # Run sentiment metric
-            sentiment_metric = SentimentMetric(threshold=0.9, mode="teaching")
-            sentiment_score = sentiment_metric.measure(test_case)
+        Returns:
+            Evaluation results with sentiment metric
+        """
+        results = self._init_results(["sentiment"])
+        vocab_mode = self.test_cases["teaching_vocab"]
 
-            results["total"] += 1
-            if sentiment_metric.is_successful():
-                results["passed"] += 1
-            else:
-                results["failed"] += 1
-
-            results["metrics"]["sentiment"].append(
-                {
-                    "test_id": test_id,
-                    "score": sentiment_score,
-                    "passed": sentiment_metric.is_successful(),
-                    "reason": sentiment_metric.reason,
-                }
-            )
-
-        # Grammar topic explanation
-        for test_case_data in teaching_cases["grammar_topic_explanation"]:
-            test_id = test_case_data["test_id"]
-
-            if test_id not in model_responses:
-                continue
-
-            test_case = LLMTestCase(
-                input=json.dumps(test_case_data["input"]),
-                actual_output=model_responses[test_id],
-                expected_output=test_case_data["expected_output"],
-            )
-
-            sentiment_metric = SentimentMetric(threshold=0.9, mode="teaching")
-            sentiment_score = sentiment_metric.measure(test_case)
-
-            results["total"] += 1
-            if sentiment_metric.is_successful():
-                results["passed"] += 1
-            else:
-                results["failed"] += 1
-
-            results["metrics"]["sentiment"].append(
-                {
-                    "test_id": test_id,
-                    "score": sentiment_score,
-                    "passed": sentiment_metric.is_successful(),
-                    "reason": sentiment_metric.reason,
-                }
-            )
-
-        # Quiz feedback
-        for test_case_data in teaching_cases["quiz_feedback"]:
-            test_id = test_case_data["test_id"]
-
-            if test_id not in model_responses:
-                continue
-
-            test_case = LLMTestCase(
-                input=json.dumps(test_case_data["input"]),
-                actual_output=model_responses[test_id],
-                expected_output=test_case_data["expected_output"],
-            )
-
-            # Feedback has lower threshold (0.7-0.8)
-            threshold = 0.8 if test_case_data["input"].get("is_correct") else 0.7
-            sentiment_metric = SentimentMetric(threshold=threshold, mode="feedback")
-            sentiment_score = sentiment_metric.measure(test_case)
-
-            results["total"] += 1
-            if sentiment_metric.is_successful():
-                results["passed"] += 1
-            else:
-                results["failed"] += 1
-
-            results["metrics"]["sentiment"].append(
-                {
-                    "test_id": test_id,
-                    "score": sentiment_score,
-                    "passed": sentiment_metric.is_successful(),
-                    "reason": sentiment_metric.reason,
-                }
+        # Iterate through all sub-groups
+        for sub_group in [
+            "vocab_overview",
+            "batch_introduction",
+            "list_view",
+            "quiz_question",
+            "batch_summary",
+        ]:
+            self._evaluate_teaching_test_cases(
+                vocab_mode[sub_group],
+                model_responses,
+                results,
+                threshold=0.9,
+                mode="teaching",
             )
 
         return results
 
-    def evaluate_grading_mode(self, model_responses: dict[str, str]) -> dict[str, Any]:
+    def evaluate_teaching_grammar(self, model_responses: dict[str, str]) -> dict[str, Any]:
         """
-        Evaluate grading mode responses.
+        Evaluate teaching_grammar mode responses (Prompts #9-12, #14).
 
         Args:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with metrics
+            Evaluation results with sentiment metric
         """
-        results = {
-            "total": 0,
-            "passed": 0,
-            "failed": 0,
-            "metrics": {
-                "json_validity": [],
-                "accuracy": [],
-            },
-        }
+        results = self._init_results(["sentiment"])
+        grammar_mode = self.test_cases["teaching_grammar"]
 
-        grading_cases = self.test_cases["grading_mode"]
+        # Iterate through all sub-groups
+        for sub_group in [
+            "grammar_overview",
+            "topic_explanation",
+            "quiz_question",
+            "topic_summary",
+        ]:
+            self._evaluate_teaching_test_cases(
+                grammar_mode[sub_group],
+                model_responses,
+                results,
+                threshold=0.9,
+                mode="teaching",
+            )
 
-        # Vocabulary grading
-        vocab_grading = grading_cases["vocabulary_grading"]
+        return results
 
-        for test_case_data in (
-            vocab_grading["correct_translations"] + vocab_grading["incorrect_translations"]
-        ):
+    def evaluate_feedback_vocab(self, model_responses: dict[str, str]) -> dict[str, Any]:
+        """
+        Evaluate feedback_vocab mode responses (Prompts #6, #7).
+
+        Args:
+            model_responses: Dict mapping test_id to model output
+
+        Returns:
+            Evaluation results with sentiment metric
+        """
+        results = self._init_results(["sentiment"])
+        feedback_mode = self.test_cases["feedback_vocab"]
+
+        # Iterate through correct and incorrect feedback
+        for sub_group in ["correct_feedback", "incorrect_feedback"]:
+            self._evaluate_teaching_test_cases(
+                feedback_mode[sub_group],
+                model_responses,
+                results,
+                threshold=0.8,
+                mode="feedback",
+            )
+
+        return results
+
+    def evaluate_feedback_grammar(self, model_responses: dict[str, str]) -> dict[str, Any]:
+        """
+        Evaluate feedback_grammar mode responses (Prompts #12, #13).
+
+        Args:
+            model_responses: Dict mapping test_id to model output
+
+        Returns:
+            Evaluation results with sentiment metric
+        """
+        results = self._init_results(["sentiment"])
+        feedback_mode = self.test_cases["feedback_grammar"]
+
+        # Iterate through correct and incorrect feedback
+        for sub_group in ["correct_feedback", "incorrect_feedback"]:
+            self._evaluate_teaching_test_cases(
+                feedback_mode[sub_group],
+                model_responses,
+                results,
+                threshold=0.8,
+                mode="feedback",
+            )
+
+        return results
+
+    def _evaluate_grading_test_cases(
+        self,
+        test_cases: list[dict],
+        model_responses: dict[str, str],
+        results: dict[str, Any],
+    ) -> None:
+        """
+        Process a list of grading test cases (vocab or grammar).
+
+        Handles two structures:
+        1. Simple: {"correct": bool} - for single-question grading
+        2. Complex: {"total_score": str, "results": [...]} - for multi-question test grading
+
+        Args:
+            test_cases: List of test case data dictionaries
+            model_responses: Dict mapping test_id to model output
+            results: Results dictionary to update (modified in place)
+        """
+        for test_case_data in test_cases:
             test_id = test_case_data["test_id"]
-
             if test_id not in model_responses:
                 continue
 
-            # Store expected boolean for accuracy check
-            expected_correct = test_case_data["expected_output"]["correct"]
+            expected_output = test_case_data["expected_output"]
 
-            test_case = LLMTestCase(
-                input=json.dumps(test_case_data["input"]),
-                actual_output=model_responses[test_id],
-                expected_output=json.dumps(expected_correct),  # Convert to JSON string for DeepEval
-            )
-            # Override for our metric logic which expects bool
-            test_case.expected_output = expected_correct
-
-            # Check JSON validity
-            json_metric = JSONValidityMetric()
-            json_score = json_metric.measure(test_case)
-
-            # Check accuracy
-            accuracy_metric = AccuracyMetric()
-            accuracy_score = accuracy_metric.measure(test_case)
-
-            results["total"] += 1
-            if json_metric.is_successful() and accuracy_metric.is_successful():
-                results["passed"] += 1
+            # Determine structure type
+            if "correct" in expected_output and "results" not in expected_output:
+                # Simple case: {"correct": bool}
+                test_case = self._create_test_case(
+                    test_case_data,
+                    model_responses[test_id],
+                    expected_output=expected_output["correct"],
+                )
+                metrics = [
+                    JSONValidityMetric(),
+                    StructureMetric(
+                        expected_type=dict,
+                        required_keys=["correct"],
+                        expected_types={"correct": bool},
+                    ),
+                    AccuracyMetric(),
+                ]
             else:
-                results["failed"] += 1
+                # Complex case: {"total_score": str, "results": [...]}
+                test_case = self._create_test_case(
+                    test_case_data, model_responses[test_id], expected_output=expected_output
+                )
+                metrics = [
+                    JSONValidityMetric(),
+                    StructureMetric(
+                        expected_type=dict,
+                        required_keys=["total_score", "results"],
+                        expected_types={"total_score": str, "results": list},
+                    ),
+                    AccuracyMetric(),
+                ]
 
-            results["metrics"]["json_validity"].append(
-                {
-                    "test_id": test_id,
-                    "score": json_score,
-                    "passed": json_metric.is_successful(),
-                    "reason": json_metric.reason,
-                }
-            )
+            self._run_metrics(test_case, metrics, test_id, results)
 
-            results["metrics"]["accuracy"].append(
-                {
-                    "test_id": test_id,
-                    "score": accuracy_score,
-                    "passed": accuracy_metric.is_successful(),
-                    "reason": accuracy_metric.reason,
-                }
-            )
+    def evaluate_grading_vocab(self, model_responses: dict[str, str]) -> dict[str, Any]:
+        """
+        Evaluate grading_vocab mode responses (Prompt #15).
 
-        # Grammar grading
-        grammar_grading = grading_cases["grammar_grading"]
+        Args:
+            model_responses: Dict mapping test_id to model output
 
-        for test_case_data in (
-            grammar_grading["correct_answers"] + grammar_grading["incorrect_answers"]
-        ):
-            test_id = test_case_data["test_id"]
+        Returns:
+            Evaluation results with JSON, Structure, and Accuracy metrics
+        """
+        results = self._init_results(["json_validity", "structure", "accuracy"])
+        grading_mode = self.test_cases["grading_vocab"]
 
-            if test_id not in model_responses:
-                continue
+        # Iterate through correct and incorrect translations
+        for sub_group in ["correct_translations", "incorrect_translations"]:
+            self._evaluate_grading_test_cases(grading_mode[sub_group], model_responses, results)
 
-            # Store expected boolean for accuracy check
-            expected_correct = test_case_data["expected_output"]["correct"]
+        return results
 
-            test_case = LLMTestCase(
-                input=json.dumps(test_case_data["input"]),
-                actual_output=model_responses[test_id],
-                expected_output=json.dumps(expected_correct),  # Convert to JSON string for DeepEval
-            )
-            # Override for our metric logic which expects bool
-            test_case.expected_output = expected_correct
+    def evaluate_grading_grammar(self, model_responses: dict[str, str]) -> dict[str, Any]:
+        """
+        Evaluate grading_grammar mode responses (Prompts #16, #17).
 
-            # Check JSON validity
-            json_metric = JSONValidityMetric()
-            json_score = json_metric.measure(test_case)
+        Args:
+            model_responses: Dict mapping test_id to model output
 
-            # Check accuracy
-            accuracy_metric = AccuracyMetric()
-            accuracy_score = accuracy_metric.measure(test_case)
+        Returns:
+            Evaluation results with JSON, Structure, and Accuracy metrics
+        """
+        results = self._init_results(["json_validity", "structure", "accuracy"])
+        grading_mode = self.test_cases["grading_grammar"]
 
-            results["total"] += 1
-            if json_metric.is_successful() and accuracy_metric.is_successful():
-                results["passed"] += 1
-            else:
-                results["failed"] += 1
-
-            results["metrics"]["json_validity"].append(
-                {
-                    "test_id": test_id,
-                    "score": json_score,
-                    "passed": json_metric.is_successful(),
-                    "reason": json_metric.reason,
-                }
-            )
-
-            results["metrics"]["accuracy"].append(
-                {
-                    "test_id": test_id,
-                    "score": accuracy_score,
-                    "passed": accuracy_metric.is_successful(),
-                    "reason": accuracy_metric.reason,
-                }
-            )
+        # Iterate through all sub-groups
+        for sub_group in ["quiz_grading", "quiz_incorrect", "test_grading"]:
+            self._evaluate_grading_test_cases(grading_mode[sub_group], model_responses, results)
 
         return results
 
     def evaluate_exercise_generation(self, model_responses: dict[str, str]) -> dict[str, Any]:
         """
-        Evaluate exercise generation responses.
+        Evaluate exercise_generation mode responses (Prompts #19, #20, #21).
 
         Args:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with metrics
+            Evaluation results with JSON, Structure, and Alignment metrics
         """
-        results = {
-            "total": 0,
-            "passed": 0,
-            "failed": 0,
-            "metrics": {
-                "json_validity": [],
-                "faithfulness": [],
-            },
-        }
+        results = self._init_results(["json_validity", "structure", "alignment"])
+        exercise_mode = self.test_cases["exercise_generation"]
 
-        exercise_cases = self.test_cases["exercise_generation"]["test_cases"]
+        # Iterate through all sub-groups
+        for sub_group in ["exercise_gen", "quiz_question_gen", "test_composition"]:
+            for test_case_data in exercise_mode[sub_group]:
+                test_id = test_case_data["test_id"]
+                if test_id not in model_responses:
+                    continue
 
-        for test_case_data in exercise_cases:
-            test_id = test_case_data["test_id"]
+                test_case = self._create_test_case(test_case_data, model_responses[test_id])
 
-            if test_id not in model_responses:
-                continue
-
-            # Expected fields for exercises
-            expected_fields = ["question", "answer"]
-
-            test_case = LLMTestCase(
-                input=json.dumps(test_case_data["input"]),
-                actual_output=model_responses[test_id],
-                expected_output=json.dumps(expected_fields),  # Convert to JSON string for DeepEval
-            )
-            # Override for our metric logic which expects list
-            test_case.expected_output = expected_fields
-
-            # Check JSON validity
-            json_metric = JSONValidityMetric()
-            json_score = json_metric.measure(test_case)
-
-            # Check faithfulness to template
-            faithfulness_metric = FaithfulnessMetric(threshold=0.9)
-            faithfulness_score = faithfulness_metric.measure(test_case)
-
-            results["total"] += 1
-            if json_metric.is_successful() and faithfulness_metric.is_successful():
-                results["passed"] += 1
-            else:
-                results["failed"] += 1
-
-            results["metrics"]["json_validity"].append(
-                {
-                    "test_id": test_id,
-                    "score": json_score,
-                    "passed": json_metric.is_successful(),
-                    "reason": json_metric.reason,
-                }
-            )
-
-            results["metrics"]["faithfulness"].append(
-                {
-                    "test_id": test_id,
-                    "score": faithfulness_score,
-                    "passed": faithfulness_metric.is_successful(),
-                    "reason": faithfulness_metric.reason,
-                }
-            )
+                # Run JSON + Structure + Alignment metrics
+                # Structure varies by sub-group, but all should be valid JSON with specific keys
+                metrics = [
+                    JSONValidityMetric(),
+                    StructureMetric(
+                        expected_type=dict,
+                        required_keys=["question", "answer"],
+                        expected_types={"question": str, "answer": str},
+                    ),
+                    AlignmentMetric(threshold=0.8),
+                ]
+                self._run_metrics(test_case, metrics, test_id, results)
 
         return results
 

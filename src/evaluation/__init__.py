@@ -2,14 +2,16 @@
 
 from src.evaluation.metrics import (
     AccuracyMetric,
-    FaithfulnessMetric,
+    AlignmentMetric,
     JSONValidityMetric,
     SentimentMetric,
+    StructureMetric,
 )
 
 __all__ = [
     "SentimentMetric",
     "JSONValidityMetric",
+    "StructureMetric",
     "AccuracyMetric",
-    "FaithfulnessMetric",
+    "AlignmentMetric",
 ]
