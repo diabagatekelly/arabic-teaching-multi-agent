@@ -30,7 +30,7 @@ jobs:
         run: uv run ruff format --check .
 
       - name: Run mypy type checking
-        run: uv run mypy agents/ orchestration/ rag/ prompts/ evaluation/ || true
+        run: uv run mypy src/ || true
 
       - name: Run pytest with coverage
         run: uv run pytest --cov=src --cov-report=term-missing --cov-report=xml || echo "No tests found yet"
