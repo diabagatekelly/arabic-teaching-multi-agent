@@ -13,41 +13,22 @@ class SentenceTransformerClient:
         model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
         dimension: int = 384,
     ):
-        """
-        Initialize SentenceTransformer client.
-
-        Args:
-            model_name: HuggingFace model name
-            dimension: Expected embedding dimension
-        """
+        """Initialize SentenceTransformer client."""
         self.model_name = model_name
         self.dimension = dimension
         self.model = SentenceTransformer(model_name)
 
     def embed(self, text: str) -> list[float]:
-        """
-        Generate embedding for a single text.
-
-        Args:
-            text: Text to embed
-
-        Returns:
-            List of floats representing the embedding vector
-        """
+        """Generate embedding for a single text."""
         embeddings = self.model.encode([text], convert_to_numpy=False, show_progress_bar=False)
-        return embeddings[0]
+        embedding = embeddings[0]
+
+        if hasattr(embedding, "tolist"):
+            return embedding.tolist()
+        return list(embedding)
 
     def embed_batch(self, texts: list[str], show_progress: bool = False) -> list[list[float]]:
-        """
-        Generate embeddings for multiple texts.
-
-        Args:
-            texts: List of texts to embed
-            show_progress: Show progress bar during embedding
-
-        Returns:
-            List of embedding vectors
-        """
+        """Generate embeddings for multiple texts."""
         if not texts:
             return []
 
@@ -55,14 +36,10 @@ class SentenceTransformerClient:
             texts, convert_to_numpy=False, show_progress_bar=show_progress
         )
 
-        # Convert numpy arrays to lists if needed
-        return embeddings.tolist() if hasattr(embeddings, "tolist") else embeddings
+        if hasattr(embeddings, "tolist"):
+            return embeddings.tolist()
+        return [list(emb) if hasattr(emb, "__iter__") else [emb] for emb in embeddings]
 
     def get_dimension(self) -> int:
-        """
-        Get the dimension of embedding vectors.
-
-        Returns:
-            Embedding dimension
-        """
+        """Get the dimension of embedding vectors."""
         return self.dimension
