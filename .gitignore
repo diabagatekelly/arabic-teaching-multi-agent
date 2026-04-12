@@ -238,7 +238,12 @@ data/raw/*.txt
 NEXT.md
 
 # Project-specific: Claude Code artifacts
-.claude/
+# Ignore personal settings and memory, but commit project skills
+.claude/*
+!.claude/skills/
+.claude/skills/learn-code.md
+.claude/settings.local.json
+.claude/projects/
 
 # Project-specific: User-specific workspace files
 *.code-workspace

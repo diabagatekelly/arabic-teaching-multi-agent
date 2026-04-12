@@ -13,40 +13,34 @@ dependencies = [
     # Core
     "python-dotenv>=1.0.0",
     "pydantic>=2.0.0",
-
     # LangChain & LangGraph
     "langchain>=0.1.0",
     "langgraph>=0.1.0",
     "langchain-openai>=0.1.0",
     "langchain-community>=0.1.0",
-
     # RAG
     "chromadb>=0.4.0",
     "openai>=1.0.0",
     "tiktoken>=0.5.0",
-
     # Model (for fine-tuned Qwen)
     "torch>=2.0.0",
     "transformers>=4.30.0",
     "peft>=0.5.0",
     "accelerate>=0.20.0",
-
     # API
     "fastapi>=0.110.0",
     "uvicorn>=0.27.0",
-
     # UI
     "streamlit>=1.31.0",
-
     # Utilities
     "requests>=2.31.0",
     "numpy>=1.24.0",
     "pandas>=2.0.0",
     "python-frontmatter>=1.0.0",
-
     # Evaluation
     "deepeval>=0.21.0",
     "sentence-transformers>=2.2.0",
+    "pinecone>=8.1.2",
 ]
 
 [project.optional-dependencies]
@@ -106,6 +100,8 @@ module = [
     "transformers.*",
     "peft.*",
     "frontmatter",
+    "pinecone",
+    "pinecone.*",
 ]
 ignore_missing_imports = true
 follow_imports = "skip"
