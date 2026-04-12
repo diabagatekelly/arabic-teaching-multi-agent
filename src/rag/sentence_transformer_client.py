@@ -35,7 +35,12 @@ class SentenceTransformerClient:
             List of floats representing the embedding vector
         """
         embeddings = self.model.encode([text], convert_to_numpy=False, show_progress_bar=False)
-        return embeddings[0]
+        embedding = embeddings[0]
+
+        # Normalize to plain Python list
+        if hasattr(embedding, "tolist"):
+            return embedding.tolist()
+        return list(embedding)
 
     def embed_batch(self, texts: list[str], show_progress: bool = False) -> list[list[float]]:
         """
