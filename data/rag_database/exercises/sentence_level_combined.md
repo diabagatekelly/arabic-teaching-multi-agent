@@ -75,9 +75,7 @@ Two errors: ال + tanween conflict, missing tanween
 
 ---
 
-## Example Generated Exercise Set
-
-### Question 1 (Simple - One Error)
+## Example Question 1 - Simple One Error
 **Question:** Fix the error in this sentence:
 
 The big كِتَابٌ is on the table.
@@ -101,7 +99,7 @@ The big كِتَابٌ is on the table.
 
 ---
 
-### Question 2 (Two Words, One Error Each)
+## Example Question 2 - Two Words One Error Each
 **Question:** Fix the errors in this sentence:
 
 I see a كِتَاب on الطَّاوِلَةٌ.
@@ -131,7 +129,7 @@ I see a كِتَاب on الطَّاوِلَةٌ.
 
 ---
 
-### Question 3 (Context Clues)
+## Example Question 3 - Context Clues
 **Question:** Fix the errors based on context:
 
 There is a مَدْرَسَةُ near the بَيْتٌ.
@@ -161,7 +159,7 @@ There is a مَدْرَسَةُ near the بَيْتٌ.
 
 ---
 
-### Question 4 (All Arabic Sentence)
+## Example Question 4 - All Arabic Sentence
 **Question:** Fix the errors in this Arabic sentence:
 
 **Arabic:** الْكِتَابٌ فِي غُرْفَة
@@ -193,7 +191,7 @@ There is a مَدْرَسَةُ near the بَيْتٌ.
 
 ---
 
-### Question 5 (Longer Sentence - Advanced)
+## Example Question 5 - Longer Sentence Advanced
 **Question:** Fix all errors:
 
 I see الْقَلَمٌ and كِتَاب and a طَاوِلَةُ.
