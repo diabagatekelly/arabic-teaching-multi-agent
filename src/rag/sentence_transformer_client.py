@@ -56,9 +56,7 @@ class SentenceTransformerClient:
         )
 
         # Convert numpy arrays to lists if needed
-        if hasattr(embeddings, "tolist"):
-            return embeddings.tolist()
-        return embeddings
+        return embeddings.tolist() if hasattr(embeddings, "tolist") else embeddings
 
     def get_dimension(self) -> int:
         """
