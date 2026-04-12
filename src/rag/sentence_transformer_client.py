@@ -36,9 +36,20 @@ class SentenceTransformerClient:
             texts, convert_to_numpy=False, show_progress_bar=show_progress
         )
 
+        # Convert to plain Python lists
         if hasattr(embeddings, "tolist"):
             return embeddings.tolist()
-        return [list(emb) if hasattr(emb, "__iter__") else [emb] for emb in embeddings]
+
+        # Fallback: convert each embedding individually
+        result = []
+        for emb in embeddings:
+            if hasattr(emb, "tolist"):
+                result.append(emb.tolist())
+            elif hasattr(emb, "__iter__"):
+                result.append(list(emb))
+            else:
+                result.append([emb])
+        return result
 
     def get_dimension(self) -> int:
         """Get the dimension of embedding vectors."""

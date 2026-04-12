@@ -1,0 +1,210 @@
+{
+  "num_test_cases": 10,
+  "hit_rate": 0.8,
+  "mean_reciprocal_rank": 0.55,
+  "avg_score": 0.5515338604666666,
+  "results": [
+    {
+      "test_id": "gender_01",
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "avg_score": 0.6732553443333332,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Overview",
+        "Next Lesson Preview",
+        "Grammar Point 1: Masculine and Feminine Nouns: Rule"
+      ],
+      "retrieved_texts": [
+        "Overview\n\nThis lesson introduces two fundamental concepts in Arabic:\n1. **Noun Gender**: Every Arabi...",
+        "Next Lesson Preview\n\n**Lesson 2: Subject Pronouns & Nominal Sentences**\n\nOnce you understand noun ge...",
+        "Grammar Point 1: Masculine and Feminine Nouns: Rule\n\nIn Arabic, **both nouns and adjectives** are ei..."
+      ]
+    },
+    {
+      "test_id": "gender_02",
+      "hit": true,
+      "reciprocal_rank": 0.3333333333333333,
+      "avg_score": 0.5552804273333334,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Practice Patterns: Pattern 1: Identify Gender",
+        "Combined Practice: Noun-Adjective Agreement: The Complete Agreement System",
+        "Grammar Point 1: Masculine and Feminine Nouns: Detection Pattern (For Grading)"
+      ],
+      "retrieved_texts": [
+        "Practice Patterns: Pattern 1: Identify Gender\n\n**Given a word, identify if it's masculine or feminin...",
+        "Combined Practice: Noun-Adjective Agreement: The Complete Agreement System\n\nFor a noun-adjective phr...",
+        "Grammar Point 1: Masculine and Feminine Nouns: Detection Pattern (For Grading)\n\n```\nIF word ends in ..."
+      ]
+    },
+    {
+      "test_id": "gender_03",
+      "hit": true,
+      "reciprocal_rank": 0.3333333333333333,
+      "avg_score": 0.494834582,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Combined Practice: Noun-Adjective Agreement: Practice Adjectives for Lesson 1",
+        "Practice Patterns: Pattern 1: Identify Gender",
+        "Grammar Point 1: Masculine and Feminine Nouns: Rule"
+      ],
+      "retrieved_texts": [
+        "Combined Practice: Noun-Adjective Agreement: Practice Adjectives for Lesson 1\n\n| Masculine | Feminin...",
+        "Practice Patterns: Pattern 1: Identify Gender\n\n**Given a word, identify if it's masculine or feminin...",
+        "Grammar Point 1: Masculine and Feminine Nouns: Rule\n\nIn Arabic, **both nouns and adjectives** are ei..."
+      ]
+    },
+    {
+      "test_id": "gender_04",
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "avg_score": 0.2799689223333333,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Grammar Point 1: Masculine and Feminine Nouns: Examples - Feminine Nouns",
+        "Grammar Point 1: Masculine and Feminine Nouns: Rule",
+        "Essential Phrases: Greeting: \"Hello\""
+      ],
+      "retrieved_texts": [
+        "Grammar Point 1: Masculine and Feminine Nouns: Examples - Feminine Nouns\n\n**Pattern**: Ends in \u0629 (ta...",
+        "Grammar Point 1: Masculine and Feminine Nouns: Rule\n\nIn Arabic, **both nouns and adjectives** are ei...",
+        "Essential Phrases: Greeting: \"Hello\"\n\n**Arabic**: \u0645\u064e\u0631\u0652\u062d\u064e\u0628\u064b\u0627  \n**Transliteration**: marhaban  \n**Engl..."
+      ]
+    },
+    {
+      "test_id": "definite_01",
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "avg_score": 0.6850604813333333,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Rule",
+        "Overview",
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Detection Pattern (For Grading)"
+      ],
+      "retrieved_texts": [
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Rule\n\nAdd **\u0627\u0644** (al-) to the beginning of a noun to mak...",
+        "Overview\n\nThis lesson introduces two fundamental concepts in Arabic:\n1. **Noun Gender**: Every Arabi...",
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Detection Pattern (For Grading)\n\n```\nIF word starts with..."
+      ]
+    },
+    {
+      "test_id": "definite_02",
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "avg_score": 0.6564818026666667,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Rule",
+        "Overview",
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Key Insight"
+      ],
+      "retrieved_texts": [
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Rule\n\nAdd **\u0627\u0644** (al-) to the beginning of a noun to mak...",
+        "Overview\n\nThis lesson introduces two fundamental concepts in Arabic:\n1. **Noun Gender**: Every Arabi...",
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Key Insight\n\n**\u2713 Indefinite = tanween**: \u0643\u0650\u062a\u064e\u0627\u0628\u064c (kitaab..."
+      ]
+    },
+    {
+      "test_id": "definite_03",
+      "hit": false,
+      "reciprocal_rank": 0.0,
+      "avg_score": 0.4314087326666667,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Practice Patterns: Pattern 2: Add Definite Article",
+        "Practice Patterns: Pattern 3: Remove Definite Article",
+        "Combined Practice: Noun-Adjective Agreement: The Complete Agreement System"
+      ],
+      "retrieved_texts": [
+        "Practice Patterns: Pattern 2: Add Definite Article\n\n**Given an indefinite noun, make it definite**\n\n...",
+        "Practice Patterns: Pattern 3: Remove Definite Article\n\n**Given a definite noun, make it indefinite**...",
+        "Combined Practice: Noun-Adjective Agreement: The Complete Agreement System\n\nFor a noun-adjective phr..."
+      ]
+    },
+    {
+      "test_id": "combined_01",
+      "hit": true,
+      "reciprocal_rank": 0.5,
+      "avg_score": 0.5374844866666667,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Overview",
+        "Combined Practice: Noun-Adjective Agreement: The Complete Agreement System",
+        "Grammar Point 1: Masculine and Feminine Nouns: Agreement Rule (Critical!)"
+      ],
+      "retrieved_texts": [
+        "Overview\n\nThis lesson introduces two fundamental concepts in Arabic:\n1. **Noun Gender**: Every Arabi...",
+        "Combined Practice: Noun-Adjective Agreement: The Complete Agreement System\n\nFor a noun-adjective phr...",
+        "Grammar Point 1: Masculine and Feminine Nouns: Agreement Rule (Critical!)\n\nThe gender of a noun **mu..."
+      ]
+    },
+    {
+      "test_id": "practice_01",
+      "hit": true,
+      "reciprocal_rank": 0.3333333333333333,
+      "avg_score": 0.7207012176666666,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Overview",
+        "Next Lesson Preview",
+        "Practice Patterns: Pattern 1: Identify Gender"
+      ],
+      "retrieved_texts": [
+        "Overview\n\nThis lesson introduces two fundamental concepts in Arabic:\n1. **Noun Gender**: Every Arabi...",
+        "Next Lesson Preview\n\n**Lesson 2: Subject Pronouns & Nominal Sentences**\n\nOnce you understand noun ge...",
+        "Practice Patterns: Pattern 1: Identify Gender\n\n**Given a word, identify if it's masculine or feminin..."
+      ]
+    },
+    {
+      "test_id": "edge_01",
+      "hit": false,
+      "reciprocal_rank": 0.0,
+      "avg_score": 0.48086260766666666,
+      "num_results": 3,
+      "retrieved_sections": [
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Understanding Tanween (\u062a\u064e\u0646\u0652\u0648\u0650\u064a\u0646)",
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Detection Pattern (For Grading)",
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Rule"
+      ],
+      "retrieved_texts": [
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Understanding Tanween (\u062a\u064e\u0646\u0652\u0648\u0650\u064a\u0646)\n\n**Tanween** = Double v...",
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Detection Pattern (For Grading)\n\n```\nIF word starts with...",
+        "Grammar Point 2: Definite Article \u0627\u0644 (al-): Rule\n\nAdd **\u0627\u0644** (al-) to the beginning of a noun to mak..."
+      ]
+    }
+  ],
+  "by_category": {
+    "gender": {
+      "num_cases": 4,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 0.6666666666666666,
+      "avg_score": 0.500834819
+    },
+    "definite_article": {
+      "num_cases": 3,
+      "hit_rate": 0.6666666666666666,
+      "mean_reciprocal_rank": 0.6666666666666666,
+      "avg_score": 0.5909836722222223
+    },
+    "combined": {
+      "num_cases": 1,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 0.5,
+      "avg_score": 0.5374844866666667
+    },
+    "practice": {
+      "num_cases": 1,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 0.3333333333333333,
+      "avg_score": 0.7207012176666666
+    },
+    "edge_case": {
+      "num_cases": 1,
+      "hit_rate": 0.0,
+      "mean_reciprocal_rank": 0.0,
+      "avg_score": 0.48086260766666666
+    }
+  }
+}

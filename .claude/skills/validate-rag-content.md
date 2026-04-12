@@ -20,8 +20,9 @@ args:
 
 2. **Section Structure**
    - Uses `##` (level 2) headers for main sections
+   - Uses `###` (level 3) headers for subsections (RECOMMENDED for granular chunks)
    - Headers are properly formatted
-   - Sections are reasonably sized (<3000 chars)
+   - Sections/subsections are reasonably sized (<3000 chars)
 
 3. **Chunk Size Analysis**
    - Preview how the parser will chunk the file
@@ -166,17 +167,55 @@ lesson_name: Pronouns
 ---
 ```
 
-### Problem: Using wrong header level
+### Problem: Using only large `##` sections without subsections
 
-**Solution:** Use `##` for main sections
+**Solution:** Break down large `##` sections into `###` subsections for better granularity
 ```markdown
 Before:
-### Grammar Rule
-Content...
+## Grammar Point 1: Masculine and Feminine Nouns
+[3000 characters covering rules, examples, edge cases...]
 
 After:
-## Grammar Rule
-Content...
+## Grammar Point 1: Masculine and Feminine Nouns
+[Introduction paragraph - 200 chars]
+
+### Rule
+[Core grammar rules - 500 chars]
+
+### Examples - Masculine Nouns
+[Examples - 400 chars]
+
+### Examples - Feminine Nouns
+[Examples - 400 chars]
+
+### Key Insight: Taa Marbuuta (ة)
+[Special case explanation - 300 chars]
+```
+
+This creates 5 separate, focused chunks instead of 1 large chunk!
+
+## Why Use `###` Subsections?
+
+**Benefits of granular chunking:**
+- **Better retrieval precision**: Query "What is taa marbuuta?" can retrieve just the specific subsection about taa marbuuta, not the entire 3000-char grammar point
+- **Higher hit rates**: Specific queries match specific chunks more accurately
+- **Reduced noise**: Less irrelevant content in top-k results
+- **Improved evaluation**: From 60% → 80% hit rate after implementing subsection chunking
+
+**Example impact:**
+```markdown
+Before (1 large chunk):
+## Grammar Point 1: Masculine and Feminine Nouns
+[3000 chars covering rules, examples, taa marbuuta, agreement...]
+↓ Query: "What is taa marbuuta?" → Retrieves entire 3000-char chunk
+
+After (5 focused chunks):
+### Rule [500 chars]
+### Examples - Masculine [400 chars]
+### Examples - Feminine [400 chars]
+### Key Insight: Taa Marbuuta (ة) [300 chars]  ← Retrieves THIS!
+### Agreement Rule [400 chars]
+↓ Query: "What is taa marbuuta?" → Retrieves 300-char focused chunk
 ```
 
 ## Optimal Chunk Size Guidelines
@@ -222,6 +261,14 @@ This skill should:
 
 **Code location:** `scripts/validate_rag_content.py` (developer tool, excluded from test coverage)
 
+**Chunking behavior:**
+- Each `##` section is processed independently
+- If a `##` section contains `###` subsections:
+  - Content before first `###` becomes one chunk (if any)
+  - Each `###` subsection becomes a separate chunk with title: "Parent: Subsection"
+- If a `##` section has NO `###` subsections, the entire section is one chunk
+- This creates more granular, focused chunks for better retrieval
+
 ---
 
-**Remember:** The parser splits by `##` headers. Each section becomes one chunk. Keep sections between 400-2000 chars for optimal RAG retrieval quality!
+**Remember:** The parser splits by both `##` and `###` headers. Each section/subsection becomes a separate chunk with a combined title (e.g., "Grammar Point 1: Rule"). Use `###` subsections to break down large `##` sections into focused, retrievable units. Keep sections between 400-2000 chars for optimal RAG retrieval quality!
