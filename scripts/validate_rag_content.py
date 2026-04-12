@@ -4,8 +4,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+# Add src to path (go up from scripts/ to project root, then into src/)
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from rag.markdown_parser import MarkdownParser
 
@@ -148,7 +148,7 @@ def print_validation_result(result: dict[str, Any]) -> None:
         print("\n📊 Chunk Analysis:")
         print(f"   Total chunks: {len(sizes)}")
         print(
-            f"   Size range: {min(sizes)} - {max(sizes)} chars ({min(sizes)//4} - {max(sizes)//4} tokens)"
+            f"   Size range: {min(sizes)} - {max(sizes)} chars ({min(sizes) // 4} - {max(sizes) // 4} tokens)"
         )
 
         # Distribution
