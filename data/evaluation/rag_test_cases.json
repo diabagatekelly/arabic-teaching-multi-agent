@@ -1,0 +1,110 @@
+{
+  "description": "RAG evaluation test cases for lesson content retrieval (Agents 1 & 2). Exercise template retrieval (Agent 3) evaluated separately.",
+  "version": "1.0",
+  "test_cases": [
+    {
+      "id": "gender_01",
+      "query": "What is noun gender in Arabic?",
+      "category": "gender",
+      "expected_sections": [
+        "Overview",
+        "Grammar Point 1: Masculine and Feminine Nouns"
+      ],
+      "expected_lesson": 1,
+      "min_score": 0.5
+    },
+    {
+      "id": "gender_02",
+      "query": "How do I identify masculine and feminine nouns?",
+      "category": "gender",
+      "expected_sections": [
+        "Grammar Point 1: Masculine and Feminine Nouns"
+      ],
+      "expected_lesson": 1,
+      "min_score": 0.5
+    },
+    {
+      "id": "gender_03",
+      "query": "Give me examples of feminine nouns",
+      "category": "gender",
+      "expected_sections": [
+        "Grammar Point 1: Masculine and Feminine Nouns",
+        "Vocabulary List (Full)"
+      ],
+      "expected_lesson": 1,
+      "min_score": 0.4
+    },
+    {
+      "id": "gender_04",
+      "query": "What is taa marbuuta?",
+      "category": "gender",
+      "expected_sections": [
+        "Grammar Point 1: Masculine and Feminine Nouns"
+      ],
+      "expected_lesson": 1,
+      "min_score": 0.5
+    },
+    {
+      "id": "definite_01",
+      "query": "What is the definite article in Arabic?",
+      "category": "definite_article",
+      "expected_sections": [
+        "Overview",
+        "Grammar Point 2: Definite Article ال (al-)"
+      ],
+      "expected_lesson": 1,
+      "min_score": 0.5
+    },
+    {
+      "id": "definite_02",
+      "query": "How do I use ال in Arabic?",
+      "category": "definite_article",
+      "expected_sections": [
+        "Grammar Point 2: Definite Article ال (al-)"
+      ],
+      "expected_lesson": 1,
+      "min_score": 0.5
+    },
+    {
+      "id": "definite_03",
+      "query": "When should I add the definite article to a noun?",
+      "category": "definite_article",
+      "expected_sections": [
+        "Grammar Point 2: Definite Article ال (al-)"
+      ],
+      "expected_lesson": 1,
+      "min_score": 0.4
+    },
+    {
+      "id": "combined_01",
+      "query": "How do noun gender and definite article work together?",
+      "category": "combined",
+      "expected_sections": [
+        "Combined Practice: Noun-Adjective Agreement",
+        "Combined Examples"
+      ],
+      "expected_lesson": 1,
+      "min_score": 0.4
+    },
+    {
+      "id": "practice_01",
+      "query": "How can I practice Arabic noun gender?",
+      "category": "practice",
+      "expected_sections": [
+        "Practice Patterns",
+        "Combined Practice: Noun-Adjective Agreement"
+      ],
+      "expected_lesson": 1,
+      "min_score": 0.4
+    },
+    {
+      "id": "edge_01",
+      "query": "What is verb conjugation in Arabic?",
+      "category": "edge_case",
+      "expected_sections": [],
+      "expected_lesson": null,
+      "min_score": 0.3,
+      "notes": "Out of scope - lesson 2+ content, should return low scores or wrong lesson"
+    }
+  ]
+}

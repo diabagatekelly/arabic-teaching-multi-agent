@@ -108,30 +108,40 @@ Question format and rules.
         assert metadata == {}
 
     def test_extract_sections(self, parser, sample_lesson_content):
-        """Test extracting markdown sections by ## headers."""
+        """Test extracting markdown sections by ## headers and ### subsections."""
         sections = parser.extract_sections(sample_lesson_content)
 
-        assert len(sections) == 3
+        # Now extracts subsections separately: Overview, Grammar Point 1 (intro),
+        # Grammar Point 1: Examples, Grammar Point 2
+        assert len(sections) == 4
 
         assert sections[0]["title"] == "Overview"
         assert sections[0]["content"].startswith("This lesson introduces")
         assert "Grammar Point" not in sections[0]["content"]
 
+        # Grammar Point 1 intro (content before ### subsection)
         assert sections[1]["title"] == "Grammar Point 1: Masculine Nouns"
         assert "Arabic nouns are either masculine or feminine" in sections[1]["content"]
-        assert sections[1]["content"].count("###") == 1
+        assert "###" not in sections[1]["content"]  # No ### headers in this chunk
 
-        assert sections[2]["title"] == "Grammar Point 2: Definite Article"
-        assert "The definite article" in sections[2]["content"]
-        assert "Overview" not in sections[2]["content"]
+        # Grammar Point 1: Examples subsection
+        assert sections[2]["title"] == "Grammar Point 1: Masculine Nouns: Examples"
+        assert "كِتَابٌ" in sections[2]["content"]
+        assert "بَيْتٌ" in sections[2]["content"]
+
+        # Grammar Point 2 (no subsections)
+        assert sections[3]["title"] == "Grammar Point 2: Definite Article"
+        assert "The definite article" in sections[3]["content"]
+        assert "Overview" not in sections[3]["content"]
 
     def test_extract_sections_includes_subsections(self, parser, sample_lesson_content):
-        """Test that subsections (###) are included in parent section."""
+        """Test that subsections (###) are extracted as separate chunks."""
         sections = parser.extract_sections(sample_lesson_content)
 
-        grammar_section = sections[1]
-        assert "Examples" in grammar_section["content"]
-        assert "كِتَابٌ" in grammar_section["content"]
+        # Find the Examples subsection chunk
+        examples_section = [s for s in sections if "Examples" in s["title"]][0]
+        assert examples_section["title"] == "Grammar Point 1: Masculine Nouns: Examples"
+        assert "كِتَابٌ" in examples_section["content"]
 
     def test_extract_sections_no_sections(self, parser):
         """Test content without ## sections returns empty list."""

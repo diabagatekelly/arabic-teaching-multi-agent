@@ -42,37 +42,71 @@ class MarkdownParser:
 
     def extract_sections(self, content: str) -> list[dict[str, str]]:
         """
-        Extract markdown sections by ## headers.
+        Extract markdown sections by ## and ### headers.
+
+        Extracts both ## sections and ### subsections as separate chunks
+        to create more granular retrieval units.
 
         Args:
             content: Markdown file content
 
         Returns:
-            List of dicts with {title, content} for each ## section
+            List of dicts with {title, content} for each section/subsection
         """
         # Remove frontmatter first (support CRLF and allow EOF after ---)
         content = re.sub(r"^---\s*\r?\n.*?\r?\n---(?:\s*\r?\n|$)", "", content, flags=re.DOTALL)
 
-        # Split by ## headers (but not # or ###)
         sections = []
-        pattern = r"^## (.+)$"
 
-        # Find all ## headers and their positions
-        matches = list(re.finditer(pattern, content, re.MULTILINE))
+        # Find all ## headers
+        h2_pattern = r"^## (.+)$"
+        h2_matches = list(re.finditer(h2_pattern, content, re.MULTILINE))
 
-        for i, match in enumerate(matches):
-            title = match.group(1).strip()
-            start = match.end()
+        for i, h2_match in enumerate(h2_matches):
+            h2_title = h2_match.group(1).strip()
+            h2_start = h2_match.end()
 
             # Content ends at next ## header or end of file
-            if i + 1 < len(matches):
-                end = matches[i + 1].start()
+            if i + 1 < len(h2_matches):
+                h2_end = h2_matches[i + 1].start()
             else:
-                end = len(content)
+                h2_end = len(content)
 
-            section_content = content[start:end].strip()
+            h2_section_content = content[h2_start:h2_end]
 
-            sections.append({"title": title, "content": section_content})
+            # Find ### subsections within this ## section
+            h3_pattern = r"^### (.+)$"
+            h3_matches = list(re.finditer(h3_pattern, h2_section_content, re.MULTILINE))
+
+            if h3_matches:
+                # Check if there's content before the first ### subsection
+                first_h3_start = h3_matches[0].start()
+                intro_content = h2_section_content[:first_h3_start].strip()
+
+                if intro_content:
+                    # Create a chunk for the intro content
+                    sections.append({"title": h2_title, "content": intro_content})
+
+                # Process each ### subsection
+                for j, h3_match in enumerate(h3_matches):
+                    h3_title = h3_match.group(1).strip()
+                    h3_start = h3_match.end()
+
+                    # Content ends at next ### or end of section
+                    if j + 1 < len(h3_matches):
+                        h3_end = h3_matches[j + 1].start()
+                    else:
+                        h3_end = len(h2_section_content)
+
+                    h3_content = h2_section_content[h3_start:h3_end].strip()
+
+                    # Use combined title for context
+                    combined_title = f"{h2_title}: {h3_title}"
+                    sections.append({"title": combined_title, "content": h3_content})
+            else:
+                # No subsections, use the whole ## section
+                section_content = h2_section_content.strip()
+                sections.append({"title": h2_title, "content": section_content})
 
         return sections
 
