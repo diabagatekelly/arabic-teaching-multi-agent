@@ -65,8 +65,8 @@ python scripts/validate_rag_content.py data/rag_database/lessons/lesson_02_prono
    - Estimated token count (chars ÷ 4)
    - Section title
 4. **Report findings:**
-   - ✅ PASS: All chunks in optimal range (400-3000 chars)
-   - ⚠️ WARNING: Some chunks slightly outside optimal range
+   - ✅ PASS: All chunks within acceptable range (200-3000 chars, optimal 400-2000)
+   - ⚠️ WARNING: Some chunks outside optimal range (<200 or >2000 chars)
    - ❌ FAIL: Chunks too large (>3000 chars) or invalid structure
 
 ## Output Format
@@ -185,11 +185,11 @@ Content...
 
 | Size Category | Chars | Tokens | Status | Action |
 |---------------|-------|--------|--------|--------|
-| Too Small | <200 | <50 | ⚠️ | Merge or expand |
-| Acceptable Small | 200-400 | 50-100 | ✅ | OK, but prefer larger |
-| **Optimal** | **400-2000** | **100-500** | ✅ | **Perfect!** |
-| Acceptable Large | 2000-3000 | 500-750 | ✅ | OK, but consider splitting |
-| Too Large | >3000 | >750 | ❌ | Split required |
+| Too Small | <200 | <50 | ⚠️ WARNING | Merge or expand |
+| Acceptable Small | 200-400 | 50-100 | ✅ PASS | OK, but prefer larger |
+| **Optimal** | **400-2000** | **100-500** | **✅ PASS** | **Perfect!** |
+| Acceptable Large | 2000-3000 | 500-750 | ⚠️ WARNING | OK, but consider splitting |
+| Too Large | >3000 | >750 | ❌ FAIL | Split required |
 
 ## Integration with Content Creation
 

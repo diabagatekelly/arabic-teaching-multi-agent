@@ -1,5 +1,6 @@
 """Validate markdown files for RAG parser compatibility."""
 
+import logging
 import sys
 from pathlib import Path
 from typing import Any
@@ -8,6 +9,18 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from rag.markdown_parser import MarkdownParser
+
+# Chunk size thresholds (in characters)
+CHUNK_MIN_OPTIMAL = 400  # Below this is acceptable but not optimal
+CHUNK_MAX_OPTIMAL = 2000  # Above this is acceptable but not optimal
+CHUNK_MIN_WARN = 200  # Below this triggers warning (too small)
+CHUNK_MAX_WARN = 2000  # Above this triggers warning (large, consider splitting)
+CHUNK_MAX_FAIL = 3000  # Above this triggers failure (too large, must split)
+
+# Token estimation (rough approximation: 1 token ≈ 4 chars)
+CHARS_PER_TOKEN = 4
+
+logger = logging.getLogger(__name__)
 
 
 def validate_file(file_path: Path) -> dict[str, Any]:
@@ -55,7 +68,7 @@ def validate_file(file_path: Path) -> dict[str, Any]:
         for chunk in chunks:
             text = chunk["text"]
             size = len(text)
-            tokens_est = size // 4
+            tokens_est = size // CHARS_PER_TOKEN
             section_title = chunk["metadata"].get("section_title", "Unknown")
 
             chunk_info = {
@@ -65,21 +78,21 @@ def validate_file(file_path: Path) -> dict[str, Any]:
                 "status": "OK",
             }
 
-            # Check size
-            if size > 3000:
+            # Check size against thresholds
+            if size > CHUNK_MAX_FAIL:
                 chunk_info["status"] = "TOO_LARGE"
                 result["issues"].append(
                     f"Section '{section_title}' is too large: {size} chars (~{tokens_est} tokens)"
                 )
                 result["status"] = "FAIL"
-            elif size > 2000:
+            elif size > CHUNK_MAX_WARN:
                 chunk_info["status"] = "LARGE"
                 result["warnings"].append(
                     f"Section '{section_title}' is large: {size} chars (~{tokens_est} tokens). Consider splitting."
                 )
                 if result["status"] == "PASS":
                     result["status"] = "WARNING"
-            elif size < 200:
+            elif size < CHUNK_MIN_WARN:
                 chunk_info["status"] = "SMALL"
                 result["warnings"].append(
                     f"Section '{section_title}' is small: {size} chars (~{tokens_est} tokens). Consider merging."
@@ -95,9 +108,13 @@ def validate_file(file_path: Path) -> dict[str, Any]:
     except UnicodeDecodeError:
         result["status"] = "FAIL"
         result["issues"].append("File encoding error (not UTF-8)")
-    except Exception as e:
+    except Exception:
+        # Log full details so unexpected operational issues are not mistaken for parse errors
+        logger.exception("Unexpected error while validating RAG content")
         result["status"] = "FAIL"
-        result["issues"].append(f"Parse error: {str(e)}")
+        result["issues"].append(
+            "Unexpected internal error during validation (see logs for details)"
+        )
 
     return result
 
@@ -148,15 +165,21 @@ def print_validation_result(result: dict[str, Any]) -> None:
         print("\n📊 Chunk Analysis:")
         print(f"   Total chunks: {len(sizes)}")
         print(
-            f"   Size range: {min(sizes)} - {max(sizes)} chars ({min(sizes) // 4} - {max(sizes) // 4} tokens)"
+            f"   Size range: {min(sizes)} - {max(sizes)} chars "
+            f"({min(sizes) // CHARS_PER_TOKEN} - {max(sizes) // CHARS_PER_TOKEN} tokens)"
         )
 
         # Distribution
-        optimal = sum(1 for s in sizes if 400 <= s <= 2000)
+        optimal = sum(1 for s in sizes if CHUNK_MIN_OPTIMAL <= s <= CHUNK_MAX_OPTIMAL)
         if optimal == len(sizes):
-            print("   ✅ All chunks in optimal range (400-2000 chars)")
+            print(
+                f"   ✅ All chunks in optimal range ({CHUNK_MIN_OPTIMAL}-{CHUNK_MAX_OPTIMAL} chars)"
+            )
         else:
-            print(f"   {optimal}/{len(sizes)} chunks in optimal range (400-2000 chars)")
+            print(
+                f"   {optimal}/{len(sizes)} chunks in optimal range "
+                f"({CHUNK_MIN_OPTIMAL}-{CHUNK_MAX_OPTIMAL} chars)"
+            )
 
     # Issues
     if result["issues"]:
