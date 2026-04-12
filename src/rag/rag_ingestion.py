@@ -162,7 +162,7 @@ class RAGIngestion:
 
     def _generate_vector_id(self, chunk: dict[str, Any]) -> str:
         """
-        Generate deterministic ID for a chunk.
+        Generate deterministic unique ID for a chunk.
 
         Args:
             chunk: Chunk with text and metadata
@@ -170,10 +170,12 @@ class RAGIngestion:
         Returns:
             Unique ID string
         """
-        # Create ID from source file and section title
+        # Create ID from source file, section title, and text content hash
+        # This ensures uniqueness even for multiple chunks from the same section
         source = chunk["metadata"].get("source_file", "unknown")
         section = chunk["metadata"].get("section_title", "unknown")
-        id_string = f"{source}::{section}"
+        text_hash = hashlib.sha256(chunk["text"].encode()).hexdigest()[:8]
+        id_string = f"{source}::{section}::{text_hash}"
 
         # Use hash for deterministic, short IDs
         return hashlib.sha256(id_string.encode()).hexdigest()[:16]

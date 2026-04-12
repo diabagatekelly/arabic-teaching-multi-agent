@@ -225,6 +225,64 @@ Content.
         lesson_numbers = {c["metadata"]["lesson_number"] for c in chunks}
         assert lesson_numbers == {1, 2}
 
+    def test_parse_directory_recursive(self, parser, tmp_path):
+        """Test parsing directory recursively finds files in subdirectories."""
+        # Create files in root
+        (tmp_path / "root.md").write_text("""---
+lesson_number: 1
+---
+# Root
+## Section
+Content.
+""")
+
+        # Create subdirectory with files
+        subdir = tmp_path / "lessons"
+        subdir.mkdir()
+        (subdir / "lesson_01.md").write_text("""---
+lesson_number: 2
+---
+# Lesson 1
+## Section
+Content.
+""")
+
+        # Recursive search (default)
+        chunks = parser.parse_directory(tmp_path, recursive=True)
+
+        assert len(chunks) == 2
+        lesson_numbers = {c["metadata"]["lesson_number"] for c in chunks}
+        assert lesson_numbers == {1, 2}
+
+    def test_parse_directory_non_recursive(self, parser, tmp_path):
+        """Test parsing directory non-recursively only finds files in root."""
+        # Create files in root
+        (tmp_path / "root.md").write_text("""---
+lesson_number: 1
+---
+# Root
+## Section
+Content.
+""")
+
+        # Create subdirectory with files
+        subdir = tmp_path / "lessons"
+        subdir.mkdir()
+        (subdir / "lesson_01.md").write_text("""---
+lesson_number: 2
+---
+# Lesson 1
+## Section
+Content.
+""")
+
+        # Non-recursive search
+        chunks = parser.parse_directory(tmp_path, recursive=False)
+
+        # Should only find root.md
+        assert len(chunks) == 1
+        assert chunks[0]["metadata"]["lesson_number"] == 1
+
     def test_chunk_long_content(self, parser):
         """Test chunking long content splits at paragraph boundaries."""
         short_p1 = "Paragraph 1."

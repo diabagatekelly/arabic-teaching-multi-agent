@@ -199,9 +199,9 @@ class MarkdownParser:
         all_chunks = []
 
         # Use rglob for recursive search, glob for non-recursive
-        pattern = "**/*.md" if recursive else "*.md"
+        file_paths = directory.rglob("*.md") if recursive else directory.glob("*.md")
 
-        for file_path in directory.glob(pattern):
+        for file_path in file_paths:
             try:
                 chunks = self.parse_file(file_path)
                 all_chunks.extend(chunks)

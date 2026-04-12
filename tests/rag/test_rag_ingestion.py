@@ -135,6 +135,30 @@ class TestRAGIngestion:
         # Same chunk should produce same ID (deterministic)
         assert ingestion._generate_vector_id(chunk1) == id1
 
+    def test_generate_vector_id_same_section_different_text(
+        self, mock_parser, mock_embedder, mock_vector_db
+    ):
+        """Test vector IDs are unique even for multiple chunks from same section."""
+        ingestion = RAGIngestion(
+            parser=mock_parser, embedder=mock_embedder, vector_db=mock_vector_db
+        )
+
+        # Multiple chunks from same section (e.g., from chunking long content)
+        chunk1 = {
+            "text": "First part of content",
+            "metadata": {"source_file": "file1.md", "section_title": "Intro"},
+        }
+        chunk2 = {
+            "text": "Second part of content",
+            "metadata": {"source_file": "file1.md", "section_title": "Intro"},
+        }
+
+        id1 = ingestion._generate_vector_id(chunk1)
+        id2 = ingestion._generate_vector_id(chunk2)
+
+        # IDs must be different to avoid collision
+        assert id1 != id2
+
     def test_create_vectors_from_chunks(self, mock_parser, mock_embedder, mock_vector_db):
         """Test vector creation from chunks."""
         ingestion = RAGIngestion(
@@ -182,12 +206,17 @@ class TestRAGIngestion:
             "dict_field": {"key": "value"},
             "list_of_dicts": [{"a": 1}, {"b": 2}],
             "mixed_list": ["string", 123, {"nested": "dict"}],
+            "str_list": ["a", "b", "c"],
         }
 
         sanitized = ingestion._sanitize_metadata(metadata)
 
         # Simple types pass through
         assert sanitized["simple"] == "test"
+
+        # list[str] should be preserved, not JSON-encoded
+        assert "str_list" in sanitized
+        assert sanitized["str_list"] == ["a", "b", "c"]
 
         # Verify complex types are converted to valid JSON (round-trip test)
         assert json.loads(sanitized["dict_field"]) == {"key": "value"}
