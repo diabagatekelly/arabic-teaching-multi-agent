@@ -142,7 +142,6 @@ Question format and rules.
 
     def test_parse_file_returns_chunks(self, parser, tmp_path):
         """Test parsing a file returns list of chunks with metadata."""
-        # Create temporary lesson file
         lesson_file = tmp_path / "lesson_test.md"
         lesson_file.write_text("""---
 lesson_number: 1
@@ -166,7 +165,6 @@ Content for section 2.
 
         assert len(chunks) == 2
 
-        # Check first chunk
         assert chunks[0]["text"] == "Section 1\n\nContent for section 1."
         assert chunks[0]["metadata"]["lesson_number"] == 1
         assert chunks[0]["metadata"]["lesson_name"] == "Test Lesson"
@@ -175,7 +173,6 @@ Content for section 2.
         assert chunks[0]["metadata"]["source_file"] == "lesson_test.md"
         assert chunks[0]["metadata"]["doc_type"] == "lesson"
 
-        # Check second chunk
         assert chunks[1]["text"] == "Section 2\n\nContent for section 2."
         assert chunks[1]["metadata"]["section_title"] == "Section 2"
 
@@ -310,38 +307,56 @@ invalid: yaml: content: [
 
         assert metadata == {}
 
-    def test_parse_directory_handles_parse_errors(self, tmp_path):
-        """Test parsing directory continues when parse_file raises exception."""
-        # Create two files
+    def test_parse_directory_handles_expected_errors(self, tmp_path):
+        """Test parsing directory continues when expected errors occur."""
+        (tmp_path / "valid.md").write_text("""---
+lesson_number: 1
+---
+# File 1
+## Section
+Content.""")
+
+        parser = MarkdownParser()
+
+        # Mock parse_file to raise OSError for one file
+        original_parse_file = parser.parse_file
+
+        def mock_parse_file(file_path: Path):
+            if file_path.name == "error.md":
+                raise OSError("Simulated I/O error")
+            return original_parse_file(file_path)
+
+        (tmp_path / "error.md").write_text("# Some content")
+
+        with patch.object(parser, "parse_file", side_effect=mock_parse_file):
+            chunks = parser.parse_directory(tmp_path)
+
+        assert len(chunks) == 1
+        assert chunks[0]["metadata"]["lesson_number"] == 1
+
+    def test_parse_directory_unexpected_errors_propagate(self, tmp_path):
+        """Test parsing directory does NOT catch unexpected errors."""
         (tmp_path / "file1.md").write_text("""---
 lesson_number: 1
 ---
 # File 1
 ## Section
 Content.""")
-        (tmp_path / "file2.md").write_text("""---
-lesson_number: 2
----
-# File 2
-## Section
-Content.""")
 
         parser = MarkdownParser()
 
-        # Mock parse_file to raise exception for file1.md but work for file2.md
+        # Mock parse_file to raise unexpected exception (ValueError)
         original_parse_file = parser.parse_file
 
         def mock_parse_file(file_path: Path):
             if file_path.name == "file1.md":
-                raise ValueError("Simulated parse error")
+                raise ValueError("Unexpected error - should propagate!")
             return original_parse_file(file_path)
 
         with patch.object(parser, "parse_file", side_effect=mock_parse_file):
-            chunks = parser.parse_directory(tmp_path)
-
-        # Should only get chunks from file2.md since file1.md raises error
-        assert len(chunks) == 1
-        assert chunks[0]["metadata"]["lesson_number"] == 2
+            # ValueError should propagate, not be caught
+            with pytest.raises(ValueError, match="Unexpected error"):
+                parser.parse_directory(tmp_path)
 
     def test_parse_file_no_frontmatter_no_sections(self, parser, tmp_path):
         """Test parsing file with no frontmatter and no sections returns empty list."""
@@ -358,3 +373,75 @@ Content.""")
 
         assert len(chunks) == 1
         assert chunks[0] == ""
+
+    def test_parse_frontmatter_windows_line_endings(self, parser):
+        """Test parsing frontmatter with Windows line endings (CRLF)."""
+        content = "---\r\nlesson_number: 1\r\nlesson_name: Test\r\n---\r\n\r\n# Content"
+
+        metadata = parser.parse_frontmatter(content)
+
+        assert metadata["lesson_number"] == 1
+        assert metadata["lesson_name"] == "Test"
+
+    def test_parse_frontmatter_at_eof(self, parser):
+        """Test parsing frontmatter without trailing newline (EOF after ---)."""
+        content = "---\nlesson_number: 1\nlesson_name: Test\n---"
+
+        metadata = parser.parse_frontmatter(content)
+
+        assert metadata["lesson_number"] == 1
+        assert metadata["lesson_name"] == "Test"
+
+    def test_extract_sections_windows_line_endings(self, parser):
+        """Test extracting sections with Windows line endings."""
+        content = "---\r\ntitle: test\r\n---\r\n\r\n## Section 1\r\n\r\nContent 1\r\n\r\n## Section 2\r\n\r\nContent 2"
+
+        sections = parser.extract_sections(content)
+
+        assert len(sections) == 2
+        assert sections[0]["title"] == "Section 1"
+        assert "Content 1" in sections[0]["content"]
+
+    def test_parse_directory_handles_encoding_errors(self, parser, tmp_path):
+        """Test parsing directory handles UnicodeDecodeError gracefully."""
+        (tmp_path / "valid.md").write_text("""---
+lesson_number: 1
+---
+# Valid
+## Section
+Content.""")
+
+        invalid_file = tmp_path / "invalid.md"
+        invalid_file.write_bytes(b"\xff\xfe Invalid UTF-8")
+
+        chunks = parser.parse_directory(tmp_path)
+
+        assert len(chunks) == 1
+        assert chunks[0]["metadata"]["lesson_number"] == 1
+
+    def test_parse_directory_handles_yaml_errors_gracefully(self, tmp_path):
+        """Test parsing directory handles invalid YAML gracefully (empty metadata)."""
+        (tmp_path / "bad_yaml.md").write_text("""---
+invalid: yaml: [
+---
+## Section
+Content.""")
+
+        (tmp_path / "valid.md").write_text("""---
+lesson_number: 2
+---
+# Valid
+## Section
+Content.""")
+
+        parser = MarkdownParser()
+        chunks = parser.parse_directory(tmp_path)
+
+        assert len(chunks) == 2
+
+        bad_yaml_chunk = next(c for c in chunks if c["metadata"]["source_file"] == "bad_yaml.md")
+        valid_chunk = next(c for c in chunks if c["metadata"]["source_file"] == "valid.md")
+
+        assert "lesson_number" not in bad_yaml_chunk["metadata"]
+        assert bad_yaml_chunk["metadata"]["doc_type"] == "unknown"
+        assert valid_chunk["metadata"]["lesson_number"] == 2

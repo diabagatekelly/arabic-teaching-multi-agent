@@ -28,7 +28,9 @@ class MarkdownParser:
             Dictionary of metadata from frontmatter, or empty dict if none
         """
         # Match content between --- delimiters at start of file
-        match = re.match(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL)
+        # Allow Windows (CRLF) or Unix (LF) line endings
+        # Allow EOF after closing --- (no trailing newline required)
+        match = re.match(r"^---\s*\r?\n(.*?)\r?\n---(?:\s*\r?\n|$)", content, re.DOTALL)
         if not match:
             return {}
 
@@ -48,8 +50,8 @@ class MarkdownParser:
         Returns:
             List of dicts with {title, content} for each ## section
         """
-        # Remove frontmatter first
-        content = re.sub(r"^---\s*\n.*?\n---\s*\n", "", content, flags=re.DOTALL)
+        # Remove frontmatter first (support CRLF and allow EOF after ---)
+        content = re.sub(r"^---\s*\r?\n.*?\r?\n---(?:\s*\r?\n|$)", "", content, flags=re.DOTALL)
 
         # Split by ## headers (but not # or ###)
         sections = []
@@ -199,8 +201,8 @@ class MarkdownParser:
             try:
                 chunks = self.parse_file(file_path)
                 all_chunks.extend(chunks)
-            except Exception:
-                # Skip files that fail to parse
+            except (OSError, UnicodeDecodeError):
+                # Skip files with I/O or encoding errors
                 # TODO: Add logging to track parse failures for debugging
                 # logger.warning(f"Failed to parse {file_path}: {e}")
                 continue
