@@ -18,6 +18,13 @@ Or audit all test files:
 /tests-audit
 ```
 
+**After completing the audit:**
+- Implement ALL recommendations immediately
+- Remove redundant/weak tests
+- Strengthen tests with false positive risks
+- Consolidate similar tests
+- This ensures test quality improvements are applied, not just documented
+
 ## Audit Criteria
 
 ### 1. False Positive Detection
@@ -47,6 +54,8 @@ Or audit all test files:
 ## Instructions
 
 When auditing tests:
+
+**IMPORTANT: After completing the audit, implement ALL recommendations immediately. This skill includes both audit AND implementation.**
 
 1. **Identify False Positives**
    - Find assertions that would pass even if code is broken

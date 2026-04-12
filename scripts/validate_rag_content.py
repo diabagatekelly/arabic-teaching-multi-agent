@@ -46,9 +46,7 @@ def validate_file(file_path: Path) -> dict[str, Any]:
         # Read file
         content = file_path.read_text(encoding="utf-8")
 
-        # Check frontmatter
-        metadata = parser.parse_frontmatter(content)
-        if metadata:
+        if metadata := parser.parse_frontmatter(content):
             result["frontmatter_valid"] = True
             result["metadata"] = metadata
         else:
@@ -161,26 +159,7 @@ def print_validation_result(result: dict[str, Any]) -> None:
 
     # Chunk analysis summary
     if result["chunks"]:
-        sizes = [len(c["text"]) for c in result["chunks"]]
-        print("\n📊 Chunk Analysis:")
-        print(f"   Total chunks: {len(sizes)}")
-        print(
-            f"   Size range: {min(sizes)} - {max(sizes)} chars "
-            f"({min(sizes) // CHARS_PER_TOKEN} - {max(sizes) // CHARS_PER_TOKEN} tokens)"
-        )
-
-        # Distribution
-        optimal = sum(1 for s in sizes if CHUNK_MIN_OPTIMAL <= s <= CHUNK_MAX_OPTIMAL)
-        if optimal == len(sizes):
-            print(
-                f"   ✅ All chunks in optimal range ({CHUNK_MIN_OPTIMAL}-{CHUNK_MAX_OPTIMAL} chars)"
-            )
-        else:
-            print(
-                f"   {optimal}/{len(sizes)} chunks in optimal range "
-                f"({CHUNK_MIN_OPTIMAL}-{CHUNK_MAX_OPTIMAL} chars)"
-            )
-
+        _print_chunk_analysis(result)
     # Issues
     if result["issues"]:
         print("\n❌ Issues Found:")
@@ -205,6 +184,27 @@ def print_validation_result(result: dict[str, Any]) -> None:
     print("━" * 60)
 
 
+def _print_chunk_analysis(result: dict[str, Any]) -> None:
+    """Print chunk size analysis and distribution."""
+    sizes = [len(c["text"]) for c in result["chunks"]]
+    print("\n📊 Chunk Analysis:")
+    print(f"   Total chunks: {len(sizes)}")
+    print(
+        f"   Size range: {min(sizes)} - {max(sizes)} chars "
+        f"({min(sizes) // CHARS_PER_TOKEN} - {max(sizes) // CHARS_PER_TOKEN} tokens)"
+    )
+
+    # Distribution
+    optimal = sum(CHUNK_MIN_OPTIMAL <= s <= CHUNK_MAX_OPTIMAL for s in sizes)
+    if optimal == len(sizes):
+        print(f"   ✅ All chunks in optimal range ({CHUNK_MIN_OPTIMAL}-{CHUNK_MAX_OPTIMAL} chars)")
+    else:
+        print(
+            f"   {optimal}/{len(sizes)} chunks in optimal range "
+            f"({CHUNK_MIN_OPTIMAL}-{CHUNK_MAX_OPTIMAL} chars)"
+        )
+
+
 def validate_directory(directory: Path) -> None:
     """Validate all .md files in a directory."""
 
@@ -225,9 +225,9 @@ def validate_directory(directory: Path) -> None:
     print("SUMMARY")
     print("=" * 60)
 
-    pass_count = sum(1 for r in results if r["status"] == "PASS")
-    warning_count = sum(1 for r in results if r["status"] == "WARNING")
-    fail_count = sum(1 for r in results if r["status"] == "FAIL")
+    pass_count = sum(r["status"] == "PASS" for r in results)
+    warning_count = sum(r["status"] == "WARNING" for r in results)
+    fail_count = sum(r["status"] == "FAIL" for r in results)
 
     print(f"Total files: {len(results)}")
     print(f"✅ Pass: {pass_count}")

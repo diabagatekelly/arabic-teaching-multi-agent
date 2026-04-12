@@ -185,19 +185,23 @@ class MarkdownParser:
 
         return chunks
 
-    def parse_directory(self, directory: Path) -> list[dict[str, Any]]:
+    def parse_directory(self, directory: Path, recursive: bool = True) -> list[dict[str, Any]]:
         """
         Parse all markdown files in a directory.
 
         Args:
             directory: Path to directory containing markdown files
+            recursive: If True, search subdirectories recursively
 
         Returns:
             List of all chunks from all files
         """
         all_chunks = []
 
-        for file_path in directory.glob("*.md"):
+        # Use rglob for recursive search, glob for non-recursive
+        file_paths = directory.rglob("*.md") if recursive else directory.glob("*.md")
+
+        for file_path in file_paths:
             try:
                 chunks = self.parse_file(file_path)
                 all_chunks.extend(chunks)
