@@ -56,7 +56,6 @@ class TestRAGRetriever:
         # Verify embedder was called
         mock_embedder.embed.assert_called_once_with("What is noun gender?")
 
-        # Verify vector_db was called
         mock_vector_db.query.assert_called_once_with(
             vector=[0.5] * 384, top_k=2, filter=None, include_metadata=True
         )
@@ -72,9 +71,8 @@ class TestRAGRetriever:
         """Test retrieval with metadata filters."""
         retriever = RAGRetriever(embedder=mock_embedder, vector_db=mock_vector_db)
 
-        retriever.retrieve("test query", top_k=3, filter={"lesson_number": 1})
+        retriever.retrieve("test query", top_k=3, metadata_filter={"lesson_number": 1})
 
-        # Verify filter was passed to vector_db
         mock_vector_db.query.assert_called_once()
         assert mock_vector_db.query.call_args[1]["filter"] == {"lesson_number": 1}
 
