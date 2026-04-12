@@ -39,6 +39,11 @@ Or review all changed files:
 - Interface-based design for agents
 - Dependency injection over global state
 - Single source of truth for configuration
+- **Dependency Inversion Principle (DIP)**: Depend on abstractions, not concrete implementations
+  - Define abstract interfaces (Protocol/ABC) for external dependencies (databases, APIs, services)
+  - Concrete implementations should implement the interface
+  - Application code should depend only on the interface, not the concrete class
+  - Makes it easy to swap implementations (testing, different providers)
 
 ### 4. Type Hints
 - **Required** for all function signatures
@@ -69,10 +74,11 @@ When reviewing code:
    - Propose well-named helper functions
 
 3. **Analyze architecture**
-   - Check for tight coupling
-   - Verify interface usage
-   - Check dependency direction
+   - Check for tight coupling to external dependencies
+   - Verify interface usage (especially for databases, APIs, external services)
+   - Check dependency direction (depend on abstractions, not concretions)
    - Flag god objects/classes
+   - Flag concrete external dependencies without abstractions
 
 4. **Validate type hints**
    - All public functions must have hints
