@@ -52,14 +52,16 @@ class RAGEvaluator:
         results = self.retriever.retrieve(query=query, top_k=top_k, metadata_filter=metadata_filter)
 
         num_results = len(results)
-        avg_score = self._safe_average([r["score"] for r in results])
+        avg_score = self._safe_average([r.get("score", 0.0) for r in results])
         hit, reciprocal_rank = self._find_first_matching_result(results, expected_sections)
 
-        retrieved_sections = [r["metadata"].get("section_title", "Unknown") for r in results]
+        retrieved_sections = [
+            r.get("metadata", {}).get("section_title", "Unknown") for r in results
+        ]
         retrieved_texts = [
-            r["text"][:TEXT_PREVIEW_LENGTH] + "..."
-            if len(r["text"]) > TEXT_PREVIEW_LENGTH
-            else r["text"]
+            r.get("text", "")[:TEXT_PREVIEW_LENGTH] + "..."
+            if len(r.get("text", "")) > TEXT_PREVIEW_LENGTH
+            else r.get("text", "")
             for r in results
         ]
 
@@ -162,7 +164,7 @@ class RAGEvaluator:
             Tuple of (hit, reciprocal_rank)
         """
         for i, result in enumerate(results, start=1):
-            section = result["metadata"].get("section_title")
+            section = result.get("metadata", {}).get("section_title")
             if self._section_matches(section, expected_sections):
                 return True, 1.0 / i
         return False, 0.0

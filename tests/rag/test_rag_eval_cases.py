@@ -99,6 +99,14 @@ class TestRAGEvalCases:
             assert "expected_sections" in test_case
             assert isinstance(test_case["expected_sections"], list)
 
+    def test_get_categories(self, test_cases_file: Path) -> None:
+        """Test getting list of all categories."""
+        cases = RAGEvalCases.load_from_file(test_cases_file)
+        categories = cases.get_categories()
+
+        assert categories == ["test"]
+        assert len(categories) == 1
+
     def test_count_by_category(self, test_cases_file: Path) -> None:
         """Test counting test cases by category."""
         cases = RAGEvalCases.load_from_file(test_cases_file)

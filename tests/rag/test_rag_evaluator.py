@@ -253,3 +253,25 @@ class TestRAGEvaluator:
         mock_retriever.retrieve.assert_called_once()
         call_kwargs = mock_retriever.retrieve.call_args[1]
         assert call_kwargs["top_k"] == 10
+
+    def test_evaluate_single_case_malformed_result(
+        self, mock_retriever: Mock, test_cases: RAGEvalCases
+    ) -> None:
+        """Test graceful handling of results with missing metadata key."""
+        evaluator = RAGEvaluator(mock_retriever, test_cases)
+
+        mock_retriever.retrieve.return_value = [
+            {
+                "text": "Some content",
+                "score": 0.7,
+            },
+        ]
+
+        test_case = test_cases.get_by_id("test_01")
+        assert test_case is not None
+        result = evaluator.evaluate_single(test_case, top_k=5)
+
+        assert result["hit"] is False
+        assert result["reciprocal_rank"] == 0.0
+        assert result["num_results"] == 1
+        assert result["avg_score"] == 0.7
