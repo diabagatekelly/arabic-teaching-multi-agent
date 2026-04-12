@@ -63,6 +63,11 @@ class TestPineconeClient:
         assert call_kwargs["dimension"] == 384
         assert call_kwargs["metric"] == "cosine"
 
+        # Verify ServerlessSpec parameters
+        spec = call_kwargs["spec"]
+        assert spec.cloud == "aws"
+        assert spec.region == "us-east-1"
+
     def test_uses_existing_index(self, mock_pinecone):
         """Test uses existing index if it exists."""
         # Mock list_indexes to return existing index
@@ -70,13 +75,41 @@ class TestPineconeClient:
         mock_index_obj.name = "arabic-teaching"
         mock_pinecone["pc"].list_indexes.return_value = [mock_index_obj]
 
+        # Mock describe_index to return matching dimension
+        mock_pinecone["pc"].describe_index.return_value = Mock(dimension=384)
+
         _client = PineconeClient(api_key="test-key")
 
         mock_pinecone["pc"].create_index.assert_not_called()
         mock_pinecone["pc"].Index.assert_called_once_with("arabic-teaching")
+        mock_pinecone["pc"].describe_index.assert_called_once_with("arabic-teaching")
+
+    def test_dimension_mismatch_raises_error(self, mock_pinecone):
+        """Test raises error when existing index has different dimension."""
+        # Mock list_indexes to return existing index
+        mock_index_obj = Mock()
+        mock_index_obj.name = "arabic-teaching"
+        mock_pinecone["pc"].list_indexes.return_value = [mock_index_obj]
+
+        # Mock describe_index to return DIFFERENT dimension
+        mock_pinecone["pc"].describe_index.return_value = Mock(dimension=512)
+
+        with pytest.raises(
+            ValueError, match="Index 'arabic-teaching' exists with dimension 512, expected 384"
+        ):
+            PineconeClient(api_key="test-key")
+
+    def test_custom_cloud_and_region(self, mock_pinecone):
+        """Test allows custom cloud and region."""
+        _client = PineconeClient(api_key="test-key", cloud="gcp", region="us-central1")
+
+        call_kwargs = mock_pinecone["pc"].create_index.call_args[1]
+        spec = call_kwargs["spec"]
+        assert spec.cloud == "gcp"
+        assert spec.region == "us-central1"
 
     def test_upsert_single_batch(self, mock_pinecone):
-        """Test upsert with single batch."""
+        """Test upsert with single batch returns actual Pinecone counts."""
         mock_pinecone["index"].upsert.return_value = {"upserted_count": 5}
 
         client = PineconeClient(api_key="test-key")
@@ -90,11 +123,17 @@ class TestPineconeClient:
 
         assert result["batches"] == 1
         assert result["total_vectors"] == 5
+        assert result["upserted_count"] == 5  # Actual count from Pinecone
         mock_pinecone["index"].upsert.assert_called_once_with(vectors=vectors)
 
     def test_upsert_multiple_batches(self, mock_pinecone):
-        """Test upsert with multiple batches."""
-        mock_pinecone["index"].upsert.return_value = {"upserted_count": 50}
+        """Test upsert with multiple batches aggregates actual counts."""
+        # Return different counts per batch to simulate real responses
+        mock_pinecone["index"].upsert.side_effect = [
+            {"upserted_count": 100},
+            {"upserted_count": 100},
+            {"upserted_count": 50},
+        ]
 
         client = PineconeClient(api_key="test-key")
 
@@ -108,6 +147,7 @@ class TestPineconeClient:
 
         assert result["batches"] == 3
         assert result["total_vectors"] == 250
+        assert result["upserted_count"] == 250  # Sum of actual counts: 100+100+50
         assert mock_pinecone["index"].upsert.call_count == 3
 
     def test_upsert_empty_vectors(self, mock_pinecone):

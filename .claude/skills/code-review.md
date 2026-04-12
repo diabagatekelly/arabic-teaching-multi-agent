@@ -1,3 +1,8 @@
+---
+name: code-review
+description: Perform comprehensive code quality review with strict standards enforcement
+---
+
 # Code Review Skill
 
 Perform comprehensive code quality review with strict standards enforcement.
@@ -59,6 +64,38 @@ Or review all changed files:
 - Include: brief description, Args, Returns
 - ❌ **Never** repeat type information already in type hints
 
+### 6. API Response Handling
+- **Never ignore return values** from external APIs/services
+- Aggregate and expose useful information (errors, counts, warnings)
+- Allow callers to detect partial failures or mismatches
+- Example: Don't just count inputs, aggregate actual API responses
+- ❌ **Bad**: `return {"total": len(items)}`  # ignores API responses
+- ✅ **Good**: `return {"total": len(items), "upserted": sum(r.count for r in results), "errors": [r for r in results if r.error]}`
+
+### 7. Configuration Management
+- **Avoid hardcoded values** that make code less reusable
+- Externalize via:
+  - Constructor parameters (with sensible defaults)
+  - Environment variables
+  - Configuration files
+- ❌ **Bad**: `cloud="aws"`, `region="us-east-1"` hardcoded in method
+- ✅ **Good**: Accept as constructor params with defaults, or load from env
+
+### 8. Defensive Programming
+- **Validate assumptions** when reusing existing resources
+- Check state/configuration matches expectations
+- Fail fast with clear error messages
+- Example: When reusing an existing database index, verify dimension matches
+- ❌ **Bad**: Assume existing index has correct configuration
+- ✅ **Good**: Describe and validate index dimension matches expected value
+
+### 9. Test Completeness
+- **Test all behavior**, not just happy paths
+- Verify all parameters passed to mocked dependencies
+- Test edge cases (empty inputs, mismatches, failures)
+- ❌ **Bad**: Only assert on `name` and `dimension` when creating index
+- ✅ **Good**: Also verify `metric`, `spec.cloud`, `spec.region`, etc.
+
 ## Instructions
 
 When reviewing code:
@@ -90,6 +127,26 @@ When reviewing code:
    - Suggest more Pythonic alternatives
    - Flag repeated code (DRY violations)
    - Check for unnecessary intermediate variables
+
+6. **Check API response handling**
+   - Flag ignored return values from external APIs
+   - Verify errors/failures are exposed to callers
+   - Check for partial failure detection
+
+7. **Verify configuration management**
+   - Flag hardcoded values (URLs, regions, dimensions, etc.)
+   - Suggest constructor params or environment variables
+   - Check for configuration externalization
+
+8. **Review defensive programming**
+   - Check for validation when reusing resources
+   - Verify assumptions are checked (dimensions match, types align, etc.)
+   - Look for fail-fast error messages
+
+9. **Evaluate test coverage**
+   - Ensure all parameters to mocked functions are tested
+   - Check for edge case tests (empty, mismatches, errors)
+   - Verify all code paths have corresponding tests
 
 ## Output Format
 

@@ -15,7 +15,11 @@ class VectorDatabase(Protocol):
             batch_size: Number of vectors per batch
 
         Returns:
-            Upsert response with batches count and total vectors
+            Dict with at least:
+            - batches: Number of batches processed
+            - total_vectors: Number of input vectors
+            Implementations may include additional fields like:
+            - upserted_count: Actual count from database (may differ if errors occur)
         """
         ...
 

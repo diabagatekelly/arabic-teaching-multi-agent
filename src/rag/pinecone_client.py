@@ -19,13 +19,18 @@ class PineconeClient:
         api_key: str | None = None,
         index_name: str = "arabic-teaching",
         dimension: int = 384,  # all-MiniLM-L6-v2 embedding size
+        cloud: str = "aws",
+        region: str = "us-east-1",
     ):
         """
         Initialize Pinecone client.
 
         Args:
             api_key: Falls back to PINECONE_API_KEY environment variable
+            index_name: Name of the Pinecone index
             dimension: Must match embedding model (384 for all-MiniLM-L6-v2)
+            cloud: Cloud provider (aws, gcp, azure)
+            region: Cloud region for serverless deployment
         """
         if api_key is None:
             load_dotenv()
@@ -37,12 +42,21 @@ class PineconeClient:
 
         self.index_name = index_name
         self.dimension = dimension
+        self.cloud = cloud
+        self.region = region
 
         self.pc = Pinecone(api_key=self.api_key)
         self.index = self._get_or_create_index()
 
     def _get_or_create_index(self) -> Any:
-        """Get existing index or create new one if it doesn't exist."""
+        """
+        Get existing index or create new one if it doesn't exist.
+
+        Validates dimension matches if index already exists.
+
+        Raises:
+            ValueError: If existing index has different dimension than expected
+        """
         existing_indexes = [index.name for index in self.pc.list_indexes()]
 
         if self.index_name not in existing_indexes:
@@ -50,8 +64,16 @@ class PineconeClient:
                 name=self.index_name,
                 dimension=self.dimension,
                 metric="cosine",
-                spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+                spec=ServerlessSpec(cloud=self.cloud, region=self.region),
             )
+        else:
+            # Validate dimension matches when reusing existing index
+            index_info = self.pc.describe_index(self.index_name)
+            if index_info.dimension != self.dimension:
+                raise ValueError(
+                    f"Index '{self.index_name}' exists with dimension {index_info.dimension}, "
+                    f"expected {self.dimension}"
+                )
 
         return self.pc.Index(self.index_name)
 
@@ -64,14 +86,22 @@ class PineconeClient:
             batch_size: Number of vectors per batch
 
         Returns:
-            Upsert response with batches count and total vectors
+            Dict with batches, total_vectors (input), and upserted_count (actual from Pinecone)
         """
         results = []
         for i in range(0, len(vectors), batch_size):
             batch = vectors[i : i + batch_size]
             result = self.index.upsert(vectors=batch)
             results.append(result)
-        return {"batches": len(results), "total_vectors": len(vectors)}
+
+        # Aggregate actual upserted counts from Pinecone responses
+        total_upserted = sum(r.get("upserted_count", 0) for r in results)
+
+        return {
+            "batches": len(results),
+            "total_vectors": len(vectors),
+            "upserted_count": total_upserted,
+        }
 
     def query(
         self,
