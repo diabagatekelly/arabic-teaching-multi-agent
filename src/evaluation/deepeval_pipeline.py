@@ -20,6 +20,10 @@ __all__ = ["EvaluationPipeline"]
 
 logger = logging.getLogger(__name__)
 
+# Sentiment thresholds for different modes
+TEACHING_MODE_THRESHOLD = 0.6  # Neutral/informative tone acceptable
+FEEDBACK_MODE_THRESHOLD = 0.8  # Must be encouraging and positive
+
 
 class EvaluationPipeline:
     """Pipeline for running DeepEval evaluations on agent outputs."""
@@ -70,6 +74,39 @@ class EvaluationPipeline:
 
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON in test cases file: {e}") from e
+
+    def get_test_cases_for_mode(self, mode_name: str) -> list[dict]:
+        """
+        Extract test cases list for a given mode.
+
+        Handles both simple structure (mode has 'test_cases' key) and
+        complex structure (mode has subgroups with lists).
+
+        Args:
+            mode_name: Mode name (e.g., "lesson_start", "feedback_vocab")
+
+        Returns:
+            Flat list of test case dictionaries for the mode
+
+        Raises:
+            KeyError: If mode_name not found in test_cases
+        """
+        if mode_name not in self.test_cases:
+            raise KeyError(f"Mode '{mode_name}' not found in test cases")
+
+        mode_data = self.test_cases[mode_name]
+        test_cases_list = []
+
+        if "test_cases" in mode_data:
+            # Simple structure: {"test_cases": [...]}
+            test_cases_list = mode_data["test_cases"]
+        else:
+            # Complex structure: {"subgroup1": [...], "subgroup2": [...]}
+            for subgroup_data in mode_data.values():
+                if isinstance(subgroup_data, list):
+                    test_cases_list.extend(subgroup_data)
+
+        return test_cases_list
 
     @staticmethod
     def _safe_percentage(numerator: int, denominator: int) -> float:
@@ -250,7 +287,7 @@ class EvaluationPipeline:
             lesson_start_cases,
             model_responses,
             results,
-            threshold=0.6,
+            threshold=TEACHING_MODE_THRESHOLD,
             mode="teaching",
         )
 
@@ -281,7 +318,7 @@ class EvaluationPipeline:
                 vocab_mode[sub_group],
                 model_responses,
                 results,
-                threshold=0.6,
+                threshold=TEACHING_MODE_THRESHOLD,
                 mode="teaching",
             )
 
@@ -311,7 +348,7 @@ class EvaluationPipeline:
                 grammar_mode[sub_group],
                 model_responses,
                 results,
-                threshold=0.6,
+                threshold=TEACHING_MODE_THRESHOLD,
                 mode="teaching",
             )
 
@@ -336,7 +373,7 @@ class EvaluationPipeline:
                 feedback_mode[sub_group],
                 model_responses,
                 results,
-                threshold=0.8,
+                threshold=FEEDBACK_MODE_THRESHOLD,
                 mode="feedback",
             )
 
@@ -361,7 +398,7 @@ class EvaluationPipeline:
                 feedback_mode[sub_group],
                 model_responses,
                 results,
-                threshold=0.8,
+                threshold=FEEDBACK_MODE_THRESHOLD,
                 mode="feedback",
             )
 

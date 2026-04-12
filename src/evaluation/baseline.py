@@ -590,27 +590,16 @@ class BaselineEvaluator:
             mode_results = results_by_mode[mode_name]
             detailed_outputs[mode_name] = {}
 
-            # Get test cases for this mode
-            test_cases_list = []
-            if mode_name in self.pipeline.test_cases:
-                # Standard mode structure
-                mode_data = self.pipeline.test_cases[mode_name]
-                if "test_cases" in mode_data:
-                    test_cases_list = mode_data["test_cases"]
-                else:
-                    # Handle modes with subgroups (feedback_vocab, feedback_grammar)
-                    for _subgroup_key, subgroup_data in mode_data.items():
-                        if isinstance(subgroup_data, list):
-                            test_cases_list.extend(subgroup_data)
+            # Get test cases for this mode using centralized helper
+            test_cases_list = self.pipeline.get_test_cases_for_mode(mode_name)
+
+            # Build dict mapping test_id -> test_case for O(1) lookup
+            test_cases_by_id = {tc["test_id"]: tc for tc in test_cases_list}
 
             # Build output dict with test case details
             for test_id, response in model_responses.items():
-                # Find matching test case
-                test_case = None
-                for tc in test_cases_list:
-                    if tc.get("test_id") == test_id:
-                        test_case = tc
-                        break
+                # O(1) lookup instead of O(n) scan
+                test_case = test_cases_by_id.get(test_id)
 
                 # Find scores from results
                 scores = {}
