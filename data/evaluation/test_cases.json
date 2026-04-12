@@ -17,15 +17,24 @@
           "lesson_number": 1,
           "vocab_summary": {
             "total_words": 10,
-            "topics_preview": ["كِتَاب (book)", "قَلَم (pen)", "مَكْتَب (desk)"]
+            "topics_preview": [
+              "كِتَاب (book)",
+              "قَلَم (pen)",
+              "مَكْتَب (desk)"
+            ]
           },
           "grammar_summary": {
-            "topics": ["Feminine Nouns", "Definite Article"],
+            "topics": [
+              "Feminine Nouns",
+              "Definite Article"
+            ],
             "topics_count": 2
           }
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "lesson_start_02",
@@ -34,15 +43,24 @@
           "lesson_number": 3,
           "vocab_summary": {
             "total_words": 12,
-            "topics_preview": ["يَكْتُب (he writes)", "يَقْرَأ (he reads)"]
+            "topics_preview": [
+              "يَكْتُب (he writes)",
+              "يَقْرَأ (he reads)"
+            ]
           },
           "grammar_summary": {
-            "topics": ["Present Tense Conjugation", "Subject Pronouns", "Verb Agreement"],
+            "topics": [
+              "Present Tense Conjugation",
+              "Subject Pronouns",
+              "Verb Agreement"
+            ],
             "topics_count": 3
           }
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "lesson_start_03",
@@ -51,15 +69,22 @@
           "lesson_number": 5,
           "vocab_summary": {
             "total_words": 8,
-            "topics_preview": ["أَنَا (I)", "أَنْتَ (you)"]
+            "topics_preview": [
+              "أَنَا (I)",
+              "أَنْتَ (you)"
+            ]
           },
           "grammar_summary": {
-            "topics": ["Pronouns"],
+            "topics": [
+              "Pronouns"
+            ],
             "topics_count": 1
           }
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "lesson_start_04",
@@ -68,15 +93,23 @@
           "lesson_number": 2,
           "vocab_summary": {
             "total_words": 15,
-            "topics_preview": ["مَدْرَسَة (school)", "بَيْت (house)", "سَيَّارَة (car)"]
+            "topics_preview": [
+              "مَدْرَسَة (school)",
+              "بَيْت (house)",
+              "سَيَّارَة (car)"
+            ]
           },
           "grammar_summary": {
-            "topics": ["Noun-Adjective Agreement"],
+            "topics": [
+              "Noun-Adjective Agreement"
+            ],
             "topics_count": 1
           }
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "lesson_start_05",
@@ -85,15 +118,25 @@
           "lesson_number": 7,
           "vocab_summary": {
             "total_words": 20,
-            "topics_preview": ["طَالِب (student)", "مُعَلِّم (teacher)", "طَبِيب (doctor)"]
+            "topics_preview": [
+              "طَالِب (student)",
+              "مُعَلِّم (teacher)",
+              "طَبِيب (doctor)"
+            ]
           },
           "grammar_summary": {
-            "topics": ["Past Tense", "Negation", "Questions"],
+            "topics": [
+              "Past Tense",
+              "Negation",
+              "Questions"
+            ],
             "topics_count": 3
           }
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ]
   },
@@ -109,20 +152,62 @@
           "total_words": 10,
           "batches_count": 4,
           "words": [
-            {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"},
-            {"arabic": "قَلَم", "transliteration": "qalam", "english": "pen"},
-            {"arabic": "مَكْتَب", "transliteration": "maktab", "english": "desk"},
-            {"arabic": "مَدْرَسَة", "transliteration": "madrasa", "english": "school"},
-            {"arabic": "بَيْت", "transliteration": "bayt", "english": "house"},
-            {"arabic": "سَيَّارَة", "transliteration": "sayyaara", "english": "car"},
-            {"arabic": "كَبِير", "transliteration": "kabiir", "english": "big"},
-            {"arabic": "صَغِير", "transliteration": "saghiir", "english": "small"},
-            {"arabic": "جَمِيل", "transliteration": "jamiil", "english": "beautiful"},
-            {"arabic": "جَدِيد", "transliteration": "jadiid", "english": "new"}
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book"
+            },
+            {
+              "arabic": "قَلَم",
+              "transliteration": "qalam",
+              "english": "pen"
+            },
+            {
+              "arabic": "مَكْتَب",
+              "transliteration": "maktab",
+              "english": "desk"
+            },
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            },
+            {
+              "arabic": "بَيْت",
+              "transliteration": "bayt",
+              "english": "house"
+            },
+            {
+              "arabic": "سَيَّارَة",
+              "transliteration": "sayyaara",
+              "english": "car"
+            },
+            {
+              "arabic": "كَبِير",
+              "transliteration": "kabiir",
+              "english": "big"
+            },
+            {
+              "arabic": "صَغِير",
+              "transliteration": "saghiir",
+              "english": "small"
+            },
+            {
+              "arabic": "جَمِيل",
+              "transliteration": "jamiil",
+              "english": "beautiful"
+            },
+            {
+              "arabic": "جَدِيد",
+              "transliteration": "jadiid",
+              "english": "new"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "vocab_overview_02",
@@ -132,18 +217,52 @@
           "total_words": 8,
           "batches_count": 3,
           "words": [
-            {"arabic": "أَنَا", "transliteration": "ana", "english": "I"},
-            {"arabic": "أَنْتَ", "transliteration": "anta", "english": "you (m)"},
-            {"arabic": "هُوَ", "transliteration": "huwa", "english": "he"},
-            {"arabic": "هِيَ", "transliteration": "hiya", "english": "she"},
-            {"arabic": "نَحْنُ", "transliteration": "nahnu", "english": "we"},
-            {"arabic": "أَنْتُم", "transliteration": "antum", "english": "you (pl)"},
-            {"arabic": "هُم", "transliteration": "hum", "english": "they (m)"},
-            {"arabic": "هُنَّ", "transliteration": "hunna", "english": "they (f)"}
+            {
+              "arabic": "أَنَا",
+              "transliteration": "ana",
+              "english": "I"
+            },
+            {
+              "arabic": "أَنْتَ",
+              "transliteration": "anta",
+              "english": "you (m)"
+            },
+            {
+              "arabic": "هُوَ",
+              "transliteration": "huwa",
+              "english": "he"
+            },
+            {
+              "arabic": "هِيَ",
+              "transliteration": "hiya",
+              "english": "she"
+            },
+            {
+              "arabic": "نَحْنُ",
+              "transliteration": "nahnu",
+              "english": "we"
+            },
+            {
+              "arabic": "أَنْتُم",
+              "transliteration": "antum",
+              "english": "you (pl)"
+            },
+            {
+              "arabic": "هُم",
+              "transliteration": "hum",
+              "english": "they (m)"
+            },
+            {
+              "arabic": "هُنَّ",
+              "transliteration": "hunna",
+              "english": "they (f)"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "vocab_overview_03",
@@ -153,22 +272,72 @@
           "total_words": 12,
           "batches_count": 4,
           "words": [
-            {"arabic": "يَوْم", "transliteration": "yawm", "english": "day"},
-            {"arabic": "شَهْر", "transliteration": "shahr", "english": "month"},
-            {"arabic": "سَنَة", "transliteration": "sana", "english": "year"},
-            {"arabic": "صَبَاح", "transliteration": "sabah", "english": "morning"},
-            {"arabic": "مَسَاء", "transliteration": "masaa", "english": "evening"},
-            {"arabic": "لَيْل", "transliteration": "layl", "english": "night"},
-            {"arabic": "اليَوْم", "transliteration": "al-yawm", "english": "today"},
-            {"arabic": "غَداً", "transliteration": "ghadan", "english": "tomorrow"},
-            {"arabic": "أَمْس", "transliteration": "ams", "english": "yesterday"},
-            {"arabic": "الآن", "transliteration": "al-aan", "english": "now"},
-            {"arabic": "بَعْد", "transliteration": "baad", "english": "after"},
-            {"arabic": "قَبْل", "transliteration": "qabl", "english": "before"}
+            {
+              "arabic": "يَوْم",
+              "transliteration": "yawm",
+              "english": "day"
+            },
+            {
+              "arabic": "شَهْر",
+              "transliteration": "shahr",
+              "english": "month"
+            },
+            {
+              "arabic": "سَنَة",
+              "transliteration": "sana",
+              "english": "year"
+            },
+            {
+              "arabic": "صَبَاح",
+              "transliteration": "sabah",
+              "english": "morning"
+            },
+            {
+              "arabic": "مَسَاء",
+              "transliteration": "masaa",
+              "english": "evening"
+            },
+            {
+              "arabic": "لَيْل",
+              "transliteration": "layl",
+              "english": "night"
+            },
+            {
+              "arabic": "اليَوْم",
+              "transliteration": "al-yawm",
+              "english": "today"
+            },
+            {
+              "arabic": "غَداً",
+              "transliteration": "ghadan",
+              "english": "tomorrow"
+            },
+            {
+              "arabic": "أَمْس",
+              "transliteration": "ams",
+              "english": "yesterday"
+            },
+            {
+              "arabic": "الآن",
+              "transliteration": "al-aan",
+              "english": "now"
+            },
+            {
+              "arabic": "بَعْد",
+              "transliteration": "baad",
+              "english": "after"
+            },
+            {
+              "arabic": "قَبْل",
+              "transliteration": "qabl",
+              "english": "before"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ],
     "batch_introduction": [
@@ -180,13 +349,27 @@
           "batch_number": 1,
           "total_batches": 4,
           "words": [
-            {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"},
-            {"arabic": "قَلَم", "transliteration": "qalam", "english": "pen"},
-            {"arabic": "مَكْتَب", "transliteration": "maktab", "english": "desk"}
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book"
+            },
+            {
+              "arabic": "قَلَم",
+              "transliteration": "qalam",
+              "english": "pen"
+            },
+            {
+              "arabic": "مَكْتَب",
+              "transliteration": "maktab",
+              "english": "desk"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "batch_intro_02",
@@ -196,13 +379,27 @@
           "batch_number": 2,
           "total_batches": 3,
           "words": [
-            {"arabic": "مَدْرَسَة", "transliteration": "madrasa", "english": "school"},
-            {"arabic": "بَيْت", "transliteration": "bayt", "english": "house"},
-            {"arabic": "سَيَّارَة", "transliteration": "sayyaara", "english": "car"}
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            },
+            {
+              "arabic": "بَيْت",
+              "transliteration": "bayt",
+              "english": "house"
+            },
+            {
+              "arabic": "سَيَّارَة",
+              "transliteration": "sayyaara",
+              "english": "car"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "batch_intro_03",
@@ -212,12 +409,22 @@
           "batch_number": 3,
           "total_batches": 4,
           "words": [
-            {"arabic": "كَبِير", "transliteration": "kabiir", "english": "big"},
-            {"arabic": "صَغِير", "transliteration": "saghiir", "english": "small"}
+            {
+              "arabic": "كَبِير",
+              "transliteration": "kabiir",
+              "english": "big"
+            },
+            {
+              "arabic": "صَغِير",
+              "transliteration": "saghiir",
+              "english": "small"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "batch_intro_04",
@@ -227,11 +434,17 @@
           "batch_number": 1,
           "total_batches": 2,
           "words": [
-            {"arabic": "يَكْتُب", "transliteration": "yaktub", "english": "he writes"}
+            {
+              "arabic": "يَكْتُب",
+              "transliteration": "yaktub",
+              "english": "he writes"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"],
+        "metrics": [
+          "sentiment"
+        ],
         "notes": "Single word batch"
       },
       {
@@ -242,13 +455,27 @@
           "batch_number": 2,
           "total_batches": 3,
           "words": [
-            {"arabic": "طَالِب", "transliteration": "taalib", "english": "student (m)"},
-            {"arabic": "طَالِبَة", "transliteration": "taaliba", "english": "student (f)"},
-            {"arabic": "مُعَلِّم", "transliteration": "muallim", "english": "teacher"}
+            {
+              "arabic": "طَالِب",
+              "transliteration": "taalib",
+              "english": "student (m)"
+            },
+            {
+              "arabic": "طَالِبَة",
+              "transliteration": "taaliba",
+              "english": "student (f)"
+            },
+            {
+              "arabic": "مُعَلِّم",
+              "transliteration": "muallim",
+              "english": "teacher"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ],
     "list_view": [
@@ -260,20 +487,62 @@
           "current_batch": 2,
           "total_batches": 4,
           "words": [
-            {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"},
-            {"arabic": "قَلَم", "transliteration": "qalam", "english": "pen"},
-            {"arabic": "مَكْتَب", "transliteration": "maktab", "english": "desk"},
-            {"arabic": "مَدْرَسَة", "transliteration": "madrasa", "english": "school"},
-            {"arabic": "بَيْت", "transliteration": "bayt", "english": "house"},
-            {"arabic": "سَيَّارَة", "transliteration": "sayyaara", "english": "car"},
-            {"arabic": "كَبِير", "transliteration": "kabiir", "english": "big"},
-            {"arabic": "صَغِير", "transliteration": "saghiir", "english": "small"},
-            {"arabic": "جَمِيل", "transliteration": "jamiil", "english": "beautiful"},
-            {"arabic": "جَدِيد", "transliteration": "jadiid", "english": "new"}
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book"
+            },
+            {
+              "arabic": "قَلَم",
+              "transliteration": "qalam",
+              "english": "pen"
+            },
+            {
+              "arabic": "مَكْتَب",
+              "transliteration": "maktab",
+              "english": "desk"
+            },
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            },
+            {
+              "arabic": "بَيْت",
+              "transliteration": "bayt",
+              "english": "house"
+            },
+            {
+              "arabic": "سَيَّارَة",
+              "transliteration": "sayyaara",
+              "english": "car"
+            },
+            {
+              "arabic": "كَبِير",
+              "transliteration": "kabiir",
+              "english": "big"
+            },
+            {
+              "arabic": "صَغِير",
+              "transliteration": "saghiir",
+              "english": "small"
+            },
+            {
+              "arabic": "جَمِيل",
+              "transliteration": "jamiil",
+              "english": "beautiful"
+            },
+            {
+              "arabic": "جَدِيد",
+              "transliteration": "jadiid",
+              "english": "new"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "vocab_list_02",
@@ -283,15 +552,37 @@
           "current_batch": 1,
           "total_batches": 3,
           "words": [
-            {"arabic": "أَكَلَ", "transliteration": "akala", "english": "he ate"},
-            {"arabic": "شَرِبَ", "transliteration": "shariba", "english": "he drank"},
-            {"arabic": "ذَهَبَ", "transliteration": "dhahaba", "english": "he went"},
-            {"arabic": "كَتَبَ", "transliteration": "kataba", "english": "he wrote"},
-            {"arabic": "قَرَأَ", "transliteration": "qaraa", "english": "he read"}
+            {
+              "arabic": "أَكَلَ",
+              "transliteration": "akala",
+              "english": "he ate"
+            },
+            {
+              "arabic": "شَرِبَ",
+              "transliteration": "shariba",
+              "english": "he drank"
+            },
+            {
+              "arabic": "ذَهَبَ",
+              "transliteration": "dhahaba",
+              "english": "he went"
+            },
+            {
+              "arabic": "كَتَبَ",
+              "transliteration": "kataba",
+              "english": "he wrote"
+            },
+            {
+              "arabic": "قَرَأَ",
+              "transliteration": "qaraa",
+              "english": "he read"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ],
     "quiz_question": [
@@ -304,7 +595,9 @@
           "question_type": "arabic_to_english"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "vocab_quiz_q_02",
@@ -314,7 +607,9 @@
           "question_type": "english_to_arabic"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ],
     "batch_summary": [
@@ -329,7 +624,9 @@
           "words_missed": []
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "vocab_summary_02",
@@ -340,11 +637,17 @@
           "total_questions": 3,
           "correct_count": 2,
           "words_missed": [
-            {"arabic": "مَدْرَسَة", "transliteration": "madrasa", "english": "school"}
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "vocab_summary_03",
@@ -355,12 +658,22 @@
           "total_questions": 3,
           "correct_count": 1,
           "words_missed": [
-            {"arabic": "كَبِير", "transliteration": "kabiir", "english": "big"},
-            {"arabic": "صَغِير", "transliteration": "saghiir", "english": "small"}
+            {
+              "arabic": "كَبِير",
+              "transliteration": "kabiir",
+              "english": "big"
+            },
+            {
+              "arabic": "صَغِير",
+              "transliteration": "saghiir",
+              "english": "small"
+            }
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ]
   },
@@ -373,33 +686,49 @@
         "input": {
           "mode": "teaching_grammar",
           "lesson_number": 1,
-          "topics": ["Feminine Nouns", "Definite Article"],
+          "topics": [
+            "Feminine Nouns",
+            "Definite Article"
+          ],
           "topics_count": 2
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_overview_02",
         "input": {
           "mode": "teaching_grammar",
           "lesson_number": 3,
-          "topics": ["Present Tense Conjugation", "Subject Pronouns", "Verb Agreement"],
+          "topics": [
+            "Present Tense Conjugation",
+            "Subject Pronouns",
+            "Verb Agreement"
+          ],
           "topics_count": 3
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_overview_03",
         "input": {
           "mode": "teaching_grammar",
           "lesson_number": 5,
-          "topics": ["Past Tense", "Negation"],
+          "topics": [
+            "Past Tense",
+            "Negation"
+          ],
           "topics_count": 2
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ],
     "topic_explanation": [
@@ -410,7 +739,7 @@
           "lesson_number": 1,
           "topic_name": "Feminine Nouns",
           "grammar_rule": "Feminine nouns usually end in ة (taa marbuuta)",
-          "learned_items": [
+          "examples": [
             {
               "arabic": "مَدْرَسَة",
               "transliteration": "madrasa",
@@ -432,7 +761,9 @@
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_explain_02",
@@ -441,7 +772,7 @@
           "lesson_number": 2,
           "topic_name": "Definite Article",
           "grammar_rule": "Use ال (al-) prefix to make nouns definite",
-          "learned_items": [
+          "examples": [
             {
               "arabic": "كِتَاب",
               "transliteration": "kitaab",
@@ -457,7 +788,9 @@
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_explain_03",
@@ -466,7 +799,7 @@
           "lesson_number": 3,
           "topic_name": "Noun-Adjective Agreement",
           "grammar_rule": "Adjectives must match nouns in gender and definiteness",
-          "learned_items": [
+          "examples": [
             {
               "arabic": "كِتَاب كَبِير",
               "transliteration": "kitaab kabiir",
@@ -482,7 +815,9 @@
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_explain_04",
@@ -491,7 +826,7 @@
           "lesson_number": 4,
           "topic_name": "Subject Pronouns",
           "grammar_rule": "Arabic has separate pronouns for masculine and feminine 'you'",
-          "learned_items": [
+          "examples": [
             {
               "arabic": "أَنْتَ",
               "transliteration": "anta",
@@ -507,7 +842,9 @@
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_explain_05",
@@ -516,7 +853,7 @@
           "lesson_number": 5,
           "topic_name": "Present Tense Verbs",
           "grammar_rule": "Present tense verbs use prefixes to indicate subject",
-          "learned_items": [
+          "examples": [
             {
               "arabic": "أَكْتُب",
               "transliteration": "aktub",
@@ -538,7 +875,9 @@
           ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ],
     "quiz_question": [
@@ -553,7 +892,9 @@
           "question": "Is the word مَدْرَسَة masculine or feminine?"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_quiz_q_02",
@@ -566,7 +907,9 @@
           "question": "Is the word بَيْت (bayt - house) masculine or feminine?"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ],
     "topic_summary": [
@@ -582,7 +925,9 @@
           "weak_areas": []
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_summary_02",
@@ -596,7 +941,9 @@
           "weak_areas": []
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_summary_03",
@@ -607,10 +954,15 @@
           "correct_count": 3,
           "total_questions": 5,
           "pass_threshold": 4,
-          "weak_areas": ["Feminine noun markers (ة ending)", "Exceptions to the rule"]
+          "weak_areas": [
+            "Feminine noun markers (ة ending)",
+            "Exceptions to the rule"
+          ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "grammar_summary_04",
@@ -621,10 +973,15 @@
           "correct_count": 2,
           "total_questions": 5,
           "pass_threshold": 4,
-          "weak_areas": ["Verb prefix patterns", "Subject-verb agreement"]
+          "weak_areas": [
+            "Verb prefix patterns",
+            "Subject-verb agreement"
+          ]
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ]
   },
@@ -639,12 +996,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "كِتَاب",
           "word_transliteration": "kitaab",
-          "word_english": "book",
           "student_answer": "book",
-          "is_correct": true
+          "is_correct": true,
+          "english": "book"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_vocab_correct_02",
@@ -652,12 +1011,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "مَدْرَسَة",
           "word_transliteration": "madrasa",
-          "word_english": "school",
           "student_answer": "school",
-          "is_correct": true
+          "is_correct": true,
+          "english": "school"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_vocab_correct_03",
@@ -665,12 +1026,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "قَلَم",
           "word_transliteration": "qalam",
-          "word_english": "pen",
           "student_answer": "pen",
-          "is_correct": true
+          "is_correct": true,
+          "english": "pen"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_vocab_correct_04",
@@ -678,12 +1041,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "سَيَّارَة",
           "word_transliteration": "sayyaara",
-          "word_english": "car",
           "student_answer": "car",
-          "is_correct": true
+          "is_correct": true,
+          "english": "car"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_vocab_correct_05",
@@ -691,12 +1056,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "جَمِيل",
           "word_transliteration": "jamiil",
-          "word_english": "beautiful",
           "student_answer": "beautiful",
-          "is_correct": true
+          "is_correct": true,
+          "english": "beautiful"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ],
     "incorrect_feedback": [
@@ -706,12 +1073,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "مَدْرَسَة",
           "word_transliteration": "madrasa",
-          "word_english": "school",
           "student_answer": "house",
-          "is_correct": false
+          "is_correct": false,
+          "english": "school"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_vocab_incorrect_02",
@@ -719,12 +1088,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "بَيْت",
           "word_transliteration": "bayt",
-          "word_english": "house",
           "student_answer": "door",
-          "is_correct": false
+          "is_correct": false,
+          "english": "house"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_vocab_incorrect_03",
@@ -732,12 +1103,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "قَلَم",
           "word_transliteration": "qalam",
-          "word_english": "pen",
           "student_answer": "pencil",
-          "is_correct": false
+          "is_correct": false,
+          "english": "pen"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_vocab_incorrect_04",
@@ -745,12 +1118,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "كَبِير",
           "word_transliteration": "kabiir",
-          "word_english": "big",
           "student_answer": "small",
-          "is_correct": false
+          "is_correct": false,
+          "english": "big"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_vocab_incorrect_05",
@@ -758,12 +1133,14 @@
           "mode": "feedback_vocab",
           "word_arabic": "سَيَّارَة",
           "word_transliteration": "sayyaara",
-          "word_english": "car",
           "student_answer": "bus",
-          "is_correct": false
+          "is_correct": false,
+          "english": "car"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ]
   },
@@ -784,7 +1161,9 @@
           "current_score": "1/1"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_grammar_correct_02",
@@ -798,7 +1177,9 @@
           "current_score": "2/2"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_grammar_correct_03",
@@ -812,7 +1193,9 @@
           "current_score": "3/3"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_grammar_correct_04",
@@ -826,7 +1209,9 @@
           "current_score": "4/4"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_grammar_correct_05",
@@ -840,7 +1225,9 @@
           "current_score": "5/5"
         },
         "expected_output": "positive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ],
     "incorrect_feedback": [
@@ -856,7 +1243,9 @@
           "current_score": "0/1"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_grammar_incorrect_02",
@@ -870,7 +1259,9 @@
           "current_score": "1/2"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_grammar_incorrect_03",
@@ -884,7 +1275,9 @@
           "current_score": "2/3"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_grammar_incorrect_04",
@@ -898,7 +1291,9 @@
           "current_score": "3/4"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       },
       {
         "test_id": "feedback_grammar_incorrect_05",
@@ -912,7 +1307,9 @@
           "current_score": "4/5"
         },
         "expected_output": "supportive",
-        "metrics": ["sentiment"]
+        "metrics": [
+          "sentiment"
+        ]
       }
     ]
   },
@@ -929,8 +1326,14 @@
           "student_answer": "book",
           "correct_answer": "book"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_correct_02",
@@ -940,8 +1343,14 @@
           "student_answer": "school",
           "correct_answer": "school"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_correct_03",
@@ -951,8 +1360,14 @@
           "student_answer": "pen",
           "correct_answer": "pen"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_correct_04",
@@ -962,8 +1377,14 @@
           "student_answer": "house",
           "correct_answer": "house"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_correct_05",
@@ -973,8 +1394,14 @@
           "student_answer": "car",
           "correct_answer": "car"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_synonym_01",
@@ -984,8 +1411,14 @@
           "student_answer": "instructor",
           "correct_answer": "teacher"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"],
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ],
         "notes": "Test flexible grading - accept synonyms"
       },
       {
@@ -996,8 +1429,14 @@
           "student_answer": "scool",
           "correct_answer": "school"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"],
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ],
         "notes": "Test flexible grading - accept minor typos"
       }
     ],
@@ -1010,8 +1449,14 @@
           "student_answer": "pen",
           "correct_answer": "book"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_incorrect_02",
@@ -1021,8 +1466,14 @@
           "student_answer": "house",
           "correct_answer": "school"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_incorrect_03",
@@ -1032,8 +1483,14 @@
           "student_answer": "door",
           "correct_answer": "house"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_incorrect_04",
@@ -1043,8 +1500,14 @@
           "student_answer": "pencil",
           "correct_answer": "pen"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_incorrect_05",
@@ -1054,8 +1517,14 @@
           "student_answer": "bus",
           "correct_answer": "car"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_incorrect_06",
@@ -1065,8 +1534,14 @@
           "student_answer": "small",
           "correct_answer": "big"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_incorrect_07",
@@ -1076,8 +1551,14 @@
           "student_answer": "ugly",
           "correct_answer": "beautiful"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_vocab_incorrect_08",
@@ -1087,8 +1568,14 @@
           "student_answer": "old",
           "correct_answer": "new"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       }
     ]
   },
@@ -1105,8 +1592,14 @@
           "student_answer": "feminine",
           "correct_answer": "feminine"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_grammar_correct_02",
@@ -1116,8 +1609,14 @@
           "student_answer": "masculine",
           "correct_answer": "masculine"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_grammar_correct_03",
@@ -1127,8 +1626,14 @@
           "student_answer": "كَبِير",
           "correct_answer": "كَبِير"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_grammar_correct_04",
@@ -1138,8 +1643,14 @@
           "student_answer": "الكِتَاب",
           "correct_answer": "الكِتَاب"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_grammar_correct_05",
@@ -1149,8 +1660,14 @@
           "student_answer": "أَكْتُب",
           "correct_answer": "أَكْتُب"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_grammar_abbrev_01",
@@ -1160,8 +1677,14 @@
           "student_answer": "f",
           "correct_answer": "feminine"
         },
-        "expected_output": {"correct": true},
-        "metrics": ["json_validity", "structure", "accuracy"],
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ],
         "notes": "Test flexible grading - accept abbreviations"
       }
     ],
@@ -1174,8 +1697,14 @@
           "student_answer": "masculine",
           "correct_answer": "feminine"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_grammar_incorrect_02",
@@ -1185,8 +1714,14 @@
           "student_answer": "feminine",
           "correct_answer": "masculine"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_grammar_incorrect_03",
@@ -1196,8 +1731,14 @@
           "student_answer": "كَبِيرَة",
           "correct_answer": "كَبِير"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_grammar_incorrect_04",
@@ -1207,8 +1748,14 @@
           "student_answer": "ما أَكْتُب",
           "correct_answer": "لا أَكْتُب"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       },
       {
         "test_id": "grade_grammar_incorrect_05",
@@ -1218,8 +1765,14 @@
           "student_answer": "كَبِير",
           "correct_answer": "كَبِيرَة"
         },
-        "expected_output": {"correct": false},
-        "metrics": ["json_validity", "structure", "accuracy"]
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ]
       }
     ],
     "test_grading": [
@@ -1246,11 +1799,21 @@
         "expected_output": {
           "total_score": "1/2",
           "results": [
-            {"question_id": "q1", "correct": true},
-            {"question_id": "q2", "correct": false}
+            {
+              "question_id": "q1",
+              "correct": true
+            },
+            {
+              "question_id": "q2",
+              "correct": false
+            }
           ]
         },
-        "metrics": ["json_validity", "structure", "accuracy"],
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ],
         "notes": "Multi-answer grading test"
       },
       {
@@ -1282,12 +1845,25 @@
         "expected_output": {
           "total_score": "3/3",
           "results": [
-            {"question_id": "q1", "correct": true},
-            {"question_id": "q2", "correct": true},
-            {"question_id": "q3", "correct": true}
+            {
+              "question_id": "q1",
+              "correct": true
+            },
+            {
+              "question_id": "q2",
+              "correct": true
+            },
+            {
+              "question_id": "q3",
+              "correct": true
+            }
           ]
         },
-        "metrics": ["json_validity", "structure", "accuracy"],
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ],
         "notes": "Multi-answer grading test - all correct"
       },
       {
@@ -1319,12 +1895,25 @@
         "expected_output": {
           "total_score": "2/3",
           "results": [
-            {"question_id": "q1", "correct": true},
-            {"question_id": "q2", "correct": false},
-            {"question_id": "q3", "correct": true}
+            {
+              "question_id": "q1",
+              "correct": true
+            },
+            {
+              "question_id": "q2",
+              "correct": false
+            },
+            {
+              "question_id": "q3",
+              "correct": true
+            }
           ]
         },
-        "metrics": ["json_validity", "structure", "accuracy"],
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ],
         "notes": "Multi-answer grading test - mixed results"
       },
       {
@@ -1356,12 +1945,25 @@
         "expected_output": {
           "total_score": "3/3",
           "results": [
-            {"question_id": "q1", "correct": true},
-            {"question_id": "q2", "correct": true},
-            {"question_id": "q3", "correct": true}
+            {
+              "question_id": "q1",
+              "correct": true
+            },
+            {
+              "question_id": "q2",
+              "correct": true
+            },
+            {
+              "question_id": "q3",
+              "correct": true
+            }
           ]
         },
-        "metrics": ["json_validity", "structure", "accuracy"],
+        "metrics": [
+          "json_validity",
+          "structure",
+          "accuracy"
+        ],
         "notes": "All correct answers test"
       }
     ]
@@ -1392,7 +1994,11 @@
           "matches_exercise_type": true,
           "uses_learned_vocab": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       },
       {
         "test_id": "gen_exercise_02",
@@ -1416,7 +2022,11 @@
           "uses_learned_vocab": true,
           "tests_grammar_rule": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       },
       {
         "test_id": "gen_exercise_03",
@@ -1439,7 +2049,11 @@
           "matches_exercise_type": true,
           "uses_learned_vocab": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       }
     ],
     "quiz_question_gen": [
@@ -1451,9 +2065,21 @@
           "topic_name": "Feminine Nouns",
           "grammar_rule": "In Arabic, most feminine nouns end with ة (taa marbuuta)",
           "learned_items": [
-            {"arabic": "مَدْرَسَة", "transliteration": "madrasa", "english": "school"},
-            {"arabic": "طَاوِلَة", "transliteration": "taawila", "english": "table"},
-            {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"}
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            },
+            {
+              "arabic": "طَاوِلَة",
+              "transliteration": "taawila",
+              "english": "table"
+            },
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book"
+            }
           ],
           "count": 5
         },
@@ -1466,7 +2092,11 @@
           "tests_grammar_rule": true,
           "has_variety": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       },
       {
         "test_id": "gen_quiz_02",
@@ -1476,8 +2106,16 @@
           "topic_name": "Definite Article",
           "grammar_rule": "Use ال (al-) prefix to make nouns definite",
           "learned_items": [
-            {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "a book"},
-            {"arabic": "الكِتَاب", "transliteration": "al-kitaab", "english": "the book"}
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "a book"
+            },
+            {
+              "arabic": "الكِتَاب",
+              "transliteration": "al-kitaab",
+              "english": "the book"
+            }
           ],
           "count": 5
         },
@@ -1490,7 +2128,11 @@
           "tests_grammar_rule": true,
           "has_variety": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       },
       {
         "test_id": "gen_quiz_03",
@@ -1500,8 +2142,16 @@
           "topic_name": "Noun-Adjective Agreement",
           "grammar_rule": "Adjectives must match nouns in gender and definiteness",
           "learned_items": [
-            {"arabic": "كِتَاب كَبِير", "transliteration": "kitaab kabiir", "english": "big book"},
-            {"arabic": "مَدْرَسَة كَبِيرَة", "transliteration": "madrasa kabiira", "english": "big school"}
+            {
+              "arabic": "كِتَاب كَبِير",
+              "transliteration": "kitaab kabiir",
+              "english": "big book"
+            },
+            {
+              "arabic": "مَدْرَسَة كَبِيرَة",
+              "transliteration": "madrasa kabiira",
+              "english": "big school"
+            }
           ],
           "count": 5
         },
@@ -1514,7 +2164,11 @@
           "tests_grammar_rule": true,
           "has_variety": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       }
     ],
     "test_composition": [
@@ -1523,9 +2177,16 @@
         "input": {
           "mode": "exercise_generation",
           "lesson_number": 3,
-          "grammar_topics": ["Feminine Nouns", "Definite Article"],
+          "grammar_topics": [
+            "Feminine Nouns",
+            "Definite Article"
+          ],
           "question_count": 10,
-          "question_types": ["fill_in_blank", "identification", "translation"]
+          "question_types": [
+            "fill_in_blank",
+            "identification",
+            "translation"
+          ]
         },
         "expected_output": {
           "test_id": "lesson_3_test",
@@ -1533,16 +2194,28 @@
           "has_mixed_types": true,
           "covers_all_topics": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       },
       {
         "test_id": "gen_test_02",
         "input": {
           "mode": "exercise_generation",
           "lesson_number": 5,
-          "grammar_topics": ["Present Tense Verbs", "Subject Pronouns", "Negation"],
+          "grammar_topics": [
+            "Present Tense Verbs",
+            "Subject Pronouns",
+            "Negation"
+          ],
           "question_count": 15,
-          "question_types": ["conjugation", "identification", "correction"]
+          "question_types": [
+            "conjugation",
+            "identification",
+            "correction"
+          ]
         },
         "expected_output": {
           "test_id": "lesson_5_test",
@@ -1550,16 +2223,25 @@
           "has_mixed_types": true,
           "covers_all_topics": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       },
       {
         "test_id": "gen_test_03",
         "input": {
           "mode": "exercise_generation",
           "lesson_number": 1,
-          "grammar_topics": ["Feminine Nouns"],
+          "grammar_topics": [
+            "Feminine Nouns"
+          ],
           "question_count": 8,
-          "question_types": ["identification", "fill_in_blank"]
+          "question_types": [
+            "identification",
+            "fill_in_blank"
+          ]
         },
         "expected_output": {
           "test_id": "lesson_1_test",
@@ -1567,16 +2249,27 @@
           "has_mixed_types": true,
           "covers_all_topics": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       },
       {
         "test_id": "gen_test_04",
         "input": {
           "mode": "exercise_generation",
           "lesson_number": 3,
-          "grammar_topics": ["Present Tense Conjugation", "Verb Agreement"],
+          "grammar_topics": [
+            "Present Tense Conjugation",
+            "Verb Agreement"
+          ],
           "question_count": 10,
-          "question_types": ["conjugation", "translation", "fill_in_blank"]
+          "question_types": [
+            "conjugation",
+            "translation",
+            "fill_in_blank"
+          ]
         },
         "expected_output": {
           "test_id": "lesson_3_test",
@@ -1584,7 +2277,11 @@
           "has_mixed_types": true,
           "covers_all_topics": true
         },
-        "metrics": ["json_validity", "structure", "alignment"]
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
       }
     ]
   }

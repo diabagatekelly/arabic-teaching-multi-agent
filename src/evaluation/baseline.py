@@ -517,14 +517,16 @@ class BaselineEvaluator:
     def save_baseline_report(
         self,
         results_by_mode: dict[str, dict],
+        outputs_by_mode: dict[str, dict[str, str]],
         output_path: str | Path | None = None,
     ) -> None:
         """
-        Save baseline evaluation report for all evaluated modes.
+        Save baseline evaluation report and detailed outputs for all evaluated modes.
 
         Args:
             results_by_mode: Dict mapping mode names to their evaluation results
                 Example: {"lesson_start": {...}, "teaching_vocab": {...}, "grading_vocab": {...}}
+            outputs_by_mode: Dict mapping mode names to model outputs (test_id -> response)
             output_path: Output file path (defaults to PROJECT_ROOT/data/evaluation/baseline_report.md)
         """
         output_file = Path(output_path) if output_path else DEFAULT_BASELINE_REPORT_PATH
@@ -554,13 +556,88 @@ class BaselineEvaluator:
             report.append("---")
             report.append("")
 
-        # Save report
+        # Save markdown report
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
         with open(output_file, "w") as f:
             f.write("\n".join(report))
 
         logger.info(f"\n✓ Baseline report saved to: {output_file}")
+
+        # Save detailed outputs JSON
+        outputs_file = output_file.parent / "baseline_outputs.json"
+        self._save_detailed_outputs(outputs_by_mode, results_by_mode, outputs_file)
+
+    def _save_detailed_outputs(
+        self,
+        outputs_by_mode: dict[str, dict[str, str]],
+        results_by_mode: dict[str, dict],
+        output_file: Path,
+    ) -> None:
+        """
+        Save detailed model outputs with inputs and scores for manual review.
+
+        Args:
+            outputs_by_mode: Model outputs by mode (test_id -> response)
+            results_by_mode: Evaluation results by mode
+            output_file: Path to save JSON
+        """
+        import json
+
+        detailed_outputs = {}
+
+        for mode_name, model_responses in outputs_by_mode.items():
+            mode_results = results_by_mode[mode_name]
+            detailed_outputs[mode_name] = {}
+
+            # Get test cases for this mode
+            test_cases_list = []
+            if mode_name in self.pipeline.test_cases:
+                # Standard mode structure
+                mode_data = self.pipeline.test_cases[mode_name]
+                if "test_cases" in mode_data:
+                    test_cases_list = mode_data["test_cases"]
+                else:
+                    # Handle modes with subgroups (feedback_vocab, feedback_grammar)
+                    for _subgroup_key, subgroup_data in mode_data.items():
+                        if isinstance(subgroup_data, list):
+                            test_cases_list.extend(subgroup_data)
+
+            # Build output dict with test case details
+            for test_id, response in model_responses.items():
+                # Find matching test case
+                test_case = None
+                for tc in test_cases_list:
+                    if tc.get("test_id") == test_id:
+                        test_case = tc
+                        break
+
+                # Find scores from results
+                scores = {}
+                passed = False
+                if "metrics" in mode_results:
+                    for metric_name, metric_results_list in mode_results["metrics"].items():
+                        for result in metric_results_list:
+                            if result.get("test_id") == test_id:
+                                scores[metric_name] = {
+                                    "score": result.get("score", 0.0),
+                                    "passed": result.get("passed", False),
+                                    "reason": result.get("reason", ""),
+                                }
+                                passed = passed or result.get("passed", False)
+
+                detailed_outputs[mode_name][test_id] = {
+                    "input": test_case["input"] if test_case else {},
+                    "expected_output": test_case.get("expected_output") if test_case else None,
+                    "model_output": response,
+                    "passed": passed,
+                    "scores": scores,
+                }
+
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(detailed_outputs, f, indent=2, ensure_ascii=False)
+
+        logger.info(f"✓ Detailed outputs saved to: {output_file}")
 
 
 def main() -> None:
@@ -575,6 +652,7 @@ def main() -> None:
 
     evaluator = BaselineEvaluator()
     results_by_mode = {}
+    outputs_by_mode = {}
 
     # Define all baseline methods to run
     baseline_methods = [
@@ -588,10 +666,11 @@ def main() -> None:
         ("exercise_generation", evaluator.run_exercise_generation_baseline),
     ]
 
-    # Run all baselines and collect results
+    # Run all baselines and collect results + outputs
     for mode_name, baseline_method in baseline_methods:
-        _, mode_results = baseline_method()
+        model_outputs, mode_results = baseline_method()
         results_by_mode[mode_name] = mode_results
+        outputs_by_mode[mode_name] = model_outputs
 
         mode_pct = EvaluationPipeline._safe_percentage(
             mode_results["passed"], mode_results["total"]
@@ -608,8 +687,8 @@ def main() -> None:
     logger.info(f"Overall: {total_passed}/{total_cases} passed ({overall_pct:.1f}%)")
     logger.info("=" * 60)
 
-    # Save comprehensive report
-    evaluator.save_baseline_report(results_by_mode)
+    # Save comprehensive report and detailed outputs
+    evaluator.save_baseline_report(results_by_mode, outputs_by_mode)
 
     logger.info("\n=== Baseline Evaluation Complete ===")
 

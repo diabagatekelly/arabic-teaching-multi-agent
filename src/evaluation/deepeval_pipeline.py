@@ -250,7 +250,7 @@ class EvaluationPipeline:
             lesson_start_cases,
             model_responses,
             results,
-            threshold=0.9,
+            threshold=0.6,
             mode="teaching",
         )
 
@@ -281,7 +281,7 @@ class EvaluationPipeline:
                 vocab_mode[sub_group],
                 model_responses,
                 results,
-                threshold=0.9,
+                threshold=0.6,
                 mode="teaching",
             )
 
@@ -311,7 +311,7 @@ class EvaluationPipeline:
                 grammar_mode[sub_group],
                 model_responses,
                 results,
-                threshold=0.9,
+                threshold=0.6,
                 mode="teaching",
             )
 
