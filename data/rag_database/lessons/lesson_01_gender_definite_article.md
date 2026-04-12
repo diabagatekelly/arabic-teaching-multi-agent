@@ -82,7 +82,7 @@ The gender of a noun **must match** any words that describe or refer to it:
 |---------------------|----------------|---------|--------|
 | طَاوِلَةٌ | taawilatun | a table | feminine |
 | مَدْرَسَةٌ | madrasatun | a school | feminine |
-| نَافِذَةٌ | naafidhatu | a window | feminine |
+| نَافِذَةٌ | naafidhatun | a window | feminine |
 | غُرْفَةٌ | ghurfatun | a room | feminine |
 
 ### Key Insight: Taa Marbuuta (ة)

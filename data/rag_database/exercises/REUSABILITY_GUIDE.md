@@ -65,7 +65,7 @@ These templates work with minimal adaptation:
 9. **noun_adjective_agreement.md** (NEW)
    - **Reusable for**: verb-subject agreement, pronoun agreement, demonstrative agreement
    - **How to adapt**: Change what must agree (adjective → verb → pronoun)
-   - **Example**: "Complete: أنا _____ (to write)" → أنا أكْتُبُ
+   - **Example**: "Complete: أنا _____ (to write)" → أنا أَكْتُبُ
 
 ---
 
