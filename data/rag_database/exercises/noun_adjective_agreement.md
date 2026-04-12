@@ -100,7 +100,7 @@ Fix the agreement error:
 ### Question 2 (Complete - Gender + Definiteness)
 **Question:** Complete the phrase with the correct form of "big":
 
-الطَّاوِلَةُ (aT-Taawilatu - the table, feminine, definite) + كَبِير/كَبِيرَة → ?
+الطَّاوِلَةُ (at-taawilatu - the table, feminine, definite) + كَبِير/كَبِيرَة → ?
 
 **Correct Answer:** الطَّاوِلَةُ الْكَبِيرَةُ
 

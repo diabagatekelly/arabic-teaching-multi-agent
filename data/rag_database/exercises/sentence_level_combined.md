@@ -33,7 +33,7 @@ Translation: {english_translation}
 ```json
 {
   "corrected_sentence": "{sentence_in_arabic}",
-  "errors_found": [
+  "corrections": [
     {"word": "...", "error_type": "...", "fix": "..."}
   ],
   "explanation": "Brief explanation"
@@ -86,10 +86,10 @@ The big كِتَابٌ is on the table.
 ```json
 {
   "corrected_sentence": "The big الْكِتَابُ is on the table.",
-  "errors_found": [
+  "corrections": [
     {
-      "original_word": "كِتَابٌ",
-      "corrected_word": "الْكِتَابُ",
+      "original": "كِتَابٌ",
+      "corrected": "الْكِتَابُ",
       "error_type": "wrong_definiteness",
       "explanation": "'The book' is definite, needs ال and no tanween"
     }
@@ -110,16 +110,16 @@ I see a كِتَاب on الطَّاوِلَةٌ.
 ```json
 {
   "corrected_sentence": "I see a كِتَابٌ on الطَّاوِلَةُ.",
-  "errors_found": [
+  "corrections": [
     {
-      "original_word": "كِتَاب",
-      "corrected_word": "كِتَابٌ",
+      "original": "كِتَاب",
+      "corrected": "كِتَابٌ",
       "error_type": "missing_tanween",
       "explanation": "'A book' is indefinite, needs tanween"
     },
     {
-      "original_word": "الطَّاوِلَةٌ",
-      "corrected_word": "الطَّاوِلَةُ",
+      "original": "الطَّاوِلَةٌ",
+      "corrected": "الطَّاوِلَةُ",
       "error_type": "al_tanween_conflict",
       "explanation": "Definite word cannot have tanween, remove it"
     }
@@ -140,16 +140,16 @@ There is a مَدْرَسَةُ near the بَيْتٌ.
 ```json
 {
   "corrected_sentence": "There is a مَدْرَسَةٌ near the الْبَيْتُ.",
-  "errors_found": [
+  "corrections": [
     {
-      "original_word": "مَدْرَسَةُ",
-      "corrected_word": "مَدْرَسَةٌ",
+      "original": "مَدْرَسَةُ",
+      "corrected": "مَدْرَسَةٌ",
       "error_type": "missing_tanween",
       "explanation": "'A school' is indefinite (uses 'a'), needs tanween not just damma"
     },
     {
-      "original_word": "بَيْتٌ",
-      "corrected_word": "الْبَيْتُ",
+      "original": "بَيْتٌ",
+      "corrected": "الْبَيْتُ",
       "error_type": "missing_al",
       "explanation": "'The house' is definite (uses 'the'), needs ال and no tanween"
     }
@@ -172,16 +172,16 @@ There is a مَدْرَسَةُ near the بَيْتٌ.
 ```json
 {
   "corrected_sentence": "الْكِتَابُ فِي غُرْفَةٌ",
-  "errors_found": [
+  "corrections": [
     {
-      "original_word": "الْكِتَابٌ",
-      "corrected_word": "الْكِتَابُ",
+      "original": "الْكِتَابٌ",
+      "corrected": "الْكِتَابُ",
       "error_type": "al_tanween_conflict",
       "explanation": "Remove tanween from definite noun"
     },
     {
-      "original_word": "غُرْفَة",
-      "corrected_word": "غُرْفَةٌ",
+      "original": "غُرْفَة",
+      "corrected": "غُرْفَةٌ",
       "error_type": "missing_tanween",
       "explanation": "Indefinite noun (a room) needs tanween"
     }
@@ -202,22 +202,22 @@ I see الْقَلَمٌ and كِتَاب and a طَاوِلَةُ.
 ```json
 {
   "corrected_sentence": "I see الْقَلَمُ and كِتَابٌ and a طَاوِلَةٌ.",
-  "errors_found": [
+  "corrections": [
     {
-      "original_word": "الْقَلَمٌ",
-      "corrected_word": "الْقَلَمُ",
+      "original": "الْقَلَمٌ",
+      "corrected": "الْقَلَمُ",
       "error_type": "al_tanween_conflict",
       "explanation": "'The pen' has ال, remove tanween"
     },
     {
-      "original_word": "كِتَاب",
-      "corrected_word": "كِتَابٌ",
+      "original": "كِتَاب",
+      "corrected": "كِتَابٌ",
       "error_type": "missing_tanween",
       "explanation": "Indefinite 'a book' needs tanween"
     },
     {
-      "original_word": "طَاوِلَةُ",
-      "corrected_word": "طَاوِلَةٌ",
+      "original": "طَاوِلَةُ",
+      "corrected": "طَاوِلَةٌ",
       "error_type": "wrong_vowel",
       "explanation": "'A table' is indefinite, needs tanween not just damma"
     }
@@ -290,8 +290,8 @@ I see الْقَلَمٌ and كِتَاب and a طَاوِلَةُ.
   "errors": [
     {
       "position": 2,
-      "original_word": "كِتَابٌ",
-      "corrected_word": "الْكِتَابُ",
+      "original": "كِتَابٌ",
+      "corrected": "الْكِتَابُ",
       "error_type": "wrong_definiteness",
       "explanation": "'The book' is definite, needs ال"
     }

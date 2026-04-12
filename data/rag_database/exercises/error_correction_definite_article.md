@@ -147,7 +147,7 @@ Fix the spelling errors in these words:
 ### Question 2 (Intermediate - focus on one error type)
 **Question:** All of these words should be definite (with ال). Fix any spelling errors:
 
-1. الطَّاوِلَةٌ (aT-Taawilatu) - "the table"
+1. الطَّاوِلَةٌ (at-taawilatu) - "the table"
 2. الْمَكْتَبُ (al-maktabu) - "the office"
 3. الْكِتَابٌ (al-kitaabun) - "the book"
 4. الْبَابُ (al-baabu) - "the door"

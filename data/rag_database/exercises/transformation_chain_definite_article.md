@@ -113,7 +113,7 @@ Tests understanding of alternation pattern
 ### Question 3 (Full Cycle - Pattern Recognition)
 **Question:** Complete the sequence:
 
-طَاوِلَةٌ (taawilatun - a table) → الطَّاوِلَةُ (aT-Taawilatu - the table) → _____
+طَاوِلَةٌ (taawilatun - a table) → الطَّاوِلَةُ (at-taawilatu - the table) → _____
 
 **Correct Answer:**
 ```json

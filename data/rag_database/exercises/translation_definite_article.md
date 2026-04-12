@@ -122,7 +122,7 @@ c) بَيْتُ
 ### Question 5 (Remove ال)
 **Question:** Translate to Arabic: "a table"
 
-**Given:** الطَّاوِلَةُ (aT-Taawilatu - the table)
+**Given:** الطَّاوِلَةُ (at-taawilatu - the table)
 
 **Correct Answer:** طَاوِلَةٌ
 

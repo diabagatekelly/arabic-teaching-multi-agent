@@ -145,7 +145,7 @@ c) طَاوِلَةٌ (taawilatun) - indefinite
 
 **Options:**
 a) الْمَكْتَبُ (al-maktabu) - definite  
-b) الطَّاوِلَةٌ (aT-Taawilatu) - definite  
+b) الطَّاوِلَةٌ (at-taawilatu) - definite  
 c) كُرْسِيٌّ (kursiyyun) - indefinite
 
 **Correct Answer:** b

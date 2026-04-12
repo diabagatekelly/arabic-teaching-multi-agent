@@ -112,7 +112,7 @@ Example: "book (masculine, definite)" → الْكِتَابُ
 
 **Correct Answer:** الطَّاوِلَةُ
 
-**Explanation:** "The table" is definite and feminine (table = طَاوِلَة ends in ة). Write: الطَّاوِلَةُ (aT-Taawilatu) with ال, no tanween.
+**Explanation:** "The table" is definite and feminine (table = طَاوِلَة ends in ة). Write: الطَّاوِلَةُ (at-taawilatu) with ال, no tanween.
 
 ---
 

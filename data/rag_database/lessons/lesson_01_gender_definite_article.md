@@ -398,7 +398,7 @@ IF indefinite but missing tanween → ERROR
 
 **Correction**: "Indefinite nouns must end with tanween (ٌ). Add ٌ to the end: كِتَابٌ"
 
-### Error Type: tanween_with_definite_article
+### Error Type: al_tanween_conflict
 
 **Pattern**:
 ```
@@ -439,9 +439,9 @@ IF missing harakaat → ERROR
 
 | Indefinite | Definite | Transliteration | English |
 |------------|----------|----------------|---------|
-| طَاوِلَةٌ | الطَّاوِلَةُ | taawilatun / aT-Taawilatu | table / the table |
+| طَاوِلَةٌ | الطَّاوِلَةُ | taawilatun / at-taawilatu | table / the table |
 | مَدْرَسَةٌ | الْمَدْرَسَةُ | madrasatun / al-madrasatu | school / the school |
-| نَافِذَةٌ | النَّافِذَةُ | naafidhatun / an-naafIdhatu | window / the window |
+| نَافِذَةٌ | النَّافِذَةُ | naafidhatun / an-naafidhatu | window / the window |
 | غُرْفَةٌ | الْغُرْفَةُ | ghurfatun / al-ghurfatu | room / the room |
 
 ### Essential Phrases
