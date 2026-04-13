@@ -1,0 +1,271 @@
+[
+  {
+    "lesson_number": 1,
+    "exercise_type": "fill_in_blank",
+    "content_type": "vocabulary",
+    "count": 5,
+    "learned_items": [
+      "كِتَابٌ (kitaabun) - book",
+      "مَدْرَسَةٌ (madrasatun) - school",
+      "قَلَمٌ (qalamun) - pen",
+      "طَالِبٌ (ṭālibun) - student",
+      "مُعَلِّمٌ (muʿallimun) - teacher"
+    ],
+    "exercises": [
+      {"question": "The student needs a ___ to write.", "answer": "قَلَمٌ (pen)"},
+      {"question": "I go to ___ every day.", "answer": "مَدْرَسَةٌ (school)"},
+      {"question": "The ___ teaches Arabic.", "answer": "مُعَلِّمٌ (teacher)"},
+      {"question": "I read a ___ in the library.", "answer": "كِتَابٌ (book)"},
+      {"question": "A ___ learns new words.", "answer": "طَالِبٌ (student)"}
+    ]
+  },
+  {
+    "lesson_number": 2,
+    "exercise_type": "fill_in_blank",
+    "content_type": "vocabulary",
+    "count": 4,
+    "learned_items": [
+      "بَيْتٌ (baytun) - house",
+      "بَابٌ (baabun) - door",
+      "شُبَّاكٌ (shubbākun) - window",
+      "كُرْسِيٌّ (kursiyyun) - chair"
+    ],
+    "exercises": [
+      {"question": "The ___ of the house is green.", "answer": "بَابٌ (door)"},
+      {"question": "I live in a big ___.", "answer": "بَيْتٌ (house)"},
+      {"question": "Please sit on the ___.", "answer": "كُرْسِيٌّ (chair)"},
+      {"question": "Open the ___ to let in fresh air.", "answer": "شُبَّاكٌ (window)"}
+    ]
+  },
+  {
+    "lesson_number": 1,
+    "exercise_type": "fill_in_blank",
+    "content_type": "grammar",
+    "count": 5,
+    "learned_items": [
+      "Definite article: ال (al-)",
+      "Masculine nouns: كِتَابٌ, بَيْتٌ, قَلَمٌ",
+      "Feminine nouns: مَدْرَسَةٌ, طَاوِلَةٌ"
+    ],
+    "exercises": [
+      {"question": "Add the definite article: ___ كِتَابُ (the book)", "answer": "ال"},
+      {"question": "___ مَدْرَسَةُ is near my house. (the school)", "answer": "ال"},
+      {"question": "The teacher uses ___ قَلَمَ. (the pen)", "answer": "ال"},
+      {"question": "I sat at ___ طَاوِلَةِ. (the table)", "answer": "ال"},
+      {"question": "He lives in ___ بَيْتِ. (the house)", "answer": "ال"}
+    ]
+  },
+  {
+    "lesson_number": 2,
+    "exercise_type": "fill_in_blank",
+    "content_type": "grammar",
+    "count": 4,
+    "learned_items": [
+      "Subject pronouns: أَنَا (I), أَنْتَ (you-m), أَنْتِ (you-f), هُوَ (he), هِيَ (she)",
+      "Nominal sentences: subject + predicate"
+    ],
+    "exercises": [
+      {"question": "___ مُعَلِّمٌ. (I am a teacher)", "answer": "أَنَا"},
+      {"question": "___ طَالِبَةٌ. (She is a student)", "answer": "هِيَ"},
+      {"question": "___ مُجْتَهِدٌ. (He is diligent)", "answer": "هُوَ"},
+      {"question": "___ طَالِبٌ. (You are a student - masculine)", "answer": "أَنْتَ"}
+    ]
+  },
+  {
+    "lesson_number": 3,
+    "exercise_type": "fill_in_blank",
+    "content_type": "vocabulary",
+    "count": 5,
+    "learned_items": [
+      "يَوْمٌ (yawmun) - day",
+      "لَيْلٌ (laylun) - night",
+      "شَمْسٌ (shamsun) - sun",
+      "قَمَرٌ (qamarun) - moon",
+      "سَمَاءٌ (samāʾun) - sky"
+    ],
+    "exercises": [
+      {"question": "The ___ shines during the day.", "answer": "شَمْسٌ (sun)"},
+      {"question": "The ___ appears at night.", "answer": "قَمَرٌ (moon)"},
+      {"question": "Birds fly in the ___.", "answer": "سَمَاءٌ (sky)"},
+      {"question": "We sleep at ___.", "answer": "لَيْلٌ (night)"},
+      {"question": "I study during the ___.", "answer": "يَوْمٌ (day)"}
+    ]
+  },
+  {
+    "lesson_number": 1,
+    "exercise_type": "fill_in_blank",
+    "content_type": "vocabulary",
+    "count": 3,
+    "learned_items": [
+      "كَبِيرٌ (kabīrun) - big",
+      "صَغِيرٌ (ṣaghīrun) - small",
+      "جَدِيدٌ (jadīdun) - new"
+    ],
+    "exercises": [
+      {"question": "The house is very ___.", "answer": "كَبِيرٌ (big)"},
+      {"question": "I bought a ___ book.", "answer": "جَدِيدٌ (new)"},
+      {"question": "The pen is ___.", "answer": "صَغِيرٌ (small)"}
+    ]
+  },
+  {
+    "lesson_number": 2,
+    "exercise_type": "fill_in_blank",
+    "content_type": "grammar",
+    "count": 5,
+    "learned_items": [
+      "Demonstrative pronouns: هٰذَا (this-m), هٰذِهِ (this-f)",
+      "Gender agreement"
+    ],
+    "exercises": [
+      {"question": "___ كِتَابٌ. (This is a book - masculine)", "answer": "هٰذَا"},
+      {"question": "___ مَدْرَسَةٌ. (This is a school - feminine)", "answer": "هٰذِهِ"},
+      {"question": "___ قَلَمٌ. (This is a pen - masculine)", "answer": "هٰذَا"},
+      {"question": "___ طَاوِلَةٌ. (This is a table - feminine)", "answer": "هٰذِهِ"},
+      {"question": "___ بَيْتٌ. (This is a house - masculine)", "answer": "هٰذَا"}
+    ]
+  },
+  {
+    "lesson_number": 3,
+    "exercise_type": "fill_in_blank",
+    "content_type": "grammar",
+    "count": 4,
+    "learned_items": [
+      "Possessive pronouns: ـِي (my), ـُكَ (your-m), ـُهُ (his), ـُهَا (her)",
+      "Attachment to nouns"
+    ],
+    "exercises": [
+      {"question": "كِتَابـ___ (my book)", "answer": "ِي"},
+      {"question": "بَيْتـ___ (his house)", "answer": "ُهُ"},
+      {"question": "قَلَمـ___ (your pen - masculine)", "answer": "ُكَ"},
+      {"question": "مَدْرَسَةـ___ (her school)", "answer": "ُهَا"}
+    ]
+  },
+  {
+    "lesson_number": 1,
+    "exercise_type": "fill_in_blank",
+    "content_type": "vocabulary",
+    "count": 5,
+    "learned_items": [
+      "أَكَلَ (akala) - ate/to eat",
+      "شَرِبَ (shariba) - drank/to drink",
+      "كَتَبَ (kataba) - wrote/to write",
+      "قَرَأَ (qaraʾa) - read/to read",
+      "ذَهَبَ (dhahaba) - went/to go"
+    ],
+    "exercises": [
+      {"question": "The student ___ the book.", "answer": "قَرَأَ (read)"},
+      {"question": "The teacher ___ on the board.", "answer": "كَتَبَ (wrote)"},
+      {"question": "I ___ to school.", "answer": "ذَهَبَ (went)"},
+      {"question": "He ___ water.", "answer": "شَرِبَ (drank)"},
+      {"question": "She ___ breakfast.", "answer": "أَكَلَ (ate)"}
+    ]
+  },
+  {
+    "lesson_number": 2,
+    "exercise_type": "fill_in_blank",
+    "content_type": "grammar",
+    "count": 4,
+    "learned_items": [
+      "Idafa construction (إضافة)",
+      "Possession structure: noun1 + noun2"
+    ],
+    "exercises": [
+      {"question": "كِتَابُ ___ (the teacher's book)", "answer": "المُعَلِّمِ"},
+      {"question": "بَابُ ___ (the house's door)", "answer": "البَيْتِ"},
+      {"question": "قَلَمُ ___ (the student's pen)", "answer": "الطَّالِبِ"},
+      {"question": "مَدْرَسَةُ ___ (the city's school)", "answer": "المَدِينَةِ"}
+    ]
+  },
+  {
+    "lesson_number": 3,
+    "exercise_type": "fill_in_blank",
+    "content_type": "vocabulary",
+    "count": 5,
+    "learned_items": [
+      "أُسْرَةٌ (usratun) - family",
+      "أَبٌ (abun) - father",
+      "أُمٌّ (ummun) - mother",
+      "أَخٌ (akhun) - brother",
+      "أُخْتٌ (ukhtun) - sister"
+    ],
+    "exercises": [
+      {"question": "My ___ cooks delicious food.", "answer": "أُمٌّ (mother)"},
+      {"question": "My ___ goes to work.", "answer": "أَبٌ (father)"},
+      {"question": "I have one ___ and one sister.", "answer": "أَخٌ (brother)"},
+      {"question": "My ___ studies medicine.", "answer": "أُخْتٌ (sister)"},
+      {"question": "The ___ eats together.", "answer": "أُسْرَةٌ (family)"}
+    ]
+  },
+  {
+    "lesson_number": 1,
+    "exercise_type": "fill_in_blank",
+    "content_type": "grammar",
+    "count": 4,
+    "learned_items": [
+      "Adjective-noun agreement",
+      "Gender agreement: masculine/feminine"
+    ],
+    "exercises": [
+      {"question": "كِتَابٌ ___ (a big book - masculine)", "answer": "كَبِيرٌ"},
+      {"question": "مَدْرَسَةٌ ___ (a big school - feminine)", "answer": "كَبِيرَةٌ"},
+      {"question": "طَالِبٌ ___ (a diligent student - masculine)", "answer": "مُجْتَهِدٌ"},
+      {"question": "طَالِبَةٌ ___ (a diligent student - feminine)", "answer": "مُجْتَهِدَةٌ"}
+    ]
+  },
+  {
+    "lesson_number": 2,
+    "exercise_type": "fill_in_blank",
+    "content_type": "vocabulary",
+    "count": 5,
+    "learned_items": [
+      "لَوْنٌ (lawnun) - color",
+      "أَحْمَرُ (aḥmaru) - red",
+      "أَزْرَقُ (azraqu) - blue",
+      "أَخْضَرُ (akhḍaru) - green",
+      "أَبْيَضُ (abyaḍu) - white"
+    ],
+    "exercises": [
+      {"question": "The sky is ___.", "answer": "أَزْرَقُ (blue)"},
+      {"question": "The tree is ___.", "answer": "أَخْضَرُ (green)"},
+      {"question": "The apple is ___.", "answer": "أَحْمَرُ (red)"},
+      {"question": "The paper is ___.", "answer": "أَبْيَضُ (white)"},
+      {"question": "What ___ is the book?", "answer": "لَوْنٌ (color)"}
+    ]
+  },
+  {
+    "lesson_number": 3,
+    "exercise_type": "fill_in_blank",
+    "content_type": "grammar",
+    "count": 4,
+    "learned_items": [
+      "Negation with لَيْسَ (laysa)",
+      "Sentence negation"
+    ],
+    "exercises": [
+      {"question": "___ الطَّالِبُ كَسْلَانَ. (The student is not lazy)", "answer": "لَيْسَ"},
+      {"question": "___ المَدْرَسَةُ بَعِيدَةً. (The school is not far)", "answer": "لَيْسَتِ"},
+      {"question": "___ الكِتَابُ جَدِيدًا. (The book is not new)", "answer": "لَيْسَ"},
+      {"question": "___ المُعَلِّمَةُ غَائِبَةً. (The teacher-f is not absent)", "answer": "لَيْسَتِ"}
+    ]
+  },
+  {
+    "lesson_number": 1,
+    "exercise_type": "fill_in_blank",
+    "content_type": "vocabulary",
+    "count": 5,
+    "learned_items": [
+      "مَاءٌ (māʾun) - water",
+      "طَعَامٌ (ṭaʿāmun) - food",
+      "حَلِيبٌ (ḥalībun) - milk",
+      "خُبْزٌ (khubzun) - bread",
+      "لَحْمٌ (laḥmun) - meat"
+    ],
+    "exercises": [
+      {"question": "I drink ___ when thirsty.", "answer": "مَاءٌ (water)"},
+      {"question": "We eat ___ every day.", "answer": "طَعَامٌ (food)"},
+      {"question": "The child drinks ___.", "answer": "حَلِيبٌ (milk)"},
+      {"question": "I eat ___ with breakfast.", "answer": "خُبْزٌ (bread)"},
+      {"question": "He cooked ___ for dinner.", "answer": "لَحْمٌ (meat)"}
+    ]
+  }
+]

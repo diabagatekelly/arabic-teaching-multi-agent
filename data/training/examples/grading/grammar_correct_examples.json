@@ -1,0 +1,52 @@
+[
+  {
+    "question": "Is كِتَابٌ (kitaabun) masculine or feminine?",
+    "student_answer": "masculine",
+    "correct_answer": "masculine"
+  },
+  {
+    "question": "Is مَدْرَسَةٌ (madrasatun) masculine or feminine?",
+    "student_answer": "f",
+    "correct_answer": "feminine"
+  },
+  {
+    "question": "Add the definite article to بَيْتٌ (baytun).",
+    "student_answer": "البَيْتُ",
+    "correct_answer": "البَيْتُ (al-baytu)"
+  },
+  {
+    "question": "What is the subject pronoun for 'he' in Arabic?",
+    "student_answer": "هُوَ",
+    "correct_answer": "هُوَ (huwa)"
+  },
+  {
+    "question": "Is طَالِبَةٌ (ṭālibatun) masculine or feminine?",
+    "student_answer": "fem",
+    "correct_answer": "feminine"
+  },
+  {
+    "question": "Complete: كِتَابُ ___ (the student's book)",
+    "student_answer": "الطَّالِبِ",
+    "correct_answer": "الطَّالِبِ (aṭ-ṭālibi)"
+  },
+  {
+    "question": "Which demonstrative pronoun is used for a masculine noun?",
+    "student_answer": "هٰذَا",
+    "correct_answer": "هٰذَا (hādhā)"
+  },
+  {
+    "question": "What marker indicates a feminine noun in Arabic?",
+    "student_answer": "taa marbuuta",
+    "correct_answer": "ة (taa marbuuta)"
+  },
+  {
+    "question": "Is the word بَابٌ (baabun - door) masculine or feminine?",
+    "student_answer": "masc",
+    "correct_answer": "masculine"
+  },
+  {
+    "question": "Translate: I am a teacher (male)",
+    "student_answer": "أَنَا مُعَلِّمٌ",
+    "correct_answer": "أَنَا مُعَلِّمٌ (ana muʿallimun)"
+  }
+]

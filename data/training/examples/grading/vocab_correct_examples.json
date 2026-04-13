@@ -1,0 +1,42 @@
+[
+  {
+    "word": "كِتَابٌ",
+    "student_answer": "book",
+    "correct_answer": "book"
+  },
+  {
+    "word": "مَدْرَسَةٌ",
+    "student_answer": "scool",
+    "correct_answer": "school"
+  },
+  {
+    "word": "مُعَلِّمٌ",
+    "student_answer": "instructor",
+    "correct_answer": "teacher"
+  },
+  {
+    "word": "طَالِبٌ",
+    "student_answer": "student",
+    "correct_answer": "student"
+  },
+  {
+    "word": "بَيْتٌ",
+    "student_answer": "house",
+    "correct_answer": "house"
+  },
+  {
+    "word": "قَلَمٌ",
+    "student_answer": "pen",
+    "correct_answer": "pen"
+  },
+  {
+    "word": "كُرْسِيٌّ",
+    "student_answer": "chair",
+    "correct_answer": "chair"
+  },
+  {
+    "word": "بَابٌ",
+    "student_answer": "a door",
+    "correct_answer": "door"
+  }
+]

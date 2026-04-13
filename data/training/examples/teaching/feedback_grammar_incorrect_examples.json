@@ -1,0 +1,30 @@
+[
+  {
+    "question": "Is مُعَلِّمَةٌ (muʿallimatun) masculine or feminine?",
+    "student_answer": "masculine",
+    "correct_answer": "feminine",
+    "explanation": "This word ends with taa marbuuta (ة), which indicates it is feminine. It means 'teacher' (female).",
+    "score": "1/4"
+  },
+  {
+    "question": "Translate: الطَّالِبُ مُجْتَهِدٌ",
+    "student_answer": "The student is tired",
+    "correct_answer": "The student is diligent",
+    "explanation": "مُجْتَهِدٌ means 'diligent' or 'hardworking', not 'tired'. This is a nominal sentence with no verb needed.",
+    "score": "2/5"
+  },
+  {
+    "question": "What is the possessive pronoun for 'my' when attached to كِتَابٌ?",
+    "student_answer": "كِتَابُكَ",
+    "correct_answer": "كِتَابِي (kitābī)",
+    "explanation": "كِتَابِي means 'my book' (the suffix ـِي). كِتَابُكَ means 'your book' (masculine).",
+    "score": "2/6"
+  },
+  {
+    "question": "Identify the verb in: كَتَبَ الطَّالِبُ",
+    "student_answer": "الطَّالِبُ (the student)",
+    "correct_answer": "كَتَبَ (kataba - wrote)",
+    "explanation": "كَتَبَ is the verb (wrote). الطَّالِبُ is the subject (the student). Verbal sentences begin with the verb.",
+    "score": "1/3"
+  }
+]

@@ -1,0 +1,27 @@
+[
+  {
+    "type": "LESSON_WELCOME",
+    "user_prompt": "Mode: lesson_start\n\nLesson {{lesson_number}} - {{lesson_name}}\n\nTopics:\n- {{vocab_count}} vocabulary words\n- {{grammar_topics_count}} grammar topics\n\nWelcome the student warmly. Build excitement about what they'll learn. Offer navigation:\n1. Start with vocabulary\n2. Start with grammar\n3. See lesson progress\n\nFormat with numbered options and mention they can request something else.",
+    "assistant_response": "Welcome to Lesson {{lesson_number}}! 🌟\n\nToday we're exploring {{lesson_name}} - this is going to be exciting! You'll learn {{vocab_count}} useful vocabulary words and master {{grammar_topics_count}} important grammar concepts that will really strengthen your Arabic skills.\n\nI'm here to guide you every step of the way. Remember, learning a language is a journey, and every small step forward is progress worth celebrating!\n\nWhere would you like to start?\n1. Start with vocabulary ({{vocab_count}} words)\n2. Start with grammar ({{grammar_topics_count}} topics)\n3. See lesson progress\n\nOr tell me what you'd like to do!"
+  },
+  {
+    "type": "VOCAB_OVERVIEW",
+    "user_prompt": "Mode: lesson_start\n\nLesson {{lesson_number}} - Vocabulary Section\n\nTotal Words: {{total_words}}\nOrganization: {{batch_count}} batches ({{words_per_batch}} words each)\n\nExplain how vocabulary learning works. Mention quizzes after each batch. Offer options:\n1. Learn in batches (teach each batch, then quiz)\n2. Skip to final test\n\nFormat with numbered options and mention they can request something else. Be encouraging.",
+    "assistant_response": "Great! Let's dive into the vocabulary section.\n\nI've organized the {{total_words}} words into {{batch_count}} small batches of {{words_per_batch}} words each. This makes learning more manageable and helps you build confidence as you go.\n\nHere's how it works:\n- I'll introduce each batch with Arabic text, transliteration, and English meanings\n- After each batch, you'll take a quick quiz to practice\n- Don't worry about perfection - these quizzes help your memory, not test you!\n\nWhat would you like to do?\n1. Learn in batches (I'll teach each batch, then quiz you)\n2. Skip to final test (test yourself on all {{total_words}} words now)\n\nOr tell me what you'd like to do!"
+  },
+  {
+    "type": "GRAMMAR_OVERVIEW",
+    "user_prompt": "Mode: lesson_start\n\nLesson {{lesson_number}} - Grammar Section\n\nTopics ({{topics_count}}):\n{{topics_list}}\n\nPresent grammar section overview. Explain each topic has a quiz. Offer options:\n1. Start first topic\n2. See lesson progress\n\nOr tell me what you'd like to do.",
+    "assistant_response": "Wonderful progress so far! Now let's move to the grammar section.\n\nIn this lesson, we have {{topics_count}} grammar topics to explore:\n{{topics_list}}\n\nEach topic includes:\n- A clear explanation of the rule\n- Helpful examples\n- A short quiz to reinforce what you've learned\n\nThese concepts build on each other, so take your time and enjoy discovering how Arabic works!\n\nWhat would you like to do?\n1. Start the first topic\n2. See your lesson progress\n\nJust let me know!"
+  },
+  {
+    "type": "LESSON_WELCOME_SPECIFIC",
+    "user_prompt": "Mode: lesson_start\n\nLesson 2 - Pronouns and Verbal Sentences\n\nTopics:\n- 12 vocabulary words\n- 3 grammar topics\n\nWelcome the student warmly. Build excitement about what they'll learn. Offer navigation:\n1. Start with vocabulary\n2. Start with grammar\n3. See lesson progress\n\nFormat with numbered options and mention they can request something else.",
+    "assistant_response": "Welcome back to Lesson 2! I'm so glad you're here! 🌟\n\nToday's topic is Pronouns and Verbal Sentences - these are fundamental building blocks that will unlock so much of the Arabic language for you. You'll learn 12 essential vocabulary words and master 3 key grammar concepts.\n\nI can see your dedication to learning, and that's what makes all the difference. Every lesson brings you closer to fluency!\n\nWhere would you like to start?\n1. Start with vocabulary (12 words)\n2. Start with grammar (3 topics)\n3. See lesson progress\n\nOr tell me what you'd like to do!"
+  },
+  {
+    "type": "CHALLENGING_LESSON",
+    "user_prompt": "Mode: lesson_start\n\nLesson {{lesson_number}} - {{lesson_name}}\n\nTopics:\n- {{vocab_count}} vocabulary words\n- {{grammar_topics_count}} grammar topics\n\nNote: This lesson builds on previous concepts.\n\nWelcome the student warmly. Build excitement about what they'll learn. Offer navigation:\n1. Start with vocabulary\n2. Start with grammar\n3. See lesson progress\n\nFormat with numbered options and mention they can request something else.",
+    "assistant_response": "Welcome to Lesson {{lesson_number}} - {{lesson_name}}! 🎉\n\nI know this lesson builds on what you've already learned, which means you're making real progress! You'll learn {{vocab_count}} new vocabulary words and {{grammar_topics_count}} grammar topics that connect to everything you've studied so far.\n\nDon't worry if some concepts feel challenging at first - that's completely normal and shows you're pushing yourself to grow. I'm here to support you through every step!\n\nWhere would you like to start?\n1. Start with vocabulary ({{vocab_count}} words)\n2. Start with grammar ({{grammar_topics_count}} topics)\n3. See lesson progress\n\nOr tell me what you'd like to do!"
+  }
+]
