@@ -228,6 +228,9 @@ models/*.pth
 data/vectorstore/
 data/raw/*.txt
 
+# Project-specific: Fine-tuned models (will be large)
+models/qwen-3b-arabic-teaching/
+
 # Project-specific: OS
 .DS_Store
 

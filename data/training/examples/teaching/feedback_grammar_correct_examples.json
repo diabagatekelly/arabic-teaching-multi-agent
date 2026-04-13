@@ -1,0 +1,44 @@
+[
+  {
+    "question": "Is كِتَابٌ (kitaabun) masculine or feminine?",
+    "student_answer": "masculine",
+    "correct_answer": "masculine",
+    "explanation": "This word does not end with taa marbuuta (ة), so it is masculine.",
+    "score": "3/5"
+  },
+  {
+    "question": "Is مَدْرَسَةٌ (madrasatun) masculine or feminine?",
+    "student_answer": "f",
+    "correct_answer": "feminine",
+    "explanation": "The definite article ال is attached to the beginning, making it 'the school'.",
+    "score": "2/3"
+  },
+  {
+    "question": "Add the definite article to بَيْتٌ (baytun).",
+    "student_answer": "البَيْتُ",
+    "correct_answer": "البَيْتُ (al-baytu)",
+    "explanation": "The definite article ال is attached to the beginning, making it 'the house'.",
+    "score": "2/3"
+  },
+  {
+    "question": "What is the subject pronoun for 'he' in Arabic?",
+    "student_answer": "هُوَ",
+    "correct_answer": "هُوَ (huwa)",
+    "explanation": "هُوَ is the third person masculine singular pronoun.",
+    "score": "5/5"
+  },
+  {
+    "question": "Is طَالِبَةٌ (ṭālibatun) masculine or feminine?",
+    "student_answer": "fem",
+    "correct_answer": "feminine",
+    "explanation": "This word ends with taa marbuuta (ة), indicating feminine gender.",
+    "score": "4/5"
+  },
+  {
+    "question": "Complete: كِتَابُ ___ (the student's book)",
+    "student_answer": "الطَّالِبِ",
+    "correct_answer": "الطَّالِبِ (aṭ-ṭālibi)",
+    "explanation": "This is an idafa construction. The second noun takes the genitive case.",
+    "score": "3/4"
+  }
+]

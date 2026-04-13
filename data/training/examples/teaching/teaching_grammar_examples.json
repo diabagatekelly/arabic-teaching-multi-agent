@@ -1,0 +1,52 @@
+[
+  {
+    "topic": "Masculine and Feminine Nouns",
+    "rule": "Arabic nouns are either masculine or feminine. Most feminine nouns end with taa marbuuta (ة).",
+    "examples": "- كِتَابٌ (kitaabun) - book [masculine]\n- مَدْرَسَةٌ (madrasatun) - school [feminine, ends with ة]"
+  },
+  {
+    "topic": "Definite Article (ال)",
+    "rule": "The definite article ال (al-) is attached to the beginning of nouns to make them definite.",
+    "examples": "- كِتَابٌ (kitaabun) - a book [indefinite]\n- الكِتَابُ (al-kitaabu) - the book [definite]"
+  },
+  {
+    "topic": "Subject Pronouns",
+    "rule": "Subject pronouns indicate who is performing the action. They vary by person, number, and gender.",
+    "examples": "- أَنَا (ana) - I\n- أَنْتَ (anta) - you (masculine)\n- هُوَ (huwa) - he"
+  },
+  {
+    "topic": "Nominal Sentences (جملة اسمية)",
+    "rule": "Nominal sentences begin with a noun or pronoun (subject) followed by a predicate. No verb 'to be' is needed in present tense.",
+    "examples": "- الطَّالِبُ مُجْتَهِدٌ (aṭ-ṭālibu mujtahidun) - The student is diligent.\n- أَنَا مُعَلِّمٌ (ana muʿallimun) - I am a teacher."
+  },
+  {
+    "topic": "Gender Agreement",
+    "rule": "Adjectives must agree with the noun they modify in gender. Feminine adjectives typically end with taa marbuuta (ة).",
+    "examples": "- طَالِبٌ مُجْتَهِدٌ (ṭālibun mujtahidun) - diligent student [masculine]\n- طَالِبَةٌ مُجْتَهِدَةٌ (ṭālibatun mujtahidatun) - diligent student [feminine]"
+  },
+  {
+    "topic": "Verbal Sentences (جملة فعلية)",
+    "rule": "Verbal sentences begin with a verb, followed by the subject (doer) and object (if any).",
+    "examples": "- كَتَبَ الطَّالِبُ (kataba aṭ-ṭālibu) - The student wrote.\n- دَرَسَتِ الطَّالِبَةُ (darasat aṭ-ṭālibatu) - The student (f) studied."
+  },
+  {
+    "topic": "Demonstrative Pronouns",
+    "rule": "Demonstrative pronouns (this, that) agree with the noun in gender. هٰذَا (hādhā) is masculine, هٰذِهِ (hādhihi) is feminine.",
+    "examples": "- هٰذَا كِتَابٌ (hādhā kitābun) - This is a book [masculine]\n- هٰذِهِ مَدْرَسَةٌ (hādhihi madrasatun) - This is a school [feminine]"
+  },
+  {
+    "topic": "Possessive Pronouns",
+    "rule": "Possessive pronouns are suffixes attached to nouns. The form changes based on the possessor.",
+    "examples": "- كِتَابِي (kitābī) - my book\n- كِتَابُكَ (kitābuka) - your book (masculine)\n- كِتَابُهُ (kitābuhu) - his book"
+  },
+  {
+    "topic": "Idafa Construction (إضافة)",
+    "rule": "Idafa is used to show possession or relationship between two nouns. The first noun loses its nunation.",
+    "examples": "- كِتَابُ الطَّالِبِ (kitābu aṭ-ṭālibi) - the student's book\n- بَابُ المَدْرَسَةِ (bābu al-madrasati) - the school's door"
+  },
+  {
+    "topic": "Negation with لَيْسَ",
+    "rule": "لَيْسَ (laysa) is used to negate nominal sentences. It means 'is not' and is conjugated like a verb.",
+    "examples": "- لَيْسَ الطَّالِبُ كَسْلَانَ (laysa aṭ-ṭālibu kaslāna) - The student is not lazy.\n- لَسْتُ مُعَلِّمًا (lastu muʿalliman) - I am not a teacher."
+  }
+]
