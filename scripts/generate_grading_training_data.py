@@ -22,32 +22,42 @@ def main() -> None:
     vocab_correct = load_examples("vocab_correct_examples.json", "grading")
     for example in vocab_correct:
         all_conversations.append(create_grading_vocab_conversation(example, is_correct=True))
+    vocab_correct_count = len(vocab_correct)
 
     vocab_incorrect = load_examples("vocab_incorrect_examples.json", "grading")
     for example in vocab_incorrect:
         all_conversations.append(create_grading_vocab_conversation(example, is_correct=False))
+    vocab_incorrect_count = len(vocab_incorrect)
 
     grammar_correct = load_examples("grammar_correct_examples.json", "grading")
     for example in grammar_correct:
         all_conversations.append(create_grading_grammar_conversation(example, is_correct=True))
+    grammar_correct_count = len(grammar_correct)
 
     grammar_incorrect = load_examples("grammar_incorrect_examples.json", "grading")
     for example in grammar_incorrect:
         all_conversations.append(create_grading_grammar_conversation(example, is_correct=False))
+    grammar_incorrect_count = len(grammar_incorrect)
 
     grammar_multiple = load_examples("grammar_multiple_errors_examples.json", "grading")
     for example in grammar_multiple:
         all_conversations.append(create_grading_multiple_errors_conversation(example))
+    grammar_multiple_count = len(grammar_multiple)
 
     output_file = output_dir / "grading_mode_training_data.jsonl"
     write_jsonl(all_conversations, output_file)
 
+    vocab_total = vocab_correct_count + vocab_incorrect_count
+    grammar_total = grammar_correct_count + grammar_incorrect_count + grammar_multiple_count
+
     print("\nBreakdown:")
-    print("  - Grading vocab: 15 conversations (8 correct, 7 incorrect)")
-    print("  - Grading grammar: 25 conversations")
-    print("    - 10 correct (including flexible matches)")
-    print("    - 10 incorrect (single errors)")
-    print("    - 5 multiple errors (batch grading)")
+    print(
+        f"  - Grading vocab: {vocab_total} conversations ({vocab_correct_count} correct, {vocab_incorrect_count} incorrect)"
+    )
+    print(f"  - Grading grammar: {grammar_total} conversations")
+    print(f"    - {grammar_correct_count} correct (including flexible matches)")
+    print(f"    - {grammar_incorrect_count} incorrect (single errors)")
+    print(f"    - {grammar_multiple_count} multiple errors (batch grading)")
     print(f"  - Total: {len(all_conversations)} conversations")
 
 
