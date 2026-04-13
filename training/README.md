@@ -226,7 +226,7 @@ If training crashes with OOM error:
 - **Method:** LoRA fine-tuning (rank=32, alpha=32, dropout=0)
 - **Framework:** Unsloth (2x faster training)
 - **Training Data:** 111 conversations
-  - 45 teaching mode (lesson_start, teaching_vocab, teaching_grammar, feedback)
+  - 41 teaching mode (lesson_start, teaching_vocab, teaching_grammar, feedback)
   - 40 grading mode (vocab, grammar)
   - 30 exercise generation (fill-in-blank, translation, correction)
 - **Epochs:** 10

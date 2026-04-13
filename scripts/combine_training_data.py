@@ -17,10 +17,13 @@ def load_training_file(file_path: Path) -> list[dict[str, Any]] | None:
 
     Returns:
         List of conversation dictionaries, or None if error occurred
+
+    Note:
+        Skips blank lines to avoid JSONDecodeError.
     """
     try:
         with open(file_path, encoding="utf-8") as f:
-            return [json.loads(line) for line in f]
+            return [json.loads(line) for line in f if line.strip()]
     except FileNotFoundError:
         print(f"❌ Error: {file_path.name} not found")
         return None

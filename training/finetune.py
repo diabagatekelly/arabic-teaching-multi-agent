@@ -36,9 +36,12 @@ from unsloth import FastLanguageModel
 
 
 def load_training_data(file_path: Path) -> list[dict]:
-    """Load training data from JSONL file."""
+    """Load training data from JSONL file.
+
+    Skips blank lines to avoid JSONDecodeError.
+    """
     with open(file_path, encoding="utf-8") as f:
-        conversations = [json.loads(line) for line in f]
+        conversations = [json.loads(line) for line in f if line.strip()]
     return conversations
 
 
@@ -47,6 +50,12 @@ def load_training_data(file_path: Path) -> list[dict]:
 
 def main():
     """Fine-tune Qwen2.5-3B on Arabic teaching data using Unsloth."""
+
+    # ========== Device Selection ==========
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    if device == "cpu":
+        print("⚠️  WARNING: No CUDA GPU detected. Training will be very slow on CPU.")
+        print("Consider using a GPU instance or cloud service (SageMaker, Colab, Kaggle).")
 
     # ========== Configuration ==========
     MODEL_NAME = "Qwen/Qwen2.5-3B-Instruct"  # Non-Unsloth version (Unsloth patches it)
@@ -233,7 +242,7 @@ Format with numbered options and mention they can request something else. Be enc
         test_messages, tokenize=False, add_generation_prompt=True
     )
 
-    inputs = tokenizer([prompt], return_tensors="pt").to("cuda")
+    inputs = tokenizer([prompt], return_tensors="pt").to(device)
 
     outputs = model.generate(
         **inputs,
@@ -285,7 +294,7 @@ Return JSON: {"correct": true/false}""",
         grading_test, tokenize=False, add_generation_prompt=True
     )
 
-    grading_inputs = tokenizer([grading_prompt], return_tensors="pt").to("cuda")
+    grading_inputs = tokenizer([grading_prompt], return_tensors="pt").to(device)
     grading_outputs = model.generate(
         **grading_inputs, max_new_tokens=50, temperature=0.3, do_sample=False
     )
