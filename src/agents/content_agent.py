@@ -26,8 +26,9 @@ class ContentAgent:
         Initialize Content Agent.
 
         Args:
-            rag_retriever: Optional RAGRetriever instance. If None, will be created from rag_config.
-            rag_config: Optional RAG configuration (pinecone index, namespace, etc.)
+            rag_retriever: Optional RAGRetriever instance. If None, agent will work in mock mode
+                          (useful for testing). In production, pass a configured RAGRetriever.
+            rag_config: Optional RAG configuration (top_k, filters, etc.) used when retriever is provided.
                        If None, uses defaults.
         """
         self.rag_retriever = rag_retriever
@@ -77,8 +78,12 @@ class ContentAgent:
             # No retriever - return empty structure (for testing)
             results = []
 
-        # Parse and structure results
-        return self._parse_lesson_content(results, content_type)
+        # Parse and structure results (pass known inputs for metadata fallback)
+        return self._parse_lesson_content(
+            results,
+            content_type,
+            known_metadata={"lesson_number": lesson_number, "topic": topic},
+        )
 
     def generate_exercises(
         self,
@@ -216,36 +221,52 @@ class ContentAgent:
         self,
         rag_results: list[dict[str, Any]],
         content_type: str,
+        known_metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Parse RAG results into structured lesson content."""
+        """Parse RAG results into structured lesson content.
+
+        Args:
+            rag_results: Results from RAG retrieval
+            content_type: Type of content requested ("vocab", "grammar", "all")
+            known_metadata: Known metadata from input arguments (lesson_number, topic)
+                           Used as fallback if RAG results don't provide metadata
+
+        Returns:
+            Structured lesson content with vocab, grammar, examples, and metadata
+        """
+        # Initialize with known metadata to ensure it's never empty
+        known_metadata = known_metadata or {}
         parsed = {
             "vocab": [],
             "grammar": [],
             "examples": [],
-            "metadata": {},
+            "metadata": {
+                "lesson_number": known_metadata.get("lesson_number"),
+                "topic": known_metadata.get("topic"),
+                "difficulty": "beginner",  # Default
+            },
         }
 
         for result in rag_results:
             metadata = result.get("metadata", {})
             text = result.get("text", "")
 
-            # Categorize by content type
-            if metadata.get("content_type") == "vocab" or "vocab" in content_type:
+            # Categorize by content type (explicit comparisons to avoid substring matches)
+            result_content_type = metadata.get("content_type", "")
+
+            if result_content_type == "vocab" or content_type in ("vocab", "all"):
                 parsed["vocab"].append(self._parse_vocab_item(text, metadata))
-            elif metadata.get("content_type") == "grammar" or "grammar" in content_type:
+
+            if result_content_type == "grammar" or content_type in ("grammar", "all"):
                 parsed["grammar"].append(self._parse_grammar_rule(text, metadata))
 
             # Extract examples
             if "example" in text.lower() or metadata.get("has_examples"):
                 parsed["examples"].extend(self._extract_examples(text))
 
-            # Update metadata
-            if not parsed["metadata"]:
-                parsed["metadata"] = {
-                    "lesson_number": metadata.get("lesson_number"),
-                    "topic": metadata.get("topic"),
-                    "difficulty": metadata.get("difficulty", "beginner"),
-                }
+            # Enrich metadata from RAG results (only update if RAG provides better info)
+            if metadata.get("difficulty") and metadata.get("difficulty") != "beginner":
+                parsed["metadata"]["difficulty"] = metadata.get("difficulty")
 
         return parsed
 
@@ -287,12 +308,16 @@ class ContentAgent:
         vocab_items = content.get("vocab", [])[:count]
 
         for vocab in vocab_items:
+            english_word = vocab.get("english", "word")
+            arabic_word = vocab.get("arabic", "")
+            transliteration = vocab.get("transliteration", "")
+
             exercises.append(
                 {
-                    "question": "Complete: This is a _____ (book in Arabic)",
-                    "answer": vocab.get("arabic", ""),
-                    "hint": vocab.get("transliteration", ""),
-                    "explanation": f"The Arabic word for book is {vocab.get('arabic')}",
+                    "question": f"Complete: This is a _____ ({english_word} in Arabic)",
+                    "answer": arabic_word,
+                    "hint": transliteration,
+                    "explanation": f"The Arabic word for {english_word} is {arabic_word}",
                     "metadata": {
                         "exercise_type": "fill_in_blank",
                         "difficulty": difficulty,

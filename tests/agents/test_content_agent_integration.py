@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 import pytest
 
 from src.agents.content_agent import ContentAgent
@@ -9,7 +11,7 @@ from src.agents.content_agent import ContentAgent
 
 @pytest.mark.integration
 @pytest.mark.skipif(
-    True,  # Skip by default - requires Pinecone setup
+    not os.getenv("PINECONE_API_KEY"),  # Skip if Pinecone API key is not configured
     reason="Requires Pinecone RAG database (set PINECONE_API_KEY to run)",
 )
 def test_get_lesson_content_with_real_rag():
@@ -53,8 +55,8 @@ def test_get_lesson_content_with_real_rag():
 
 @pytest.mark.integration
 @pytest.mark.skipif(
-    True,
-    reason="Requires Pinecone RAG database",
+    not os.getenv("PINECONE_API_KEY"),
+    reason="Requires Pinecone RAG database (set PINECONE_API_KEY to run)",
 )
 def test_generate_exercises_with_real_content():
     """
@@ -87,8 +89,8 @@ def test_generate_exercises_with_real_content():
 
 @pytest.mark.integration
 @pytest.mark.skipif(
-    True,
-    reason="Requires Pinecone RAG database",
+    not os.getenv("PINECONE_API_KEY"),
+    reason="Requires Pinecone RAG database (set PINECONE_API_KEY to run)",
 )
 def test_full_teaching_workflow_real_rag():
     """
