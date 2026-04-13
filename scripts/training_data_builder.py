@@ -63,15 +63,15 @@ def create_exercise_conversation(
                 "role": "user",
                 "content": f"""Mode: exercise_generation
 
-Lesson {example['lesson_number']}
-Type: {example['exercise_type']}
-Content: {example['content_type']}
-Count: {example['count']}
+Lesson {example["lesson_number"]}
+Type: {example["exercise_type"]}
+Content: {example["content_type"]}
+Count: {example["count"]}
 
 Learned items:
 {learned_items_formatted}
 
-Generate {example['count']} practice exercises. Return JSON list:
+Generate {example["count"]} practice exercises. Return JSON list:
 [
   {{
     "question": "question text here",
@@ -109,9 +109,9 @@ def create_grading_vocab_conversation(
                 "role": "user",
                 "content": f"""Mode: grading_vocab
 
-Question: What does "{example['word']}" mean?
-Student Answer: "{example['student_answer']}"
-Correct Answer: "{example['correct_answer']}"
+Question: What does "{example["word"]}" mean?
+Student Answer: "{example["student_answer"]}"
+Correct Answer: "{example["correct_answer"]}"
 
 Evaluate if the student's answer is correct. Be flexible:
 - Accept minor typos (e.g., "scool" for "school")
@@ -153,9 +153,9 @@ def create_grading_grammar_conversation(
                 "role": "user",
                 "content": f"""Mode: grading_grammar
 
-Question: {example['question']}
-Student Answer: "{example['student_answer']}"
-Correct Answer: "{example['correct_answer']}"
+Question: {example["question"]}
+Student Answer: "{example["student_answer"]}"
+Correct Answer: "{example["correct_answer"]}"
 
 Evaluate if the student's answer is correct. Be flexible:
 - Accept minor typos
@@ -190,7 +190,7 @@ def create_grading_multiple_errors_conversation(
     """
     answers_formatted = "\n\n".join(
         [
-            f"Question {i+1} (ID: {ans['question_id']}):\nQ: {ans['question']}\nStudent: \"{ans['student']}\"\nCorrect: \"{ans['correct']}\""
+            f'Question {i + 1} (ID: {ans["question_id"]}):\nQ: {ans["question"]}\nStudent: "{ans["student"]}"\nCorrect: "{ans["correct"]}"'
             for i, ans in enumerate(example["answers"])
         ]
     )
@@ -222,7 +222,7 @@ def create_grading_multiple_errors_conversation(
                 "role": "user",
                 "content": f"""Mode: grading_grammar
 
-Lesson {example['lesson_number']} - Final Test Grading
+Lesson {example["lesson_number"]} - Final Test Grading
 
 Grade the following answers:
 
@@ -286,26 +286,26 @@ def create_teaching_grammar_conversation(
 
 Lesson {{{{lesson_number}}}}
 
-Topic: {example['topic']}
+Topic: {example["topic"]}
 
-Rule: {example['rule']}
+Rule: {example["rule"]}
 
 Examples:
-{example['examples']}
+{example["examples"]}
 
 Explain this grammar topic to the student in an encouraging way. End by mentioning the quiz is next and offering to proceed."""
 
-    assistant_response = f"""Let's explore {example['topic']}! 🌟
+    assistant_response = f"""Let's explore {example["topic"]}! 🌟
 
 **The Rule:**
-{example['rule']}
+{example["rule"]}
 
 **Let's See It In Action:**
-{example['examples']}
+{example["examples"]}
 
 Notice how the rule works in these examples? This pattern will become second nature with practice!
 
-Understanding {example['topic']} opens up so many possibilities in Arabic. You're building a strong foundation!
+Understanding {example["topic"]} opens up so many possibilities in Arabic. You're building a strong foundation!
 
 Ready to test your understanding with the quiz? Or would you like me to review anything first?"""
 
@@ -336,30 +336,30 @@ def create_feedback_vocab_conversation(
     if is_correct:
         user_prompt = f"""Mode: feedback_vocab
 
-Word: {example['arabic']} ({example['trans']})
-Translation: {example['english']}
+Word: {example["arabic"]} ({example["trans"]})
+Translation: {example["english"]}
 Student was correct.
 
 Provide brief, encouraging feedback. Confirm correctness with checkmark."""
 
         assistant_response = f"""✅ Perfect! That's correct!
 
-{example['arabic']} ({example['trans']}) means {example['english']}. Well done!"""
+{example["arabic"]} ({example["trans"]}) means {example["english"]}. Well done!"""
     else:
         user_prompt = f"""Mode: feedback_vocab
 
-Word: {example['arabic']} ({example['trans']})
-Correct Translation: {example['english']}
-Student Answer: {example['student_answer']}
+Word: {example["arabic"]} ({example["trans"]})
+Correct Translation: {example["english"]}
+Student Answer: {example["student_answer"]}
 Student was incorrect.
 
 Provide supportive correction. Show correct answer with transliteration. Give memory tip."""
 
         assistant_response = f"""Not quite, but great effort! Let's clarify:
 
-{example['arabic']} ({example['trans']}) means **{example['english']}**, not {example['student_answer']}.
+{example["arabic"]} ({example["trans"]}) means **{example["english"]}**, not {example["student_answer"]}.
 
-💡 Memory tip: Try connecting the sound "{example['trans']}" with "{example['english']}" in your mind. The more you practice, the more natural it becomes!
+💡 Memory tip: Try connecting the sound "{example["trans"]}" with "{example["english"]}" in your mind. The more you practice, the more natural it becomes!
 
 You're learning - that's what matters! ✨"""
 
@@ -391,40 +391,40 @@ def create_feedback_grammar_conversation(
     if is_correct:
         user_prompt = f"""Mode: feedback_grammar
 
-Question: {example['question']}
-Student Answer: {example['student_answer']}
-Correct Answer: {example['correct_answer']}
-Explanation: {example['explanation']}
-Current Score: {example['score']}
+Question: {example["question"]}
+Student Answer: {example["student_answer"]}
+Correct Answer: {example["correct_answer"]}
+Explanation: {example["explanation"]}
+Current Score: {example["score"]}
 Student was correct.
 
 Provide brief, encouraging feedback. Mention current score."""
 
         assistant_response = f"""✅ Excellent! You're absolutely right!
 
-{example['explanation']}
+{example["explanation"]}
 
-Your current score: {example['score']} - keep up the great work! 🌟"""
+Your current score: {example["score"]} - keep up the great work! 🌟"""
     else:
         user_prompt = f"""Mode: feedback_grammar
 
-Question: {example['question']}
-Student Answer: {example['student_answer']}
-Correct Answer: {example['correct_answer']}
-Explanation: {example['explanation']}
-Current Score: {example['score']}
+Question: {example["question"]}
+Student Answer: {example["student_answer"]}
+Correct Answer: {example["correct_answer"]}
+Explanation: {example["explanation"]}
+Current Score: {example["score"]}
 Student was incorrect.
 
 Provide supportive correction. Explain why with reference to grammar rule. Mention current score."""
 
         assistant_response = f"""Not quite, but you're learning! Let's work through this together:
 
-**Your answer:** {example['student_answer']}
-**Correct answer:** {example['correct_answer']}
+**Your answer:** {example["student_answer"]}
+**Correct answer:** {example["correct_answer"]}
 
-**Why:** {example['explanation']}
+**Why:** {example["explanation"]}
 
-Your current score: {example['score']}
+Your current score: {example["score"]}
 
 Don't be discouraged - understanding grammar rules takes practice, and you're making progress with every attempt! Keep going! 💪"""
 
