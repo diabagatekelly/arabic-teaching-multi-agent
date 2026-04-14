@@ -390,17 +390,33 @@ EXERCISE_GENERATION = PromptTemplate(
 
 Lesson {lesson_number}
 Type: {exercise_type}
-Content: {content_type}
+Difficulty: {difficulty}
 Count: {count}
 
 Learned items:
 {learned_items_formatted}
 
-Generate {count} practice exercises. Return JSON list:
+Generate {count} practice exercises using the learned items above.
+
+CRITICAL REQUIREMENTS:
+1. ALL Arabic text MUST include harakaat (diacritical marks), especially final case endings (ُ َ ِ ٌ ً ٍ)
+2. NEVER use transliteration alone (e.g., "kabiir") - always include Arabic script: "كَبِيرٌ"
+3. Each question must be clear: "Translate:", "What does X mean?", "Fill in:", "Complete:", etc.
+4. Use the learned vocabulary in your exercises
+
+Correct Arabic examples:
+- "كِتَابٌ" (with harakaat ٌ)
+- "الكِتَابُ" (with case ending ُ)
+- "المَدْرَسَةَ" (with case ending َ)
+
+IMPORTANT: Output ONLY valid JSON. Do NOT add explanations, commentary, or text before/after the JSON.
+
+Required JSON format:
 [
   {{
-    "question": "question text here",
-    "answer": "correct answer here"
+    "question": "...",
+    "answer": "...",
+    "difficulty": "{difficulty}"
   }},
   ...
 ]
@@ -409,7 +425,7 @@ Response:""",
     input_variables=[
         "lesson_number",
         "exercise_type",
-        "content_type",
+        "difficulty",
         "count",
         "learned_items_formatted",
     ],

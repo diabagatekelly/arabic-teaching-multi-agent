@@ -10,6 +10,7 @@ from deepeval.test_case import LLMTestCase
 
 from src.evaluation.metrics import (
     AccuracyMetric,
+    AlignmentMetric,
     ExerciseQualityMetric,
     FeedbackAppropriatenessMetric,
     HasNavigationMetric,
@@ -69,9 +70,6 @@ class EvaluationPipeline:
                 "grading_vocab",
                 "grading_grammar",
                 "exercise_generation",
-                "quiz_generation",
-                "test_composition",
-                "content_retrieval",
             ]
             found_modes = [key for key in valid_mode_keys if key in test_cases]
             if not found_modes:
@@ -293,35 +291,44 @@ class EvaluationPipeline:
             elif metric_name == "json_validity":
                 metrics_list.append(JSONValidityMetric())
             elif metric_name == "structure":
-                # For Agent 3 (content generation): validate exercise structure
-                # Required fields: question, answer, type, difficulty
-                # Note: "correct" field removed from RAG templates (2026-04-15)
-                metrics_list.append(
-                    StructureMetric(
-                        expected_type=dict,
-                        required_keys=["question", "answer", "type", "difficulty"],
-                        expected_types={
-                            "question": str,
-                            "answer": str,
-                            "type": str,
-                            "difficulty": str,
-                        },
+                # Determine structure based on context
+                count = input_data.get("count", 1)
+                mode = input_data.get("mode", "")
+
+                if mode == "exercise_generation":
+                    # Exercise generation: expect list if count > 1, dict if count == 1
+                    if count > 1:
+                        metrics_list.append(
+                            StructureMetric(
+                                expected_type=list,
+                                required_keys=["question", "answer"],
+                                expected_types={"question": str, "answer": str},
+                            )
+                        )
+                    else:
+                        metrics_list.append(
+                            StructureMetric(
+                                expected_type=dict,
+                                required_keys=["question", "answer"],
+                                expected_types={"question": str, "answer": str},
+                            )
+                        )
+                else:
+                    # Grading: expect dict with "correct" field
+                    metrics_list.append(
+                        StructureMetric(
+                            expected_type=dict,
+                            required_keys=["correct"],
+                            expected_types={"correct": bool},
+                        )
                     )
-                )
             elif metric_name == "accuracy":
                 metrics_list.append(AccuracyMetric())
+            elif metric_name == "alignment":
+                metrics_list.append(AlignmentMetric())
             elif metric_name == "exercise_quality":
-                # Extract learned items from input (required for Agent 3)
-                learned_items = input_data.get("learned_items", [])
-                # For duplicate detection, would need batch_exercises context
-                # For now, create metric with just learned_items
-                metrics_list.append(
-                    ExerciseQualityMetric(
-                        learned_items=learned_items,
-                        batch_exercises=[],  # TODO: Pass batch context for duplicate detection
-                        use_llm_judge=False,  # Fast mode by default
-                    )
-                )
+                # Rule-based quality metric with Arabic text matching
+                metrics_list.append(ExerciseQualityMetric(threshold=0.7))
             else:
                 logger.warning(f"Unknown metric requested: {metric_name}")
 
@@ -650,35 +657,23 @@ class EvaluationPipeline:
 
         return results
 
-    def evaluate_content_agent(self, model_responses: dict[str, str]) -> dict[str, Any]:
+    def evaluate_exercise_generation(self, model_responses: dict[str, str]) -> dict[str, Any]:
         """
-        Evaluate Agent 3 (Content Generation) responses across all test modes.
-
-        Handles 4 test modes:
-        1. exercise_generation - Individual exercise creation (12 types)
-        2. quiz_generation - Quiz composition from multiple exercises
-        3. test_composition - Full test creation with balanced content
-        4. content_retrieval - RAG-based content retrieval
+        Evaluate exercise_generation mode responses (Prompts #19, #20, #21).
 
         Args:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with metrics: json_validity, structure, exercise_quality
+            Evaluation results with metrics dynamically created from test cases
         """
-        # Collect all test cases from all 4 modes
+        exercise_mode = self.test_cases["exercise_generation"]
+
+        # Collect all test cases from sub-groups
         all_test_cases = []
-
-        # Mode 1: Exercise generation (has subgroups)
-        if "exercise_generation" in self.test_cases:
-            exercise_gen = self.test_cases["exercise_generation"]
-            all_test_cases.extend(exercise_gen.get("comprehensive_types", []))
-            all_test_cases.extend(exercise_gen.get("smoke_tests", []))
-
-        # Mode 2-4: Quiz generation, test composition, content retrieval (simple structure)
-        for mode_name in ["quiz_generation", "test_composition", "content_retrieval"]:
-            if mode_name in self.test_cases:
-                all_test_cases.extend(self.test_cases[mode_name].get("test_cases", []))
+        for sub_group in ["exercise_gen", "quiz_question_gen", "test_composition"]:
+            if sub_group in exercise_mode:
+                all_test_cases.extend(exercise_mode[sub_group])
 
         # Collect all unique metric names
         metric_names = set()
@@ -688,8 +683,22 @@ class EvaluationPipeline:
 
         results = self._init_results(list(metric_names))
 
-        # Evaluate all test cases using dynamic metric creation
-        self._evaluate_teaching_test_cases(all_test_cases, model_responses, results)
+        # Evaluate all test cases using dynamic metrics
+        for sub_group in ["exercise_gen", "quiz_question_gen", "test_composition"]:
+            if sub_group not in exercise_mode:
+                continue
+
+            for test_case_data in exercise_mode[sub_group]:
+                test_id = test_case_data["test_id"]
+                if test_id not in model_responses:
+                    continue
+
+                test_case = self._create_test_case(test_case_data, model_responses[test_id])
+
+                # Create metrics dynamically from test case definition
+                metrics = self._create_metrics_from_test_case(test_case_data)
+
+                self._run_metrics(test_case, metrics, test_id, results)
 
         return results
 
@@ -699,7 +708,7 @@ class EvaluationPipeline:
 
         Args:
             results: Evaluation results
-            mode: Agent mode ("teaching", "grading")
+            mode: Agent mode ("teaching", "grading", "exercise_generation")
 
         Returns:
             Markdown formatted report

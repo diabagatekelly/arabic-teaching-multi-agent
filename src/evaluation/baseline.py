@@ -1,28 +1,32 @@
 """Baseline evaluation using base Qwen2.5-3B and 7B models (no fine-tuning)."""
 
-import json
 import logging
 from pathlib import Path
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from src.agents import ContentAgent, GradingAgent, TeachingAgent
+from src.agents import GradingAgent, TeachingAgent
 from src.evaluation.deepeval_pipeline import EvaluationPipeline
+from src.prompts.formatters import flatten_nested_input
+from src.prompts.templates import (
+    EXERCISE_GENERATION,
+)
 
 # Constants
 PROJECT_ROOT = Path(__file__).parent.parent.parent
+DEFAULT_TEST_CASES_PATH = PROJECT_ROOT / "data" / "evaluation" / "test_cases.json"
 TEACHING_AGENT_TEST_CASES_PATH = (
     PROJECT_ROOT / "data" / "evaluation" / "teaching_agent" / "teaching_agent_test_cases.json"
 )
 GRADING_AGENT_TEST_CASES_PATH = (
     PROJECT_ROOT / "data" / "evaluation" / "grading_agent" / "grading_agent_test_cases.json"
 )
-CONTENT_AGENT_TEST_CASES_PATH = (
-    PROJECT_ROOT / "data" / "evaluation" / "content_agent" / "content_agent_test_cases.json"
-)
 DEFAULT_BASELINE_REPORT_PATH = PROJECT_ROOT / "data" / "evaluation" / "baseline_report.md"
 DEFAULT_MAX_TOKENS = 256
 GRADING_MAX_TOKENS = 50
+EXERCISE_GENERATION_MAX_TOKENS = (
+    512  # Higher limit for exercise generation (7B needs more tokens for full harakaat)
+)
 DEFAULT_SAMPLE_SIZE = 5
 
 logger = logging.getLogger(__name__)
@@ -36,7 +40,7 @@ class BaselineEvaluator:
     - Agent 1 (Teaching/Feedback): Base Qwen2.5-3B → Fine-tuned 3B
     - Agent 2 (Grading): Base Qwen2.5-7B → Fine-tuned 7B
       (Baseline evaluated 2026-04-13: 83% reasoning, 0-6% JSON compliance)
-    - Agent 3 (Content): Base Qwen2.5-3B → Fine-tuned 3B (planned)
+    - Agent 3 (Generation): Base Qwen2.5-3B (may not need fine-tuning)
 
     Available baseline methods (8/8 modes - COMPLETE COVERAGE):
     1. run_lesson_start_baseline() - Agent 1 (3B)
@@ -46,22 +50,22 @@ class BaselineEvaluator:
     5. run_feedback_grammar_baseline() - Agent 1 (3B)
     6. run_grading_vocab_baseline() - Direct model (7B)
     7. run_grading_grammar_baseline() - Direct model (7B, quiz_grading only)
-    8. run_content_agent_baseline() - Direct model (3B, all 4 modes)
+    8. run_exercise_generation_baseline() - Direct model (3B, exercise_gen only)
 
     Note: Some modes only evaluate primary sub-groups for speed (marked above).
     To evaluate all sub-groups, extend the relevant method to sample from more sub-groups.
 
     Pattern for Agent 1 methods (1-5):
-    1. Sample test cases from self.teaching_pipeline.test_cases[mode_name]
+    1. Sample test cases from self.pipeline.test_cases[mode_name]
     2. Call teaching_agent.handle_*() with input_data
     3. Collect responses and run evaluation
     4. Return (model_responses, results) tuple
 
-    Pattern for Agent 2 methods (6-7):
-    1. Sample test cases from self.grading_pipeline.test_cases[mode_name]
+    Pattern for direct model methods (6-8):
+    1. Sample test cases from self.pipeline.test_cases[mode_name]
     2. Use flatten_nested_input() to prepare data
     3. Use prompt templates to generate prompts
-    4. Call self.generate_response() with appropriate model (7B)
+    4. Call self.generate_response() with appropriate model
     5. Return (model_responses, results) tuple
     """
 
@@ -69,19 +73,19 @@ class BaselineEvaluator:
         self,
         model_3b_name: str = "Qwen/Qwen2.5-3B-Instruct",
         model_7b_name: str = "Qwen/Qwen2.5-7B-Instruct",
+        test_cases_path: str | Path | None = None,
         teaching_agent_test_cases_path: str | Path | None = None,
         grading_agent_test_cases_path: str | Path | None = None,
-        content_agent_test_cases_path: str | Path | None = None,
     ) -> None:
         """
         Initialize baseline evaluator with both 3B and 7B models.
 
         Args:
-            model_3b_name: HuggingFace model ID for 3B model (teaching, feedback, content)
+            model_3b_name: HuggingFace model ID for 3B model (teaching, feedback, generation)
             model_7b_name: HuggingFace model ID for 7B model (grading)
+            test_cases_path: Path to test cases JSON for Agent 3 (defaults to test_cases.json)
             teaching_agent_test_cases_path: Path to Agent 1 test cases (defaults to teaching_agent_test_cases.json)
             grading_agent_test_cases_path: Path to Agent 2 test cases (defaults to grading_agent_test_cases.json)
-            content_agent_test_cases_path: Path to Agent 3 test cases (defaults to content_agent_test_cases.json)
 
         Raises:
             RuntimeError: If model loading fails
@@ -89,6 +93,7 @@ class BaselineEvaluator:
         """
         self.model_3b_name = model_3b_name
         self.model_7b_name = model_7b_name
+        self.test_cases_path = Path(test_cases_path) if test_cases_path else DEFAULT_TEST_CASES_PATH
         self.teaching_agent_test_cases_path = (
             Path(teaching_agent_test_cases_path)
             if teaching_agent_test_cases_path
@@ -99,11 +104,6 @@ class BaselineEvaluator:
             if grading_agent_test_cases_path
             else GRADING_AGENT_TEST_CASES_PATH
         )
-        self.content_agent_test_cases_path = (
-            Path(content_agent_test_cases_path)
-            if content_agent_test_cases_path
-            else CONTENT_AGENT_TEST_CASES_PATH
-        )
 
         # Lazy loading - models and agents loaded on first access
         self._model_3b = None
@@ -113,8 +113,6 @@ class BaselineEvaluator:
         self._teaching_agent = None
         self._grading_agent_3b = None
         self._grading_agent_7b = None
-        self._content_agent_3b = None
-        self._content_agent_7b = None
 
         # Load pipelines for each agent
         try:
@@ -136,13 +134,11 @@ class BaselineEvaluator:
             self.grading_pipeline = None  # Optional for now
 
         try:
-            self.content_pipeline = EvaluationPipeline(self.content_agent_test_cases_path)
-            logger.info(f"Loaded Agent 3 test cases from {self.content_agent_test_cases_path}")
+            self.pipeline = EvaluationPipeline(self.test_cases_path)
+            logger.info(f"Loaded Agent 3 test cases from {self.test_cases_path}")
         except FileNotFoundError:
-            logger.warning(
-                f"Agent 3 test cases file not found: {self.content_agent_test_cases_path}"
-            )
-            self.content_pipeline = None  # Optional for now
+            logger.warning(f"Agent 3 test cases file not found: {self.test_cases_path}")
+            self.pipeline = None  # Optional for now
 
     @property
     def model_3b(self):
@@ -232,32 +228,6 @@ class BaselineEvaluator:
             )
             logger.info("✓ GradingAgent (7B) initialized")
         return self._grading_agent_7b
-
-    @property
-    def content_agent_3b(self):
-        """Lazy load ContentAgent with 3B model on first access."""
-        if self._content_agent_3b is None:
-            logger.info("Initializing ContentAgent with 3B model...")
-            self._content_agent_3b = ContentAgent(
-                model=self.model_3b,
-                tokenizer=self.tokenizer_3b,
-                max_new_tokens=512,
-            )
-            logger.info("✓ ContentAgent (3B) initialized")
-        return self._content_agent_3b
-
-    @property
-    def content_agent_7b(self):
-        """Lazy load ContentAgent with 7B model on first access."""
-        if self._content_agent_7b is None:
-            logger.info("Initializing ContentAgent with 7B model...")
-            self._content_agent_7b = ContentAgent(
-                model=self.model_7b,
-                tokenizer=self.tokenizer_7b,
-                max_new_tokens=512,
-            )
-            logger.info("✓ ContentAgent (7B) initialized")
-        return self._content_agent_7b
 
     def generate_response(
         self, prompt: str, max_new_tokens: int = DEFAULT_MAX_TOKENS, use_7b: bool = False
@@ -563,211 +533,58 @@ class BaselineEvaluator:
         results = self.grading_pipeline.evaluate_grading_grammar(model_responses)
         return model_responses, results
 
-    def run_content_agent_baseline(
-        self, sample_size: int = DEFAULT_SAMPLE_SIZE
-    ) -> tuple[dict[str, str], dict]:
-        """
-        Run baseline evaluation on content_agent (Agent 3) modes.
-
-        Evaluates all 4 content generation modes:
-        1. exercise_generation - Individual exercise creation (12 types)
-        2. quiz_generation - Quiz composition
-        3. test_composition - Full test creation
-        4. content_retrieval - RAG-based content retrieval
-
-        Note: Agent 3 (ContentAgent) not yet implemented, so this uses direct
-        model generation with simple prompts to establish baseline performance.
-
-        Args:
-            sample_size: Number of test cases to evaluate per mode
-
-        Returns:
-            Tuple of (model_responses, evaluation_results)
-
-        Raises:
-            RuntimeError: If Agent 3 test cases not loaded
-        """
-        if self.content_pipeline is None:
-            raise RuntimeError(
-                "Agent 3 test cases not loaded. Cannot run content_agent baseline. "
-                f"Ensure {self.content_agent_test_cases_path} exists."
-            )
-
-        logger.info("\n=== Running Content Agent Baseline (3B) ===\n")
-
-        model_responses = {}
-
-        # Sample from all 4 modes
-        all_test_cases = []
-
-        # Mode 1: Exercise generation (has subgroups)
-        if "exercise_generation" in self.content_pipeline.test_cases:
-            exercise_gen = self.content_pipeline.test_cases["exercise_generation"]
-            all_test_cases.extend(exercise_gen.get("comprehensive_types", [])[:sample_size])
-            all_test_cases.extend(exercise_gen.get("smoke_tests", [])[:sample_size])
-
-        # Mode 2-4: Quiz generation, test composition, content retrieval
-        for mode_name in ["quiz_generation", "test_composition", "content_retrieval"]:
-            if mode_name in self.content_pipeline.test_cases:
-                mode_cases = self.content_pipeline.test_cases[mode_name].get("test_cases", [])
-                all_test_cases.extend(mode_cases[:sample_size])
-
-        # Generate responses for each test case
-        for test_case in all_test_cases:
-            test_id = test_case["test_id"]
-            input_data = test_case["input"]
-
-            logger.info(f"Evaluating {test_id}...")
-
-            # Build simple prompt for content generation
-            prompt = self._build_content_generation_prompt(input_data)
-            response = self.generate_response(prompt, max_new_tokens=512, use_7b=False)
-
-            model_responses[test_id] = response
-
-        # Run evaluation
-        results = self.content_pipeline.evaluate_content_agent(model_responses)
-        return model_responses, results
-
-    def _build_content_generation_prompt(self, input_data: dict) -> str:
-        """
-        Build simple prompt for content generation baseline.
-
-        Args:
-            input_data: Test case input data
-
-        Returns:
-            Formatted prompt string
-        """
-        mode = input_data.get("mode", "exercise_generation")
-
-        if mode == "exercise_generation":
-            exercise_type = input_data.get("exercise_type", "translation")
-            difficulty = input_data.get("difficulty", "beginner")
-            learned_items = input_data.get("learned_items", [])
-
-            prompt = f"""Generate an Arabic learning exercise in JSON format.
-
-Exercise type: {exercise_type}
-Difficulty: {difficulty}
-Learned vocabulary: {', '.join(learned_items[:3])}
-
-Return JSON with: {{"question": "...", "answer": "...", "difficulty": "{difficulty}", "type": "{exercise_type}"}}
-
-JSON:"""
-
-        elif mode == "quiz_generation":
-            question_count = input_data.get("question_count", 5)
-            learned_items = input_data.get("learned_items", [])
-
-            prompt = f"""Generate a quiz with {question_count} Arabic learning questions in JSON format.
-
-Learned items: {', '.join(learned_items[:3])}
-
-Return JSON array of questions with: {{"question": "...", "answer": "...", "type": "..."}}
-
-JSON:"""
-
-        elif mode == "test_composition":
-            question_count = input_data.get("question_count", 20)
-
-            prompt = f"""Compose a comprehensive Arabic test with {question_count} questions in JSON format.
-
-Include mix of vocabulary and grammar questions.
-
-Return JSON with: {{"test": [{{"question": "...", "answer": "...", "type": "..."}}]}}
-
-JSON:"""
-
-        else:  # content_retrieval
-            lesson_number = input_data.get("lesson_number", 1)
-
-            prompt = f"""Retrieve lesson content for Lesson {lesson_number} in JSON format.
-
-Return JSON with: {{"lesson": {lesson_number}, "content": "...", "vocab": [...], "grammar": [...]}}
-
-JSON:"""
-
-        return prompt
-
-    def run_content_agent_evaluation(
+    def run_exercise_generation_baseline(
         self, sample_size: int = DEFAULT_SAMPLE_SIZE, use_7b: bool = False
     ) -> tuple[dict[str, str], dict]:
         """
-        Run evaluation using actual ContentAgent with RAG (proper implementation).
+        Run baseline evaluation on exercise_generation mode (exercise_gen only).
 
-        This replaces run_content_agent_baseline() with a proper agent-based approach
-        that uses RAG templates and lesson content.
+        Note: Only evaluates exercise_gen sub-group for speed.
+        AlignmentMetric will use Qwen2.5-7B as judge.
 
         Args:
-            sample_size: Number of test cases to evaluate per mode
-            use_7b: If True, use 7B model; if False, use 3B model (default)
+            sample_size: Number of test cases to evaluate
+            use_7b: If True, use 7B model for generation; if False, use 3B model (default)
 
         Returns:
             Tuple of (model_responses, evaluation_results)
 
         Raises:
-            RuntimeError: If Agent 3 test cases not loaded
+            RuntimeError: If Agent 2/3 test cases not loaded
         """
-        if self.content_pipeline is None:
+        if self.pipeline is None:
             raise RuntimeError(
-                "Agent 3 test cases not loaded. Cannot run content_agent evaluation. "
-                f"Ensure {self.content_agent_test_cases_path} exists."
+                "Agent 2/3 test cases not loaded. Cannot run exercise_generation baseline. "
+                f"Ensure {self.test_cases_path} exists."
             )
 
-        model_size = "7B" if use_7b else "3B"
-        logger.info(f"\n=== Running Content Agent Evaluation ({model_size}) with RAG ===\n")
-
-        # Select appropriate content agent
-        content_agent = self.content_agent_7b if use_7b else self.content_agent_3b
+        model_name = "7B" if use_7b else "3B"
+        logger.info(f"\n=== Running Exercise Generation Baseline ({model_name}) ===\n")
 
         model_responses = {}
+        exercise_mode = self.pipeline.test_cases["exercise_generation"]
 
-        # Sample from all 4 modes
-        all_test_cases = []
+        # Sample exercise_gen cases
+        exercise_cases = exercise_mode["exercise_gen"][:sample_size]
 
-        # Mode 1: Exercise generation (has subgroups)
-        if "exercise_generation" in self.content_pipeline.test_cases:
-            exercise_gen = self.content_pipeline.test_cases["exercise_generation"]
-            all_test_cases.extend(exercise_gen.get("comprehensive_types", [])[:sample_size])
-            all_test_cases.extend(exercise_gen.get("smoke_tests", [])[:sample_size])
-
-        # Mode 2-4: Quiz generation, test composition, content retrieval
-        for mode_name in ["quiz_generation", "test_composition", "content_retrieval"]:
-            if mode_name in self.content_pipeline.test_cases:
-                mode_cases = self.content_pipeline.test_cases[mode_name].get("test_cases", [])
-                all_test_cases.extend(mode_cases[:sample_size])
-
-        # Generate responses using ContentAgent
-        for test_case in all_test_cases:
+        for test_case in exercise_cases:
             test_id = test_case["test_id"]
             input_data = test_case["input"]
-            mode = input_data.get("mode")
 
-            logger.info(f"Evaluating {test_id} (mode: {mode})...")
+            # Use formatter to flatten input
+            flattened = flatten_nested_input(input_data)
 
-            try:
-                # Route to appropriate agent method based on mode
-                if mode == "exercise_generation":
-                    response = content_agent.generate_exercise(input_data)
-                elif mode == "quiz_generation":
-                    response = content_agent.generate_quiz(input_data)
-                elif mode == "test_composition":
-                    response = content_agent.generate_test(input_data)
-                elif mode == "content_retrieval":
-                    response = content_agent.retrieve_content(input_data)
-                else:
-                    logger.warning(f"Unknown mode: {mode}, using exercise generation")
-                    response = content_agent.generate_exercise(input_data)
+            # Use template to generate prompt
+            prompt = EXERCISE_GENERATION.format(**flattened)
 
-                model_responses[test_id] = response
+            logger.info(f"Evaluating {test_id}...")
+            response = self.generate_response(
+                prompt, max_new_tokens=EXERCISE_GENERATION_MAX_TOKENS, use_7b=use_7b
+            )
+            model_responses[test_id] = response
 
-            except Exception as e:
-                logger.error(f"Error generating response for {test_id}: {e}")
-                model_responses[test_id] = json.dumps({"error": str(e)})
-
-        # Run evaluation
-        results = self.content_pipeline.evaluate_content_agent(model_responses)
+        # Run evaluation (includes AlignmentMetric with 7B judge)
+        results = self.pipeline.evaluate_exercise_generation(model_responses)
         return model_responses, results
 
     def save_baseline_report(
@@ -806,20 +623,11 @@ JSON:"""
 
         # Add report for each mode
         for mode_name, mode_results in results_by_mode.items():
-            # Determine which pipeline to use based on mode
-            if mode_name in ["grading_vocab", "grading_grammar"]:
-                pipeline = self.grading_pipeline
-            elif mode_name == "content_agent":
-                pipeline = self.content_pipeline
-            else:
-                pipeline = self.teaching_pipeline
-
-            if pipeline is not None:
-                mode_report = pipeline.generate_report(mode_results, mode_name)
-                report.append(mode_report)
-                report.append("")
-                report.append("---")
-                report.append("")
+            mode_report = self.pipeline.generate_report(mode_results, mode_name)
+            report.append(mode_report)
+            report.append("")
+            report.append("---")
+            report.append("")
 
         # Save markdown report
         output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -855,19 +663,8 @@ JSON:"""
             mode_results = results_by_mode[mode_name]
             detailed_outputs[mode_name] = {}
 
-            # Determine which pipeline to use based on mode
-            if mode_name in ["grading_vocab", "grading_grammar"]:
-                pipeline = self.grading_pipeline
-            elif mode_name == "content_agent":
-                pipeline = self.content_pipeline
-            else:
-                pipeline = self.teaching_pipeline
-
-            if pipeline is None:
-                continue
-
             # Get test cases for this mode using centralized helper
-            test_cases_list = pipeline.get_test_cases_for_mode(mode_name)
+            test_cases_list = self.pipeline.get_test_cases_for_mode(mode_name)
 
             # Build dict mapping test_id -> test_case for O(1) lookup
             test_cases_by_id = {tc["test_id"]: tc for tc in test_cases_list}
@@ -912,7 +709,7 @@ def main() -> None:
     )
 
     logger.info("=== Baseline Evaluation ===")
-    logger.info("Testing base Qwen2.5-3B/7B (no fine-tuning) against evaluation dataset")
+    logger.info("Testing base Qwen2.5-3B (no fine-tuning) against evaluation dataset")
     logger.info("Evaluating all 8 modes with sample_size=5 per mode\n")
 
     evaluator = BaselineEvaluator()
@@ -928,7 +725,7 @@ def main() -> None:
         ("feedback_grammar", evaluator.run_feedback_grammar_baseline),
         ("grading_vocab", evaluator.run_grading_vocab_baseline),
         ("grading_grammar", evaluator.run_grading_grammar_baseline),
-        ("content_agent", evaluator.run_content_agent_baseline),
+        ("exercise_generation", evaluator.run_exercise_generation_baseline),
     ]
 
     # Run all baselines and collect results + outputs
