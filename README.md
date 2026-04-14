@@ -183,23 +183,32 @@ pytest tests/
 - [x] RAG database setup with Pinecone
 - [x] Model fine-tuning (Qwen2.5-3B for Agent 1/3)
 
-**Phase 2 - Multi-Agent System:** 🔄 IN PROGRESS
-- [x] Agent 2 (GradingAgent) implementation - 20 tests passing
+**Phase 2 - Multi-Agent System:** ✅ COMPLETE
+- [x] Agent 1 (TeachingAgent) implementation - 26 tests passing
+- [x] Agent 2 (GradingAgent) implementation - 15 tests passing
 - [x] Agent 3 (ContentAgent) implementation - 21 tests passing
-- [x] LangGraph orchestrator - 72+ tests passing
+- [x] LangGraph orchestrator - 124 tests passing
   - [x] Core state machine and routing
   - [x] Agent node wrappers
   - [x] End-to-end integration tests (11 tests)
   - [x] Lesson initialization caching
   - [x] Grammar rules pre-loading
   - [x] Grading correctness logic (39 tests)
-- [ ] Agent 1 (TeachingAgent) implementation - **NEXT**
+- [x] Agent orchestrator adapters - 35 agent tests passing
+  - [x] TeachingAgent: start_lesson(), provide_feedback(), handle_user_message()
+  - [x] GradingAgent: grade_answer()
+  - [x] Input validation (required fields, mode validation, empty strings)
+
+**Phase 3 - API Layer & Integration:** 🔄 IN PROGRESS
 - [ ] FastAPI wrapper with session management - **NEXT**
+- [ ] Real model integration (load fine-tuned models) - **NEXT**
+- [ ] CLI or Streamlit UI
+- [ ] Performance testing and optimization
 
 **Roadmap:**
 - **Phase 1:** Foundation (eval-first, RAG setup) - ✅ COMPLETE
-- **Phase 2:** Multi-Agent System - 🔄 IN PROGRESS (85% complete)
-- **Phase 3:** API Layer & UI (FastAPI, session persistence)
+- **Phase 2:** Multi-Agent System - ✅ COMPLETE
+- **Phase 3:** API Layer & UI - 🔄 IN PROGRESS (FastAPI wrapper, real models)
 - **Phase 4:** Production Readiness (performance, monitoring, deployment)
 
 ---
