@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-14  
 **Models Tested:** Qwen2.5-3B-Instruct (base) vs Qwen2.5-7B-Instruct (base)  
-**Test Cases:** 3 exercises from exercise_gen sub-group  
+**Test Cases:** 3 exercises from exercise_gen subgroup  
 **Conclusion:** ✅ **7B model ready for production (no fine-tuning needed)**
 
 ---

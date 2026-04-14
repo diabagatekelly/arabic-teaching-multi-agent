@@ -387,7 +387,9 @@ class ExerciseQualityMetric(BaseMetric):
         }
 
         # 6. Harakaat consistency (if Arabic text has harakaat, should be used consistently)
-        arabic_text = " ".join(extract_arabic_words(question + " " + answer))
+        arabic_text = " ".join(
+            extract_arabic_words(question + " " + answer, preserve_harakaat=True)
+        )
         harakaat_pattern = r"[\u064B-\u0652\u0670]"
         has_harakaat = bool(re.search(harakaat_pattern, arabic_text))
         if has_harakaat:

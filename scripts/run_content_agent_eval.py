@@ -162,8 +162,10 @@ def main():
     """Run content agent evaluation with 3B and 7B models."""
     logger.info("Initializing BaselineEvaluator...")
 
-    # Use content_agent_test_cases.json instead of test_cases.json
-    test_cases_path = PROJECT_ROOT / "data" / "evaluation" / "content_agent_test_cases.json"
+    # Use content_agent_test_cases.json in content_agent subdirectory
+    test_cases_path = (
+        PROJECT_ROOT / "data" / "evaluation" / "content_agent" / "content_agent_test_cases.json"
+    )
     evaluator = BaselineEvaluator(test_cases_path=test_cases_path)
 
     # Full evaluation (all test cases in exercise_gen)

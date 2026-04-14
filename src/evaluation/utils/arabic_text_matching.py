@@ -26,12 +26,13 @@ def remove_harakaat(text: str) -> str:
     return re.sub(harakaat_pattern, "", text)
 
 
-def extract_arabic_words(text: str) -> list[str]:
+def extract_arabic_words(text: str, preserve_harakaat: bool = False) -> list[str]:
     """
     Extract Arabic words from mixed text (may contain English, punctuation).
 
     Args:
         text: Text containing Arabic (may have English/numbers/punctuation)
+        preserve_harakaat: If True, keep harakaat in extracted words (default: False)
 
     Returns:
         List of Arabic word strings
@@ -41,9 +42,15 @@ def extract_arabic_words(text: str) -> list[str]:
         ['القلم']
         >>> extract_arabic_words("كِتَاب (kitaab) - book")
         ['كتاب']
+        >>> extract_arabic_words("القَلَم", preserve_harakaat=True)
+        ['القَلَم']
     """
-    # Arabic character range: \u0600-\u06FF
+    # Arabic character range: \u0600-\u06FF (includes harakaat)
     arabic_words = re.findall(r"[\u0600-\u06FF]+", text)
+
+    if preserve_harakaat:
+        return arabic_words
+
     # Remove harakaat from extracted words
     return [remove_harakaat(word) for word in arabic_words]
 
