@@ -7,6 +7,8 @@ import re
 from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 
+from src.evaluation.utils import check_learned_items_usage, extract_arabic_words
+
 from .shared_metrics import extract_json
 
 logger = logging.getLogger(__name__)
@@ -247,3 +249,261 @@ Reasoning: [brief explanation]
     def __name__(self) -> str:
         """Metric name."""
         return "Alignment"
+
+
+class ExerciseQualityMetric(BaseMetric):
+    """
+    Rule-based quality evaluation for generated exercises.
+
+    Checks:
+    1. Question validity (has text, reasonable length 10-500 chars)
+    2. Answer presence (not empty)
+    3. Learned items usage (using Arabic text matching with harakaat handling)
+    4. Difficulty appropriateness (matches requested difficulty)
+    5. Cultural appropriateness (no offensive content)
+    6. Harakaat consistency (if present, used consistently)
+    7. Instructions clarity (has clear prompt)
+    8. Answer format specification (specifies expected format)
+
+    This is a RULE-BASED metric (not LLM-judged) for fast, deterministic evaluation.
+    """
+
+    def __init__(self, threshold: float = 0.7) -> None:
+        """
+        Initialize exercise quality metric.
+
+        Args:
+            threshold: Minimum quality score required (default 0.7)
+        """
+        self.threshold = threshold
+        self.score = 0.0
+        self.reason = ""
+        self.success = False
+
+    def measure(self, test_case: LLMTestCase) -> float:
+        """
+        Measure exercise quality using rule-based checks.
+
+        Args:
+            test_case: Test case with input (requirements) and actual_output (generated exercise or list)
+
+        Returns:
+            Quality score (0.0-1.0)
+        """
+        try:
+            input_data, generated_output = self._parse_test_case(test_case)
+
+            # Handle both single exercise (dict) and multiple exercises (list)
+            if isinstance(generated_output, list):
+                # Multiple exercises: check first exercise only (representative)
+                if not generated_output:
+                    return self._set_error("Empty list of exercises")
+                exercise = generated_output[0]
+                checks = self._run_quality_checks(input_data, exercise)
+                score = self._calculate_score(checks)
+                return self._set_result(score, checks)
+            else:
+                # Single exercise: check directly
+                checks = self._run_quality_checks(input_data, generated_output)
+                score = self._calculate_score(checks)
+                return self._set_result(score, checks)
+
+        except Exception as e:
+            return self._set_error(f"Quality check error: {str(e)}")
+
+    def _parse_test_case(self, test_case: LLMTestCase) -> tuple[dict, dict | list]:
+        """Extract and parse input requirements and generated output."""
+        input_json = extract_json(test_case.input)
+        output_json = extract_json(test_case.actual_output)
+        input_data = json.loads(input_json)
+        generated_output = json.loads(output_json)
+        return input_data, generated_output
+
+    def _run_quality_checks(self, input_data: dict, exercise: dict) -> dict:
+        """
+        Run all quality checks on generated exercise.
+
+        Args:
+            input_data: Exercise generation requirements (learned_items, difficulty, etc.)
+            exercise: Generated exercise JSON
+
+        Returns:
+            Dictionary of check results with passed/failed status and reasons
+        """
+        checks = {}
+
+        # 1. Question validity
+        question = exercise.get("question", "")
+        question_len = len(question)
+        checks["question"] = {
+            "passed": 10 <= question_len <= 500,
+            "reason": f"valid ({question_len} chars)"
+            if 10 <= question_len <= 500
+            else f"invalid length ({question_len} chars)",
+        }
+
+        # 2. Answer presence
+        answer = exercise.get("answer", "")
+        checks["answer"] = {
+            "passed": bool(answer.strip()),
+            "reason": "present" if answer.strip() else "missing",
+        }
+
+        # 3. Learned items usage (FIXED with Arabic text matching!)
+        learned_items = input_data.get("learned_items", [])
+        if learned_items:
+            # Extract Arabic text from question and answer
+            text_to_check = question + " " + answer
+            passed, used_items, unused_items = check_learned_items_usage(
+                text_to_check, learned_items, require_all=False, min_usage_count=1
+            )
+            checks["learned_items"] = {
+                "passed": passed,
+                "reason": (
+                    f"{len(used_items)}/{len(learned_items)} used" if passed else "none used"
+                ),
+            }
+        else:
+            # No learned items specified, so pass by default
+            checks["learned_items"] = {"passed": True, "reason": "N/A"}
+
+        # 4. Difficulty appropriateness
+        expected_difficulty = input_data.get("difficulty", "beginner")
+        actual_difficulty = exercise.get("difficulty", "")
+        checks["difficulty"] = {
+            "passed": actual_difficulty == expected_difficulty,
+            "reason": actual_difficulty
+            if actual_difficulty == expected_difficulty
+            else f"mismatch (expected {expected_difficulty}, got {actual_difficulty})",
+        }
+
+        # 5. Cultural appropriateness (basic check for offensive keywords)
+        offensive_keywords = ["offensive", "inappropriate", "taboo"]  # Extend as needed
+        text = (question + " " + answer).lower()
+        has_offensive = any(keyword in text for keyword in offensive_keywords)
+        checks["cultural"] = {
+            "passed": not has_offensive,
+            "reason": "appropriate" if not has_offensive else "contains offensive content",
+        }
+
+        # 6. Harakaat consistency (if Arabic text has harakaat, should be used consistently)
+        arabic_text = " ".join(
+            extract_arabic_words(question + " " + answer, preserve_harakaat=True)
+        )
+        harakaat_pattern = r"[\u064B-\u0652\u0670]"
+        has_harakaat = bool(re.search(harakaat_pattern, arabic_text))
+        if has_harakaat:
+            # Count words with and without harakaat
+            words = arabic_text.split()
+            words_with_harakaat = sum(1 for w in words if re.search(harakaat_pattern, w))
+            consistency = words_with_harakaat / len(words) if words else 0
+            checks["harakaat"] = {
+                "passed": consistency > 0.8,
+                "reason": f"consistent ({consistency:.0%})"
+                if consistency > 0.8
+                else f"inconsistent ({consistency:.0%})",
+            }
+        else:
+            checks["harakaat"] = {"passed": True, "reason": "consistent (none used)"}
+
+        # 7. Instructions clarity (question should have clear prompt)
+        instruction_keywords = [
+            "translate",
+            "fill",
+            "choose",
+            "write",
+            "complete",
+            "match",
+            "اكتب",
+            "املأ",
+            "اختر",
+            "ترجم",
+        ]
+        has_instruction = any(keyword in text.lower() for keyword in instruction_keywords)
+        checks["instructions"] = {
+            "passed": has_instruction,
+            "reason": "clear" if has_instruction else "unclear",
+            "warning": not has_instruction,  # Mark as warning, not failure
+        }
+
+        # 8. Answer format specification (for complex exercises)
+        format_keywords = ["format", "example", "e.g.", "like", "as follows", "مثال", "بالشكل"]
+        has_format_spec = any(keyword in text.lower() for keyword in format_keywords)
+        # This is a soft check - nice to have but not critical for simple exercises
+        checks["answer_format"] = {
+            "passed": has_format_spec,
+            "reason": "specified" if has_format_spec else "not specified",
+            "warning": not has_format_spec,  # Mark as warning, not failure
+        }
+
+        return checks
+
+    def _calculate_score(self, checks: dict) -> float:
+        """
+        Calculate overall quality score from individual checks.
+
+        Critical checks (must pass): question, answer, learned_items, difficulty, cultural, harakaat
+        Warning checks (nice to have): instructions, answer_format
+
+        Args:
+            checks: Dictionary of check results
+
+        Returns:
+            Quality score (0.0-1.0)
+        """
+        critical_checks = [
+            "question",
+            "answer",
+            "learned_items",
+            "difficulty",
+            "cultural",
+            "harakaat",
+        ]
+        warning_checks = ["instructions", "answer_format"]
+
+        critical_passed = sum(
+            1 for key in critical_checks if checks.get(key, {}).get("passed", False)
+        )
+        warnings_passed = sum(
+            1 for key in warning_checks if checks.get(key, {}).get("passed", False)
+        )
+
+        # Critical checks are worth 0.8 of the score, warnings are worth 0.2
+        critical_score = (critical_passed / len(critical_checks)) * 0.8
+        warning_score = (warnings_passed / len(warning_checks)) * 0.2
+
+        return critical_score + warning_score
+
+    def _set_result(self, score: float, checks: dict) -> float:
+        """Set metric result with score and detailed reason."""
+        self.score = score
+        self.success = score >= self.threshold
+
+        # Format reason with all check results
+        check_symbols = []
+        for check_name, check_result in checks.items():
+            symbol = (
+                "✓" if check_result["passed"] else ("⚠" if check_result.get("warning") else "✗")
+            )
+            reason_text = check_result["reason"]
+            check_symbols.append(f"{symbol} {check_name.capitalize()}: {reason_text}")
+
+        self.reason = " | ".join(check_symbols)
+        return self.score
+
+    def _set_error(self, reason: str) -> float:
+        """Set error state."""
+        self.score = 0.0
+        self.success = False
+        self.reason = f"✗ {reason}"
+        logger.error(f"ExerciseQualityMetric error: {reason}")
+        return 0.0
+
+    def is_successful(self) -> bool:
+        """Check if quality score meets threshold."""
+        return self.success
+
+    @property
+    def __name__(self) -> str:
+        """Metric name."""
+        return "Exercise Quality"

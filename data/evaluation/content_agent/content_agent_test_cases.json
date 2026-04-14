@@ -25,7 +25,8 @@
             "مرحبا (marhaba) - hello",
             "شكرا (shukran) - thank you",
             "وداعا (wada'an) - goodbye"
-          ]
+          ],
+          "difficulty": "beginner"
         },
         "expected_output": {
           "count": 5,
@@ -37,7 +38,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
@@ -52,7 +54,8 @@
             "كَبِير (kabiir) - big",
             "صَغِير (saghiir) - small",
             "Gender agreement rule"
-          ]
+          ],
+          "difficulty": "intermediate"
         },
         "expected_output": {
           "count": 4,
@@ -65,7 +68,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
@@ -80,7 +84,8 @@
             "كِتَاب (kitaab) - book",
             "قَلَم (qalam) - pen",
             "مَكْتَب (maktab) - desk"
-          ]
+          ],
+          "difficulty": "intermediate"
         },
         "expected_output": {
           "count": 3,
@@ -92,7 +97,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       }
     ],
@@ -121,7 +127,8 @@
               "english": "book"
             }
           ],
-          "count": 5
+          "count": 5,
+          "difficulty": "beginner"
         },
         "expected_output": {
           "count": 5,
@@ -135,7 +142,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
@@ -157,7 +165,8 @@
               "english": "the book"
             }
           ],
-          "count": 5
+          "count": 5,
+          "difficulty": "intermediate"
         },
         "expected_output": {
           "count": 5,
@@ -171,7 +180,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
@@ -193,7 +203,8 @@
               "english": "big school"
             }
           ],
-          "count": 5
+          "count": 5,
+          "difficulty": "intermediate"
         },
         "expected_output": {
           "count": 5,
@@ -207,7 +218,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       }
     ],
@@ -226,7 +238,8 @@
             "fill_in_blank",
             "identification",
             "translation"
-          ]
+          ],
+          "difficulty": "beginner"
         },
         "expected_output": {
           "test_id": "lesson_3_test",
@@ -237,7 +250,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
@@ -255,7 +269,8 @@
             "conjugation",
             "identification",
             "correction"
-          ]
+          ],
+          "difficulty": "intermediate"
         },
         "expected_output": {
           "test_id": "lesson_5_test",
@@ -266,7 +281,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
@@ -281,7 +297,8 @@
           "question_types": [
             "identification",
             "fill_in_blank"
-          ]
+          ],
+          "difficulty": "intermediate"
         },
         "expected_output": {
           "test_id": "lesson_1_test",
@@ -292,7 +309,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
@@ -309,7 +327,8 @@
             "conjugation",
             "translation",
             "fill_in_blank"
-          ]
+          ],
+          "difficulty": "beginner"
         },
         "expected_output": {
           "test_id": "lesson_3_test",
@@ -320,7 +339,8 @@
         "metrics": [
           "json_validity",
           "structure",
-          "alignment"
+          "alignment",
+          "exercise_quality"
         ]
       }
     ]

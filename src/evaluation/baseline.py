@@ -24,6 +24,9 @@ GRADING_AGENT_TEST_CASES_PATH = (
 DEFAULT_BASELINE_REPORT_PATH = PROJECT_ROOT / "data" / "evaluation" / "baseline_report.md"
 DEFAULT_MAX_TOKENS = 256
 GRADING_MAX_TOKENS = 50
+EXERCISE_GENERATION_MAX_TOKENS = (
+    512  # Higher limit for exercise generation (7B needs more tokens for full harakaat)
+)
 DEFAULT_SAMPLE_SIZE = 5
 
 logger = logging.getLogger(__name__)
@@ -531,7 +534,7 @@ class BaselineEvaluator:
         return model_responses, results
 
     def run_exercise_generation_baseline(
-        self, sample_size: int = DEFAULT_SAMPLE_SIZE
+        self, sample_size: int = DEFAULT_SAMPLE_SIZE, use_7b: bool = False
     ) -> tuple[dict[str, str], dict]:
         """
         Run baseline evaluation on exercise_generation mode (exercise_gen only).
@@ -541,6 +544,7 @@ class BaselineEvaluator:
 
         Args:
             sample_size: Number of test cases to evaluate
+            use_7b: If True, use 7B model for generation; if False, use 3B model (default)
 
         Returns:
             Tuple of (model_responses, evaluation_results)
@@ -554,7 +558,8 @@ class BaselineEvaluator:
                 f"Ensure {self.test_cases_path} exists."
             )
 
-        logger.info("\n=== Running Exercise Generation Baseline ===\n")
+        model_name = "7B" if use_7b else "3B"
+        logger.info(f"\n=== Running Exercise Generation Baseline ({model_name}) ===\n")
 
         model_responses = {}
         exercise_mode = self.pipeline.test_cases["exercise_generation"]
@@ -573,7 +578,9 @@ class BaselineEvaluator:
             prompt = EXERCISE_GENERATION.format(**flattened)
 
             logger.info(f"Evaluating {test_id}...")
-            response = self.generate_response(prompt, max_new_tokens=DEFAULT_MAX_TOKENS)
+            response = self.generate_response(
+                prompt, max_new_tokens=EXERCISE_GENERATION_MAX_TOKENS, use_7b=use_7b
+            )
             model_responses[test_id] = response
 
         # Run evaluation (includes AlignmentMetric with 7B judge)

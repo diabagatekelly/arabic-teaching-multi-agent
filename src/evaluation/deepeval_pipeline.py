@@ -11,6 +11,7 @@ from deepeval.test_case import LLMTestCase
 from src.evaluation.metrics import (
     AccuracyMetric,
     AlignmentMetric,
+    ExerciseQualityMetric,
     FeedbackAppropriatenessMetric,
     HasNavigationMetric,
     JSONValidityMetric,
@@ -290,18 +291,44 @@ class EvaluationPipeline:
             elif metric_name == "json_validity":
                 metrics_list.append(JSONValidityMetric())
             elif metric_name == "structure":
-                # This would need more configuration - placeholder for now
-                metrics_list.append(
-                    StructureMetric(
-                        expected_type=dict,
-                        required_keys=["correct"],
-                        expected_types={"correct": bool},
+                # Determine structure based on context
+                count = input_data.get("count", 1)
+                mode = input_data.get("mode", "")
+
+                if mode == "exercise_generation":
+                    # Exercise generation: expect list if count > 1, dict if count == 1
+                    if count > 1:
+                        metrics_list.append(
+                            StructureMetric(
+                                expected_type=list,
+                                required_keys=["question", "answer"],
+                                expected_types={"question": str, "answer": str},
+                            )
+                        )
+                    else:
+                        metrics_list.append(
+                            StructureMetric(
+                                expected_type=dict,
+                                required_keys=["question", "answer"],
+                                expected_types={"question": str, "answer": str},
+                            )
+                        )
+                else:
+                    # Grading: expect dict with "correct" field
+                    metrics_list.append(
+                        StructureMetric(
+                            expected_type=dict,
+                            required_keys=["correct"],
+                            expected_types={"correct": bool},
+                        )
                     )
-                )
             elif metric_name == "accuracy":
                 metrics_list.append(AccuracyMetric())
             elif metric_name == "alignment":
                 metrics_list.append(AlignmentMetric())
+            elif metric_name == "exercise_quality":
+                # Rule-based quality metric with Arabic text matching
+                metrics_list.append(ExerciseQualityMetric(threshold=0.7))
             else:
                 logger.warning(f"Unknown metric requested: {metric_name}")
 
@@ -638,13 +665,29 @@ class EvaluationPipeline:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with JSON, Structure, and Alignment metrics
+            Evaluation results with metrics dynamically created from test cases
         """
-        results = self._init_results(["json_validity", "structure", "alignment"])
         exercise_mode = self.test_cases["exercise_generation"]
 
-        # Iterate through all sub-groups
+        # Collect all test cases from sub-groups
+        all_test_cases = []
         for sub_group in ["exercise_gen", "quiz_question_gen", "test_composition"]:
+            if sub_group in exercise_mode:
+                all_test_cases.extend(exercise_mode[sub_group])
+
+        # Collect all unique metric names
+        metric_names = set()
+        for tc in all_test_cases:
+            for metric in tc.get("metrics", []):
+                metric_names.add(self._normalize_metric_name(metric))
+
+        results = self._init_results(list(metric_names))
+
+        # Evaluate all test cases using dynamic metrics
+        for sub_group in ["exercise_gen", "quiz_question_gen", "test_composition"]:
+            if sub_group not in exercise_mode:
+                continue
+
             for test_case_data in exercise_mode[sub_group]:
                 test_id = test_case_data["test_id"]
                 if test_id not in model_responses:
@@ -652,17 +695,9 @@ class EvaluationPipeline:
 
                 test_case = self._create_test_case(test_case_data, model_responses[test_id])
 
-                # Run JSON + Structure + Alignment metrics
-                # Structure varies by sub-group, but all should be valid JSON with specific keys
-                metrics = [
-                    JSONValidityMetric(),
-                    StructureMetric(
-                        expected_type=dict,
-                        required_keys=["question", "answer"],
-                        expected_types={"question": str, "answer": str},
-                    ),
-                    AlignmentMetric(threshold=0.8),
-                ]
+                # Create metrics dynamically from test case definition
+                metrics = self._create_metrics_from_test_case(test_case_data)
+
                 self._run_metrics(test_case, metrics, test_id, results)
 
         return results

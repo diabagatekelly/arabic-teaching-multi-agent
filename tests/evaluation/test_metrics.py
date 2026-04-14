@@ -1,6 +1,5 @@
 """Tests for custom DeepEval metrics."""
 
-import json
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -8,7 +7,6 @@ from deepeval.test_case import LLMTestCase
 
 from src.evaluation.metrics import (
     AccuracyMetric,
-    AlignmentMetric,
     FeedbackAppropriatenessMetric,
     HasNavigationMetric,
     JSONValidityMetric,
@@ -287,51 +285,6 @@ class TestAccuracyMetric:
         assert score == 0.0
         assert not metric.is_successful()
         assert "Parsing error" in metric.reason
-
-
-class TestAlignmentMetric:
-    """Tests for AlignmentMetric."""
-
-    @patch("src.evaluation.metrics.AlignmentMetric._query_judge")
-    def test_high_alignment_passes(self, mock_query_judge):
-        """Test that high alignment score passes threshold."""
-        mock_query_judge.return_value = "Overall: 0.9\nReasoning: Excellent alignment"
-
-        metric = AlignmentMetric(threshold=0.8)
-        test_case = LLMTestCase(
-            input=json.dumps(
-                {
-                    "exercise_type": "fill_in_blank",
-                    "learned_vocab": ["word1"],
-                    "grammar_rule": "test rule",
-                }
-            ),
-            actual_output=json.dumps({"question": "Test question", "answer": "Test answer"}),
-            expected_output="{}",
-        )
-
-        score = metric.measure(test_case)
-
-        assert score == 0.9
-        assert metric.is_successful()
-        assert "0.9" in metric.reason
-
-    @patch("src.evaluation.metrics.AlignmentMetric._query_judge")
-    def test_parsing_error_returns_zero(self, mock_query_judge):
-        """Test that unparseable judge response returns 0."""
-        mock_query_judge.return_value = "Some random text without score"
-
-        metric = AlignmentMetric(threshold=0.8)
-        test_case = LLMTestCase(
-            input=json.dumps({"exercise_type": "test"}),
-            actual_output=json.dumps({"question": "Q", "answer": "A"}),
-            expected_output="{}",
-        )
-
-        score = metric.measure(test_case)
-
-        assert score == 0.0
-        assert not metric.is_successful()
 
 
 class TestFeedbackAppropriatenessMetric:

@@ -9,7 +9,7 @@ Metrics are organized by agent:
 
 # Shared metrics and utilities
 # Agent 3 (Content Agent) metrics
-from .content_agent_metrics import AlignmentMetric
+from .content_agent_metrics import AlignmentMetric, ExerciseQualityMetric
 
 # Agent 2 (Grading Agent) metrics
 from .grading_agent_metrics import AccuracyMetric
@@ -37,4 +37,5 @@ __all__ = [
     "AccuracyMetric",
     # Agent 3
     "AlignmentMetric",
+    "ExerciseQualityMetric",
 ]
