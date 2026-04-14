@@ -253,7 +253,12 @@ class EvaluationPipeline:
             List of instantiated metric objects
         """
         metrics_list = []
-        metrics_requested = test_case_data.get("metrics", ["sentiment_teaching"])
+        # Require explicit metrics field - no default to avoid key mismatches
+        metrics_requested = test_case_data.get("metrics", [])
+        if not metrics_requested:
+            logger.warning(
+                f"Test case {test_case_data.get('test_id', 'unknown')} has no metrics specified"
+            )
         validation = test_case_data.get("validation", {})
         input_data = test_case_data.get("input", {})
 

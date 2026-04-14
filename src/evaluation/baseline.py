@@ -298,7 +298,16 @@ class BaselineEvaluator:
 
         Returns:
             Tuple of (model_responses, evaluation_results)
+
+        Raises:
+            RuntimeError: If Agent 2/3 test cases not loaded
         """
+        if self.pipeline is None:
+            raise RuntimeError(
+                "Agent 2/3 test cases not loaded. Cannot run grading_vocab baseline. "
+                f"Ensure {self.test_cases_path} exists."
+            )
+
         logger.info("\n=== Running Grading Vocab Baseline ===\n")
 
         model_responses = {}
@@ -441,7 +450,16 @@ class BaselineEvaluator:
 
         Returns:
             Tuple of (model_responses, evaluation_results)
+
+        Raises:
+            RuntimeError: If Agent 2/3 test cases not loaded
         """
+        if self.pipeline is None:
+            raise RuntimeError(
+                "Agent 2/3 test cases not loaded. Cannot run grading_grammar baseline. "
+                f"Ensure {self.test_cases_path} exists."
+            )
+
         logger.info("\n=== Running Grading Grammar Baseline ===\n")
 
         model_responses = {}
@@ -482,7 +500,16 @@ class BaselineEvaluator:
 
         Returns:
             Tuple of (model_responses, evaluation_results)
+
+        Raises:
+            RuntimeError: If Agent 2/3 test cases not loaded
         """
+        if self.pipeline is None:
+            raise RuntimeError(
+                "Agent 2/3 test cases not loaded. Cannot run exercise_generation baseline. "
+                f"Ensure {self.test_cases_path} exists."
+            )
+
         logger.info("\n=== Running Exercise Generation Baseline ===\n")
 
         model_responses = {}

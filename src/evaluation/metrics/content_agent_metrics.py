@@ -30,20 +30,30 @@ class AlignmentMetric(BaseMetric):
     _shared_judge_tokenizer = None
 
     def __init__(
-        self, threshold: float = 0.8, model_name: str = "Qwen/Qwen2.5-7B-Instruct"
+        self,
+        threshold: float = 0.8,
+        model_name: str = "Qwen/Qwen2.5-7B-Instruct",
+        judge_model=None,
+        judge_tokenizer=None,
     ) -> None:
         """
         Initialize alignment metric.
 
         Args:
             threshold: Minimum alignment score required (default 0.8)
-            model_name: HuggingFace model ID for LLM judge
+            model_name: HuggingFace model ID for LLM judge (fallback if judge not provided)
+            judge_model: Optional pre-loaded judge model (for dependency injection)
+            judge_tokenizer: Optional pre-loaded judge tokenizer (for dependency injection)
         """
         self.threshold = threshold
         self.model_name = model_name
         self.score = 0.0
         self.reason = ""
         self.success = False
+
+        # Support dependency injection of judge model/tokenizer
+        self.judge_model = judge_model
+        self.judge_tokenizer = judge_tokenizer
 
     def measure(self, test_case: LLMTestCase) -> float:
         """
@@ -69,19 +79,47 @@ class AlignmentMetric(BaseMetric):
             return self._set_error(f"Alignment check error: {str(e)}")
 
     def _ensure_judge_loaded(self) -> None:
-        """Lazy load judge model on first use (singleton pattern)."""
-        if AlignmentMetric._shared_judge_model is not None:
+        """
+        Ensure a judge model/tokenizer are available.
+
+        Preference order:
+        1. Explicitly injected judge on the instance (self.judge_model/self.judge_tokenizer)
+        2. Class-level shared judge (singleton)
+        3. Lazily load a new judge from `self.model_name` as a fallback
+        """
+        # 1) Instance-level injection: if caller provided model/tokenizer, use them
+        if self.judge_model is not None and self.judge_tokenizer is not None:
             return
 
+        # 2) Reuse class-level singleton if already initialized
+        if (
+            AlignmentMetric._shared_judge_model is not None
+            and AlignmentMetric._shared_judge_tokenizer is not None
+        ):
+            # Mirror shared judge onto the instance for convenience
+            self.judge_model = AlignmentMetric._shared_judge_model
+            self.judge_tokenizer = AlignmentMetric._shared_judge_tokenizer
+            return
+
+        # 3) Fallback: lazily load from `self.model_name` once per process
         logger.info(f"Loading LLM judge model: {self.model_name} (first time)...")
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
-        AlignmentMetric._shared_judge_tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        AlignmentMetric._shared_judge_model = AutoModelForCausalLM.from_pretrained(
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
             device_map="auto",
             torch_dtype="auto",
         )
+
+        # Cache at class level (singleton)
+        AlignmentMetric._shared_judge_tokenizer = tokenizer
+        AlignmentMetric._shared_judge_model = model
+
+        # Also attach to the instance
+        self.judge_model = model
+        self.judge_tokenizer = tokenizer
+
         logger.info("LLM judge loaded and cached")
 
     def _parse_test_case(self, test_case: LLMTestCase) -> tuple[dict, dict]:
@@ -159,20 +197,17 @@ Reasoning: [brief explanation]
         Returns:
             Judge response text
         """
-        inputs = AlignmentMetric._shared_judge_tokenizer(prompt, return_tensors="pt").to(
-            AlignmentMetric._shared_judge_model.device
-        )
+        # Use instance attributes (respects dependency injection)
+        inputs = self.judge_tokenizer(prompt, return_tensors="pt").to(self.judge_model.device)
 
-        outputs = AlignmentMetric._shared_judge_model.generate(
+        outputs = self.judge_model.generate(
             **inputs,
             max_new_tokens=256,
             do_sample=False,  # Deterministic
-            pad_token_id=AlignmentMetric._shared_judge_tokenizer.eos_token_id,
+            pad_token_id=self.judge_tokenizer.eos_token_id,
         )
 
-        response = AlignmentMetric._shared_judge_tokenizer.decode(
-            outputs[0], skip_special_tokens=True
-        )
+        response = self.judge_tokenizer.decode(outputs[0], skip_special_tokens=True)
 
         # Remove prompt from response
         if response.startswith(prompt):
