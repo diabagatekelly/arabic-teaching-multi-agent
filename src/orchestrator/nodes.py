@@ -61,6 +61,9 @@ class TeachingNode:
             state.last_agent = "agent1"
 
             # Determine next step
+            # TODO: Replace keyword detection with structured output
+            # Current approach is fragile - fails on "No exercise needed" or "Question later"
+            # Consider having agent return explicit flag: response.get("generate_exercise", False)
             if "exercise" in response.lower() or "question" in response.lower():
                 # Agent wants to generate exercise
                 state.next_agent = "agent3"
@@ -71,7 +74,16 @@ class TeachingNode:
             return state
 
         except Exception as e:
-            logger.error(f"TeachingNode error: {e}")
+            logger.error(
+                f"TeachingNode error: {e}",
+                extra={
+                    "last_agent": state.last_agent,
+                    "conversation_length": len(state.conversation_history),
+                    "current_lesson": state.current_lesson,
+                    "has_pending_exercise": state.pending_exercise is not None,
+                },
+                exc_info=True,
+            )
             state.add_message("system", f"Error in teaching agent: {str(e)}")
             state.next_agent = "user"  # Fallback to user
             return state
@@ -115,6 +127,7 @@ class GradingNode:
     Responsibilities:
     - Validate user answers
     - Handle edge cases (synonyms, typos, harakaat)
+    - Use pre-loaded grammar rules for context
     - Provide grading explanations
     - Detect partial credit scenarios
     """
@@ -122,6 +135,34 @@ class GradingNode:
     def __init__(self, agent: GradingAgent):
         """Initialize grading node with agent."""
         self.agent = agent
+
+    def preload_grammar_rules(self, state: SystemState) -> None:
+        """
+        Pre-load grammar rules at lesson start for grading context.
+
+        Per ARCHITECTURE.md, Agent 2 should have grammar rules pre-loaded
+        so it can make accurate grading decisions.
+
+        Args:
+            state: SystemState with cached_grammar_content from Agent 3
+        """
+        if not state.cached_grammar_content:
+            logger.warning("No cached grammar content to pre-load for grading")
+            return
+
+        logger.info(f"Pre-loading {len(state.cached_grammar_content)} grammar rules for grading")
+
+        # Extract grading-relevant rules from cached grammar
+        state.preloaded_grammar_rules = {
+            topic: {
+                "rule": content.get("rule", ""),
+                "examples": content.get("examples", []),
+                "detection_pattern": content.get("detection_pattern", ""),
+            }
+            for topic, content in state.cached_grammar_content.items()
+        }
+
+        logger.info("Grammar rules pre-loaded for Agent 2")
 
     def __call__(self, state: SystemState) -> SystemState:
         """
@@ -175,19 +216,69 @@ class GradingNode:
             return state
 
         except Exception as e:
-            logger.error(f"GradingNode error: {e}")
+            logger.error(
+                f"GradingNode error: {e}",
+                extra={
+                    "last_agent": state.last_agent,
+                    "has_pending_exercise": state.pending_exercise is not None,
+                    "exercise_type": state.pending_exercise.exercise_type
+                    if state.pending_exercise
+                    else None,
+                    "conversation_length": len(state.conversation_history),
+                },
+                exc_info=True,
+            )
             state.add_message("system", f"Error in grading: {str(e)}")
             state.next_agent = "agent1"
             return state
 
     def _is_answer_correct(self, grading_result: str) -> bool:
-        """Parse grading result to determine if answer is correct."""
-        # Simple heuristic - can be improved
+        """
+        Parse grading result to determine if answer is correct.
+
+        Checks for negation overrides first (e.g., "not incorrect"),
+        then negative indicators, then positive indicators.
+        Ambiguous cases default to False.
+        """
         result_lower = grading_result.lower()
-        if "correct" in result_lower and "incorrect" not in result_lower:
+
+        # Handle explicit negated-negative phrases first
+        # so we don't misclassify cases like "not incorrect" or "not wrong"
+        negation_overrides = [
+            "not incorrect",
+            "not wrong",
+        ]
+        if any(pattern in result_lower for pattern in negation_overrides):
             return True
-        if "✓" in grading_result or "✅" in grading_result:
+
+        # Check for negative indicators (most specific patterns first)
+        negative_patterns = [
+            # More specific phrasings first
+            " is incorrect",
+            " was incorrect",
+            " is wrong",
+            " was wrong",
+            "not entirely correct",  # e.g., "Not entirely correct"
+            "not fully correct",  # e.g., "not fully correct"
+            "not correct",
+            "isn't correct",
+            "wasn't correct",
+            "not quite",
+            "almost",
+            "partially correct",
+            # Generic catch-alls (checked after the specific phrases)
+            "incorrect",
+            "wrong",
+        ]
+        if any(pattern in result_lower for pattern in negative_patterns):
+            return False
+
+        # Check for positive indicators
+        positive_patterns = ["correct", "right", "✓", "✔", "✅", "yes"]
+        if any(pattern in result_lower for pattern in positive_patterns):
             return True
+
+        # Default to False if unclear
         return False
 
 
@@ -196,10 +287,10 @@ class ContentNode:
     Node wrapping Agent 3 (Content).
 
     Responsibilities:
+    - Initialize lesson (cache ALL content upfront)
     - Generate exercises using RAG
-    - Compose quizzes
-    - Create balanced tests
-    - Retrieve lesson content
+    - Serve cached content during lesson
+    - Compose quizzes and tests
     """
 
     def __init__(self, agent: ContentAgent):
@@ -217,9 +308,13 @@ class ContentNode:
             Updated system state with generated exercise
         """
         try:
+            # Initialize lesson content if not already cached
+            if not state.lesson_initialized:
+                state = self.initialize_lesson(state)
+
             exercise_request = self._parse_exercise_request(state)
 
-            # Generate exercise
+            # Generate exercise using cached content
             response = self.agent.generate_exercise(exercise_request)
 
             # Parse exercise from response
@@ -234,10 +329,91 @@ class ContentNode:
             return state
 
         except Exception as e:
-            logger.error(f"ContentNode error: {e}")
+            logger.error(
+                f"ContentNode error: {e}",
+                extra={
+                    "last_agent": state.last_agent,
+                    "lesson_initialized": state.lesson_initialized,
+                    "current_lesson": state.current_lesson,
+                    "cached_vocab_count": len(state.cached_vocab_words),
+                },
+                exc_info=True,
+            )
             state.add_message("system", f"Error generating exercise: {str(e)}")
             state.next_agent = "agent1"  # Return to teaching
             return state
+
+    def initialize_lesson(self, state: SystemState) -> SystemState:
+        """
+        Initialize lesson by caching ALL content upfront.
+
+        Per ARCHITECTURE.md, Agent 3 should:
+        - Retrieve all vocabulary words for the lesson
+        - Retrieve all grammar rules and examples
+        - Cache in memory (no repeated RAG queries during lesson)
+
+        Args:
+            state: SystemState to update with cached content
+
+        Returns:
+            Updated SystemState with cached content
+        """
+        logger.info(f"Initializing lesson {state.current_lesson} - caching all content")
+
+        try:
+            # TODO: Integrate with actual RAG retriever when available
+            # PLACEHOLDER DATA - Remove before production
+            # In production, would call:
+            # vocab_content = self.agent.rag_retriever.get_lesson_vocabulary(state.current_lesson)
+            # grammar_content = self.agent.rag_retriever.get_lesson_grammar(state.current_lesson)
+
+            # PLACEHOLDER: vocabulary (would come from RAG)
+            state.cached_vocab_words = [
+                {
+                    "arabic": "كِتَاب",
+                    "transliteration": "kitaab",
+                    "english": "book",
+                    "word_id": "w1",
+                },
+                {
+                    "arabic": "مَدْرَسَة",
+                    "transliteration": "madrasa",
+                    "english": "school",
+                    "word_id": "w2",
+                },
+                {
+                    "arabic": "قَلَم",
+                    "transliteration": "qalam",
+                    "english": "pen",
+                    "word_id": "w3",
+                },
+            ]
+
+            # PLACEHOLDER: grammar (would come from RAG)
+            state.cached_grammar_content = {
+                "gender": {
+                    "rule": "Nouns are either masculine or feminine",
+                    "examples": ["كِتَاب (masculine)", "مَدْرَسَة (feminine)"],
+                },
+                "definite_article": {
+                    "rule": "Use ال for 'the'",
+                    "examples": ["الكِتَاب (the book)", "المَدْرَسَة (the school)"],
+                },
+            }
+
+            state.lesson_initialized = True
+            logger.info(
+                f"Lesson {state.current_lesson} initialized: "
+                f"{len(state.cached_vocab_words)} words, "
+                f"{len(state.cached_grammar_content)} grammar topics cached"
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to initialize lesson {state.current_lesson}: {e}", exc_info=True)
+            # Don't fail - will retry on next content request
+            state.lesson_initialized = False
+
+        return state
 
     def _parse_exercise_request(self, state: SystemState) -> dict[str, Any]:
         """Extract exercise requirements from current state."""
@@ -252,28 +428,45 @@ class ContentNode:
     def _parse_exercise_response(
         self, response: str, request: dict[str, Any], state: SystemState
     ) -> Exercise:
-        """Parse generated exercise from agent response."""
+        """
+        Parse generated exercise from agent response.
+
+        Extracts JSON from markdown code blocks or raw JSON objects,
+        validates required fields, and returns an Exercise object.
+        """
         import json
         import re
 
-        # Extract JSON from response
-        json_match = re.search(r"```json\n(.*?)\n```", response, re.DOTALL)
+        # Try markdown code block first (non-greedy)
+        json_match = re.search(r"```(?:json)?\s*\n(.*?)\n```", response, re.DOTALL)
         if json_match:
-            exercise_data = json.loads(json_match.group(1))
+            json_str = json_match.group(1)
         else:
-            # Try to find JSON object
-            json_match = re.search(r"\{.*\}", response, re.DOTALL)
+            # Try to find JSON object (non-greedy, limit scope)
+            json_match = re.search(r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", response)
             if json_match:
-                exercise_data = json.loads(json_match.group(0))
+                json_str = json_match.group(0)
             else:
-                raise ValueError("Could not parse exercise JSON from response")
+                raise ValueError("Could not find JSON in exercise response")
+
+        # Parse JSON
+        try:
+            exercise_data = json.loads(json_str)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON in exercise response: {e}") from e
+
+        # Validate required fields
+        required_fields = ["question", "answer"]
+        missing = [f for f in required_fields if not exercise_data.get(f)]
+        if missing:
+            raise ValueError(f"Missing required fields in exercise: {missing}")
 
         # Create Exercise object
         return Exercise(
             exercise_id=f"ex_{state.total_exercises_completed + 1}",
             exercise_type=request["exercise_type"],
-            question=exercise_data.get("question", ""),
-            answer=exercise_data.get("answer", ""),
+            question=exercise_data["question"],
+            answer=exercise_data["answer"],
             difficulty=exercise_data.get("difficulty", request["difficulty"]),
             metadata=exercise_data,
         )

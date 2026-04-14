@@ -16,6 +16,7 @@ Routing: Conditional edges based on conversation state (see routing.py)
 """
 
 import logging
+from collections.abc import Callable
 
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
@@ -57,7 +58,7 @@ def _create_nodes(
     teaching_agent: TeachingAgent,
     grading_agent: GradingAgent,
     content_agent: ContentAgent,
-) -> dict[str, callable]:
+) -> dict[str, Callable]:
     """Create node wrappers for each agent."""
     return {
         "teaching": TeachingNode(teaching_agent),
@@ -66,7 +67,7 @@ def _create_nodes(
     }
 
 
-def _build_graph(nodes: dict[str, callable]) -> StateGraph:
+def _build_graph(nodes: dict[str, Callable]) -> StateGraph:
     """Construct the state graph with nodes and edges."""
     graph = StateGraph(SystemState)
 
@@ -141,20 +142,53 @@ def run_conversation_turn(
         return state
 
 
-def create_new_session(user_id: str, session_id: str) -> SystemState:
+def create_new_session(user_id: str, session_id: str, lesson_number: int = 1) -> SystemState:
     """
     Create a new teaching session.
 
     Args:
         user_id: Unique user identifier
         session_id: Unique session identifier
+        lesson_number: Lesson to start with (default: 1)
 
     Returns:
         Initialized SystemState
     """
-    state = SystemState(user_id=user_id, session_id=session_id)
+    state = SystemState(user_id=user_id, session_id=session_id, current_lesson=lesson_number)
 
-    logger.info(f"Created new session: {session_id} for user: {user_id}")
+    logger.info(f"Created new session: {session_id} for user: {user_id}, lesson: {lesson_number}")
+    return state
+
+
+def initialize_lesson_content(
+    state: SystemState, content_node: ContentNode, grading_node: GradingNode
+) -> SystemState:
+    """
+    Initialize lesson by caching content and pre-loading grading rules.
+
+    Per ARCHITECTURE.md:
+    1. Agent 3 caches ALL lesson content (vocabulary + grammar)
+    2. Agent 2 pre-loads grammar rules for grading context
+
+    This should be called once per lesson before teaching begins.
+
+    Args:
+        state: Current system state
+        content_node: ContentNode for caching content
+        grading_node: GradingNode for pre-loading rules
+
+    Returns:
+        Updated state with cached content and pre-loaded rules
+    """
+    logger.info(f"Initializing lesson {state.current_lesson} content")
+
+    # Content node caches all lesson content
+    state = content_node.initialize_lesson(state)
+
+    # Grading node pre-loads grammar rules
+    grading_node.preload_grammar_rules(state)
+
+    logger.info(f"Lesson {state.current_lesson} initialization complete")
     return state
 
 
