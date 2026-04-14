@@ -256,7 +256,7 @@ class TeachingAgent:
         allowed_modes = {"vocabulary", "grammar"}
         if mode not in allowed_modes:
             raise ValueError(
-                f"Unsupported mode '{mode}' for feedback. " f"Must be one of: {allowed_modes}"
+                f"Unsupported mode '{mode}' for feedback. Must be one of: {allowed_modes}"
             )
 
         if mode == "grammar":

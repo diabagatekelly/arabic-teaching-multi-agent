@@ -411,7 +411,7 @@ class GradingAgent:
         for i, ans in enumerate(input_data["answers"]):
             required_answer_keys = {"question", "student_answer", "correct_answer"}
             if missing := required_answer_keys - ans.keys():
-                raise ValueError(f"Answer {i+1} missing required keys: {missing}")
+                raise ValueError(f"Answer {i + 1} missing required keys: {missing}")
 
         # Format answers for prompt
         answers_list = []
