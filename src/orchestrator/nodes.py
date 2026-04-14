@@ -236,27 +236,45 @@ class GradingNode:
         """
         Parse grading result to determine if answer is correct.
 
-        Checks for negative indicators first (incorrect, wrong, not correct, etc.),
-        then checks for positive indicators (correct, checkmarks).
+        Checks for negation overrides first (e.g., "not incorrect"),
+        then negative indicators, then positive indicators.
+        Ambiguous cases default to False.
         """
         result_lower = grading_result.lower()
 
-        # Check for negative indicators first (most specific patterns)
+        # Handle explicit negated-negative phrases first
+        # so we don't misclassify cases like "not incorrect" or "not wrong"
+        negation_overrides = [
+            "not incorrect",
+            "not wrong",
+        ]
+        if any(pattern in result_lower for pattern in negation_overrides):
+            return True
+
+        # Check for negative indicators (most specific patterns first)
         negative_patterns = [
-            "incorrect",
-            "wrong",
+            # More specific phrasings first
+            " is incorrect",
+            " was incorrect",
+            " is wrong",
+            " was wrong",
+            "not entirely correct",  # e.g., "Not entirely correct"
+            "not fully correct",  # e.g., "not fully correct"
             "not correct",
             "isn't correct",
             "wasn't correct",
             "not quite",
             "almost",
             "partially correct",
+            # Generic catch-alls (checked after the specific phrases)
+            "incorrect",
+            "wrong",
         ]
         if any(pattern in result_lower for pattern in negative_patterns):
             return False
 
         # Check for positive indicators
-        positive_patterns = ["correct", "right", "✓", "✅", "yes"]
+        positive_patterns = ["correct", "right", "✓", "✔", "✅", "yes"]
         if any(pattern in result_lower for pattern in positive_patterns):
             return True
 

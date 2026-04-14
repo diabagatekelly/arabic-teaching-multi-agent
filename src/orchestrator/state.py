@@ -54,6 +54,9 @@ class SystemState:
     # Learning progress
     current_lesson: int = 1
     current_mode: str = "vocabulary"  # "vocabulary" or "grammar"
+    # NOTE: Treat `learned_items` as read-only outside this class.
+    # Use the helper methods `add_learned_item`, `remove_learned_item`, and
+    # `clear_learned_items` to keep `_learned_items_set` in sync.
     learned_items: list[str] = field(default_factory=list)
     _learned_items_set: set[str] = field(default_factory=set, repr=False)  # For O(1) lookup
     lesson_history: list[dict[str, Any]] = field(default_factory=list)
@@ -96,10 +99,37 @@ class SystemState:
         self.awaiting_user_answer = False
 
     def add_learned_item(self, item: str) -> None:
-        """Add a vocabulary word or grammar concept to learned items (O(1) deduplication)."""
+        """Add a learned item, keeping both the list and set in sync.
+
+        This should be the only way new items are added from outside this class.
+        Uses O(1) deduplication via the internal set.
+        """
+        if item in self._learned_items_set:
+            return
+        self.learned_items.append(item)
+        self._learned_items_set.add(item)
+
+    def remove_learned_item(self, item: str) -> None:
+        """Remove a learned item, keeping both the list and set in sync.
+
+        Safe to call even if the item is not present.
+        """
         if item not in self._learned_items_set:
-            self.learned_items.append(item)
-            self._learned_items_set.add(item)
+            return
+
+        self._learned_items_set.remove(item)
+        try:
+            self.learned_items.remove(item)
+        except ValueError:
+            # Fallback: if the list somehow got out of sync, resync from the set.
+            self.learned_items = [i for i in self.learned_items if i != item]
+            # Ensure set stays correct if there were duplicates.
+            self._learned_items_set = set(self.learned_items)
+
+    def clear_learned_items(self) -> None:
+        """Clear all learned items from both the list and set."""
+        self.learned_items.clear()
+        self._learned_items_set.clear()
 
     def record_exercise_result(self, correct: bool) -> None:
         """Record the result of an exercise."""

@@ -239,3 +239,62 @@ class TestStateSerializationWithCache:
         assert "gender" in state.cached_grammar_content
         assert "gender" in state.preloaded_grammar_rules
         assert state.lesson_initialized is True
+
+    def test_learned_items_set_rebuilt_after_deserialization(self):
+        """Test that _learned_items_set is correctly rebuilt from learned_items after from_dict."""
+        # Create state with learned items (including duplicates to test deduplication)
+        data = {
+            "user_id": "test",
+            "session_id": "test",
+            "learned_items": ["كِتَاب", "مَدْرَسَة", "قَلَم", "كِتَاب"],  # duplicate
+        }
+
+        # Deserialize
+        state = SystemState.from_dict(data)
+
+        # Set should be rebuilt (duplicates removed in set)
+        assert len(state._learned_items_set) == 3
+        assert "كِتَاب" in state._learned_items_set
+        assert "مَدْرَسَة" in state._learned_items_set
+        assert "قَلَم" in state._learned_items_set
+
+        # Add existing item - should not duplicate
+        initial_length = len(state.learned_items)
+        state.add_learned_item("كِتَاب")
+        assert len(state.learned_items) == initial_length  # No new item added
+
+        # Add new item - should be added
+        state.add_learned_item("بَيْت")
+        assert len(state.learned_items) == initial_length + 1
+        assert "بَيْت" in state.learned_items
+        assert "بَيْت" in state._learned_items_set
+
+    def test_learned_items_helpers_keep_set_in_sync(self):
+        """Test that add_learned_item, remove_learned_item, clear_learned_items keep set in sync."""
+        state = SystemState(user_id="test", session_id="test")
+
+        # Add items
+        state.add_learned_item("word1")
+        state.add_learned_item("word2")
+        state.add_learned_item("word1")  # duplicate
+
+        assert len(state.learned_items) == 2
+        assert len(state._learned_items_set) == 2
+        assert "word1" in state.learned_items
+        assert "word2" in state.learned_items
+
+        # Remove item
+        state.remove_learned_item("word1")
+        assert len(state.learned_items) == 1
+        assert len(state._learned_items_set) == 1
+        assert "word1" not in state.learned_items
+        assert "word1" not in state._learned_items_set
+
+        # Remove non-existent item (should be safe)
+        state.remove_learned_item("nonexistent")
+        assert len(state.learned_items) == 1
+
+        # Clear all
+        state.clear_learned_items()
+        assert len(state.learned_items) == 0
+        assert len(state._learned_items_set) == 0
