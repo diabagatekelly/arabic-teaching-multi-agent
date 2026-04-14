@@ -530,14 +530,14 @@ class GradingAgent:
             grading_context: Context about what needs grading (question type, correct answer, etc.)
 
         Returns:
-            Grading result as JSON string
-
-        Raises:
-            NotImplementedError: This method is not yet implemented in Pattern A
+            JSON string with status "not_implemented" and explanatory message.
+            This is a sentinel response indicating the method is a placeholder.
 
         Note:
             Current architecture (Pattern A): Use grade_vocab(), grade_grammar_quiz(),
             or grade_grammar_test() directly instead of this method.
+
+            Returns JSON: {"status": "not_implemented", "message": "..."}
         """
         # Placeholder for future orchestration logic
         return json.dumps(

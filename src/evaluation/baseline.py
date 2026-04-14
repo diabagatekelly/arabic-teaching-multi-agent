@@ -19,7 +19,7 @@ TEACHING_AGENT_TEST_CASES_PATH = (
     PROJECT_ROOT / "data" / "evaluation" / "teaching_agent" / "teaching_agent_test_cases.json"
 )
 GRADING_AGENT_TEST_CASES_PATH = (
-    PROJECT_ROOT / "data" / "evaluation" / "grading_agent_test_cases.json"
+    PROJECT_ROOT / "data" / "evaluation" / "grading_agent" / "grading_agent_test_cases.json"
 )
 DEFAULT_BASELINE_REPORT_PATH = PROJECT_ROOT / "data" / "evaluation" / "baseline_report.md"
 DEFAULT_MAX_TOKENS = 256
