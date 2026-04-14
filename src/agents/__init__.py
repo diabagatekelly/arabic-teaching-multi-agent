@@ -1,5 +1,5 @@
-"""Multi-agent system for Arabic teaching."""
+"""Multi-agent system for Arabic language teaching."""
 
-from src.agents.content_agent import ContentAgent
+from .teaching_agent import TeachingAgent
 
-__all__ = ["ContentAgent"]
+__all__ = ["TeachingAgent"]

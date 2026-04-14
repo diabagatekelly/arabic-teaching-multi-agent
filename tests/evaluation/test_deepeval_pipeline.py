@@ -35,7 +35,7 @@ def mock_test_cases_file(tmp_path):
                         "grammar_summary": {"topics": ["Topic 1"], "topics_count": 1},
                     },
                     "expected_output": "positive",
-                    "metrics": ["sentiment"],
+                    "metrics": ["sentiment_teaching"],
                 }
             ],
         },
@@ -54,7 +54,7 @@ def mock_test_cases_file(tmp_path):
                         ],
                     },
                     "expected_output": "positive",
-                    "metrics": ["sentiment"],
+                    "metrics": ["sentiment_teaching"],
                 }
             ],
             "list_view": [],
@@ -75,7 +75,7 @@ def mock_test_cases_file(tmp_path):
                         "learned_items": [],
                     },
                     "expected_output": "positive",
-                    "metrics": ["sentiment"],
+                    "metrics": ["sentiment_teaching"],
                 }
             ],
             "quiz_question": [],
@@ -92,7 +92,7 @@ def mock_test_cases_file(tmp_path):
                         "is_correct": True,
                     },
                     "expected_output": "positive",
-                    "metrics": ["sentiment"],
+                    "metrics": ["sentiment_feedback"],
                 }
             ],
             "incorrect_feedback": [],
@@ -228,7 +228,7 @@ class TestEvaluationPipeline:
         mock_metric_instance.measure.return_value = 0.95
         mock_metric_instance.is_successful.return_value = True
         mock_metric_instance.reason = "Sentiment score: 0.950 (✓ threshold: 0.9)"
-        mock_metric_instance.__name__ = "Sentiment"  # Converts to "sentiment"
+        mock_metric_instance.__name__ = "Sentiment (teaching)"  # Converts to "sentiment_teaching"
         mock_sentiment_metric.return_value = mock_metric_instance
 
         pipeline = EvaluationPipeline(mock_test_cases_file)
@@ -240,9 +240,9 @@ class TestEvaluationPipeline:
         assert results["total"] == 1
         assert results["passed"] == 1
         assert results["failed"] == 0
-        assert len(results["metrics"]["sentiment"]) == 1
-        assert results["metrics"]["sentiment"][0]["score"] == 0.95
-        assert results["metrics"]["sentiment"][0]["passed"] is True
+        assert len(results["metrics"]["sentiment_teaching"]) == 1
+        assert results["metrics"]["sentiment_teaching"][0]["score"] == 0.95
+        assert results["metrics"]["sentiment_teaching"][0]["passed"] is True
         # Verify mock was actually called
         mock_metric_instance.measure.assert_called_once()
 

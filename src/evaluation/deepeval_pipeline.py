@@ -11,9 +11,12 @@ from deepeval.test_case import LLMTestCase
 from src.evaluation.metrics import (
     AccuracyMetric,
     AlignmentMetric,
+    FeedbackAppropriatenessMetric,
+    HasNavigationMetric,
     JSONValidityMetric,
     SentimentMetric,
     StructureMetric,
+    StructureValidMetric,
 )
 
 __all__ = ["EvaluationPipeline"]
@@ -55,8 +58,9 @@ class EvaluationPipeline:
             with open(self.test_cases_path) as f:
                 test_cases = json.load(f)
 
-            # Validate structure - check for all 8 mode keys
-            required_keys = [
+            # Validate structure - check for at least one mode key
+            # (Allow partial test case files for specific agents)
+            valid_mode_keys = [
                 "lesson_start",
                 "teaching_vocab",
                 "teaching_grammar",
@@ -66,9 +70,11 @@ class EvaluationPipeline:
                 "grading_grammar",
                 "exercise_generation",
             ]
-            for key in required_keys:
-                if key not in test_cases:
-                    raise ValueError(f"Missing required key in test cases: {key}")
+            found_modes = [key for key in valid_mode_keys if key in test_cases]
+            if not found_modes:
+                raise ValueError(
+                    f"No valid mode keys found in test cases. Expected one of: {valid_mode_keys}"
+                )
 
             return test_cases
 
@@ -236,25 +242,85 @@ class EvaluationPipeline:
             "metrics": {name: [] for name in metric_names},
         }
 
+    def _create_metrics_from_test_case(self, test_case_data: dict) -> list[BaseMetric]:
+        """
+        Create metric instances based on test case's metrics field.
+
+        Args:
+            test_case_data: Test case data with 'metrics' and optional 'validation' fields
+
+        Returns:
+            List of instantiated metric objects
+        """
+        metrics_list = []
+        metrics_requested = test_case_data.get("metrics", ["sentiment_teaching"])
+        validation = test_case_data.get("validation", {})
+        input_data = test_case_data.get("input", {})
+
+        for metric_name in metrics_requested:
+            if metric_name == "sentiment_teaching":
+                metrics_list.append(
+                    SentimentMetric(threshold=TEACHING_MODE_THRESHOLD, mode="teaching")
+                )
+            elif metric_name == "sentiment_feedback":
+                metrics_list.append(
+                    SentimentMetric(threshold=FEEDBACK_MODE_THRESHOLD, mode="feedback")
+                )
+            elif metric_name == "feedback_appropriateness":
+                # Extract parameters from input or validation
+                is_correct = input_data.get("is_correct", True)
+                correct_answer = validation.get("correct_answer")
+                metrics_list.append(
+                    FeedbackAppropriatenessMetric(
+                        is_correct=is_correct, correct_answer=correct_answer
+                    )
+                )
+            elif metric_name == "has_navigation":
+                metrics_list.append(HasNavigationMetric())
+            elif metric_name == "structure_valid":
+                # Extract expected word count from input if available
+                words = input_data.get("words", [])
+                expected_count = len(words) if words else None
+                metrics_list.append(StructureValidMetric(expected_word_count=expected_count))
+            elif metric_name == "json_validity":
+                metrics_list.append(JSONValidityMetric())
+            elif metric_name == "structure":
+                # This would need more configuration - placeholder for now
+                metrics_list.append(
+                    StructureMetric(
+                        expected_type=dict,
+                        required_keys=["correct"],
+                        expected_types={"correct": bool},
+                    )
+                )
+            elif metric_name == "accuracy":
+                metrics_list.append(AccuracyMetric())
+            elif metric_name == "alignment":
+                metrics_list.append(AlignmentMetric())
+            else:
+                logger.warning(f"Unknown metric requested: {metric_name}")
+
+        return metrics_list
+
     def _evaluate_teaching_test_cases(
         self,
         test_cases: list[dict],
         model_responses: dict[str, str],
         results: dict[str, Any],
-        threshold: float,
-        mode: str,
+        threshold: float = None,
+        mode: str = None,
         dynamic_threshold_fn=None,
     ) -> None:
         """
-        Process a list of teaching test cases.
+        Process a list of teaching test cases with dynamic metric creation.
 
         Args:
             test_cases: List of test case data dictionaries
             model_responses: Dict mapping test_id to model output
             results: Results dictionary to update (modified in place)
-            threshold: Default sentiment threshold
-            mode: Sentiment mode ("teaching" or "feedback")
-            dynamic_threshold_fn: Optional function to compute threshold per test case
+            threshold: Optional default sentiment threshold (deprecated - use test case metrics field)
+            mode: Optional sentiment mode (deprecated - use test case metrics field)
+            dynamic_threshold_fn: Optional function to compute threshold per test case (deprecated)
         """
         for test_case_data in test_cases:
             test_id = test_case_data["test_id"]
@@ -263,11 +329,9 @@ class EvaluationPipeline:
 
             test_case = self._create_test_case(test_case_data, model_responses[test_id])
 
-            # Use dynamic threshold if provided, otherwise use default
-            if dynamic_threshold_fn:
-                threshold = dynamic_threshold_fn(test_case_data)
+            # Create metrics dynamically from test case definition
+            metrics = self._create_metrics_from_test_case(test_case_data)
 
-            metrics = [SentimentMetric(threshold=threshold, mode=mode)]
             self._run_metrics(test_case, metrics, test_id, results)
 
     def evaluate_lesson_start(self, model_responses: dict[str, str]) -> dict[str, Any]:
@@ -278,20 +342,25 @@ class EvaluationPipeline:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with sentiment metric
+            Evaluation results with all metrics defined in test cases
         """
-        results = self._init_results(["sentiment"])
         lesson_start_cases = self.test_cases["lesson_start"]["test_cases"]
 
-        self._evaluate_teaching_test_cases(
-            lesson_start_cases,
-            model_responses,
-            results,
-            threshold=TEACHING_MODE_THRESHOLD,
-            mode="teaching",
-        )
+        # Collect all unique metric names from test cases
+        metric_names = set()
+        for tc in lesson_start_cases:
+            for metric in tc.get("metrics", []):
+                metric_names.add(self._normalize_metric_name(metric))
+
+        results = self._init_results(list(metric_names))
+        self._evaluate_teaching_test_cases(lesson_start_cases, model_responses, results)
 
         return results
+
+    @staticmethod
+    def _normalize_metric_name(metric_name: str) -> str:
+        """Convert metric name to snake_case for results keys."""
+        return metric_name.lower().replace(" ", "_").replace("(", "").replace(")", "")
 
     def evaluate_teaching_vocab(self, model_responses: dict[str, str]) -> dict[str, Any]:
         """
@@ -301,12 +370,30 @@ class EvaluationPipeline:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with sentiment metric
+            Evaluation results with all metrics defined in test cases
         """
-        results = self._init_results(["sentiment"])
         vocab_mode = self.test_cases["teaching_vocab"]
 
-        # Iterate through all sub-groups
+        # Collect all test cases from sub-groups
+        all_test_cases = []
+        for sub_group in [
+            "vocab_overview",
+            "batch_introduction",
+            "list_view",
+            "quiz_question",
+            "batch_summary",
+        ]:
+            all_test_cases.extend(vocab_mode.get(sub_group, []))
+
+        # Collect all unique metric names
+        metric_names = set()
+        for tc in all_test_cases:
+            for metric in tc.get("metrics", []):
+                metric_names.add(self._normalize_metric_name(metric))
+
+        results = self._init_results(list(metric_names))
+
+        # Evaluate all test cases
         for sub_group in [
             "vocab_overview",
             "batch_introduction",
@@ -315,11 +402,9 @@ class EvaluationPipeline:
             "batch_summary",
         ]:
             self._evaluate_teaching_test_cases(
-                vocab_mode[sub_group],
+                vocab_mode.get(sub_group, []),
                 model_responses,
                 results,
-                threshold=TEACHING_MODE_THRESHOLD,
-                mode="teaching",
             )
 
         return results
@@ -332,12 +417,29 @@ class EvaluationPipeline:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with sentiment metric
+            Evaluation results with all metrics defined in test cases
         """
-        results = self._init_results(["sentiment"])
         grammar_mode = self.test_cases["teaching_grammar"]
 
-        # Iterate through all sub-groups
+        # Collect all test cases from sub-groups
+        all_test_cases = []
+        for sub_group in [
+            "grammar_overview",
+            "topic_explanation",
+            "quiz_question",
+            "topic_summary",
+        ]:
+            all_test_cases.extend(grammar_mode.get(sub_group, []))
+
+        # Collect all unique metric names
+        metric_names = set()
+        for tc in all_test_cases:
+            for metric in tc.get("metrics", []):
+                metric_names.add(self._normalize_metric_name(metric))
+
+        results = self._init_results(list(metric_names))
+
+        # Evaluate all test cases
         for sub_group in [
             "grammar_overview",
             "topic_explanation",
@@ -345,11 +447,9 @@ class EvaluationPipeline:
             "topic_summary",
         ]:
             self._evaluate_teaching_test_cases(
-                grammar_mode[sub_group],
+                grammar_mode.get(sub_group, []),
                 model_responses,
                 results,
-                threshold=TEACHING_MODE_THRESHOLD,
-                mode="teaching",
             )
 
         return results
@@ -362,19 +462,29 @@ class EvaluationPipeline:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with sentiment metric
+            Evaluation results with all metrics defined in test cases
         """
-        results = self._init_results(["sentiment"])
         feedback_mode = self.test_cases["feedback_vocab"]
 
-        # Iterate through correct and incorrect feedback
+        # Collect all test cases from sub-groups
+        all_test_cases = []
+        for sub_group in ["correct_feedback", "incorrect_feedback"]:
+            all_test_cases.extend(feedback_mode.get(sub_group, []))
+
+        # Collect all unique metric names
+        metric_names = set()
+        for tc in all_test_cases:
+            for metric in tc.get("metrics", []):
+                metric_names.add(self._normalize_metric_name(metric))
+
+        results = self._init_results(list(metric_names))
+
+        # Evaluate all test cases
         for sub_group in ["correct_feedback", "incorrect_feedback"]:
             self._evaluate_teaching_test_cases(
-                feedback_mode[sub_group],
+                feedback_mode.get(sub_group, []),
                 model_responses,
                 results,
-                threshold=FEEDBACK_MODE_THRESHOLD,
-                mode="feedback",
             )
 
         return results
@@ -387,19 +497,29 @@ class EvaluationPipeline:
             model_responses: Dict mapping test_id to model output
 
         Returns:
-            Evaluation results with sentiment metric
+            Evaluation results with all metrics defined in test cases
         """
-        results = self._init_results(["sentiment"])
         feedback_mode = self.test_cases["feedback_grammar"]
 
-        # Iterate through correct and incorrect feedback
+        # Collect all test cases from sub-groups
+        all_test_cases = []
+        for sub_group in ["correct_feedback", "incorrect_feedback"]:
+            all_test_cases.extend(feedback_mode.get(sub_group, []))
+
+        # Collect all unique metric names
+        metric_names = set()
+        for tc in all_test_cases:
+            for metric in tc.get("metrics", []):
+                metric_names.add(self._normalize_metric_name(metric))
+
+        results = self._init_results(list(metric_names))
+
+        # Evaluate all test cases
         for sub_group in ["correct_feedback", "incorrect_feedback"]:
             self._evaluate_teaching_test_cases(
-                feedback_mode[sub_group],
+                feedback_mode.get(sub_group, []),
                 model_responses,
                 results,
-                threshold=FEEDBACK_MODE_THRESHOLD,
-                mode="feedback",
             )
 
         return results
