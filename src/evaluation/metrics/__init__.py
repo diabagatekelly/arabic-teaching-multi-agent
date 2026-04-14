@@ -4,13 +4,9 @@ Metrics are organized by agent:
 - Shared: JSONValidityMetric, StructureMetric, extract_json (used by multiple agents)
 - Agent 1 (Teaching): SentimentMetric, FeedbackAppropriatenessMetric, HasNavigationMetric, StructureValidMetric
 - Agent 2 (Grading): AccuracyMetric
-- Agent 3 (Content): AlignmentMetric
 """
 
 # Shared metrics and utilities
-# Agent 3 (Content Agent) metrics
-from .content_agent_metrics import AlignmentMetric
-
 # Agent 2 (Grading Agent) metrics
 from .grading_agent_metrics import AccuracyMetric
 from .shared_metrics import JSONValidityMetric, StructureMetric, extract_json
@@ -35,6 +31,4 @@ __all__ = [
     "StructureValidMetric",
     # Agent 2
     "AccuracyMetric",
-    # Agent 3
-    "AlignmentMetric",
 ]

@@ -1,7 +1,6 @@
 """Tests for baseline evaluation."""
 
 import json
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -92,19 +91,16 @@ class TestBaselineEvaluator:
     @patch("src.evaluation.baseline.EvaluationPipeline")
     def test_initialization(self, mock_pipeline, mock_tokenizer, mock_model, mock_test_cases_file):
         """Test evaluator initialization with lazy loading."""
-        evaluator = BaselineEvaluator(
-            model_3b_name="test-3b", model_7b_name="test-7b", test_cases_path=mock_test_cases_file
-        )
+        evaluator = BaselineEvaluator(model_3b_name="test-3b", model_7b_name="test-7b")
 
         assert evaluator.model_3b_name == "test-3b"
         assert evaluator.model_7b_name == "test-7b"
-        assert evaluator.test_cases_path == Path(mock_test_cases_file)
         # Models should NOT be loaded yet (lazy loading)
         mock_tokenizer.from_pretrained.assert_not_called()
         mock_model.from_pretrained.assert_not_called()
-        # Baseline evaluator now creates 3 EvaluationPipeline instances:
-        # 1. teaching_agent_test_cases.json, 2. grading_agent_test_cases.json, 3. test_cases.json
-        assert mock_pipeline.call_count == 3
+        # Baseline evaluator now creates 2 EvaluationPipeline instances:
+        # 1. teaching_agent_test_cases.json, 2. grading_agent_test_cases.json
+        assert mock_pipeline.call_count == 2
 
     @patch("src.evaluation.baseline.AutoModelForCausalLM")
     @patch("src.evaluation.baseline.AutoTokenizer")
@@ -126,12 +122,14 @@ class TestBaselineEvaluator:
         self, mock_pipeline, mock_tokenizer, mock_model
     ):
         """Test that initialization succeeds gracefully with missing optional test case files."""
-        # BaselineEvaluator now allows missing optional files (grading_agent, exercise_generation)
+        # BaselineEvaluator now allows missing optional files (teaching_agent, grading_agent)
         # Initialization should succeed even with non-existent paths
-        evaluator = BaselineEvaluator(test_cases_path="/nonexistent/path/test_cases.json")
+        evaluator = BaselineEvaluator(
+            teaching_agent_test_cases_path="/nonexistent/path/teaching.json",
+            grading_agent_test_cases_path="/nonexistent/path/grading.json",
+        )
 
         # Verify initialization succeeds without raising exceptions
-        assert evaluator.test_cases_path == Path("/nonexistent/path/test_cases.json")
         assert evaluator.model_3b_name is not None
         assert evaluator.model_7b_name is not None
 
@@ -155,7 +153,7 @@ class TestBaselineEvaluator:
         mock_tokenizer_instance.decode.return_value = "Test promptGenerated response"
         mock_tokenizer_instance.eos_token_id = 2
 
-        evaluator = BaselineEvaluator(test_cases_path=mock_test_cases_file)
+        evaluator = BaselineEvaluator()
 
         # Bypass lazy loading by setting mocks directly
         evaluator._tokenizer_3b = mock_tokenizer_instance
@@ -188,7 +186,7 @@ class TestBaselineEvaluator:
             "failed": 1,
         }
 
-        evaluator = BaselineEvaluator(test_cases_path=mock_test_cases_file)
+        evaluator = BaselineEvaluator()
 
         # Mock teaching_agent (property) by setting _teaching_agent directly
         mock_teaching_agent = MagicMock()
@@ -222,7 +220,7 @@ class TestBaselineEvaluator:
             "failed": 0,
         }
 
-        evaluator = BaselineEvaluator(test_cases_path=mock_test_cases_file)
+        evaluator = BaselineEvaluator()
         evaluator.generate_response = MagicMock(return_value='{"correct": true}')
 
         responses, results = evaluator.run_grading_vocab_baseline(sample_size=5)
@@ -260,7 +258,7 @@ class TestBaselineEvaluator:
         mock_pipeline_class.return_value = mock_pipeline_instance
         mock_pipeline_instance.generate_report.return_value = "# Mock Report"
 
-        evaluator = BaselineEvaluator(test_cases_path=mock_test_cases_file)
+        evaluator = BaselineEvaluator()
 
         results_by_mode = {
             "teaching_vocab": {"total": 5, "passed": 4, "failed": 1},

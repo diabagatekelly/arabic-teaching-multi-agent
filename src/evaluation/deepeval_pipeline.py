@@ -10,7 +10,6 @@ from deepeval.test_case import LLMTestCase
 
 from src.evaluation.metrics import (
     AccuracyMetric,
-    AlignmentMetric,
     FeedbackAppropriatenessMetric,
     HasNavigationMetric,
     JSONValidityMetric,
@@ -68,7 +67,6 @@ class EvaluationPipeline:
                 "feedback_grammar",
                 "grading_vocab",
                 "grading_grammar",
-                "exercise_generation",
             ]
             found_modes = [key for key in valid_mode_keys if key in test_cases]
             if not found_modes:
@@ -301,7 +299,7 @@ class EvaluationPipeline:
             elif metric_name == "accuracy":
                 metrics_list.append(AccuracyMetric())
             elif metric_name == "alignment":
-                metrics_list.append(AlignmentMetric())
+                metrics_list.append()
             else:
                 logger.warning(f"Unknown metric requested: {metric_name}")
 
@@ -630,50 +628,13 @@ class EvaluationPipeline:
 
         return results
 
-    def evaluate_exercise_generation(self, model_responses: dict[str, str]) -> dict[str, Any]:
-        """
-        Evaluate exercise_generation mode responses (Prompts #19, #20, #21).
-
-        Args:
-            model_responses: Dict mapping test_id to model output
-
-        Returns:
-            Evaluation results with JSON, Structure, and Alignment metrics
-        """
-        results = self._init_results(["json_validity", "structure", "alignment"])
-        exercise_mode = self.test_cases["exercise_generation"]
-
-        # Iterate through all sub-groups
-        for sub_group in ["exercise_gen", "quiz_question_gen", "test_composition"]:
-            for test_case_data in exercise_mode[sub_group]:
-                test_id = test_case_data["test_id"]
-                if test_id not in model_responses:
-                    continue
-
-                test_case = self._create_test_case(test_case_data, model_responses[test_id])
-
-                # Run JSON + Structure + Alignment metrics
-                # Structure varies by sub-group, but all should be valid JSON with specific keys
-                metrics = [
-                    JSONValidityMetric(),
-                    StructureMetric(
-                        expected_type=dict,
-                        required_keys=["question", "answer"],
-                        expected_types={"question": str, "answer": str},
-                    ),
-                    AlignmentMetric(threshold=0.8),
-                ]
-                self._run_metrics(test_case, metrics, test_id, results)
-
-        return results
-
     def generate_report(self, results: dict[str, Any], mode: str) -> str:
         """
         Generate markdown report from evaluation results.
 
         Args:
             results: Evaluation results
-            mode: Agent mode ("teaching", "grading", "exercise_generation")
+            mode: Agent mode ("teaching", "grading")
 
         Returns:
             Markdown formatted report

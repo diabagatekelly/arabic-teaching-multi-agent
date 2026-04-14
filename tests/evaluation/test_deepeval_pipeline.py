@@ -289,50 +289,6 @@ class TestEvaluationPipeline:
         mock_structure_instance.measure.assert_called_once()
         mock_accuracy_instance.measure.assert_called_once()
 
-    @patch("src.evaluation.deepeval_pipeline.JSONValidityMetric")
-    @patch("src.evaluation.deepeval_pipeline.StructureMetric")
-    @patch("src.evaluation.deepeval_pipeline.AlignmentMetric")
-    def test_evaluate_exercise_generation(
-        self, mock_alignment_metric, mock_structure_metric, mock_json_metric, mock_test_cases_file
-    ):
-        """Test exercise generation evaluation with alignment metric."""
-        # Mock JSON validity metric
-        mock_json_instance = MagicMock()
-        mock_json_instance.measure.return_value = 1.0
-        mock_json_instance.is_successful.return_value = True
-        mock_json_instance.reason = "✓ Valid JSON output"
-        mock_json_instance.__name__ = "JSON Validity"
-        mock_json_metric.return_value = mock_json_instance
-
-        # Mock structure metric
-        mock_structure_instance = MagicMock()
-        mock_structure_instance.measure.return_value = 1.0
-        mock_structure_instance.is_successful.return_value = True
-        mock_structure_instance.reason = "✓ Valid structure with required keys and types"
-        mock_structure_instance.__name__ = "Structure"
-        mock_structure_metric.return_value = mock_structure_instance
-
-        # Mock alignment metric
-        mock_alignment_instance = MagicMock()
-        mock_alignment_instance.measure.return_value = 0.85
-        mock_alignment_instance.is_successful.return_value = True
-        mock_alignment_instance.reason = "✓ Alignment score: 0.85 (threshold: 0.8)"
-        mock_alignment_instance.__name__ = "Alignment"
-        mock_alignment_metric.return_value = mock_alignment_instance
-
-        pipeline = EvaluationPipeline(mock_test_cases_file)
-
-        model_responses = {"exercise_01": '{"question": "Q1", "answer": "A1"}'}
-
-        results = pipeline.evaluate_exercise_generation(model_responses)
-
-        assert results["total"] == 1
-        assert results["passed"] == 1
-        assert results["failed"] == 0
-        assert len(results["metrics"]["json_validity"]) == 1
-        assert len(results["metrics"]["structure"]) == 1
-        assert len(results["metrics"]["alignment"]) == 1
-
     def test_generate_report(self, mock_test_cases_file):
         """Test report generation."""
         pipeline = EvaluationPipeline(mock_test_cases_file)
