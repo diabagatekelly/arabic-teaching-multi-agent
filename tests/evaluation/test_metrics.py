@@ -44,7 +44,7 @@ class TestSentimentMetric:
             expected_output="positive",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.95  # Exact assertion to catch regressions
         assert metric.is_successful()
@@ -65,7 +65,7 @@ class TestSentimentMetric:
             expected_output="negative",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         # NEGATIVE label: score = 1.0 - 0.85 = 0.15
         assert score == pytest.approx(0.15)
@@ -118,7 +118,7 @@ class TestJSONValidityMetric:
             expected_output="{}",  # DeepEval expects string
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -132,7 +132,7 @@ class TestJSONValidityMetric:
             expected_output="{}",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -147,7 +147,7 @@ class TestJSONValidityMetric:
             expected_output="{}",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -165,7 +165,7 @@ class TestStructureMetric:
             input="test_input", actual_output='{"correct": true}', expected_output="{}"
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -178,7 +178,7 @@ class TestStructureMetric:
             input="test_input", actual_output='{"status": "done"}', expected_output="{}"
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -191,7 +191,7 @@ class TestStructureMetric:
             input="test_input", actual_output='["correct"]', expected_output="{}"
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -206,7 +206,7 @@ class TestStructureMetric:
             input="test_input", actual_output='{"correct": "true"}', expected_output="{}"
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -225,7 +225,7 @@ class TestStructureMetric:
             expected_output="[]",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -236,7 +236,7 @@ class TestStructureMetric:
         metric = StructureMetric(expected_type=list, required_keys=["question", "answer"])
         test_case = LLMTestCase(input="test_input", actual_output="[]", expected_output="[]")
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -265,7 +265,7 @@ class TestAccuracyMetric:
         )
         test_case.expected_output = expected
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert (score == 1.0) == should_pass
         assert metric.is_successful() == should_pass
@@ -281,7 +281,7 @@ class TestAccuracyMetric:
         )
         test_case.expected_output = True
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -300,7 +300,7 @@ class TestFeedbackAppropriatenessMetric:
             expected_output="positive_with_praise",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -315,7 +315,7 @@ class TestFeedbackAppropriatenessMetric:
             expected_output="positive_with_praise",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -330,7 +330,7 @@ class TestFeedbackAppropriatenessMetric:
             expected_output="supportive_with_correction",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -345,7 +345,7 @@ class TestFeedbackAppropriatenessMetric:
             expected_output="supportive_with_correction",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -360,7 +360,7 @@ class TestFeedbackAppropriatenessMetric:
             expected_output="supportive_with_correction",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -379,7 +379,7 @@ class TestHasNavigationMetric:
             expected_output="positive",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -394,7 +394,7 @@ class TestHasNavigationMetric:
             expected_output="positive",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -408,7 +408,7 @@ class TestHasNavigationMetric:
             expected_output="positive",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -427,7 +427,7 @@ class TestStructureValidMetric:
             expected_output="positive",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -442,7 +442,7 @@ class TestStructureValidMetric:
             expected_output="positive",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
@@ -457,7 +457,7 @@ class TestStructureValidMetric:
             expected_output="positive",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         # 4 words when expecting 3 is still within acceptable range (2-5)
         assert score == 0.8  # Exact expectation for edge case
@@ -472,7 +472,7 @@ class TestStructureValidMetric:
             expected_output="positive",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 1.0
         assert metric.is_successful()
@@ -494,7 +494,7 @@ class TestExerciseQualityMetric:
             expected_output="valid",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score >= 0.7  # Adjusted to match actual scoring (0.75)
         assert "✓" in metric.reason
@@ -511,7 +511,7 @@ class TestExerciseQualityMetric:
             expected_output="valid",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score < 0.7  # Adjusted - other checks still pass (0.625)
         assert not metric.is_successful()
@@ -562,7 +562,7 @@ class TestExerciseQualityMetric:
             expected_output="valid",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score < 0.7  # Adjusted - other checks still pass (0.625)
         assert not metric.is_successful()
@@ -786,7 +786,7 @@ class TestExerciseQualityMetric:
             expected_output="valid",
         )
 
-        _ = metric.measure(test_case)
+        score = metric.measure(test_case)
 
         assert score == 0.0
         assert not metric.is_successful()
