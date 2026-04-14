@@ -1,24 +1,25 @@
-"""Baseline evaluation using base Qwen2.5-3B (no fine-tuning)."""
+"""Baseline evaluation using base Qwen2.5-3B and 7B models (no fine-tuning)."""
 
 import logging
 from pathlib import Path
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from src.agents import TeachingAgent
+from src.agents import GradingAgent, TeachingAgent
 from src.evaluation.deepeval_pipeline import EvaluationPipeline
 from src.prompts.formatters import flatten_nested_input
 from src.prompts.templates import (
     EXERCISE_GENERATION,
-    GRADING_GRAMMAR_QUIZ,
-    GRADING_VOCAB,
 )
 
 # Constants
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DEFAULT_TEST_CASES_PATH = PROJECT_ROOT / "data" / "evaluation" / "test_cases.json"
 TEACHING_AGENT_TEST_CASES_PATH = (
-    PROJECT_ROOT / "data" / "evaluation" / "teaching_agent_test_cases.json"
+    PROJECT_ROOT / "data" / "evaluation" / "teaching_agent" / "teaching_agent_test_cases.json"
+)
+GRADING_AGENT_TEST_CASES_PATH = (
+    PROJECT_ROOT / "data" / "evaluation" / "grading_agent" / "grading_agent_test_cases.json"
 )
 DEFAULT_BASELINE_REPORT_PATH = PROJECT_ROOT / "data" / "evaluation" / "baseline_report.md"
 DEFAULT_MAX_TOKENS = 256
@@ -34,8 +35,9 @@ class BaselineEvaluator:
 
     Model Strategy (matches production architecture):
     - Agent 1 (Teaching/Feedback): Base Qwen2.5-3B → Fine-tuned 3B
-    - Agent 2 (Grading): Base Qwen2.5-7B (not fine-tuned initially)
-    - Agent 3 (Generation): Base Qwen2.5-3B (not fine-tuned initially)
+    - Agent 2 (Grading): Base Qwen2.5-7B → Fine-tuned 7B
+      (Baseline evaluated 2026-04-13: 83% reasoning, 0-6% JSON compliance)
+    - Agent 3 (Generation): Base Qwen2.5-3B (may not need fine-tuning)
 
     Available baseline methods (8/8 modes - COMPLETE COVERAGE):
     1. run_lesson_start_baseline() - Agent 1 (3B)
@@ -70,6 +72,7 @@ class BaselineEvaluator:
         model_7b_name: str = "Qwen/Qwen2.5-7B-Instruct",
         test_cases_path: str | Path | None = None,
         teaching_agent_test_cases_path: str | Path | None = None,
+        grading_agent_test_cases_path: str | Path | None = None,
     ) -> None:
         """
         Initialize baseline evaluator with both 3B and 7B models.
@@ -77,8 +80,9 @@ class BaselineEvaluator:
         Args:
             model_3b_name: HuggingFace model ID for 3B model (teaching, feedback, generation)
             model_7b_name: HuggingFace model ID for 7B model (grading)
-            test_cases_path: Path to test cases JSON for Agent 2/3 (defaults to test_cases.json)
+            test_cases_path: Path to test cases JSON for Agent 3 (defaults to test_cases.json)
             teaching_agent_test_cases_path: Path to Agent 1 test cases (defaults to teaching_agent_test_cases.json)
+            grading_agent_test_cases_path: Path to Agent 2 test cases (defaults to grading_agent_test_cases.json)
 
         Raises:
             RuntimeError: If model loading fails
@@ -92,15 +96,22 @@ class BaselineEvaluator:
             if teaching_agent_test_cases_path
             else TEACHING_AGENT_TEST_CASES_PATH
         )
+        self.grading_agent_test_cases_path = (
+            Path(grading_agent_test_cases_path)
+            if grading_agent_test_cases_path
+            else GRADING_AGENT_TEST_CASES_PATH
+        )
 
-        # Lazy loading - models loaded on first access
+        # Lazy loading - models and agents loaded on first access
         self._model_3b = None
         self._tokenizer_3b = None
         self._model_7b = None
         self._tokenizer_7b = None
         self._teaching_agent = None
+        self._grading_agent_3b = None
+        self._grading_agent_7b = None
 
-        # Load both pipelines: one for Agent 1, one for Agent 2/3
+        # Load pipelines for each agent
         try:
             self.teaching_pipeline = EvaluationPipeline(self.teaching_agent_test_cases_path)
             logger.info(f"Loaded Agent 1 test cases from {self.teaching_agent_test_cases_path}")
@@ -111,10 +122,19 @@ class BaselineEvaluator:
             raise
 
         try:
-            self.pipeline = EvaluationPipeline(self.test_cases_path)
-            logger.info(f"Loaded Agent 2/3 test cases from {self.test_cases_path}")
+            self.grading_pipeline = EvaluationPipeline(self.grading_agent_test_cases_path)
+            logger.info(f"Loaded Agent 2 test cases from {self.grading_agent_test_cases_path}")
         except FileNotFoundError:
-            logger.warning(f"Agent 2/3 test cases file not found: {self.test_cases_path}")
+            logger.warning(
+                f"Agent 2 test cases file not found: {self.grading_agent_test_cases_path}"
+            )
+            self.grading_pipeline = None  # Optional for now
+
+        try:
+            self.pipeline = EvaluationPipeline(self.test_cases_path)
+            logger.info(f"Loaded Agent 3 test cases from {self.test_cases_path}")
+        except FileNotFoundError:
+            logger.warning(f"Agent 3 test cases file not found: {self.test_cases_path}")
             self.pipeline = None  # Optional for now
 
     @property
@@ -179,6 +199,32 @@ class BaselineEvaluator:
             )
             logger.info("✓ TeachingAgent initialized")
         return self._teaching_agent
+
+    @property
+    def grading_agent_3b(self):
+        """Lazy load GradingAgent with 3B model on first access."""
+        if self._grading_agent_3b is None:
+            logger.info("Initializing GradingAgent with 3B model...")
+            self._grading_agent_3b = GradingAgent(
+                model=self.model_3b,
+                tokenizer=self.tokenizer_3b,
+                max_new_tokens=GRADING_MAX_TOKENS,
+            )
+            logger.info("✓ GradingAgent (3B) initialized")
+        return self._grading_agent_3b
+
+    @property
+    def grading_agent_7b(self):
+        """Lazy load GradingAgent with 7B model on first access."""
+        if self._grading_agent_7b is None:
+            logger.info("Initializing GradingAgent with 7B model...")
+            self._grading_agent_7b = GradingAgent(
+                model=self.model_7b,
+                tokenizer=self.tokenizer_7b,
+                max_new_tokens=GRADING_MAX_TOKENS,
+            )
+            logger.info("✓ GradingAgent (7B) initialized")
+        return self._grading_agent_7b
 
     def generate_response(
         self, prompt: str, max_new_tokens: int = DEFAULT_MAX_TOKENS, use_7b: bool = False
@@ -286,55 +332,54 @@ class BaselineEvaluator:
         return model_responses, results
 
     def run_grading_vocab_baseline(
-        self, sample_size: int = DEFAULT_SAMPLE_SIZE
+        self, sample_size: int = DEFAULT_SAMPLE_SIZE, use_7b: bool = True
     ) -> tuple[dict[str, str], dict]:
         """
-        Run baseline evaluation on grading_vocab mode (Prompt #15).
+        Run baseline evaluation on grading_vocab mode.
 
-        Uses 7B model (Agent 2 - Grading).
+        Uses GradingAgent with either 7B model (default, recommended) or 3B model.
 
         Args:
             sample_size: Number of test cases to evaluate per sub-group
+            use_7b: If True, use 7B model; if False, use 3B model (default: True)
 
         Returns:
             Tuple of (model_responses, evaluation_results)
 
         Raises:
-            RuntimeError: If Agent 2/3 test cases not loaded
+            RuntimeError: If Agent 2 test cases not loaded
         """
-        if self.pipeline is None:
+        if self.grading_pipeline is None:
             raise RuntimeError(
-                "Agent 2/3 test cases not loaded. Cannot run grading_vocab baseline. "
-                f"Ensure {self.test_cases_path} exists."
+                "Agent 2 test cases not loaded. Cannot run grading_vocab baseline. "
+                f"Ensure {self.grading_agent_test_cases_path} exists."
             )
 
-        logger.info("\n=== Running Grading Vocab Baseline ===\n")
+        model_size = "7B" if use_7b else "3B"
+        logger.info(f"\n=== Running Grading Vocab Baseline ({model_size}) ===\n")
+
+        # Select appropriate grading agent
+        grading_agent = self.grading_agent_7b if use_7b else self.grading_agent_3b
 
         model_responses = {}
-        grading_mode = self.pipeline.test_cases["grading_vocab"]
+        grading_mode = self.grading_pipeline.test_cases["grading_vocab"]
 
-        # Sample from both correct and incorrect translations
-        vocab_cases = (
-            grading_mode["correct_translations"][:sample_size]
-            + grading_mode["incorrect_translations"][:sample_size]
-        )
+        # Sample from all subgroups
+        vocab_cases = []
+        for _subgroup_name, subgroup_cases in grading_mode.items():
+            if isinstance(subgroup_cases, list):
+                vocab_cases.extend(subgroup_cases[:sample_size])
 
         for test_case in vocab_cases:
             test_id = test_case["test_id"]
             input_data = test_case["input"]
 
-            # Use template to generate prompt
-            prompt = GRADING_VOCAB.format(**input_data)
-
             logger.info(f"Evaluating {test_id}...")
-            # Use 7B model for grading (Agent 2)
-            response = self.generate_response(
-                prompt, max_new_tokens=GRADING_MAX_TOKENS, use_7b=True
-            )
+            response = grading_agent.grade_vocab(input_data)
             model_responses[test_id] = response
 
         # Run evaluation
-        results = self.pipeline.evaluate_grading_vocab(model_responses)
+        results = self.grading_pipeline.evaluate_grading_vocab(model_responses)
         return model_responses, results
 
     def run_teaching_grammar_baseline(
@@ -435,55 +480,54 @@ class BaselineEvaluator:
         return model_responses, results
 
     def run_grading_grammar_baseline(
-        self, sample_size: int = DEFAULT_SAMPLE_SIZE
+        self, sample_size: int = DEFAULT_SAMPLE_SIZE, use_7b: bool = True
     ) -> tuple[dict[str, str], dict]:
         """
-        Run baseline evaluation on grading_grammar mode (quiz_grading only).
+        Run baseline evaluation on grading_grammar mode.
 
-        Uses 7B model (Agent 2 - Grading).
-
-        Note: Only evaluates quiz_grading for speed.
-        Extend to test_grading if needed (which uses different template).
+        Uses GradingAgent with either 7B model (default, recommended) or 3B model.
 
         Args:
-            sample_size: Number of test cases to evaluate
+            sample_size: Number of test cases to evaluate per sub-group
+            use_7b: If True, use 7B model; if False, use 3B model (default: True)
 
         Returns:
             Tuple of (model_responses, evaluation_results)
 
         Raises:
-            RuntimeError: If Agent 2/3 test cases not loaded
+            RuntimeError: If Agent 2 test cases not loaded
         """
-        if self.pipeline is None:
+        if self.grading_pipeline is None:
             raise RuntimeError(
-                "Agent 2/3 test cases not loaded. Cannot run grading_grammar baseline. "
-                f"Ensure {self.test_cases_path} exists."
+                "Agent 2 test cases not loaded. Cannot run grading_grammar baseline. "
+                f"Ensure {self.grading_agent_test_cases_path} exists."
             )
 
-        logger.info("\n=== Running Grading Grammar Baseline ===\n")
+        model_size = "7B" if use_7b else "3B"
+        logger.info(f"\n=== Running Grading Grammar Baseline ({model_size}) ===\n")
+
+        # Select appropriate grading agent
+        grading_agent = self.grading_agent_7b if use_7b else self.grading_agent_3b
 
         model_responses = {}
-        grading_mode = self.pipeline.test_cases["grading_grammar"]
+        grading_mode = self.grading_pipeline.test_cases["grading_grammar"]
 
-        # Sample quiz_grading cases
-        grammar_cases = grading_mode["quiz_grading"][:sample_size]
+        # Sample from all subgroups
+        grammar_cases = []
+        for _subgroup_name, subgroup_cases in grading_mode.items():
+            if isinstance(subgroup_cases, list):
+                grammar_cases.extend(subgroup_cases[:sample_size])
 
         for test_case in grammar_cases:
             test_id = test_case["test_id"]
             input_data = test_case["input"]
 
-            # Use template to generate prompt
-            prompt = GRADING_GRAMMAR_QUIZ.format(**input_data)
-
             logger.info(f"Evaluating {test_id}...")
-            # Use 7B model for grading (Agent 2)
-            response = self.generate_response(
-                prompt, max_new_tokens=GRADING_MAX_TOKENS, use_7b=True
-            )
+            response = grading_agent.grade_grammar_quiz(input_data)
             model_responses[test_id] = response
 
         # Run evaluation
-        results = self.pipeline.evaluate_grading_grammar(model_responses)
+        results = self.grading_pipeline.evaluate_grading_grammar(model_responses)
         return model_responses, results
 
     def run_exercise_generation_baseline(

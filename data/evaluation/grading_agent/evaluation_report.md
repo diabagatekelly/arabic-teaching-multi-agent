@@ -1,0 +1,336 @@
+# Agent 2 (Grading) - 7B Baseline Evaluation
+
+**Model:** Qwen/Qwen2.5-7B-Instruct
+**Evaluation Date:** 2026-04-13
+
+## Summary
+
+### Grading Vocabulary
+- **Total Test Cases:** 25
+- **Passed:** 0
+- **Failed:** 25
+- **Pass Rate:** 0.0%
+
+### Grading Grammar
+- **Total Test Cases:** 18
+- **Passed:** 1
+- **Failed:** 17
+- **Pass Rate:** 5.6%
+
+## Detailed Results
+
+### Grading Vocabulary
+
+#### Test Summary
+- ✗ `grade_vocab_article_01`
+- ✗ `grade_vocab_article_02`
+- ✗ `grade_vocab_caps_01`
+- ✗ `grade_vocab_caps_02`
+- ✗ `grade_vocab_exact_01`
+- ✗ `grade_vocab_exact_02`
+- ✗ `grade_vocab_exact_03`
+- ✗ `grade_vocab_exact_04`
+- ✗ `grade_vocab_exact_05`
+- ✗ `grade_vocab_partial_01`
+- ✗ `grade_vocab_partial_02`
+- ✗ `grade_vocab_synonym_01`
+- ✗ `grade_vocab_synonym_02`
+- ✗ `grade_vocab_synonym_03`
+- ✗ `grade_vocab_typo_01`
+- ✗ `grade_vocab_typo_02`
+- ✗ `grade_vocab_typo_03`
+- ✗ `grade_vocab_wrong_01`
+- ✗ `grade_vocab_wrong_02`
+- ✗ `grade_vocab_wrong_03`
+- ✗ `grade_vocab_wrong_04`
+- ✗ `grade_vocab_wrong_05`
+- ✗ `grade_vocab_wrong_06`
+- ✗ `grade_vocab_wrong_07`
+- ✗ `grade_vocab_wrong_08`
+
+#### Json Validity
+- ✗ `grade_vocab_exact_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_03` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_04` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_05` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_wrong_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_03` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_04` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_05` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_06` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_07` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_08` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_synonym_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_synonym_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_synonym_03` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_typo_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_typo_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_typo_03` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_caps_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_caps_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_article_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_article_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_partial_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_partial_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+
+#### Structure
+- ✗ `grade_vocab_exact_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_03` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_04` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_05` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_wrong_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_03` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_04` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_05` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_06` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_07` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_08` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_synonym_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_synonym_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_synonym_03` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_typo_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_typo_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_typo_03` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_caps_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_caps_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_article_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_article_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_partial_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_partial_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+
+#### Accuracy
+- ✗ `grade_vocab_exact_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_03` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_04` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_exact_05` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_wrong_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_03` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_04` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_05` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_06` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_07` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_wrong_08` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_synonym_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_synonym_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_synonym_03` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_typo_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_typo_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_typo_03` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_caps_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_caps_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_article_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_article_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_vocab_partial_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_vocab_partial_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+
+### Grading Grammar
+
+#### Test Summary
+- ✗ `grade_grammar_abbrev_01`
+- ✗ `grade_grammar_abbrev_02`
+- ✗ `grade_grammar_case_required_01`
+- ✗ `grade_grammar_case_required_02`
+- ✗ `grade_grammar_case_required_03`
+- ✗ `grade_grammar_exact_01`
+- ✗ `grade_grammar_exact_02`
+- ✗ `grade_grammar_exact_03`
+- ✗ `grade_grammar_exact_04`
+- ✗ `grade_grammar_exact_05`
+- ✗ `grade_grammar_harakaat_internal_01`
+- ✗ `grade_grammar_harakaat_internal_02`
+- ✗ `grade_grammar_harakaat_internal_03`
+- ✓ `grade_grammar_wrong_01`
+- ✗ `grade_grammar_wrong_02`
+- ✗ `grade_grammar_wrong_03`
+- ✗ `grade_grammar_wrong_04`
+- ✗ `grade_grammar_wrong_05`
+
+#### Json Validity
+- ✗ `grade_grammar_exact_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_exact_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_exact_03` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_exact_04` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_exact_05` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_harakaat_internal_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_harakaat_internal_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_harakaat_internal_03` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_case_required_01` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_case_required_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_case_required_03` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✓ `grade_grammar_abbrev_01` (score: 1.00)
+- ✗ `grade_grammar_abbrev_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 19 (char 18)
+- ✓ `grade_grammar_wrong_01` (score: 1.00)
+- ✗ `grade_grammar_wrong_02` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_wrong_03` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_wrong_04` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_wrong_05` (score: 0.00)
+  - ✗ Invalid JSON: Extra data: line 1 column 20 (char 19)
+
+#### Structure
+- ✗ `grade_grammar_exact_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_exact_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_exact_03` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_exact_04` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_exact_05` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_harakaat_internal_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_harakaat_internal_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_harakaat_internal_03` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_case_required_01` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_case_required_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_case_required_03` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✓ `grade_grammar_abbrev_01` (score: 1.00)
+- ✗ `grade_grammar_abbrev_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 19 (char 18)
+- ✓ `grade_grammar_wrong_01` (score: 1.00)
+- ✗ `grade_grammar_wrong_02` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_wrong_03` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_wrong_04` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_wrong_05` (score: 0.00)
+  - ✗ Extra data: line 1 column 20 (char 19)
+
+#### Accuracy
+- ✗ `grade_grammar_exact_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_exact_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_exact_03` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_exact_04` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_exact_05` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✗ `grade_grammar_harakaat_internal_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_harakaat_internal_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_harakaat_internal_03` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_case_required_01` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_case_required_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_case_required_03` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_abbrev_01` (score: 0.00)
+  - ✗ Expected correct, got False
+- ✗ `grade_grammar_abbrev_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 19 (char 18)
+- ✓ `grade_grammar_wrong_01` (score: 1.00)
+- ✗ `grade_grammar_wrong_02` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_wrong_03` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_wrong_04` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)
+- ✗ `grade_grammar_wrong_05` (score: 0.00)
+  - ✗ Parsing error: Extra data: line 1 column 20 (char 19)

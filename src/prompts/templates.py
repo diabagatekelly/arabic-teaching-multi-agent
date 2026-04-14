@@ -173,7 +173,11 @@ Rule: {grammar_rule}
 Examples:
 {examples_formatted}
 
-Explain this grammar topic to the student in an encouraging way. End by mentioning the quiz is next.""",
+Explain this grammar topic to the student in an encouraging way.
+
+IMPORTANT: When presenting Arabic text with examples, include case endings (final harakaat) as they are grammatically significant. When mentioning the quiz, remind students that case endings matter for correctness.
+
+End by mentioning the quiz is next.""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
@@ -184,7 +188,9 @@ GRAMMAR_QUIZ_QUESTION = PromptTemplate(
 
 Question: {question}
 
-Present the question clearly.""",
+Present the question clearly.
+
+IMPORTANT: If the question expects an Arabic answer, make sure to include case endings (final harakaat) in the question text, as these are grammatically significant and students must learn them.""",
     input_variables=["topic_name", "question_number", "total_questions", "question"],
 )
 
@@ -278,7 +284,9 @@ Provide supportive correction. Explain why with reference to grammar rule. Menti
 
 # =============================================================================
 # AGENT 2: GRADING AGENT (4 prompts)
-# Model: Base Qwen2.5-7B (not fine-tuned initially)
+# Model: Fine-tuned Qwen2.5-7B
+# Baseline evaluated: 2026-04-13 (83% reasoning accuracy, 0-6% JSON compliance)
+# Fine-tuning planned: 270+ examples for JSON-only output + harakaat rules
 # =============================================================================
 
 GRADING_VOCAB = PromptTemplate(
@@ -293,8 +301,17 @@ Evaluate if the student's answer is correct. Be flexible:
 - Accept synonyms (e.g., "instructor" for "teacher")
 - Accept alternate phrasings that convey the same meaning
 
-Return JSON:
-{{"correct": true}} or {{"correct": false}}
+IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
+
+Correct output examples:
+{{"correct": true}}
+{{"correct": false}}
+
+Incorrect output examples (DO NOT DO THIS):
+{{"correct": true}} because the answer matches
+The answer is correct: {{"correct": true}}
+
+Your response must be ONLY the JSON object with no additional text.
 
 Response:""",
     input_variables=["word", "student_answer", "correct_answer"],
@@ -311,9 +328,19 @@ Evaluate if the student's answer is correct. Be flexible:
 - Accept minor typos
 - Accept synonyms or alternate phrasings that convey the same meaning
 - For identification questions (masculine/feminine), accept abbreviated forms (m/f, masc/fem)
+- For Arabic text answers: Internal harakaat (vowel marks) are OPTIONAL, but case endings (final harakaat like ُ َ ِ ٌ ً ٍ) are REQUIRED and must match exactly
 
-Return JSON:
-{{"correct": true}} or {{"correct": false}}
+IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
+
+Correct output examples:
+{{"correct": true}}
+{{"correct": false}}
+
+Incorrect output examples (DO NOT DO THIS):
+{{"correct": true}} The student correctly identified the gender
+Explanation: {{"correct": false}}
+
+Your response must be ONLY the JSON object with no additional text.
 
 Response:""",
     input_variables=["question", "student_answer", "correct_answer"],
@@ -328,9 +355,13 @@ Grade the following answers:
 
 {answers_formatted}
 
-For each answer, evaluate correctness with flexibility (accept typos, synonyms, abbreviations).
+For each answer, evaluate correctness with flexibility:
+- Accept minor typos, synonyms, abbreviations
+- For Arabic text answers: Internal harakaat (vowel marks) are OPTIONAL, but case endings (final harakaat like ُ َ ِ ٌ ً ٍ) are REQUIRED and must match exactly
 
-Return JSON with results for each question. The "correct" field should be true or false (boolean values):
+IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
+
+Required JSON format:
 {{
   "total_score": "X/Y",
   "results": [
@@ -339,6 +370,10 @@ Return JSON with results for each question. The "correct" field should be true o
     ...
   ]
 }}
+
+The "correct" field must be a boolean (true or false, not strings).
+
+Your response must be ONLY the JSON object with no additional text.
 
 Response:""",
     input_variables=["lesson_number", "answers_formatted"],
@@ -390,7 +425,11 @@ Grammar Rule: {grammar_rule}
 Examples:
 {examples_formatted}
 
-Generate {count} quiz questions to test understanding of this rule. Return JSON list:
+Generate {count} quiz questions to test understanding of this rule.
+
+IMPORTANT: For questions expecting Arabic answers, always include case endings (final harakaat like ُ َ ِ ٌ ً ٍ) in both the question text and the correct answer. Case endings are grammatically significant and must be tested.
+
+Return JSON list:
 [
   {{
     "question": "question text",
@@ -415,7 +454,11 @@ Grammar topics to cover:
 Question count: {question_count}
 Question types: {question_types}
 
-Generate a mixed test covering all topics. Return JSON:
+Generate a mixed test covering all topics.
+
+IMPORTANT: For questions expecting Arabic answers, always include case endings (final harakaat like ُ َ ِ ٌ ً ٍ) in both the question text and the correct answer. Case endings are grammatically significant and must be tested.
+
+Return JSON:
 {{
   "test_id": "lesson_{lesson_number}_test",
   "total_questions": {question_count},

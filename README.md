@@ -26,22 +26,22 @@ An intelligent Arabic language teaching system built with **multi-agent orchestr
         ▼                 ▼                    ▼
    ┌──────────┐      ┌──────────┐      ┌──────────────┐
    │ AGENT 1  │      │ AGENT 2  │      │   AGENT 3    │
-   │ Teaching │      │  Error   │      │   Content    │
-   │  (Face)  │      │Detection │      │  Retrieval   │
+   │ Teaching │      │ Grading  │      │   Content    │
+   │  (Face)  │      │  Agent   │      │  Retrieval   │
    └──────────┘      └──────────┘      └──────────────┘
         │                 │                    │
    Fine-tuned        Fine-tuned          RAG Pipeline
-   Qwen2.5-3B       Qwen2.5-3B          + Pinecone
-   (Teaching         (Strict JSON        + Embeddings
-    style)            grading)           + LLM for
-                                          generation
+   Qwen2.5-3B       Qwen2.5-7B          + Pinecone
+   (Teaching         (Flexible,          + Embeddings
+    style)            accurate           + LLM for
+                      grading)            generation
 ```
 
 **Design Philosophy:**
-- **Agent 1:** All user-facing text (teaching, feedback)
-- **Agent 2:** Strict grading (JSON in → JSON out)
+- **Agent 1:** All user-facing text (teaching, feedback) - 3B fine-tuned
+- **Agent 2:** Flexible grading with edge case handling (synonyms, typos, harakaat) - 7B fine-tuned
 - **Agent 3:** Content retrieval + holds in memory (no repeated RAG queries)
-- **One Model:** Single Qwen2.5-3B fine-tuned for all three agent modes
+- **Dual-Model Strategy:** 3B for teaching style, 7B for grading reasoning
 
 ---
 
@@ -71,11 +71,15 @@ An intelligent Arabic language teaching system built with **multi-agent orchestr
 - Immediate per-question feedback with encouraging tone
 - Running score tracking
 
-### **Single Fine-Tuned Model**
-- **Qwen2.5-3B-Instruct** fine-tuned once (~110-120 conversations)
-- Three modes controlled by system prompts (Teaching, Grading, Exercise Generation)
-- 4-bit quantization (~2GB memory)
-- LoRA rank=32 for efficient fine-tuning
+### **Dual Fine-Tuned Models**
+- **Agent 1/3: Qwen2.5-3B-Instruct** fine-tuned (~110-120 conversations)
+  - Teaching, feedback, exercise generation modes
+  - 4-bit quantization (~2GB memory)
+  - LoRA rank=32 for efficient fine-tuning
+- **Agent 2: Qwen2.5-7B-Instruct** fine-tuned (~270+ grading examples)
+  - Flexible grading with edge case handling
+  - JSON-only output enforcement
+  - Arabic harakaat rules (internal optional, case endings required)
 
 ---
 
@@ -171,12 +175,14 @@ pytest tests/
 - [x] Evaluation test cases created (75 total)
 
 **Implementation Progress:**
-- [x] Task 1.1: Create evaluation dataset (75 test cases)
+- [x] Task 1.1: Create evaluation dataset (94 test cases total - 44 teaching/feedback, 50 grading)
 - [x] Task 1.2: Set up DeepEval pipeline
-- [x] Task 1.3: Custom metrics (Sentiment, JSON Validity, Accuracy, Faithfulness)
-- [ ] Task 1.4: Run baseline evaluation
+- [x] Task 1.3: Custom metrics (Sentiment, JSON Validity, Accuracy, Structure, Alignment)
+- [x] Task 1.4: Baseline evaluation (Agent 1: 3B, Agent 2: 7B)
+- [x] Agent 2 implementation with comprehensive edge case test suite
 - [ ] Task 1.5: Build RAG database schema
 - [ ] Task 1.6: Set up Pinecone + embeddings
+- [ ] Agent 2 fine-tuning (270+ examples for JSON compliance + harakaat rules)
 
 **Roadmap:**
 - **Phase 1:** Foundation (eval-first, RAG setup) - *In Progress*
@@ -208,10 +214,12 @@ pytest tests/
 - Includes all required elements (Arabic, transliteration, English)
 - Asks comprehension questions
 
-### Agent 2 (Error Detection)
+### Agent 2 (Grading)
 - Accuracy: >90% correct/incorrect classification
-- Error type identification: >80% accuracy
+- Edge case handling: synonyms, typos, capitalization, articles
+- Arabic harakaat: internal marks optional, case endings required
 - Valid JSON output: 100%
+- JSON structure compliance: 100%
 
 ### Agent 3 (Content Retrieval + Generation)
 - Retrieval relevance: >90%
@@ -298,4 +306,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-*Last updated: April 5, 2026*
+*Last updated: April 13, 2026*

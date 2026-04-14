@@ -1,0 +1,548 @@
+"""
+Agent 2: Grading Agent - Evaluates student responses with flexible, accurate grading.
+
+## Overview
+
+The GradingAgent is responsible for evaluating student responses to vocabulary and
+grammar questions. It uses a fine-tuned Qwen2.5-7B model to provide flexible grading
+that accepts edge cases like synonyms, typos, capitalization variations, and handles
+Arabic text with proper harakaat rules.
+
+## Model Strategy
+
+**Base Model:** Qwen2.5-7B-Instruct
+**Fine-tuning Status:** Planned (270+ examples)
+**Baseline Evaluated:** 2026-04-13
+
+### Baseline Results (7B, no fine-tuning)
+
+- **JSON Compliance:** 0-6% (adds explanations after JSON) ❌
+- **Reasoning Accuracy:** 83% (5/6 correct decisions when ignoring format) ✓
+- **Edge Case Performance:**
+  - Synonyms: 100% ✓ (e.g., "instructor" = "teacher")
+  - Minor typos: 100% ✓ (e.g., "scool" = "school")
+  - Capitalization: 100% ✓ (e.g., "Book" = "book")
+  - Wrong answers: 100% ✓ (correctly rejected)
+  - Case endings (Arabic): 100% ✓ (enforced properly)
+  - Internal harakaat (Arabic): 0% ❌ (too strict, didn't follow "optional" rule)
+
+### Fine-Tuning Requirements
+
+**Training Data Needed:** 270+ examples
+
+**Categories:**
+- JSON format compliance: 100+ examples (strict JSON-only output)
+- Harakaat rules: 50+ examples (internal optional, case endings required)
+- Edge cases: 120+ examples (synonyms, typos, capitalization, articles)
+
+**Target Metrics:**
+- JSON validity: >95% (baseline: 0-6%)
+- Grading accuracy: >90% (baseline: 83%)
+- Harakaat handling: >90% (baseline: 50% - too strict)
+
+## Edge Case Handling
+
+### Vocabulary Grading
+- ✓ Accept synonyms: "instructor" → "teacher"
+- ✓ Accept minor typos: "scool" → "school", "bok" → "book"
+- ✓ Accept capitalization variations: "Book" → "book"
+- ✓ Accept articles: "a pen" → "pen", "the book" → "book"
+- ✗ Reject wrong answers: "pen" ≠ "book"
+
+### Grammar Grading
+- ✓ Accept abbreviations: "m" = "masculine", "f" = "feminine"
+- ✓ Accept synonyms and alternate phrasings
+- ✓ Arabic harakaat: Internal marks optional (الكتابُ = الكِتَابُ)
+- ✗ Arabic harakaat: Case endings required (الكتاب ≠ الكِتَابُ)
+
+## Usage
+
+### Basic Usage
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from src.agents import GradingAgent
+
+# Load model and tokenizer
+model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-7B-Instruct")
+tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-7B-Instruct")
+
+# Initialize agent
+grading_agent = GradingAgent(model, tokenizer, max_new_tokens=50)
+
+# Grade vocabulary answer
+vocab_input = {
+    "word": "كِتَاب",
+    "student_answer": "book",
+    "correct_answer": "book"
+}
+result = grading_agent.grade_vocab(vocab_input)
+# Returns: '{"correct": true}'
+
+# Grade grammar quiz question
+grammar_input = {
+    "question": "Is مَدْرَسَة masculine or feminine?",
+    "student_answer": "feminine",
+    "correct_answer": "feminine"
+}
+result = grading_agent.grade_grammar_quiz(grammar_input)
+# Returns: '{"correct": true}'
+
+# Grade multiple grammar test questions
+test_input = {
+    "lesson_number": 3,
+    "answers": [
+        {
+            "question": "Is مَدْرَسَة masculine or feminine?",
+            "student_answer": "feminine",
+            "correct_answer": "feminine"
+        },
+        {
+            "question": "Is كِتَاب masculine or feminine?",
+            "student_answer": "masculine",
+            "correct_answer": "masculine"
+        }
+    ]
+}
+result = grading_agent.grade_grammar_test(test_input)
+# Returns: '{"total_score": "2/2", "results": [{"question_id": "q1", "correct": true}, ...]}'
+```
+
+## Architecture Integration
+
+The GradingAgent is called by the Orchestrator (Agent 1) during:
+1. Vocabulary batch quizzes
+2. Vocabulary final tests
+3. Grammar topic quizzes
+4. Grammar final tests
+
+**Pattern A (Direct Calls):**
+Orchestrator → GradingAgent.grade_vocab() → JSON result → Orchestrator formats feedback
+
+## Output Format
+
+All grading methods return JSON strings:
+
+### Single Question Grading
+```json
+{"correct": true}
+```
+or
+```json
+{"correct": false}
+```
+
+### Multiple Question Grading
+```json
+{
+  "total_score": "8/10",
+  "results": [
+    {"question_id": "q1", "correct": true},
+    {"question_id": "q2", "correct": false},
+    ...
+  ]
+}
+```
+
+## Error Handling
+
+- **Invalid JSON Output:** If model produces invalid JSON, evaluation pipeline logs error
+- **Missing Keys:** StructureMetric validates expected keys are present
+- **Wrong Types:** StructureMetric validates "correct" field is boolean, not string
+
+## See Also
+
+- **docs/ARCHITECTURE.md** - Agent 2 architecture and design decisions
+- **docs/PROMPT_DESIGN.md** - Grading prompt templates with JSON-only enforcement
+- **docs/GRADING_AGENT_FINETUNING_PLAN.md** - Complete fine-tuning strategy (gitignored)
+- **data/evaluation/grading_agent_test_cases.json** - Comprehensive edge case test suite (50 cases)
+- **src/prompts/templates.py** - GRADING_VOCAB, GRADING_GRAMMAR_QUIZ, GRADING_GRAMMAR_TEST prompts
+"""
+
+import json
+import logging
+
+from src.prompts.templates import GRADING_GRAMMAR_QUIZ, GRADING_GRAMMAR_TEST, GRADING_VOCAB
+
+logger = logging.getLogger(__name__)
+
+
+class GradingAgent:
+    """
+    Agent 2: Grading Agent.
+
+    Evaluates student responses with flexible, accurate grading that handles edge cases
+    like synonyms, typos, and Arabic harakaat variations.
+
+    ## Responsibilities
+
+    1. **Vocabulary Translation Grading**
+       - Accept exact matches, synonyms, minor typos, capitalization variations
+       - Reject clearly incorrect answers
+       - Return: {"correct": true/false}
+
+    2. **Grammar Quiz Grading (Single Question)**
+       - Accept abbreviations (m/f for masculine/feminine)
+       - Apply Arabic harakaat rules: internal optional, case endings required
+       - Return: {"correct": true/false}
+
+    3. **Grammar Test Grading (Multiple Questions)**
+       - Batch process multiple questions for efficiency
+       - Return: {"total_score": "X/Y", "results": [...]}
+
+    ## Model Configuration
+
+    - **Base Model:** Qwen2.5-7B-Instruct (stronger reasoning than 3B)
+    - **Max Tokens:** 50 (short JSON responses)
+    - **Sampling:** Deterministic (do_sample=False) for consistent grading
+    - **Fine-tuning:** Required for JSON compliance and harakaat flexibility
+
+    ## Edge Case Handling
+
+    ### Flexible Grading Rules
+    - Synonyms: "instructor" = "teacher", "automobile" = "car"
+    - Minor typos: "scool" = "school" (1 char error), "bok" = "book" (1 char missing)
+    - Capitalization: "Book" = "book", "SCHOOL" = "school"
+    - Articles: "a pen" = "pen", "the book" = "book"
+
+    ### Arabic Harakaat Rules
+    - **Internal harakaat (vowel marks):** OPTIONAL
+      - الكتابُ = الكِتَابُ (both correct)
+      - الكتابُ = الكتاابُ (both correct - internal marks don't affect correctness)
+    - **Case endings (final harakaat):** REQUIRED and must match exactly
+      - الكتابُ ≠ الكتاب (nominative vs. no case ending) ❌
+      - الكتابُ ≠ الكتابَ (nominative vs. accusative) ❌
+      - الكتابُ ≠ الكتابِ (nominative vs. genitive) ❌
+
+    ## Integration Pattern
+
+    Called by Orchestrator (Agent 1) in Pattern A architecture:
+    1. Orchestrator detects quiz/test question
+    2. Orchestrator calls appropriate GradingAgent method
+    3. GradingAgent returns JSON result
+    4. Orchestrator formats user-facing feedback based on result
+
+    ## Performance Characteristics
+
+    - **Latency:** <500ms per question (target)
+    - **Batch Processing:** Multiple questions in single call for grammar tests
+    - **Deterministic:** Same input always produces same output
+    - **Memory:** ~4GB (7B model with 4-bit quantization)
+
+    ## Example Usage
+
+    ```python
+    # Initialize
+    grading_agent = GradingAgent(model, tokenizer, max_new_tokens=50)
+
+    # Grade vocabulary (synonym accepted)
+    result = grading_agent.grade_vocab({
+        "word": "مُعَلِّم",
+        "student_answer": "instructor",
+        "correct_answer": "teacher"
+    })
+    # Returns: '{"correct": true}' (synonym accepted)
+
+    # Grade grammar (abbreviation accepted)
+    result = grading_agent.grade_grammar_quiz({
+        "question": "Is مَدْرَسَة masculine or feminine?",
+        "student_answer": "f",
+        "correct_answer": "feminine"
+    })
+    # Returns: '{"correct": true}' (abbreviation accepted)
+
+    # Grade Arabic harakaat (internal optional, case ending required)
+    result = grading_agent.grade_grammar_quiz({
+        "question": "Make definite (nominative): كتاب",
+        "student_answer": "الكتابُ",  # No internal harakaat
+        "correct_answer": "الكِتَابُ"  # Has internal harakaat
+    })
+    # Returns: '{"correct": true}' (internal harakaat optional)
+
+    result = grading_agent.grade_grammar_quiz({
+        "question": "Make definite (nominative): كتاب",
+        "student_answer": "الكتاب",  # No case ending
+        "correct_answer": "الكِتَابُ"  # Has case ending ُ
+    })
+    # Returns: '{"correct": false}' (case ending required)
+    ```
+
+    ## Attributes
+
+    - model: HuggingFace model (Qwen2.5-7B-Instruct)
+    - tokenizer: HuggingFace tokenizer
+    - max_new_tokens: Maximum tokens to generate (default 50)
+    """
+
+    def __init__(
+        self,
+        model,
+        tokenizer,
+        max_new_tokens: int = 50,
+    ) -> None:
+        """
+        Initialize GradingAgent.
+
+        Args:
+            model: HuggingFace model for grading (recommended: Qwen2.5-7B-Instruct)
+            tokenizer: HuggingFace tokenizer matching the model
+            max_new_tokens: Maximum tokens to generate (default 50 for short JSON responses)
+
+        Note:
+            - 7B model recommended over 3B for better reasoning on edge cases
+            - Baseline evaluation showed 7B achieves 83% accuracy vs 3B's 56%
+            - max_new_tokens=50 is sufficient for JSON responses like {"correct": true}
+        """
+        self.model = model
+        self.tokenizer = tokenizer
+        self.max_new_tokens = max_new_tokens
+
+    def generate_response(self, prompt: str) -> str:
+        """
+        Generate response from model given a prompt.
+
+        Uses deterministic sampling (do_sample=False) for consistent grading.
+
+        Args:
+            prompt: Input prompt (should include mode, question, student answer, correct answer)
+
+        Returns:
+            Generated response text (with prompt stripped)
+
+        Note:
+            - Deterministic sampling ensures same input always produces same output
+            - Critical for consistent grading across multiple runs
+            - Prompt is stripped from response to return only the generated text
+            - For grading, expects JSON response: {"correct": true/false}
+        """
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+
+        outputs = self.model.generate(
+            **inputs,
+            max_new_tokens=self.max_new_tokens,
+            do_sample=False,  # Deterministic for grading
+            pad_token_id=self.tokenizer.eos_token_id,
+        )
+
+        response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        # Strip prompt from response
+        if response.startswith(prompt):
+            response = response[len(prompt) :].strip()
+
+        return response
+
+    def grade_vocab(self, input_data: dict) -> str:
+        """
+        Grade vocabulary translation with flexible edge case handling.
+
+        Applies flexible grading rules:
+        - Accept synonyms (e.g., "instructor" = "teacher")
+        - Accept minor typos (e.g., "scool" = "school")
+        - Accept capitalization variations (e.g., "Book" = "book")
+        - Accept articles (e.g., "a pen" = "pen")
+        - Reject clearly incorrect answers (e.g., "pen" ≠ "book")
+
+        Args:
+            input_data: Dict with required keys:
+                - word (str): Arabic word being tested (e.g., "كِتَاب")
+                - student_answer (str): Student's English translation (e.g., "book")
+                - correct_answer (str): Expected English translation (e.g., "book")
+
+        Returns:
+            JSON string with grading result: '{"correct": true}' or '{"correct": false}'
+
+        Example:
+            >>> input_data = {
+            ...     "word": "مُعَلِّم",
+            ...     "student_answer": "instructor",
+            ...     "correct_answer": "teacher"
+            ... }
+            >>> result = grading_agent.grade_vocab(input_data)
+            >>> print(result)
+            '{"correct": true}'  # Synonym accepted
+
+        Note:
+            - Uses GRADING_VOCAB prompt template from src.prompts.templates
+            - Baseline 7B model: 100% accuracy on synonyms, typos, capitalization
+            - Fine-tuning needed for JSON-only output (baseline: 0-6% compliance)
+        """
+        prompt = GRADING_VOCAB.format(
+            word=input_data["word"],
+            student_answer=input_data["student_answer"],
+            correct_answer=input_data["correct_answer"],
+        )
+
+        response = self.generate_response(prompt)
+        return response
+
+    def grade_grammar_quiz(self, input_data: dict) -> str:
+        """
+        Grade single grammar quiz question with Arabic harakaat rules.
+
+        Applies flexible grading rules:
+        - Accept abbreviations (e.g., "m" = "masculine", "f" = "feminine")
+        - Accept synonyms and alternate phrasings
+        - Arabic text: Internal harakaat OPTIONAL (الكتابُ = الكِتَابُ)
+        - Arabic text: Case endings REQUIRED (الكتاب ≠ الكِتَابُ)
+
+        Args:
+            input_data: Dict with required keys:
+                - question (str): Grammar question (e.g., "Is مَدْرَسَة masculine or feminine?")
+                - student_answer (str): Student's answer (e.g., "feminine" or "f")
+                - correct_answer (str): Expected answer (e.g., "feminine")
+
+        Returns:
+            JSON string with grading result: '{"correct": true}' or '{"correct": false}'
+
+        Example (abbreviation):
+            >>> input_data = {
+            ...     "question": "Is مَدْرَسَة masculine or feminine?",
+            ...     "student_answer": "f",
+            ...     "correct_answer": "feminine"
+            ... }
+            >>> result = grading_agent.grade_grammar_quiz(input_data)
+            >>> print(result)
+            '{"correct": true}'  # Abbreviation accepted
+
+        Example (Arabic - internal harakaat optional):
+            >>> input_data = {
+            ...     "question": "Make definite (nominative): كتاب",
+            ...     "student_answer": "الكتابُ",  # No internal harakaat
+            ...     "correct_answer": "الكِتَابُ"  # Has internal harakaat ِ
+            ... }
+            >>> result = grading_agent.grade_grammar_quiz(input_data)
+            >>> print(result)
+            '{"correct": true}'  # Internal harakaat optional
+
+        Example (Arabic - case ending required):
+            >>> input_data = {
+            ...     "question": "Make definite (nominative): كتاب",
+            ...     "student_answer": "الكتاب",  # Missing case ending
+            ...     "correct_answer": "الكِتَابُ"  # Has case ending ُ
+            ... }
+            >>> result = grading_agent.grade_grammar_quiz(input_data)
+            >>> print(result)
+            '{"correct": false}'  # Case ending required
+
+        Note:
+            - Uses GRADING_GRAMMAR_QUIZ prompt template from src.prompts.templates
+            - Baseline 7B model: 100% accuracy on case endings, 0% on internal harakaat (too strict)
+            - Fine-tuning needed for harakaat flexibility and JSON-only output
+        """
+        prompt = GRADING_GRAMMAR_QUIZ.format(
+            question=input_data["question"],
+            student_answer=input_data["student_answer"],
+            correct_answer=input_data["correct_answer"],
+        )
+
+        response = self.generate_response(prompt)
+        return response
+
+    def grade_grammar_test(self, input_data: dict) -> str:
+        """
+        Grade multiple grammar test questions in a single call.
+
+        More efficient than calling grade_grammar_quiz() multiple times, as it
+        batches all questions into a single prompt and generates a single response.
+
+        Applies same flexible grading rules as grade_grammar_quiz():
+        - Accept abbreviations, synonyms, alternate phrasings
+        - Arabic text: Internal harakaat optional, case endings required
+
+        Args:
+            input_data: Dict with required keys:
+                - lesson_number (int): Lesson number (e.g., 3)
+                - answers (list[dict]): List of question/answer dicts, each with:
+                    - question (str): Grammar question
+                    - student_answer (str): Student's answer
+                    - correct_answer (str): Expected answer
+
+        Returns:
+            JSON string with grading results:
+            '{"total_score": "X/Y", "results": [{"question_id": "qN", "correct": true/false}, ...]}'
+
+        Example:
+            >>> input_data = {
+            ...     "lesson_number": 3,
+            ...     "answers": [
+            ...         {
+            ...             "question": "Is مَدْرَسَة masculine or feminine?",
+            ...             "student_answer": "feminine",
+            ...             "correct_answer": "feminine"
+            ...         },
+            ...         {
+            ...             "question": "Is كِتَاب masculine or feminine?",
+            ...             "student_answer": "feminine",
+            ...             "correct_answer": "masculine"
+            ...         }
+            ...     ]
+            ... }
+            >>> result = grading_agent.grade_grammar_test(input_data)
+            >>> print(result)
+            '{"total_score": "1/2", "results": [{"question_id": "q1", "correct": true}, {"question_id": "q2", "correct": false}]}'
+
+        Note:
+            - Uses GRADING_GRAMMAR_TEST prompt template from src.prompts.templates
+            - Formats answers with Q1, Q2, etc. prefixes for clarity
+            - Returns question_id as "q1", "q2", etc. for easy reference
+            - More efficient than multiple grade_grammar_quiz() calls (single LLM call)
+        """
+        # Format answers for prompt
+        answers_list = []
+        for i, ans in enumerate(input_data["answers"], 1):
+            answers_list.append(
+                f"Q{i}: {ans['question']}\n"
+                f"Student: {ans['student_answer']}\n"
+                f"Correct: {ans['correct_answer']}"
+            )
+        answers_formatted = "\n\n".join(answers_list)
+
+        prompt = GRADING_GRAMMAR_TEST.format(
+            lesson_number=input_data["lesson_number"],
+            answers_formatted=answers_formatted,
+        )
+
+        response = self.generate_response(prompt)
+        return response
+
+    def handle_input(
+        self,
+        user_input: str,
+        conversation_history: list[dict],
+        grading_context: dict,
+    ) -> str:
+        """
+        Handle user input and route to appropriate grading method.
+
+        **Status:** Not yet implemented - placeholder for future orchestration logic.
+
+        In Pattern A architecture, the Orchestrator (Agent 1) calls specific grading
+        methods directly (grade_vocab(), grade_grammar_quiz(), grade_grammar_test())
+        rather than using this general handle_input() method.
+
+        This method is reserved for future Pattern B architecture where agents handle
+        their own routing based on conversation context.
+
+        Args:
+            user_input: Raw user input (student's answer)
+            conversation_history: Previous conversation turns (for context)
+            grading_context: Context about what needs grading (question type, correct answer, etc.)
+
+        Returns:
+            JSON string with status "not_implemented" and explanatory message.
+            This is a sentinel response indicating the method is a placeholder.
+
+        Note:
+            Current architecture (Pattern A): Use grade_vocab(), grade_grammar_quiz(),
+            or grade_grammar_test() directly instead of this method.
+
+            Returns JSON: {"status": "not_implemented", "message": "..."}
+        """
+        # Placeholder for future orchestration logic
+        return json.dumps(
+            {
+                "status": "not_implemented",
+                "message": "Direct input handling not yet implemented. Use grade_vocab() or grade_grammar_quiz() directly.",
+            }
+        )

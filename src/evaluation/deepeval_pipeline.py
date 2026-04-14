@@ -601,9 +601,11 @@ class EvaluationPipeline:
         results = self._init_results(["json_validity", "structure", "accuracy"])
         grading_mode = self.test_cases["grading_vocab"]
 
-        # Iterate through correct and incorrect translations
-        for sub_group in ["correct_translations", "incorrect_translations"]:
-            self._evaluate_grading_test_cases(grading_mode[sub_group], model_responses, results)
+        # Iterate through all subgroups dynamically (supports any structure)
+        for _sub_group_name, sub_group_cases in grading_mode.items():
+            # Skip metadata fields
+            if isinstance(sub_group_cases, list):
+                self._evaluate_grading_test_cases(sub_group_cases, model_responses, results)
 
         return results
 
@@ -620,9 +622,11 @@ class EvaluationPipeline:
         results = self._init_results(["json_validity", "structure", "accuracy"])
         grading_mode = self.test_cases["grading_grammar"]
 
-        # Iterate through all sub-groups
-        for sub_group in ["quiz_grading", "quiz_incorrect", "test_grading"]:
-            self._evaluate_grading_test_cases(grading_mode[sub_group], model_responses, results)
+        # Iterate through all subgroups dynamically (supports any structure)
+        for _sub_group_name, sub_group_cases in grading_mode.items():
+            # Skip metadata fields
+            if isinstance(sub_group_cases, list):
+                self._evaluate_grading_test_cases(sub_group_cases, model_responses, results)
 
         return results
 
