@@ -246,11 +246,21 @@ class TeachingAgent:
 
         Returns:
             Feedback response (vocabulary or grammar)
+
+        Raises:
+            ValueError: If mode is not one of the supported values
         """
         mode = input_data.get("mode", "vocabulary")
+
+        # Validate mode against explicit allowed set
+        allowed_modes = {"vocabulary", "grammar"}
+        if mode not in allowed_modes:
+            raise ValueError(
+                f"Unsupported mode '{mode}' for feedback. " f"Must be one of: {allowed_modes}"
+            )
 
         if mode == "grammar":
             return self.handle_feedback_grammar(input_data)
         else:
-            # Default to vocabulary feedback
+            # Vocabulary mode (explicitly checked above)
             return self.handle_feedback_vocab(input_data)

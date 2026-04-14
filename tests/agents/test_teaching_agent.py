@@ -367,3 +367,43 @@ class TestOrchestratorAdapters:
         assert hasattr(teaching_agent, "handle_user_message")
         response = teaching_agent.handle_user_message(input_data)
         assert isinstance(response, str)
+
+    def test_provide_feedback_validates_mode(self, teaching_agent):
+        """Should raise ValueError for unsupported mode values (addressing code review)."""
+        input_data = {
+            "mode": "invalid_mode",  # Unsupported mode
+            "is_correct": True,
+            "word_arabic": "كِتَاب",
+            "student_answer": "book",
+            "english": "book",
+        }
+
+        with pytest.raises(ValueError, match="mode.*invalid|unsupported"):
+            teaching_agent.provide_feedback(input_data)
+
+    @patch("src.agents.teaching_agent.FEEDBACK_VOCAB_CORRECT", "Great job!")
+    @patch("src.agents.teaching_agent.FEEDBACK_GRAMMAR_CORRECT", "Perfect!")
+    def test_provide_feedback_accepts_valid_modes(self, teaching_agent, mock_tokenizer):
+        """Should accept 'vocabulary' and 'grammar' modes without error."""
+        mock_tokenizer.decode.return_value = "Great!"
+
+        # Vocabulary mode
+        vocab_data = {
+            "mode": "vocabulary",
+            "is_correct": True,
+            "word_arabic": "كِتَاب",
+            "student_answer": "book",
+            "english": "book",
+        }
+        response = teaching_agent.provide_feedback(vocab_data)
+        assert isinstance(response, str)
+
+        # Grammar mode
+        grammar_data = {
+            "mode": "grammar",
+            "is_correct": True,
+            "question": "Q?",
+            "student_answer": "ans",
+        }
+        response = teaching_agent.provide_feedback(grammar_data)
+        assert isinstance(response, str)

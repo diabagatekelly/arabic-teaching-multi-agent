@@ -254,6 +254,29 @@ class TestGradeGrammarTest:
         assert "results" in response
 
 
+class TestGradeGrammarTestValidation:
+    """Tests for grade_grammar_test input validation (addressing code review)."""
+
+    def test_grade_grammar_test_rejects_empty_answers_list(self, grading_agent):
+        """Should raise ValueError when answers list is empty."""
+        input_data = {"lesson_number": 1, "answers": []}
+
+        with pytest.raises(ValueError, match="answers.*empty|non-empty"):
+            grading_agent.grade_grammar_test(input_data)
+
+    def test_grade_grammar_test_validates_answer_structure(self, grading_agent):
+        """Should raise ValueError when answer entries are missing required keys."""
+        input_data = {
+            "lesson_number": 1,
+            "answers": [
+                {"question": "Q1?"}  # Missing student_answer and correct_answer
+            ],
+        }
+
+        with pytest.raises((ValueError, KeyError)):
+            grading_agent.grade_grammar_test(input_data)
+
+
 class TestOrchestratorAdapter:
     """Tests for adapter method that orchestrator nodes expect (TDD)."""
 
@@ -306,3 +329,28 @@ class TestOrchestratorAdapter:
             mock_prompt.format.assert_called_once()
             assert isinstance(response, str)
             assert expected_json in response
+
+    def test_grade_answer_validates_required_fields(self, grading_agent):
+        """Should raise ValueError when required fields are missing (addressing code review)."""
+        # Missing user_answer
+        with pytest.raises(ValueError, match="user_answer|required"):
+            grading_agent.grade_answer({"correct_answer": "book", "question": "Q?"})
+
+        # Missing correct_answer
+        with pytest.raises(ValueError, match="correct_answer|required"):
+            grading_agent.grade_answer({"user_answer": "book", "question": "Q?"})
+
+        # Missing question
+        with pytest.raises(ValueError, match="question|required"):
+            grading_agent.grade_answer({"user_answer": "book", "correct_answer": "book"})
+
+    def test_grade_answer_rejects_empty_strings(self, grading_agent):
+        """Should raise ValueError when required fields are empty strings (addressing code review)."""
+        with pytest.raises(ValueError, match="empty|required"):
+            grading_agent.grade_answer(
+                {
+                    "user_answer": "",
+                    "correct_answer": "book",
+                    "question": "Q?",
+                }
+            )

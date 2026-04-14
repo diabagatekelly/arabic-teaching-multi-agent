@@ -404,6 +404,15 @@ class GradingAgent:
         if not isinstance(input_data["answers"], list):
             raise ValueError("'answers' must be a list")
 
+        if not input_data["answers"]:
+            raise ValueError("'answers' list must be non-empty")
+
+        # Validate each answer entry has required keys
+        for i, ans in enumerate(input_data["answers"]):
+            required_answer_keys = {"question", "student_answer", "correct_answer"}
+            if missing := required_answer_keys - ans.keys():
+                raise ValueError(f"Answer {i+1} missing required keys: {missing}")
+
         # Format answers for prompt
         answers_list = []
         for i, ans in enumerate(input_data["answers"], 1):
@@ -458,16 +467,29 @@ class GradingAgent:
 
         Returns:
             JSON grading result ({"correct": true/false})
+
+        Raises:
+            ValueError: If required keys are missing or empty
         """
+        # Validate required fields upfront
+        required_keys = {"user_answer", "correct_answer", "question"}
+        if missing := required_keys - input_data.keys():
+            raise ValueError(f"Missing required keys for grading: {missing}")
+
+        # Validate no empty strings (catches orchestrator bugs early)
+        for key in required_keys:
+            if not input_data[key]:
+                raise ValueError(f"Required field '{key}' cannot be empty")
+
         mode = input_data.get("mode", "vocabulary")
 
         if mode == "grammar":
             # Grammar mode: use grade_grammar_quiz
             return self.grade_grammar_quiz(
                 {
-                    "question": input_data.get("question", ""),
-                    "student_answer": input_data.get("user_answer", ""),
-                    "correct_answer": input_data.get("correct_answer", ""),
+                    "question": input_data["question"],
+                    "student_answer": input_data["user_answer"],
+                    "correct_answer": input_data["correct_answer"],
                 }
             )
         else:
@@ -475,8 +497,8 @@ class GradingAgent:
             # Map orchestrator field names to agent field names
             return self.grade_vocab(
                 {
-                    "word": input_data.get("question", ""),  # question contains the word/prompt
-                    "student_answer": input_data.get("user_answer", ""),
-                    "correct_answer": input_data.get("correct_answer", ""),
+                    "word": input_data["question"],  # question contains the word/prompt
+                    "student_answer": input_data["user_answer"],
+                    "correct_answer": input_data["correct_answer"],
                 }
             )
