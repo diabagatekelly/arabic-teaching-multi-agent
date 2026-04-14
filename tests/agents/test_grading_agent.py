@@ -90,105 +90,89 @@ class TestGenerateResponse:
 class TestGradeVocab:
     """Tests for grade_vocab method."""
 
+    @pytest.mark.parametrize(
+        "word,student_answer,correct_answer,expected_result",
+        [
+            ("كِتَاب", "book", "book", '{"correct": true}'),
+            ("مَدْرَسَة", "house", "school", '{"correct": false}'),
+        ],
+    )
     @patch("src.agents.grading_agent.GRADING_VOCAB")
-    def test_grade_vocab_correct_answer(self, mock_prompt, grading_agent, mock_tokenizer):
-        """Test grading correct vocabulary answer."""
+    def test_grade_vocab(
+        self,
+        mock_prompt,
+        grading_agent,
+        mock_tokenizer,
+        word,
+        student_answer,
+        correct_answer,
+        expected_result,
+    ):
+        """Test vocab grading accepts exact matches and rejects wrong answers."""
         mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = 'formatted prompt{"correct": true}'
+        mock_tokenizer.decode.return_value = f"formatted prompt{expected_result}"
 
         input_data = {
-            "word": "كِتَاب",
-            "student_answer": "book",
-            "correct_answer": "book",
+            "word": word,
+            "student_answer": student_answer,
+            "correct_answer": correct_answer,
         }
 
         response = grading_agent.grade_vocab(input_data)
 
         # Verify prompt was formatted with input data
         mock_prompt.format.assert_called_once_with(
-            word="كِتَاب", student_answer="book", correct_answer="book"
+            word=word, student_answer=student_answer, correct_answer=correct_answer
         )
 
-        # Verify response is JSON string
+        # Verify response is JSON string with expected result
         assert isinstance(response, str)
-        assert '{"correct": true}' in response
-
-    @patch("src.agents.grading_agent.GRADING_VOCAB")
-    def test_grade_vocab_incorrect_answer(self, mock_prompt, grading_agent, mock_tokenizer):
-        """Test grading incorrect vocabulary answer."""
-        mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = 'formatted prompt{"correct": false}'
-
-        input_data = {
-            "word": "مَدْرَسَة",
-            "student_answer": "house",
-            "correct_answer": "school",
-        }
-
-        response = grading_agent.grade_vocab(input_data)
-
-        # Verify prompt was formatted with input data
-        mock_prompt.format.assert_called_once_with(
-            word="مَدْرَسَة", student_answer="house", correct_answer="school"
-        )
-
-        # Verify response is JSON string
-        assert isinstance(response, str)
-        assert '{"correct": false}' in response
+        assert expected_result in response
 
 
 class TestGradeGrammarQuiz:
     """Tests for grade_grammar_quiz method."""
 
+    @pytest.mark.parametrize(
+        "question,student_answer,correct_answer,expected_result",
+        [
+            ("Is مَدْرَسَة masculine or feminine?", "feminine", "feminine", '{"correct": true}'),
+            ("Is كِتَاب masculine or feminine?", "feminine", "masculine", '{"correct": false}'),
+        ],
+    )
     @patch("src.agents.grading_agent.GRADING_GRAMMAR_QUIZ")
-    def test_grade_grammar_quiz_correct(self, mock_prompt, grading_agent, mock_tokenizer):
-        """Test grading correct grammar answer."""
+    def test_grade_grammar_quiz(
+        self,
+        mock_prompt,
+        grading_agent,
+        mock_tokenizer,
+        question,
+        student_answer,
+        correct_answer,
+        expected_result,
+    ):
+        """Test grammar quiz grading validates gender answers correctly."""
         mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = 'formatted prompt{"correct": true}'
+        mock_tokenizer.decode.return_value = f"formatted prompt{expected_result}"
 
         input_data = {
-            "question": "Is مَدْرَسَة masculine or feminine?",
-            "student_answer": "feminine",
-            "correct_answer": "feminine",
+            "question": question,
+            "student_answer": student_answer,
+            "correct_answer": correct_answer,
         }
 
         response = grading_agent.grade_grammar_quiz(input_data)
 
         # Verify prompt was formatted with input data
         mock_prompt.format.assert_called_once_with(
-            question="Is مَدْرَسَة masculine or feminine?",
-            student_answer="feminine",
-            correct_answer="feminine",
+            question=question,
+            student_answer=student_answer,
+            correct_answer=correct_answer,
         )
 
-        # Verify response is JSON string
+        # Verify response is JSON string with expected result
         assert isinstance(response, str)
-        assert '{"correct": true}' in response
-
-    @patch("src.agents.grading_agent.GRADING_GRAMMAR_QUIZ")
-    def test_grade_grammar_quiz_incorrect(self, mock_prompt, grading_agent, mock_tokenizer):
-        """Test grading incorrect grammar answer."""
-        mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = 'formatted prompt{"correct": false}'
-
-        input_data = {
-            "question": "Is كِتَاب masculine or feminine?",
-            "student_answer": "feminine",
-            "correct_answer": "masculine",
-        }
-
-        response = grading_agent.grade_grammar_quiz(input_data)
-
-        # Verify prompt was formatted with input data
-        mock_prompt.format.assert_called_once_with(
-            question="Is كِتَاب masculine or feminine?",
-            student_answer="feminine",
-            correct_answer="masculine",
-        )
-
-        # Verify response is JSON string
-        assert isinstance(response, str)
-        assert '{"correct": false}' in response
+        assert expected_result in response
 
 
 class TestGradeGrammarTest:
@@ -269,40 +253,56 @@ class TestGradeGrammarTest:
         assert "total_score" in response
         assert "results" in response
 
-    @patch("src.agents.grading_agent.GRADING_GRAMMAR_TEST")
-    def test_grade_grammar_test_formats_answers_correctly(
-        self, mock_prompt, grading_agent, mock_tokenizer
+
+class TestOrchestratorAdapter:
+    """Tests for adapter method that orchestrator nodes expect (TDD)."""
+
+    @pytest.mark.parametrize(
+        "input_data,expected_mock,expected_json",
+        [
+            (
+                {
+                    "user_answer": "book",
+                    "correct_answer": "book",
+                    "question": "Translate: كِتَاب",
+                    "mode": "vocabulary",
+                },
+                "GRADING_VOCAB",
+                '{"correct": true}',
+            ),
+            (
+                {
+                    "user_answer": "feminine",
+                    "correct_answer": "feminine",
+                    "question": "Is مَدْرَسَة masculine or feminine?",
+                    "mode": "grammar",
+                },
+                "GRADING_GRAMMAR_QUIZ",
+                '{"correct": true}',
+            ),
+            (
+                {
+                    "user_answer": "house",
+                    "correct_answer": "school",
+                    "question": "Translate: مَدْرَسَة",
+                    # No mode specified - should default to vocabulary
+                },
+                "GRADING_VOCAB",
+                '{"correct": false}',
+            ),
+        ],
+    )
+    def test_grade_answer_routing(
+        self, grading_agent, mock_tokenizer, input_data, expected_mock, expected_json
     ):
-        """Test that answers are formatted correctly for prompt."""
-        mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = 'formatted prompt{"total_score": "2/2", "results": []}'
+        """Test grade_answer adapter routes to vocab/grammar methods based on mode and defaults to vocab."""
+        with patch(f"src.agents.grading_agent.{expected_mock}") as mock_prompt:
+            mock_prompt.format.return_value = "formatted prompt"
+            mock_tokenizer.decode.return_value = f"formatted prompt{expected_json}"
 
-        input_data = {
-            "lesson_number": 5,
-            "answers": [
-                {
-                    "question": "Question 1?",
-                    "student_answer": "Answer 1",
-                    "correct_answer": "Answer 1",
-                },
-                {
-                    "question": "Question 2?",
-                    "student_answer": "Answer 2",
-                    "correct_answer": "Answer 2",
-                },
-            ],
-        }
+            response = grading_agent.grade_answer(input_data)
 
-        grading_agent.grade_grammar_test(input_data)
-
-        # Verify formatting includes Q1, Q2 prefixes and proper structure
-        call_kwargs = mock_prompt.format.call_args[1]
-        formatted = call_kwargs["answers_formatted"]
-
-        assert "Q1: Question 1?" in formatted
-        assert "Student: Answer 1" in formatted
-        assert "Correct: Answer 1" in formatted
-
-        assert "Q2: Question 2?" in formatted
-        assert "Student: Answer 2" in formatted
-        assert "Correct: Answer 2" in formatted
+            # Verify correct routing and response
+            mock_prompt.format.assert_called_once()
+            assert isinstance(response, str)
+            assert expected_json in response

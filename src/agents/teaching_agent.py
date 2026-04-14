@@ -87,7 +87,6 @@ class TeachingAgent:
 
         response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-        # Remove the prompt from response
         if response.startswith(prompt):
             response = response[len(prompt) :].strip()
 
@@ -184,32 +183,74 @@ class TeachingAgent:
         student_context: dict[str, Any] | None = None,
     ) -> str:
         """
-        General input handler for production (future implementation).
+        Handle arbitrary user input (placeholder - not yet implemented).
 
-        This method will be used in production when the orchestrator/backend
-        needs to send arbitrary user input to Agent 1.
+        Use specific handle_* methods instead for evaluation.
 
         Args:
-            user_input: User's message (e.g., "start lesson 1", "what does كِتَاب mean?")
-            conversation_history: Previous conversation turns from backend
-            student_context: Student profile, progress, learned words, etc.
+            user_input: User's message
+            conversation_history: Previous conversation turns
+            student_context: Student profile and progress
 
         Returns:
-            Teaching response
-
-        Note:
-            Currently returns placeholder. Full implementation will:
-            1. Parse user intent from user_input
-            2. Determine what action to take (teach, quiz, feedback, etc.)
-            3. Call content_agent or grading_agent if needed (Pattern A)
-            4. Generate appropriate teaching response
+            Placeholder message
         """
-        # TODO: Implement full conversation handling
-        # This requires:
-        # - Intent classification (what does user want?)
-        # - Context-aware response generation
-        # - Integration with Agent 2 (grading) and Agent 3 (content)
-        logger.warning(
-            "handle_input() not fully implemented yet - use specific handle_* methods for evaluation"
-        )
+        logger.warning("handle_input() not implemented - use specific handle_* methods")
         return "I'm still learning how to have conversations! Please use the specific teaching modes for now."
+
+    # Orchestrator adapter methods
+
+    def start_lesson(self, input_data: dict[str, Any]) -> str:
+        """
+        Orchestrator adapter: Start a new lesson.
+
+        This is an adapter method that orchestrator nodes expect.
+        Delegates to handle_lesson_start().
+
+        Args:
+            input_data: Input with lesson_number, mode, etc.
+
+        Returns:
+            Lesson introduction response
+        """
+        return self.handle_lesson_start(input_data)
+
+    def handle_user_message(self, input_data: dict[str, Any]) -> str:
+        """
+        Orchestrator adapter: Handle general user messages (placeholder).
+
+        Delegates to handle_input(). Use specific handle_* methods instead.
+
+        Args:
+            input_data: Input with user_input, mode, learned_items, etc.
+
+        Returns:
+            Placeholder message
+        """
+        return self.handle_input(
+            user_input=input_data.get("user_input", ""),
+            conversation_history=None,
+            student_context=input_data,
+        )
+
+    def provide_feedback(self, input_data: dict[str, Any]) -> str:
+        """
+        Orchestrator adapter: Provide feedback after grading.
+
+        This is an adapter method that orchestrator nodes expect.
+        Routes to handle_feedback_vocab() or handle_feedback_grammar()
+        based on the mode.
+
+        Args:
+            input_data: Input with is_correct, user_answer, correct_answer, mode
+
+        Returns:
+            Feedback response (vocabulary or grammar)
+        """
+        mode = input_data.get("mode", "vocabulary")
+
+        if mode == "grammar":
+            return self.handle_feedback_grammar(input_data)
+        else:
+            # Default to vocabulary feedback
+            return self.handle_feedback_vocab(input_data)
