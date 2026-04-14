@@ -14,7 +14,7 @@ lesson_number: 1
 {
   "question": "Match the adjective to the noun: كِتَاب + كَبِير/كَبِيرَة\nWhich is correct?",
   "answer": "كَبِير",
-  "correct": "كَبِير",
+  
   "type": "noun_adjective_agreement",
   "difficulty": "beginner"
 }
@@ -25,7 +25,7 @@ lesson_number: 1
 {
   "question": "Complete: مَدْرَسَة _____ (new)\nOptions: a) جَدِيد  b) جَدِيدَة",
   "answer": "b",
-  "correct": "b",
+  
   "type": "noun_adjective_agreement",
   "difficulty": "beginner"
 }
@@ -36,7 +36,7 @@ lesson_number: 1
 {
   "question": "Make definite: كِتَاب كَبِير → ?",
   "answer": "الكِتَاب الكَبِير",
-  "correct": "الكِتَاب الكَبِير",
+  
   "type": "noun_adjective_agreement",
   "difficulty": "beginner"
 }
@@ -49,7 +49,7 @@ lesson_number: 1
 {
   "question": "Which is correct?\na) المَدْرَسَة الجَدِيد\nb) المَدْرَسَة الجَدِيدَة\nc) مَدْرَسَة الجَدِيدَة\nd) المَدْرَسَةُ جَدِيدَةٌ",
   "answer": "b",
-  "correct": "b",
+  
   "type": "noun_adjective_agreement",
   "difficulty": "intermediate"
 }
@@ -60,7 +60,7 @@ lesson_number: 1
 {
   "question": "Add the adjective correctly: الكِتَاب + صَغِير (small)\nMake them agree.",
   "answer": "الكِتَاب الصَّغِير",
-  "correct": "الكِتَاب الصَّغِير",
+  
   "type": "noun_adjective_agreement",
   "difficulty": "intermediate"
 }
@@ -71,7 +71,7 @@ lesson_number: 1
 {
   "question": "Fix agreement: الطَّاوِلَة الكَبِير\nWhat's the correct form?",
   "answer": "الطَّاوِلَة الكَبِيرَة",
-  "correct": "الطَّاوِلَة الكَبِيرَة",
+  
   "type": "noun_adjective_agreement",
   "difficulty": "intermediate"
 }
@@ -84,7 +84,7 @@ lesson_number: 1
 {
   "question": "Complete with full case marking: قَرَأْتُ الكِتَاب_____ الجَدِيد_____ (I read the new book - object)\nFill in case endings.",
   "answer": "قَرَأْتُ الكِتَابَ الجَدِيدَ",
-  "correct": "قَرَأْتُ الكِتَابَ الجَدِيدَ",
+  
   "type": "noun_adjective_agreement",
   "difficulty": "advanced"
 }
@@ -95,7 +95,7 @@ lesson_number: 1
 {
   "question": "Make both noun and adjective agree in إضافة: كِتَاب + الطَّالِب + جَدِيد\nCombine correctly.",
   "answer": "كِتَابُ الطَّالِبِ الجَدِيدِ",
-  "correct": "كِتَابُ الطَّالِبِ الجَدِيدِ",
+  
   "type": "noun_adjective_agreement",
   "difficulty": "advanced"
 }
@@ -106,7 +106,7 @@ lesson_number: 1
 {
   "question": "Add two adjectives with agreement: المَدْرَسَة + كَبِير + جَدِيد\nHow do you say 'the big new school'?",
   "answer": "المَدْرَسَة الكَبِيرَة الجَدِيدَة",
-  "correct": "المَدْرَسَة الكَبِيرَة الجَدِيدَة",
+  
   "type": "noun_adjective_agreement",
   "difficulty": "advanced"
 }

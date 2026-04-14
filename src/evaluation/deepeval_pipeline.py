@@ -293,12 +293,19 @@ class EvaluationPipeline:
             elif metric_name == "json_validity":
                 metrics_list.append(JSONValidityMetric())
             elif metric_name == "structure":
-                # This would need more configuration - placeholder for now
+                # For Agent 3 (content generation): validate exercise structure
+                # Required fields: question, answer, type, difficulty
+                # Note: "correct" field removed from RAG templates (2026-04-15)
                 metrics_list.append(
                     StructureMetric(
                         expected_type=dict,
-                        required_keys=["correct"],
-                        expected_types={"correct": bool},
+                        required_keys=["question", "answer", "type", "difficulty"],
+                        expected_types={
+                            "question": str,
+                            "answer": str,
+                            "type": str,
+                            "difficulty": str,
+                        },
                     )
                 )
             elif metric_name == "accuracy":

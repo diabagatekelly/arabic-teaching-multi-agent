@@ -14,7 +14,7 @@ lesson_number: 1
 {
   "question": "Transform: كِتَاب → add definite article → add adjective كَبِير\nShow each step.",
   "answer": "Step 1: كِتَاب → الكِتَاب | Step 2: الكِتَاب → الكِتَاب الكَبِير",
-  "correct": "كِتَاب → الكِتَاب → الكِتَاب الكَبِير",
+  
   "type": "transformation_chain",
   "difficulty": "beginner"
 }
@@ -25,7 +25,7 @@ lesson_number: 1
 {
   "question": "Change: مَدْرَسَة → make definite → make plural\nShow transformation.",
   "answer": "Step 1: مَدْرَسَة → المَدْرَسَة | Step 2: المَدْرَسَة → المَدَارِس",
-  "correct": "مَدْرَسَة → المَدْرَسَة → المَدَارِس",
+  
   "type": "transformation_chain",
   "difficulty": "beginner"
 }
@@ -36,7 +36,7 @@ lesson_number: 1
 {
   "question": "Transform gender: كِتَاب كَبِير → feminine equivalent\nWhat changes?",
   "answer": "Add ة to both: مَدْرَسَة كَبِيرَة",
-  "correct": "كِتَاب كَبِير → مَدْرَسَة كَبِيرَة",
+  
   "type": "transformation_chain",
   "difficulty": "beginner"
 }
@@ -49,7 +49,7 @@ lesson_number: 1
 {
   "question": "Transform: طَالِب → definite → add adjective جَدِيد → make sentence with يَدْرُس\nShow each step.",
   "answer": "طَالِب → الطَّالِب → الطَّالِب الجَدِيد → الطَّالِب الجَدِيد يَدْرُس",
-  "correct": "طَالِب → الطَّالِب → الطَّالِب الجَدِيد → الطَّالِب الجَدِيد يَدْرُس",
+  
   "type": "transformation_chain",
   "difficulty": "intermediate"
 }
@@ -60,7 +60,7 @@ lesson_number: 1
 {
   "question": "Change sentence: الكِتَاب جَدِيد → past tense with كَانَ → negate\nShow transformation chain.",
   "answer": "الكِتَاب جَدِيد → كَانَ الكِتَاب جَدِيدًا → لَمْ يَكُنِ الكِتَاب جَدِيدًا",
-  "correct": "الكِتَاب جَدِيد → كَانَ الكِتَاب جَدِيدًا → لَمْ يَكُنِ الكِتَاب جَدِيدًا",
+  
   "type": "transformation_chain",
   "difficulty": "intermediate"
 }
@@ -71,7 +71,7 @@ lesson_number: 1
 {
   "question": "Transform: مُعَلِّم → feminine → definite → possessive (كِتَاب)\nComplete chain.",
   "answer": "مُعَلِّم → مُعَلِّمَة → المُعَلِّمَة → كِتَاب المُعَلِّمَة",
-  "correct": "مُعَلِّم → مُعَلِّمَة → المُعَلِّمَة → كِتَاب المُعَلِّمَة",
+  
   "type": "transformation_chain",
   "difficulty": "intermediate"
 }
@@ -84,7 +84,7 @@ lesson_number: 1
 {
   "question": "Transform: طَالِب → dual → definite → add verb يَدْرُسَانِ → add object الدَّرْس → add location في المَكْتَبَة\nComplete full chain.",
   "answer": "طَالِب → طَالِبَان → الطَّالِبَان → الطَّالِبَان يَدْرُسَانِ → الطَّالِبَان يَدْرُسَانِ الدَّرْسَ → الطَّالِبَان يَدْرُسَانِ الدَّرْسَ في المَكْتَبَة",
-  "correct": "طَالِب → طَالِبَان → الطَّالِبَان → ... → الطَّالِبَان يَدْرُسَانِ الدَّرْسَ في المَكْتَبَة",
+  
   "type": "transformation_chain",
   "difficulty": "advanced"
 }
@@ -95,7 +95,7 @@ lesson_number: 1
 {
   "question": "Change form: كَتَبَ (Form I) → Form II (intensive) → Form III (reciprocal) → Form IV (causative)\nShow verb transformations.",
   "answer": "كَتَبَ → كَتَّبَ → كَاتَبَ → أَكْتَبَ",
-  "correct": "كَتَبَ → كَتَّبَ → كَاتَبَ → أَكْتَبَ",
+  
   "type": "transformation_chain",
   "difficulty": "advanced"
 }
@@ -106,7 +106,7 @@ lesson_number: 1
 {
   "question": "Transform with case: طَالِب → definite → add adjective مُجْتَهِد → make object of verb رَأَى → add إضافة with كِتَاب\nShow with case markings.",
   "answer": "طَالِبٌ → الطَّالِبُ → الطَّالِبُ المُجْتَهِدُ → رَأَيْتُ الطَّالِبَ المُجْتَهِدَ → رَأَيْتُ كِتَابَ الطَّالِبِ المُجْتَهِدِ",
-  "correct": "طَالِبٌ → الطَّالِبُ → ... → رَأَيْتُ كِتَابَ الطَّالِبِ المُجْتَهِدِ",
+  
   "type": "transformation_chain",
   "difficulty": "advanced"
 }

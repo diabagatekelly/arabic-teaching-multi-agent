@@ -14,7 +14,7 @@ lesson_number: 1
 {
   "question": "Write in Arabic: al-kitaab (the book)",
   "answer": "الكِتَاب",
-  "correct": "الكِتَاب",
+  
   "type": "dictation",
   "difficulty": "beginner"
 }
@@ -25,7 +25,7 @@ lesson_number: 1
 {
   "question": "Write the word you hear: al-madrasa (the school)",
   "answer": "المَدْرَسَة",
-  "correct": "المَدْرَسَة",
+  
   "type": "dictation",
   "difficulty": "beginner"
 }
@@ -36,7 +36,7 @@ lesson_number: 1
 {
   "question": "Transcribe: al-qalam (the pen)",
   "answer": "القَلَم",
-  "correct": "القَلَم",
+  
   "type": "dictation",
   "difficulty": "beginner"
 }
@@ -49,7 +49,7 @@ lesson_number: 1
 {
   "question": "Write the sentence: al-kitaab 'alaa al-Taawila (the book is on the table)",
   "answer": "الكِتَاب على الطَّاوِلَة",
-  "correct": "الكِتَاب على الطَّاوِلَة",
+  
   "type": "dictation",
   "difficulty": "intermediate"
 }
@@ -60,7 +60,7 @@ lesson_number: 1
 {
   "question": "Transcribe: al-mu'allim fil-madrasa (the teacher in the school)",
   "answer": "المُعَلِّم في المَدْرَسَة",
-  "correct": "المُعَلِّم في المَدْرَسَة",
+  
   "type": "dictation",
   "difficulty": "intermediate"
 }
@@ -71,7 +71,7 @@ lesson_number: 1
 {
   "question": "Write what you hear: al-Taalibatu tadrusu fil-maktaba (the student studies in the library)",
   "answer": "الطَّالِبَة تَدْرُس في المَكْتَبَة",
-  "correct": "الطَّالِبَة تَدْرُس في المَكْتَبَة",
+  
   "type": "dictation",
   "difficulty": "intermediate"
 }
@@ -84,7 +84,7 @@ lesson_number: 1
 {
   "question": "Transcribe with full harakaat: kataba al-Taalibul-darsa fil-kitaabil-jadeed (the student wrote the lesson in the new book)",
   "answer": "كَتَبَ الطَّالِبُ الدَّرْسَ في الكِتَابِ الجَدِيدِ",
-  "correct": "كَتَبَ الطَّالِبُ الدَّرْسَ في الكِتَابِ الجَدِيدِ",
+  
   "type": "dictation",
   "difficulty": "advanced"
 }
@@ -95,7 +95,7 @@ lesson_number: 1
 {
   "question": "Write the sentence: yadrusul-Tullaabul-lughatal-'arabiyyata fil-jaami'a (students study Arabic at university)",
   "answer": "يَدْرُسُ الطُّلَّابُ اللُّغَةَ العَرَبِيَّةَ في الجَامِعَة",
-  "correct": "يَدْرُسُ الطُّلَّابُ اللُّغَةَ العَرَبِيَّةَ في الجَامِعَة",
+  
   "type": "dictation",
   "difficulty": "advanced"
 }
@@ -106,7 +106,7 @@ lesson_number: 1
 {
   "question": "Transcribe with case endings: waSalal-mu'allimul-jadeedu ilaal-madrasatil-kabeerati amsi (the new teacher arrived at the big school yesterday)",
   "answer": "وَصَلَ المُعَلِّمُ الجَدِيدُ إِلَى المَدْرَسَةِ الكَبِيرَةِ أَمْسِ",
-  "correct": "وَصَلَ المُعَلِّمُ الجَدِيدُ إِلَى المَدْرَسَةِ الكَبِيرَةِ أَمْسِ",
+  
   "type": "dictation",
   "difficulty": "advanced"
 }

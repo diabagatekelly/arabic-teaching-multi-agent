@@ -14,7 +14,7 @@ lesson_number: 1
 {
   "question": "Translate to Arabic: the book",
   "answer": "الكِتَاب",
-  "correct": "الكِتَاب",
+  
   "type": "translation",
   "difficulty": "beginner"
 }
@@ -25,7 +25,7 @@ lesson_number: 1
 {
   "question": "Translate to Arabic: the school",
   "answer": "المَدْرَسَة",
-  "correct": "المَدْرَسَة",
+  
   "type": "translation",
   "difficulty": "beginner"
 }
@@ -36,7 +36,7 @@ lesson_number: 1
 {
   "question": "Translate to English: القَلَم",
   "answer": "the pen",
-  "correct": "the pen",
+  
   "type": "translation",
   "difficulty": "beginner"
 }
@@ -49,7 +49,7 @@ lesson_number: 1
 {
   "question": "Translate to Arabic: The book is on the table",
   "answer": "الكِتَابُ على الطَّاوِلَةِ",
-  "correct": "الكِتَابُ على الطَّاوِلَةِ",
+  
   "type": "translation",
   "difficulty": "intermediate"
 }
@@ -60,7 +60,7 @@ lesson_number: 1
 {
   "question": "Translate to English: المَدْرَسَةُ كَبِيرَةٌ",
   "answer": "The school is big",
-  "correct": "The school is big",
+  
   "type": "translation",
   "difficulty": "intermediate"
 }
@@ -71,7 +71,7 @@ lesson_number: 1
 {
   "question": "Translate to Arabic: The pen is in the bag",
   "answer": "القَلَمُ في الحَقِيبَةِ",
-  "correct": "القَلَمُ في الحَقِيبَةِ",
+  
   "type": "translation",
   "difficulty": "intermediate"
 }
@@ -84,7 +84,7 @@ lesson_number: 1
 {
   "question": "Translate to Arabic: The new teacher arrived at the big school yesterday",
   "answer": "وَصَلَ المُعَلِّمُ الجَدِيدُ إِلَى المَدْرَسَةِ الكَبِيرَةِ أَمْسِ",
-  "correct": "وَصَلَ المُعَلِّمُ الجَدِيدُ إِلَى المَدْرَسَةِ الكَبِيرَةِ أَمْسِ",
+  
   "type": "translation",
   "difficulty": "advanced"
 }
@@ -95,7 +95,7 @@ lesson_number: 1
 {
   "question": "Translate to English: كَتَبَ الطَّالِبُ الدَّرْسَ في الكِتَابِ الجَدِيدِ",
   "answer": "The student wrote the lesson in the new book",
-  "correct": "The student wrote the lesson in the new book",
+  
   "type": "translation",
   "difficulty": "advanced"
 }
@@ -106,7 +106,7 @@ lesson_number: 1
 {
   "question": "Translate to Arabic: The students study the Arabic language in the modern library",
   "answer": "يَدْرُسُ الطُّلَّابُ اللُّغَةَ العَرَبِيَّةَ في المَكْتَبَةِ الحَدِيثَةِ",
-  "correct": "يَدْرُسُ الطُّلَّابُ اللُّغَةَ العَرَبِيَّةَ في المَكْتَبَةِ الحَدِيثَةِ",
+  
   "type": "translation",
   "difficulty": "advanced"
 }
