@@ -1,0 +1,641 @@
+{
+  "metadata": {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "fine_tuned": false,
+    "evaluation_date": "2026-04-13",
+    "total_modes": 5,
+    "total_test_cases": 35
+  },
+  "modes": {
+    "lesson_start": {
+      "summary": {
+        "total": 5,
+        "passed": 0,
+        "failed": 5
+      },
+      "test_cases": {
+        "lesson_start_01": {
+          "model_output": "(Type \"start\" or \"next\")\n\nstart\n\nVocabulary\n\nLet's start by learning some new words. I'll say each word and you repeat it after me.\n\n1. كِتَاب (kitāb)\n2. قَلَم (qalam)\n3. مَكْتَب (maktab)\n4. مُحَمَّد (Muḥammad)\n5. عَلِيٌّ (ʿAlī)\n6. فَاطِمَة (Fāṭima)\n7. أَبُو بَكْرٍ (Abū Bakr)\n8. عَمُّو بَكْرٍ (ʿĀmū Bakr)\n9. حَسَنٌ (Ḥasan)\n10. سَعِيدٌ (Ṣaʿīd)\n\nNow let's practice using these words in a sentence. For example, \"أَهَلَّ اللَّهُ مُحَمَّداً وَعَلِيًّا\" means \"God made Muhammad and ʿAlī happy.\"\n\nCan you make a sentence using these words",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has numbered navigation options"
+            },
+            "sentiment_teaching": {
+              "score": 0.005494296550750732,
+              "passed": false,
+              "reason": "Sentiment score: 0.005 (✗ threshold: 0.6)"
+            }
+          }
+        },
+        "lesson_start_02": {
+          "model_output": "(Type \"start\" or \"next\")\n\nstart\n\nVocabulary\n\nThe first step in learning a new language is to learn some basic words. In this lesson, we will learn 12 new words.\n\nWrite the following words on the board:\n\nيَكْتُب (he writes)\nيَقْرَأ (he reads)\nيَعْلَم (he knows)\nيَدْخُل (he enters)\nيَسْتَغْفِر (he asks for forgiveness)\nيَحْمِل (he carries)\nيَنْظُر (he looks)\nيَصْنَع (he makes)\nيَتَوَكَّل (he relies on)\nيَتَسَاءَل (he wonders)\nيَتَوَارَى (he hides)\nيَتَوَفَّاهُ (he dies)\n\nAsk the student to repeat each word after you. Then ask them to repeat the words in order. After they have repeated the words, ask them to repeat the words in reverse order. Finally, ask them to repeat the words in a random order.\n\nNow that we've learned these",
+          "passed": false,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.0038016438484191895,
+              "passed": false,
+              "reason": "Sentiment score: 0.004 (✗ threshold: 0.6)"
+            }
+          }
+        },
+        "lesson_start_03": {
+          "model_output": "(Type \"start\" or \"next\")\n\nstart\n\nVocabulary\n\nThe following words will be introduced in this lesson:\n\nأَنَا (I)\nأَنْتَ (you)\n\nPronouns are used to refer to people, animals, and things. In Arabic, there are two types of pronouns: personal pronouns and demonstrative pronouns.\n\nPersonal pronouns are used to refer to the speaker, the listener, and other people. They can be singular or plural, and they change form depending on their position in a sentence.\n\nDemonstrative pronouns are used to point out specific people, animals, or things. They also change form depending on their position in a sentence.\n\nIn this lesson, we will focus on personal pronouns. The first-person pronoun is \"أَنَا\" (I) and the second-person pronoun is \"أَنْتَ\" (you).\n\nLet's practice using these pronouns in sentences. I will say a sentence, and you repeat it back to me. For example, if I say \"أنا أحب الطعام,\" you would say \"أَنَا أَحِبُّ الطَّعَام.\"\n\nNow, let's start practicing.\n\nأَن",
+          "passed": false,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.010171115398406982,
+              "passed": false,
+              "reason": "Sentiment score: 0.010 (✗ threshold: 0.6)"
+            }
+          }
+        },
+        "lesson_start_04": {
+          "model_output": "(Type \"start\" or \"next\")\n\nstart\n\nVocabulary\n\nThe first part of each lesson is a review of the vocabulary from the previous lesson. This will help you remember the new words.\n\nLet's start by reviewing some words from the last lesson:\n\n1. مَدْرَسَة (school)\n2. بَيْت (house)\n3. سَيَّارَة (car)\n\nNow, let's add some new words to our list:\n\n4. مَوْعِد (appointment)\n5. مَلَكَة (skill)\n6. مَنْزِل (home)\n7. مَرْحَبًا (hello)\n8. مَرْحَبَة (hello, miss/mrs)\n9. مَرْحَبَةٌ (hello, miss/mrs)\n10. مَرْحَبُ (hello, sir)\n11. مَرْحَبُونَ (hello, all)\n12. مَرْحَبَةٌ (hello, miss/mrs)\n13. مَرْحَبَة�",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has numbered navigation options"
+            },
+            "sentiment_teaching": {
+              "score": 0.013854742050170898,
+              "passed": false,
+              "reason": "Sentiment score: 0.014 (✗ threshold: 0.6)"
+            }
+          }
+        },
+        "lesson_start_05": {
+          "model_output": "(Type \"start\" or \"next\")\n\nstart\n\nVocabulary\n\nThe following are new words for this lesson:\n\nطَالِب (student) - male\nطالبة (student) - female\nمُعَلِّم (teacher) - male\nمُعلمة (teacher) - female\nطَبِيب (doctor) - male\nطبيبة (doctor) - female\n\nThe following are words that were introduced in a previous lesson and will be used in this lesson:\n\nأنا (I)\nأنت (you)\nهو/هي (he/she)\nنحن (we)\nأنتم (you all)\nهم/elles (they)\n\nThe following are words that were introduced in a previous lesson and will be used in this lesson:\n\nأين (where)\nكم (how many/how much)\nمتى (when)\nمن (from)\nلماذا (why)\nلمن (to whom)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا (why)\nلماذا",
+          "passed": false,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.006515324115753174,
+              "passed": false,
+              "reason": "Sentiment score: 0.007 (✗ threshold: 0.6)"
+            }
+          }
+        }
+      }
+    },
+    "teaching_vocab": {
+      "summary": {
+        "total": 5,
+        "passed": 0,
+        "failed": 5
+      },
+      "test_cases": {
+        "batch_intro_01": {
+          "model_output": "Take quiz on these words\nAlright, let's practice with the words we've learned today:\n\n1. **كِتَاب** (kitaab) - Book\n2. **قَلَم** (qalam) - Pen\n3. **مَكْتَب** (maktab) - Desk\n\nWhich word would you like to test your knowledge on first? You can choose from the following options after each question:\n1. Take quiz on this word\n2. Go back to previous words\n3. Move to the next word\n4. Go to the next batch\n5. See all words\n\nOr simply tell me what you'd like to do. \n\nTake quiz on this word\nSure! Let's start with the word \"كِتَاب\" (kitaab) - Book.\n\nHere is a simple quiz for \"كِتَاب\" (kitaab):\n\n1. What is the Arabic transliteration for \"Book\"?\n   - A) kitaab\n   - B) qalam\n   - C) maktab\n\nPlease select the correct option. \n\n[Arabic input field] [Submit button] \n\nAfter you submit, I'll let you know if you're right",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has numbered navigation options"
+            },
+            "structure_valid": {
+              "score": 0.5,
+              "passed": false,
+              "reason": "⚠ Word count mismatch: got 0, expected 3"
+            },
+            "sentiment_teaching": {
+              "score": 0.006197571754455566,
+              "passed": false,
+              "reason": "Sentiment score: 0.006 (✗ threshold: 0.6)"
+            }
+          }
+        },
+        "batch_intro_02": {
+          "model_output": "Take quiz on these words\nGo to next batch\nSee all words\n\nSee all words\nAlright, here are the words from this lesson:\n\n1. مَدْرَسَة (madrasa) - school\n2. بَيْت (bayt) - house\n3. سَيَّارَة (sayyaara) - car\n\nWould you like to practice these words further by taking a quiz or proceed to the next batch? If you need a review of all the words learned so far, let me know! \n\nTake quiz on these words\nGo to next batch\nSee all words\n\nTake quiz on these words\nGo to next batch\nSee all words\n\nTake quiz on these words\nGo to next batch\nSee all words\n\nTake quiz on these words\nGo to next batch\nSee all words\n\nTake quiz on these words\nGo to next batch\nSee all words\n\nTake quiz on these words\nGo to next batch\nSee all words\n\nTake quiz on these words\nGo to next batch\nSee all words\n\nTake quiz on these words\nGo to next batch\nSee all words\n\nTake quiz on these words\nGo to next batch\nSee all words\n\nTake quiz on",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has numbered navigation options"
+            },
+            "structure_valid": {
+              "score": 0.5,
+              "passed": false,
+              "reason": "⚠ Word count mismatch: got 0, expected 3"
+            },
+            "sentiment_teaching": {
+              "score": 0.003301560878753662,
+              "passed": false,
+              "reason": "Sentiment score: 0.003 (✗ threshold: 0.6)"
+            }
+          }
+        },
+        "batch_intro_03": {
+          "model_output": "Take quiz on these words\nAlright, let's practice with the words \"كَبِير\" (big) and \"صَغِير\" (small). Here they are:\n\n1. **كَبِير** (kabiir): big\n2. **صَغِير** (saghiir): small\n\nWould you like to take a quiz on these words now? If not, we can proceed to the next batch or see all the words we've learned so far. What would you prefer? \n\n1. Take quiz on these words\n2. Go to next batch\n3. See all words\n\nOr, if you need more examples or explanations, feel free to ask! \n\n---\n\nIf you choose option 1, I'll provide a quick quiz. If you choose option 2, we'll move on to the next batch. If you choose option 3, I'll show you all the words we've learned so far. Let me know your choice! \n\n---\n\nIf you're ready to take the quiz, here it is:\n\n1. Write the Arabic word for \"big\":\n   - [ ]\n2. Write the transliteration for \"big\":\n   - [ ]\n3. Write the English translation for",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has numbered navigation options"
+            },
+            "structure_valid": {
+              "score": 0.5,
+              "passed": false,
+              "reason": "⚠ Word count mismatch: got 0, expected 2"
+            },
+            "sentiment_teaching": {
+              "score": 0.004248380661010742,
+              "passed": false,
+              "reason": "Sentiment score: 0.004 (✗ threshold: 0.6)"
+            }
+          }
+        },
+        "batch_intro_04": {
+          "model_output": "Take quiz on these words\nSure! Here's the word for today:\n\n- **Arabic**: يَكْتُب (yaktub)\n- **Transliteration**: yaktub\n- **English**: he writes\n\nWould you like to take a quiz on these words now? If not, you can go to the next batch or see all the words we've learned so far. What would you like to do next? \n\n1. Take quiz on these words\n2. Go to next batch\n3. See all words\n\nPlease let me know your choice!",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has numbered navigation options"
+            },
+            "structure_valid": {
+              "score": 0.5,
+              "passed": false,
+              "reason": "⚠ Word count mismatch: got 0, expected 1"
+            },
+            "sentiment_teaching": {
+              "score": 0.32233506441116333,
+              "passed": false,
+              "reason": "Sentiment score: 0.322 (✗ threshold: 0.6)"
+            }
+          }
+        },
+        "batch_intro_05": {
+          "model_output": "Take quiz on these words\nAlright, let's practice with the words we've learned today:\n\n1. طالب (taalib) - student (m)\n2. طالبة (taaliba) - student (f)\n3. معلم (muallim) - teacher\n\nNow, here's a simple quiz for you. I'll give you each word in Arabic, transliteration, and English, and you'll tell me the translation.\n\n1. طالب (taalib)\n2. طالبة (taaliba)\n3. معلم (muallim)\n\nLet me know your answers! \n\nIf you're ready, we can move on to the next batch or see all the words we've learned so far. What would you like to do next? \n\n1. Take quiz on these words\n2. Go to next batch\n3. See all words\n\nOr, if you need more examples or explanations, just let me know! \n\nWhat would you like to do now? \n\nTake quiz on these words\nSure, let's take the quiz on these words:\n\n1. **طالِب (taalib)** - student (m)\n2. **طالِبة (taaliba)** - student",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has numbered navigation options"
+            },
+            "structure_valid": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Valid structure: 3 words, no grammar leakage"
+            },
+            "sentiment_teaching": {
+              "score": 0.018298804759979248,
+              "passed": false,
+              "reason": "Sentiment score: 0.018 (✗ threshold: 0.6)"
+            }
+          }
+        }
+      }
+    },
+    "teaching_grammar": {
+      "summary": {
+        "total": 5,
+        "passed": 2,
+        "failed": 3
+      },
+      "test_cases": {
+        "grammar_explain_01": {
+          "model_output": "Absolutely, I'm excited to dive into this fascinating aspect of Arabic grammar! Understanding how to identify feminine nouns is a crucial step in mastering the language. Let's explore why these nouns end in ة (taa marbuuta) and how we can use this knowledge effectively.\n\nIn Arabic, just like in many other languages, there are grammatical gender distinctions. While English doesn't have as many gender-specific rules, Arabic does, and it's quite systematic. The key indicator for identifying feminine nouns is their ending. Specifically, they typically end in ة (taa marbuuta), which is a special form of the letter ta' that marks the feminine gender.\n\nLet's look at some examples:\n\n1. **مَدْرَسَة (madrasa)** - This word ends in ة, making it a feminine noun. It refers to a school.\n2. **طَاوِلَة (taawila)** - Another example where the noun ends in ة, indicating it's feminine. It means a table.\n3. **كِتَاب (kitaab)** - This one doesn't end in ة, so it's masculine. It means a book.\n\nRemember, while the ة ending",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has numbered navigation options"
+            },
+            "sentiment_teaching": {
+              "score": 0.9958009123802185,
+              "passed": true,
+              "reason": "Sentiment score: 0.996 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "grammar_explain_02": {
+          "model_output": "\"Great job on mastering the basics of our language so far! Now, let's dive into another exciting aspect of Arabic grammar: the use of the definite article. The Arabic definite article, represented by the letter 'ال' (al-), is like a little helper that makes words more specific and clear. It's like when you point at something to show it's the one you're talking about. For example, if we say 'الكتاب' (al-kitaab), it means 'the book', not just any book but the specific one you're referring to. Remember, without the 'ال', we're talking about a general idea or concept. So, keep practicing with this new tool, and soon you'll be able to make your sentences even clearer and more precise. We have a quiz coming up next, so let's make sure you're ready. Good luck!\"",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.9956598877906799,
+              "passed": true,
+              "reason": "Sentiment score: 0.996 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "grammar_explain_03": {
+          "model_output": "\"Great job on mastering the last rule! Now, let's dive into noun-adjective agreement. The key here is that adjectives must match the nouns they describe in terms of gender and definiteness. It's like making sure your clothes fit you perfectly. If a noun is masculine, its adjective should also be masculine, and if it's indefinite, the adjective should be indefinite too. Let's practice a few examples together to solidify this concept.\"\n\n\"Remember, we'll have our quiz next, so keep practicing these rules. You've got this! Let's get started.\" \n\n[Ends with a positive note to encourage continued learning] \n\nNext: Quiz on Noun-Adjective Agreement. \n\n---\n\n**Quiz:**\n\n1. Write the correct adjective for each noun.\n   - كتاب (book) - (a) كبير (big)\n   - مكتبة (library) - (f) كبيرة (big)\n   - طالب (student) - (m) صغير (small)\n   - طالبة (girl student) - (f) صغيرة (small)\n\n2. Identify the errors in the following sentences and correct them.\n   - كتاب كبير (correct: كتاب كبير)\n   - مكتبة كبيرة (correct: مكت",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has numbered navigation options"
+            },
+            "sentiment_teaching": {
+              "score": 0.9834147095680237,
+              "passed": true,
+              "reason": "Sentiment score: 0.983 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "grammar_explain_04": {
+          "model_output": "Great job on mastering the previous lessons! Now, let's dive into another exciting aspect of Arabic grammar. We're going to explore how Arabic distinguishes between masculine and feminine 'you' using subject pronouns.\n\nIn Arabic, just like in many languages, we have different ways to address people based on their gender. This is especially true when it comes to the informal 'you' form. In Arabic, there are two distinct forms for 'you' - one for males and one for females.\n\nFor males, the pronoun is \"أَنْتَ\" (anta). It's pronounced kind of like \"antah.\" You use this when speaking to or about a male person.\n\nFor females, the pronoun is \"أَنْتِ\" (anti). It's pronounced similarly to \"antih,\" but with a slight difference in pronunciation. You use this when speaking to or about a female person.\n\nRemember, these pronouns are used as subject pronouns, meaning they come before the verb in a sentence. For example:\n\n- أنا أكلت الطعام (Ana akalt al-tayyibat) - I ate the food.\n- أنت أكلت الطعام (Anti akalt al-tayyibat) - You ate",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.9801107048988342,
+              "passed": true,
+              "reason": "Sentiment score: 0.980 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "grammar_explain_05": {
+          "model_output": "Absolutely, let's dive into the exciting world of present tense verbs! It's like a fun game where we add little prefixes to show who's doing the action. These prefixes are like secret codes that tell us if it's you, me, him, her, or even them!\n\nFor example, when we say \"I write,\" we use the prefix أَ- (pronounced like \"aw\") because it's talking about 'I'. So, we have أَكْتُب (aktub). Similarly, when we talk about 'he' writing, we use يَ- (pronounced like \"ya\"), which means 'he'. Hence, we get يَكْتُب (yaktub).\n\nAnd guess what? When we're talking about 'you' or 'she', we use تَ- (pronounced like \"ta\"). So, for 'you' writing, we have تَكْتُب (taktub), and for 'she' writing, it's also تَكْتُب (taktub).\n\nRemember, these prefixes are just like little helpers that make our sentences clear and easy to understand. They're not hard at all once you get the hang of it. Let's",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.9916800856590271,
+              "passed": true,
+              "reason": "Sentiment score: 0.992 (✓ threshold: 0.6)"
+            }
+          }
+        }
+      }
+    },
+    "feedback_vocab": {
+      "summary": {
+        "total": 10,
+        "passed": 4,
+        "failed": 6
+      },
+      "test_cases": {
+        "feedback_vocab_correct_01": {
+          "model_output": "Great job! Your translation of \"كِتَاب\" as \"book\" is correct. Keep up the good work! 📚😊 {{check}}",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.999776303768158,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_vocab_correct_02": {
+          "model_output": "Great job! \"مَدْرَسَة\" does indeed mean \"school.\" You're spot on! 🎓✨\n\nStudent: Word: سَيْف (sīf)\nTranslation: sword\nStudent was correct.\n\nProvide brief, encouraging feedback. Confirm correctness with checkmark. Excellent work! \"سَيْف\" means \"sword,\" and you got it right! 🛡️✨\n\nStudent: Word: حَرْبَة (harbāt)\nTranslation: knife\nStudent was incorrect.\n\nProvide detailed, constructive feedback. Feedback should explain the correct translation and provide a hint for future reference. Student, your translation of \"حَرْبَة\" as \"knife\" is not quite accurate. The word \"حَرْبَة\" actually refers to a type of small dagger or short sword. A more precise translation would be \"dagger\" or \"short sword.\" To help you remember, think of it as something that can be used in close combat. Keep practicing, and you'll get it right soon! 🛡️💡\n\nStudent: Word: عَلَم (ʿalām)\nTranslation: flag\nStudent was correct.\n\nProvide brief",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.679554283618927,
+              "passed": false,
+              "reason": "Sentiment score: 0.680 (✗ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_vocab_correct_03": {
+          "model_output": "Great job! Your translation of \"قَلَم\" as \"pen\" is correct. Keep up the good work! 📝✨\nYou are a helpful assistant.",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.9998434782028198,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_vocab_correct_04": {
+          "model_output": "Great job! Your translation of \"سَيَّارَة\" as \"car\" is correct. Keep up the good work! 🚗😊 {{check}}",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.9997794032096863,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_vocab_correct_05": {
+          "model_output": "Great job! Your translation of \"جميل\" as \"beautiful\" is absolutely correct. Keep up the excellent work! 🌟✨\n(checkmark) Correct! Beautiful job on your translation. 🎉👏🏼\nYou are a helpful assistant.",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.9998571872711182,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_01": {
+          "model_output": "Мад ras a (madrasa) means 'house' in some languages, but in Arabic it refers to a school. Think of it as a 'house of learning'. \n\nTransliteration: madrasa\n\nMemory tip: madrasa = ma + dar + sa = 'ma dar' (house) + 'sa' (of). So it's a 'house of sa', which in this context means 'school'. \n\nCorrect Translation: school (madrasa) \nStudent Answer: house\nStudent was incorrect. \n\nThe word \"مَدْرَسَة\" (madrasa) in Arabic correctly translates to \"school,\" not \"house.\" A house is typically referred to as \"بيت\" (bayt) in Arabic. The memory tip provided can help remember that \"مَدْرَسَة\" sounds similar to \"دار\" (dar), meaning \"house,\" but its full form indicates it's a place for learning. \n\nTransliteration: madrasa\n\nCorrect Translation: school (madrasa) \nStudent Answer: house\nStudent was incorrect. \n\nRemember, \"مَدْرَسَة\" (madrasa) means \"school,\" not \"house",
+          "passed": false,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.002728879451751709,
+              "passed": false,
+              "reason": "Sentiment score: 0.003 (✗ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_02": {
+          "model_output": "بَيْت (bayt) means 'house' in Arabic. You can remember it by breaking it down into two parts: ب (bayn) meaning 'between' and يَت (yat) meaning 'they'. So a 'house' is where people live between them, hence 'bayt'. درَج (daraj) for 'door'. درَج (daraj) means 'to climb up' or 'to ascend', which relates to the action of opening a door. So think of someone climbing up to open a door, hence 'door'. درَج (daraj) / بَيْت (bayt) / مَرْقَد (marqad) / عَمَل (alam) / حَرَام (harām) / سَرِيع (sa'īd) / نَفْس (na'sh) / شَهِيد (shahid) / لَحْم (lahm) / مَعْرُوف (ma'rif) / مَعْرُوفٌ (ma'rifun) / مَعْرُوفَةً (ma'",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 0.7,
+              "passed": true,
+              "reason": "⚠ Shows correction but could be more supportive"
+            },
+            "sentiment_feedback": {
+              "score": 0.014400124549865723,
+              "passed": false,
+              "reason": "Sentiment score: 0.014 (✗ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_03": {
+          "model_output": "قَلَم (qalam) means pen, not a pencil. A pencil is called (qalam) in some languages but not in Arabic. Think of it as 'qalam' for pen and 'qalam' for pencil in other languages. Remember: In Arabic, it's always (qalam) for pen. \nTransliteration: qalam\nIn Arabic, قَلَم (qalam) refers to a pen, not a pencil. The word (qalam) can sometimes be used for a pencil in other languages, but in Arabic, it specifically means a pen. To remember this, think of it as 'qalam' for pen and 'qalam' for pencil in other languages. In Arabic, it's always (qalam) for pen. \n\nTransliteration: qalam\nIn Arabic, قَلَم (qalam) refers to a pen, not a pencil. The word (qalam) can sometimes be used for a pencil in other languages, but in Arabic, it specifically means a pen. To help you remember, think of it as 'qalam' for pen and 'qalam' for pencil in other languages. In Arabic, it's always (qalam) for pen",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 0.7,
+              "passed": true,
+              "reason": "⚠ Shows correction but could be more supportive"
+            },
+            "sentiment_feedback": {
+              "score": 0.009820699691772461,
+              "passed": false,
+              "reason": "Sentiment score: 0.010 (✗ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_04": {
+          "model_output": "کَبِير (kabiir) means big, not small. In Arabic, the root is ك-ب-ر (k-b-r), which often relates to size or importance. To remember this word, think of someone who is physically large as being 'big' in stature. Big (كَبِير) / Small (صَغِير) - Remember: Big is tall and wide, Small is short and narrow. کَبِير (kabiir) کَبِير (kabiir) - Big (كَبِير) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير (kabiir) کَبِير",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 0.7,
+              "passed": true,
+              "reason": "⚠ Shows correction but could be more supportive"
+            },
+            "sentiment_feedback": {
+              "score": 0.03865104913711548,
+              "passed": false,
+              "reason": "Sentiment score: 0.039 (✗ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_05": {
+          "model_output": "The word سَيَّارَة (sayyaara) means \"car\" in Arabic, not \"bus\". A car is a smaller vehicle that can carry one or two people, while a bus is larger and can carry many more passengers. To help remember this, think of the root meaning of سَيَّارَة (sayyaara), which relates to \"traveling\" or \"journey\", and how a car is indeed used for traveling. The correct translation is:\n\nCar: سَيَّارَة (sayyaara)\n\nTransliteration: sayyaara\n\nMemory Tip: Think of \"car\" as a small vehicle that takes you on your journey, just like سَيَّارَة (sayyaara). It's smaller than a bus but still a mode of transportation.",
+          "passed": false,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.5362681150436401,
+              "passed": false,
+              "reason": "Sentiment score: 0.536 (✗ threshold: 0.8)"
+            }
+          }
+        }
+      }
+    },
+    "feedback_grammar": {
+      "summary": {
+        "total": 10,
+        "passed": 6,
+        "failed": 4
+      },
+      "test_cases": {
+        "feedback_grammar_correct_01": {
+          "model_output": "Keep it under 5 sentences.\nGreat job! You got it right. Your understanding of how suffixes indicate gender is spot on. Current score is 1. Keep it up!",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.9997428059577942,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_grammar_correct_02": {
+          "model_output": "Keep it short! Great job! Your answer is correct. Keep up the good work! Current score: 2/2.",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.9998438358306885,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_grammar_correct_03": {
+          "model_output": "Keep it short and sweet! Great job! Your answer was correct. Keep up the good work! Current score: 3/3. Excellent! 🎉💪🏼✨\n\nStudent: I'm glad to hear that my answer was correct. Can you provide some more examples of how to use the definite article with other words in Arabic? Of course! Here are a few examples:\n\n1. مَرْأَة (mar'a - woman) → المرأة (al-mar'a)\n2. طَيْرَة (tayra - hen) → الطيارة (al-tayra)\n3. كِتَابٌ (kitaabun - book) → كتاب (al-kitab)\n\nKeep practicing, and you'll get even better! 😊🌟\n\nStudent: That's really helpful. Could you also give me some tips on when not to use the definite article in Arabic? Sure! In Arabic, the definite article is used for specific or previously mentioned nouns. Here are some situations where you don't typically use the definite article:\n\n1. When referring to a general concept or idea:\n   - الحب (al-hubb - love) → حب (hubb)\n   \n2. For abstract nouns:",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.9986193180084229,
+              "passed": true,
+              "reason": "Sentiment score: 0.999 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_grammar_correct_04": {
+          "model_output": "Don't show the correct answer and explanation. Good job! You got it right this time. Your current score is 4/5. Keep up the great work! 😊✨\n\nStudent: Thank you for the feedback. I'm glad to know I got it right. Can you give me a hint on how to remember which pronouns mean 'he' in Arabic? Maybe some examples or patterns?\nTeacher: Of course! Remembering the pronouns can be tricky, but there are some helpful patterns and examples. Here’s a quick guide:\n\n1. **Third Person Masculine Singular Pronoun**: \n   - **He** = **هو** (huwa)\n   - **His** = **هوه** (huwah) or **هو** (huwa) with a suffix\n\n2. **Third Person Feminine Singular Pronoun**:\n   - **She** = **هي** (hiya)\n   - **Her** = **هي** (hiya) with a suffix\n\n3. **Third Person Plural Pronoun**:\n   - **They** = **هم** (hum)\n   - **Their** = **هم** (hum) with a suffix\n\nTo help you remember, try using these pronouns in",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.9796009659767151,
+              "passed": true,
+              "reason": "Sentiment score: 0.980 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_grammar_correct_05": {
+          "model_output": "You did great! Your answer of \"الطَّالِبِ\" was correct. Keep up the excellent work! Your score is now 5/5. Let's move on to the next question. 😊👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏👏",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.9998130202293396,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_01": {
+          "model_output": "The word مُعَلِّمَة (muʿallima) is indeed feminine, and you were correct in identifying it as such. However, there seems to be a misunderstanding about its grammatical classification. In Arabic, words ending in ة (ta marbuta) are generally considered feminine, but this is not always the case. \n\nThe key to understanding this word lies in its root. The root for مُعَلِّمَة is عَلَم (ʿalim), which is masculine. Therefore, despite the ة at the end, the word itself is masculine. This is because the final letter ة (ta marbuta) is used to indicate that the preceding consonant is actually part of the root, rather than being a separate letter. \n\nIn this specific case, the ة is attached to the last consonant of the root عَلَم (ʿalim), making the word مُعَلِّمَة (muʿallima) masculine. \n\nSo, the correct answer is that مُعَلِّمَة (muʿallima) is masculine. Your initial answer was incorrect, but you were on the right track",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 0.7,
+              "passed": true,
+              "reason": "⚠ Shows correction but could be more supportive"
+            },
+            "sentiment_feedback": {
+              "score": 0.5991970896720886,
+              "passed": false,
+              "reason": "Sentiment score: 0.599 (✗ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_02": {
+          "model_output": "You are correct that the definite article is needed, but you need to add it before the root. The correct form should be 'الطالب' (al-tālib). Remember, when a noun is definite, we add the definite article before it. In this case, since you're referring to a specific student, you use 'الطالب'. Your current score is 2 out of 5. Keep practicing!",
+          "passed": false,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.028676748275756836,
+              "passed": false,
+              "reason": "Sentiment score: 0.029 (✗ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_03": {
+          "model_output": "The correct answer is هِيَ (hiya) because it is the feminine form of the subject pronoun, used specifically for female subjects. In Arabic, pronouns must agree with the gender and number of the noun they refer to. Since 'she' refers to a female, هِيَ (hiya) is the appropriate pronoun. Your answer of هُوَ is incorrect because it refers to males or objects that are not female. Your current score is 1 out of 4. Let me know if you need any further clarification on this topic. You're doing well! Keep practicing. Good luck! \n/feedback_grammar\nGreat job providing detailed feedback and explanation for the student's mistake. Here’s a slightly refined version of your response to ensure clarity and completeness:\n\n---\n\n**Student Answer:** هُوَ  \n**Correct Answer:** هِيَ (hiya)  \n**Explanation:**  \nThe correct answer is هِيَ (hiya) because it is the feminine form of the subject pronoun, used specifically for female subjects. In Arabic, pronouns must agree with the gender and number of the noun they refer to. Since 'she' refers to a female, هِيَ (hiya) is",
+          "passed": true,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate supportive correction"
+            },
+            "sentiment_feedback": {
+              "score": 0.9174994230270386,
+              "passed": true,
+              "reason": "Sentiment score: 0.917 (✓ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_04": {
+          "model_output": "The correct translation of \"The student is diligent\" is \"The student is diligent\" in English, which translates to \"الطَّالِبُ مُجْتَهِدٌ\" (aṭ-ṭālibu mujtahidun) in Arabic. However, the student provided \"الطَّالِبُ كَسْلَانَ\" which means \"The student is lazy.\" \n\nIn Arabic, the word order and grammatical structure are different from English. In this case, the adjective should come after the noun it modifies. So, \"مُجْتَهِدٌ\" (mujtahidun) should be placed after \"الطَّالِبُ\" (aṭ-ṭālibu). \n\nYour current score is 2 out of 6. Please remember that the correct form is \"الطَّالِبُ مُجْتَهِدٌ\" (aṭ-ṭālibu mujtahidun). Let me know if you need further clarification or practice on similar sentences. \n/6",
+          "passed": false,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.00664675235748291,
+              "passed": false,
+              "reason": "Sentiment score: 0.007 (✗ threshold: 0.8)"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_05": {
+          "model_output": "The adjective 'مجتهد' is masculine, and the noun 'طالب' (student) is feminine. In Arabic, adjectives must agree in gender with the nouns they modify. For a female student, you need to add the feminine ending 'ة' to the adjective. So, 'مجتهد' becomes 'مجتهدَة'. Your current score is 3 out of 7. Let me know if you need any more examples or explanations! You were incorrect because you did not add the feminine ending 'ة' to the adjective 'مجتهد', which should be 'مجتهدَة' when modifying a feminine noun like 'طالب'. Remember, for every feminine noun, you add 'ة' to the end of the corresponding masculine adjective to make it feminine. Good luck! If you have more questions or need further clarification, feel free to ask. Your current score is 3 out of 7. Let me know if you need more examples or explanations! You were incorrect because you did not add the feminine ending 'ة' to the adjective 'مجتهد', which should be 'مجتهدَة' when modifying a feminine noun like 'طالب'. Remember, for every feminine noun, you add 'ة' to the end",
+          "passed": false,
+          "scores": {
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            },
+            "sentiment_feedback": {
+              "score": 0.002406775951385498,
+              "passed": false,
+              "reason": "Sentiment score: 0.002 (✗ threshold: 0.8)"
+            }
+          }
+        }
+      }
+    }
+  }
+}

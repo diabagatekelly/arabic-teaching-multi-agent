@@ -1,0 +1,1542 @@
+{
+  "metadata": {
+    "version": "3.0",
+    "created": "2026-04-13",
+    "agent": "Agent 1 - Teaching Agent",
+    "total_test_cases": 54,
+    "description": "Evaluation dataset for Agent 1 (Teaching Agent) - Tests lesson presentation, vocabulary teaching, grammar explanations, and feedback",
+    "modes": [
+      "lesson_start",
+      "teaching_vocab",
+      "teaching_grammar",
+      "feedback_vocab",
+      "feedback_grammar"
+    ],
+    "metrics": {
+      "sentiment_teaching": {
+        "description": "Measures warm, encouraging tone for teaching modes",
+        "threshold": 0.6,
+        "applies_to": [
+          "lesson_start",
+          "teaching_vocab",
+          "teaching_grammar"
+        ]
+      },
+      "sentiment_feedback": {
+        "description": "Measures supportive tone for feedback modes",
+        "threshold": 0.8,
+        "applies_to": [
+          "feedback_vocab",
+          "feedback_grammar"
+        ]
+      },
+      "feedback_appropriateness": {
+        "description": "Validates feedback matches correctness (praise for correct, supportive correction for incorrect)",
+        "applies_to": [
+          "feedback_vocab",
+          "feedback_grammar"
+        ],
+        "checks": {
+          "correct_answer": "Must contain praise keywords (perfect, correct, excellent, great job, well done) and confirm correctness",
+          "incorrect_answer": "Must be supportive (not quite, great effort, keep trying) with correction shown, NO false praise"
+        }
+      },
+      "has_navigation": {
+        "description": "Checks if response provides navigation options for student",
+        "applies_to": [
+          "lesson_start",
+          "teaching_vocab",
+          "teaching_grammar"
+        ],
+        "checks": "Response includes numbered options or clear next steps"
+      },
+      "structure_valid": {
+        "description": "Validates proper formatting and structure",
+        "applies_to": [
+          "teaching_vocab"
+        ],
+        "checks": "Batched vocabulary (3-4 words at a time), no grammar leakage in vocab mode"
+      }
+    }
+  },
+  "lesson_start": {
+    "description": "Test cases for Lesson Welcome/Greeting - Agent 1 should welcome warmly and offer navigation",
+    "mode": "lesson_start",
+    "total_cases": 5,
+    "test_cases": [
+      {
+        "test_id": "lesson_start_01",
+        "input": {
+          "mode": "lesson_start",
+          "lesson_number": 1,
+          "vocab_summary": {
+            "total_words": 10,
+            "topics_preview": [
+              "كِتَاب (book)",
+              "قَلَم (pen)",
+              "مَكْتَب (desk)"
+            ]
+          },
+          "grammar_summary": {
+            "topics": [
+              "Feminine Nouns",
+              "Definite Article"
+            ],
+            "topics_count": 2
+          }
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "lesson_start_02",
+        "input": {
+          "mode": "lesson_start",
+          "lesson_number": 3,
+          "vocab_summary": {
+            "total_words": 12,
+            "topics_preview": [
+              "يَكْتُب (he writes)",
+              "يَقْرَأ (he reads)"
+            ]
+          },
+          "grammar_summary": {
+            "topics": [
+              "Present Tense Conjugation",
+              "Subject Pronouns",
+              "Verb Agreement"
+            ],
+            "topics_count": 3
+          }
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "lesson_start_03",
+        "input": {
+          "mode": "lesson_start",
+          "lesson_number": 5,
+          "vocab_summary": {
+            "total_words": 8,
+            "topics_preview": [
+              "أَنَا (I)",
+              "أَنْتَ (you)"
+            ]
+          },
+          "grammar_summary": {
+            "topics": [
+              "Pronouns"
+            ],
+            "topics_count": 1
+          }
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "lesson_start_04",
+        "input": {
+          "mode": "lesson_start",
+          "lesson_number": 2,
+          "vocab_summary": {
+            "total_words": 15,
+            "topics_preview": [
+              "مَدْرَسَة (school)",
+              "بَيْت (house)",
+              "سَيَّارَة (car)"
+            ]
+          },
+          "grammar_summary": {
+            "topics": [
+              "Noun-Adjective Agreement"
+            ],
+            "topics_count": 1
+          }
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "lesson_start_05",
+        "input": {
+          "mode": "lesson_start",
+          "lesson_number": 7,
+          "vocab_summary": {
+            "total_words": 20,
+            "topics_preview": [
+              "طَالِب (student)",
+              "مُعَلِّم (teacher)",
+              "طَبِيب (doctor)"
+            ]
+          },
+          "grammar_summary": {
+            "topics": [
+              "Past Tense",
+              "Negation",
+              "Questions"
+            ],
+            "topics_count": 3
+          }
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      }
+    ]
+  },
+  "feedback_vocab": {
+    "description": "Test cases for vocab feedback - Agent 1 should provide appropriate feedback based on correctness",
+    "mode": "feedback_vocab",
+    "total_cases": 10,
+    "correct_feedback": [
+      {
+        "test_id": "feedback_vocab_correct_01",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "كِتَاب",
+          "word_transliteration": "kitaab",
+          "student_answer": "book",
+          "is_correct": true,
+          "english": "book"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      },
+      {
+        "test_id": "feedback_vocab_correct_02",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "مَدْرَسَة",
+          "word_transliteration": "madrasa",
+          "student_answer": "school",
+          "is_correct": true,
+          "english": "school"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      },
+      {
+        "test_id": "feedback_vocab_correct_03",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "قَلَم",
+          "word_transliteration": "qalam",
+          "student_answer": "pen",
+          "is_correct": true,
+          "english": "pen"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      },
+      {
+        "test_id": "feedback_vocab_correct_04",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "سَيَّارَة",
+          "word_transliteration": "sayyaara",
+          "student_answer": "car",
+          "is_correct": true,
+          "english": "car"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      },
+      {
+        "test_id": "feedback_vocab_correct_05",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "جَمِيل",
+          "word_transliteration": "jamiil",
+          "student_answer": "beautiful",
+          "is_correct": true,
+          "english": "beautiful"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      }
+    ],
+    "incorrect_feedback": [
+      {
+        "test_id": "feedback_vocab_incorrect_01",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "مَدْرَسَة",
+          "word_transliteration": "madrasa",
+          "student_answer": "house",
+          "is_correct": false,
+          "english": "school"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "school"
+        }
+      },
+      {
+        "test_id": "feedback_vocab_incorrect_02",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "بَيْت",
+          "word_transliteration": "bayt",
+          "student_answer": "door",
+          "is_correct": false,
+          "english": "house"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "house"
+        }
+      },
+      {
+        "test_id": "feedback_vocab_incorrect_03",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "قَلَم",
+          "word_transliteration": "qalam",
+          "student_answer": "pencil",
+          "is_correct": false,
+          "english": "pen"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "pen"
+        }
+      },
+      {
+        "test_id": "feedback_vocab_incorrect_04",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "كَبِير",
+          "word_transliteration": "kabiir",
+          "student_answer": "small",
+          "is_correct": false,
+          "english": "big"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "big"
+        }
+      },
+      {
+        "test_id": "feedback_vocab_incorrect_05",
+        "input": {
+          "mode": "feedback_vocab",
+          "word_arabic": "سَيَّارَة",
+          "word_transliteration": "sayyaara",
+          "student_answer": "bus",
+          "is_correct": false,
+          "english": "car"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "car"
+        }
+      }
+    ]
+  },
+  "feedback_grammar": {
+    "description": "Test cases for grammar feedback - Agent 1 should provide appropriate feedback based on correctness",
+    "mode": "feedback_grammar",
+    "total_cases": 10,
+    "correct_feedback": [
+      {
+        "test_id": "feedback_grammar_correct_01",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "Is the word مَدْرَسَة masculine or feminine?",
+          "student_answer": "feminine",
+          "correct_answer": "feminine",
+          "explanation": "مَدْرَسَة ends with ة so it's feminine",
+          "is_correct": true,
+          "current_score": "1/1"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      },
+      {
+        "test_id": "feedback_grammar_correct_02",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "Is the word بَيْت (bayt - house) masculine or feminine?",
+          "student_answer": "masculine",
+          "correct_answer": "masculine",
+          "explanation": "بَيْت has no ة ending, so it's masculine",
+          "is_correct": true,
+          "current_score": "2/2"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      },
+      {
+        "test_id": "feedback_grammar_correct_03",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "Add the definite article to قَلَم (qalam - pen)",
+          "student_answer": "القَلَم",
+          "correct_answer": "القَلَم (al-qalam)",
+          "explanation": "The definite article ال is attached to the beginning",
+          "is_correct": true,
+          "current_score": "3/3"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      },
+      {
+        "test_id": "feedback_grammar_correct_04",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "What is the subject pronoun for 'he' in Arabic?",
+          "student_answer": "هُوَ",
+          "correct_answer": "هُوَ (huwa)",
+          "explanation": "هُوَ is the third person masculine singular pronoun",
+          "is_correct": true,
+          "current_score": "4/5"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      },
+      {
+        "test_id": "feedback_grammar_correct_05",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "Complete: كِتَابُ ___ (the student's book)",
+          "student_answer": "الطَّالِبِ",
+          "correct_answer": "الطَّالِبِ (aṭ-ṭālibi)",
+          "explanation": "This is an idafa construction. The second noun takes the genitive case",
+          "is_correct": true,
+          "current_score": "5/5"
+        },
+        "expected_output": "positive_with_praise",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_contain_praise": true,
+          "must_confirm_correct": true,
+          "must_not_say_incorrect": true
+        }
+      }
+    ],
+    "incorrect_feedback": [
+      {
+        "test_id": "feedback_grammar_incorrect_01",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "Is the word مُعَلِّمَة (muʿallima - teacher f) masculine or feminine?",
+          "student_answer": "masculine",
+          "correct_answer": "feminine",
+          "explanation": "مُعَلِّمَة ends with ة so it's feminine. It's the female form of teacher",
+          "is_correct": false,
+          "current_score": "1/3"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "feminine"
+        }
+      },
+      {
+        "test_id": "feedback_grammar_incorrect_02",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "Add the definite article to طَالِب (ṭālib - student)",
+          "student_answer": "طَالِب",
+          "correct_answer": "الطَّالِب (aṭ-ṭālib)",
+          "explanation": "The definite article ال must be attached to make it 'the student'",
+          "is_correct": false,
+          "current_score": "2/5"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "الطَّالِب"
+        }
+      },
+      {
+        "test_id": "feedback_grammar_incorrect_03",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "What is the subject pronoun for 'she' in Arabic?",
+          "student_answer": "هُوَ",
+          "correct_answer": "هِيَ (hiya)",
+          "explanation": "هِيَ is the feminine pronoun for 'she'. هُوَ is 'he' (masculine)",
+          "is_correct": false,
+          "current_score": "1/4"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "هِيَ"
+        }
+      },
+      {
+        "test_id": "feedback_grammar_incorrect_04",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "Translate: The student is diligent",
+          "student_answer": "الطَّالِبُ كَسْلَانَ",
+          "correct_answer": "الطَّالِبُ مُجْتَهِدٌ (aṭ-ṭālibu mujtahidun)",
+          "explanation": "مُجْتَهِدٌ means 'diligent'. كَسْلَانَ means 'lazy' (opposite meaning)",
+          "is_correct": false,
+          "current_score": "2/6"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "الطَّالِبُ مُجْتَهِدٌ"
+        }
+      },
+      {
+        "test_id": "feedback_grammar_incorrect_05",
+        "input": {
+          "mode": "feedback_grammar",
+          "question": "Make this adjective agree with طَالِبَة (female student): مُجْتَهِد",
+          "student_answer": "مُجْتَهِد",
+          "correct_answer": "مُجْتَهِدَة (mujtahida)",
+          "explanation": "Adjectives must agree in gender. Add ة to make it feminine",
+          "is_correct": false,
+          "current_score": "3/7"
+        },
+        "expected_output": "supportive_with_correction",
+        "metrics": [
+          "sentiment_feedback",
+          "feedback_appropriateness"
+        ],
+        "validation": {
+          "must_be_supportive": true,
+          "must_show_correct_answer": true,
+          "must_not_give_false_praise": true,
+          "correct_answer": "مُجْتَهِدَة"
+        }
+      }
+    ]
+  },
+  "teaching_vocab": {
+    "description": "Test cases for vocabulary teaching prompts (#2, #3, #4, #5, #8)",
+    "total_cases": 15,
+    "vocab_overview": [
+      {
+        "test_id": "vocab_overview_01",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 1,
+          "total_words": 10,
+          "batches_count": 4,
+          "words": [
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book"
+            },
+            {
+              "arabic": "قَلَم",
+              "transliteration": "qalam",
+              "english": "pen"
+            },
+            {
+              "arabic": "مَكْتَب",
+              "transliteration": "maktab",
+              "english": "desk"
+            },
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            },
+            {
+              "arabic": "بَيْت",
+              "transliteration": "bayt",
+              "english": "house"
+            },
+            {
+              "arabic": "سَيَّارَة",
+              "transliteration": "sayyaara",
+              "english": "car"
+            },
+            {
+              "arabic": "كَبِير",
+              "transliteration": "kabiir",
+              "english": "big"
+            },
+            {
+              "arabic": "صَغِير",
+              "transliteration": "saghiir",
+              "english": "small"
+            },
+            {
+              "arabic": "جَمِيل",
+              "transliteration": "jamiil",
+              "english": "beautiful"
+            },
+            {
+              "arabic": "جَدِيد",
+              "transliteration": "jadiid",
+              "english": "new"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "vocab_overview_02",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 2,
+          "total_words": 8,
+          "batches_count": 3,
+          "words": [
+            {
+              "arabic": "أَنَا",
+              "transliteration": "ana",
+              "english": "I"
+            },
+            {
+              "arabic": "أَنْتَ",
+              "transliteration": "anta",
+              "english": "you (m)"
+            },
+            {
+              "arabic": "هُوَ",
+              "transliteration": "huwa",
+              "english": "he"
+            },
+            {
+              "arabic": "هِيَ",
+              "transliteration": "hiya",
+              "english": "she"
+            },
+            {
+              "arabic": "نَحْنُ",
+              "transliteration": "nahnu",
+              "english": "we"
+            },
+            {
+              "arabic": "أَنْتُم",
+              "transliteration": "antum",
+              "english": "you (pl)"
+            },
+            {
+              "arabic": "هُم",
+              "transliteration": "hum",
+              "english": "they (m)"
+            },
+            {
+              "arabic": "هُنَّ",
+              "transliteration": "hunna",
+              "english": "they (f)"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "vocab_overview_03",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 4,
+          "total_words": 12,
+          "batches_count": 4,
+          "words": [
+            {
+              "arabic": "يَوْم",
+              "transliteration": "yawm",
+              "english": "day"
+            },
+            {
+              "arabic": "شَهْر",
+              "transliteration": "shahr",
+              "english": "month"
+            },
+            {
+              "arabic": "سَنَة",
+              "transliteration": "sana",
+              "english": "year"
+            },
+            {
+              "arabic": "صَبَاح",
+              "transliteration": "sabah",
+              "english": "morning"
+            },
+            {
+              "arabic": "مَسَاء",
+              "transliteration": "masaa",
+              "english": "evening"
+            },
+            {
+              "arabic": "لَيْل",
+              "transliteration": "layl",
+              "english": "night"
+            },
+            {
+              "arabic": "اليَوْم",
+              "transliteration": "al-yawm",
+              "english": "today"
+            },
+            {
+              "arabic": "غَداً",
+              "transliteration": "ghadan",
+              "english": "tomorrow"
+            },
+            {
+              "arabic": "أَمْس",
+              "transliteration": "ams",
+              "english": "yesterday"
+            },
+            {
+              "arabic": "الآن",
+              "transliteration": "al-aan",
+              "english": "now"
+            },
+            {
+              "arabic": "بَعْد",
+              "transliteration": "baad",
+              "english": "after"
+            },
+            {
+              "arabic": "قَبْل",
+              "transliteration": "qabl",
+              "english": "before"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      }
+    ],
+    "batch_introduction": [
+      {
+        "test_id": "batch_intro_01",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 1,
+          "batch_number": 1,
+          "total_batches": 4,
+          "words": [
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book"
+            },
+            {
+              "arabic": "قَلَم",
+              "transliteration": "qalam",
+              "english": "pen"
+            },
+            {
+              "arabic": "مَكْتَب",
+              "transliteration": "maktab",
+              "english": "desk"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation",
+          "structure_valid"
+        ]
+      },
+      {
+        "test_id": "batch_intro_02",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 2,
+          "batch_number": 2,
+          "total_batches": 3,
+          "words": [
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            },
+            {
+              "arabic": "بَيْت",
+              "transliteration": "bayt",
+              "english": "house"
+            },
+            {
+              "arabic": "سَيَّارَة",
+              "transliteration": "sayyaara",
+              "english": "car"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation",
+          "structure_valid"
+        ]
+      },
+      {
+        "test_id": "batch_intro_03",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 3,
+          "batch_number": 3,
+          "total_batches": 4,
+          "words": [
+            {
+              "arabic": "كَبِير",
+              "transliteration": "kabiir",
+              "english": "big"
+            },
+            {
+              "arabic": "صَغِير",
+              "transliteration": "saghiir",
+              "english": "small"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation",
+          "structure_valid"
+        ]
+      },
+      {
+        "test_id": "batch_intro_04",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 4,
+          "batch_number": 1,
+          "total_batches": 2,
+          "words": [
+            {
+              "arabic": "يَكْتُب",
+              "transliteration": "yaktub",
+              "english": "he writes"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation",
+          "structure_valid"
+        ],
+        "notes": "Single word batch"
+      },
+      {
+        "test_id": "batch_intro_05",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 5,
+          "batch_number": 2,
+          "total_batches": 3,
+          "words": [
+            {
+              "arabic": "طَالِب",
+              "transliteration": "taalib",
+              "english": "student (m)"
+            },
+            {
+              "arabic": "طَالِبَة",
+              "transliteration": "taaliba",
+              "english": "student (f)"
+            },
+            {
+              "arabic": "مُعَلِّم",
+              "transliteration": "muallim",
+              "english": "teacher"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation",
+          "structure_valid"
+        ]
+      }
+    ],
+    "list_view": [
+      {
+        "test_id": "vocab_list_01",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 1,
+          "current_batch": 2,
+          "total_batches": 4,
+          "words": [
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book"
+            },
+            {
+              "arabic": "قَلَم",
+              "transliteration": "qalam",
+              "english": "pen"
+            },
+            {
+              "arabic": "مَكْتَب",
+              "transliteration": "maktab",
+              "english": "desk"
+            },
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            },
+            {
+              "arabic": "بَيْت",
+              "transliteration": "bayt",
+              "english": "house"
+            },
+            {
+              "arabic": "سَيَّارَة",
+              "transliteration": "sayyaara",
+              "english": "car"
+            },
+            {
+              "arabic": "كَبِير",
+              "transliteration": "kabiir",
+              "english": "big"
+            },
+            {
+              "arabic": "صَغِير",
+              "transliteration": "saghiir",
+              "english": "small"
+            },
+            {
+              "arabic": "جَمِيل",
+              "transliteration": "jamiil",
+              "english": "beautiful"
+            },
+            {
+              "arabic": "جَدِيد",
+              "transliteration": "jadiid",
+              "english": "new"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "vocab_list_02",
+        "input": {
+          "mode": "teaching_vocab",
+          "lesson_number": 3,
+          "current_batch": 1,
+          "total_batches": 3,
+          "words": [
+            {
+              "arabic": "أَكَلَ",
+              "transliteration": "akala",
+              "english": "he ate"
+            },
+            {
+              "arabic": "شَرِبَ",
+              "transliteration": "shariba",
+              "english": "he drank"
+            },
+            {
+              "arabic": "ذَهَبَ",
+              "transliteration": "dhahaba",
+              "english": "he went"
+            },
+            {
+              "arabic": "كَتَبَ",
+              "transliteration": "kataba",
+              "english": "he wrote"
+            },
+            {
+              "arabic": "قَرَأَ",
+              "transliteration": "qaraa",
+              "english": "he read"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      }
+    ],
+    "quiz_question": [
+      {
+        "test_id": "vocab_quiz_q_01",
+        "input": {
+          "mode": "teaching_vocab",
+          "word_arabic": "كِتَاب",
+          "word_transliteration": "kitaab",
+          "question_type": "arabic_to_english"
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "vocab_quiz_q_02",
+        "input": {
+          "mode": "teaching_vocab",
+          "english": "school",
+          "question_type": "english_to_arabic"
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      }
+    ],
+    "batch_summary": [
+      {
+        "test_id": "vocab_summary_01",
+        "input": {
+          "mode": "teaching_vocab",
+          "batch_number": 1,
+          "score": "3/3",
+          "total_questions": 3,
+          "correct_count": 3,
+          "words_missed": []
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation",
+          "structure_valid"
+        ]
+      },
+      {
+        "test_id": "vocab_summary_02",
+        "input": {
+          "mode": "teaching_vocab",
+          "batch_number": 2,
+          "score": "2/3",
+          "total_questions": 3,
+          "correct_count": 2,
+          "words_missed": [
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation",
+          "structure_valid"
+        ]
+      },
+      {
+        "test_id": "vocab_summary_03",
+        "input": {
+          "mode": "teaching_vocab",
+          "batch_number": 3,
+          "score": "1/3",
+          "total_questions": 3,
+          "correct_count": 1,
+          "words_missed": [
+            {
+              "arabic": "كَبِير",
+              "transliteration": "kabiir",
+              "english": "big"
+            },
+            {
+              "arabic": "صَغِير",
+              "transliteration": "saghiir",
+              "english": "small"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation",
+          "structure_valid"
+        ]
+      }
+    ]
+  },
+  "teaching_grammar": {
+    "description": "Test cases for grammar teaching prompts (#9, #10, #11, #14)",
+    "total_cases": 14,
+    "grammar_overview": [
+      {
+        "test_id": "grammar_overview_01",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 1,
+          "topics": [
+            "Feminine Nouns",
+            "Definite Article"
+          ],
+          "topics_count": 2
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_overview_02",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 3,
+          "topics": [
+            "Present Tense Conjugation",
+            "Subject Pronouns",
+            "Verb Agreement"
+          ],
+          "topics_count": 3
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_overview_03",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 5,
+          "topics": [
+            "Past Tense",
+            "Negation"
+          ],
+          "topics_count": 2
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      }
+    ],
+    "topic_explanation": [
+      {
+        "test_id": "grammar_explain_01",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 1,
+          "topic_name": "Feminine Nouns",
+          "grammar_rule": "Feminine nouns usually end in ة (taa marbuuta)",
+          "examples": [
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school",
+              "note": "Ends with ة so it's feminine"
+            },
+            {
+              "arabic": "طَاوِلَة",
+              "transliteration": "taawila",
+              "english": "table",
+              "note": "Ends with ة so it's feminine"
+            },
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book",
+              "note": "No ة ending, so it's masculine (not feminine)"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_explain_02",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 2,
+          "topic_name": "Definite Article",
+          "grammar_rule": "Use ال (al-) prefix to make nouns definite",
+          "examples": [
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "a book",
+              "note": "Indefinite (no ال)"
+            },
+            {
+              "arabic": "الكِتَاب",
+              "transliteration": "al-kitaab",
+              "english": "the book",
+              "note": "Definite (has ال prefix)"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_explain_03",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 3,
+          "topic_name": "Noun-Adjective Agreement",
+          "grammar_rule": "Adjectives must match nouns in gender and definiteness",
+          "examples": [
+            {
+              "arabic": "كِتَاب كَبِير",
+              "transliteration": "kitaab kabiir",
+              "english": "big book",
+              "note": "Both masculine and indefinite - correct"
+            },
+            {
+              "arabic": "كِتَاب كَبِيرَة",
+              "transliteration": "kitaab kabiira",
+              "english": "big book (incorrect)",
+              "note": "Gender mismatch - كتاب is masculine but كبيرة is feminine"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_explain_04",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 4,
+          "topic_name": "Subject Pronouns",
+          "grammar_rule": "Arabic has separate pronouns for masculine and feminine 'you'",
+          "examples": [
+            {
+              "arabic": "أَنْتَ",
+              "transliteration": "anta",
+              "english": "you (masculine)",
+              "note": "Used when addressing a male"
+            },
+            {
+              "arabic": "أَنْتِ",
+              "transliteration": "anti",
+              "english": "you (feminine)",
+              "note": "Used when addressing a female"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_explain_05",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 5,
+          "topic_name": "Present Tense Verbs",
+          "grammar_rule": "Present tense verbs use prefixes to indicate subject",
+          "examples": [
+            {
+              "arabic": "أَكْتُب",
+              "transliteration": "aktub",
+              "english": "I write",
+              "note": "Prefix أَ- indicates 'I'"
+            },
+            {
+              "arabic": "يَكْتُب",
+              "transliteration": "yaktub",
+              "english": "he writes",
+              "note": "Prefix يَ- indicates 'he'"
+            },
+            {
+              "arabic": "تَكْتُب",
+              "transliteration": "taktub",
+              "english": "you/she write(s)",
+              "note": "Prefix تَ- indicates 'you' or 'she'"
+            }
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      }
+    ],
+    "quiz_question": [
+      {
+        "test_id": "grammar_quiz_q_01",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 1,
+          "topic_name": "Feminine Nouns",
+          "question_number": 1,
+          "total_questions": 5,
+          "question": "Is the word مَدْرَسَة masculine or feminine?"
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_quiz_q_02",
+        "input": {
+          "mode": "teaching_grammar",
+          "lesson_number": 1,
+          "topic_name": "Feminine Nouns",
+          "question_number": 2,
+          "total_questions": 5,
+          "question": "Is the word بَيْت (bayt - house) masculine or feminine?"
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      }
+    ],
+    "topic_summary": [
+      {
+        "test_id": "grammar_summary_01",
+        "input": {
+          "mode": "teaching_grammar",
+          "topic_name": "Feminine Nouns",
+          "score": "5/5",
+          "correct_count": 5,
+          "total_questions": 5,
+          "pass_threshold": 4,
+          "weak_areas": []
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_summary_02",
+        "input": {
+          "mode": "teaching_grammar",
+          "topic_name": "Noun-Adjective Agreement",
+          "score": "4/5",
+          "correct_count": 4,
+          "total_questions": 5,
+          "pass_threshold": 4,
+          "weak_areas": []
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_summary_03",
+        "input": {
+          "mode": "teaching_grammar",
+          "topic_name": "Feminine Nouns",
+          "score": "3/5",
+          "correct_count": 3,
+          "total_questions": 5,
+          "pass_threshold": 4,
+          "weak_areas": [
+            "Feminine noun markers (ة ending)",
+            "Exceptions to the rule"
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      },
+      {
+        "test_id": "grammar_summary_04",
+        "input": {
+          "mode": "teaching_grammar",
+          "topic_name": "Present Tense Verbs",
+          "score": "2/5",
+          "correct_count": 2,
+          "total_questions": 5,
+          "pass_threshold": 4,
+          "weak_areas": [
+            "Verb prefix patterns",
+            "Subject-verb agreement"
+          ]
+        },
+        "expected_output": "positive",
+        "metrics": [
+          "sentiment_teaching",
+          "has_navigation"
+        ]
+      }
+    ]
+  }
+}

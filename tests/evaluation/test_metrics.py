@@ -9,9 +9,12 @@ from deepeval.test_case import LLMTestCase
 from src.evaluation.metrics import (
     AccuracyMetric,
     AlignmentMetric,
+    FeedbackAppropriatenessMetric,
+    HasNavigationMetric,
     JSONValidityMetric,
     SentimentMetric,
     StructureMetric,
+    StructureValidMetric,
 )
 
 
@@ -27,7 +30,7 @@ def reset_sentiment_singleton():
 class TestSentimentMetric:
     """Tests for SentimentMetric."""
 
-    @patch("src.evaluation.metrics.pipeline")
+    @patch("src.evaluation.metrics.teaching_agent_metrics.pipeline")
     def test_positive_sentiment_passes_threshold(self, mock_pipeline):
         """Test that highly positive text passes threshold."""
         # Mock the sentiment pipeline to return high positive score
@@ -44,11 +47,11 @@ class TestSentimentMetric:
 
         score = metric.measure(test_case)
 
-        assert score >= 0.9  # Strengthened: >= instead of >
+        assert score == 0.95  # Exact assertion to catch regressions
         assert metric.is_successful()
         assert metric.score == score
 
-    @patch("src.evaluation.metrics.pipeline")
+    @patch("src.evaluation.metrics.teaching_agent_metrics.pipeline")
     def test_negative_sentiment_fails_threshold(self, mock_pipeline):
         """Test that negative text fails threshold."""
         # Mock the sentiment pipeline to return negative score
@@ -65,10 +68,11 @@ class TestSentimentMetric:
 
         score = metric.measure(test_case)
 
-        assert score < 0.9
+        # NEGATIVE label: score = 1.0 - 0.85 = 0.15
+        assert score == pytest.approx(0.15)
         assert not metric.is_successful()
 
-    @patch("src.evaluation.metrics.pipeline")
+    @patch("src.evaluation.metrics.teaching_agent_metrics.pipeline")
     def test_sentiment_pipeline_cached(self, mock_pipeline):
         """Test that sentiment pipeline is a class-level singleton."""
         # Mock the sentiment pipeline
@@ -328,3 +332,193 @@ class TestAlignmentMetric:
 
         assert score == 0.0
         assert not metric.is_successful()
+
+
+class TestFeedbackAppropriatenessMetric:
+    """Tests for FeedbackAppropriatenessMetric (Agent 1)."""
+
+    def test_correct_answer_with_praise_passes(self):
+        """Test that correct answer feedback with praise passes."""
+        metric = FeedbackAppropriatenessMetric(is_correct=True)
+        test_case = LLMTestCase(
+            input="word: book",
+            actual_output="✓ Perfect! That's correct! Well done!",
+            expected_output="positive_with_praise",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 1.0
+        assert metric.is_successful()
+        assert "praise" in metric.reason.lower()
+
+    def test_correct_answer_without_praise_fails(self):
+        """Test that correct answer without praise fails."""
+        metric = FeedbackAppropriatenessMetric(is_correct=True)
+        test_case = LLMTestCase(
+            input="word: book",
+            actual_output="That is the answer.",
+            expected_output="positive_with_praise",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 0.0
+        assert not metric.is_successful()
+        assert "missing praise" in metric.reason.lower()
+
+    def test_incorrect_answer_with_correction_passes(self):
+        """Test that incorrect answer with supportive correction passes."""
+        metric = FeedbackAppropriatenessMetric(is_correct=False, correct_answer="school")
+        test_case = LLMTestCase(
+            input="word: school",
+            actual_output="Not quite, but great effort! The correct answer is school. Keep practicing!",
+            expected_output="supportive_with_correction",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 1.0
+        assert metric.is_successful()
+        assert "supportive correction" in metric.reason.lower()
+
+    def test_incorrect_answer_with_false_praise_fails(self):
+        """Test that incorrect answer with false praise fails."""
+        metric = FeedbackAppropriatenessMetric(is_correct=False, correct_answer="school")
+        test_case = LLMTestCase(
+            input="word: school",
+            actual_output="Perfect! That's correct! Well done!",
+            expected_output="supportive_with_correction",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 0.0
+        assert not metric.is_successful()
+        assert "false praise" in metric.reason.lower()
+
+    def test_incorrect_answer_without_correction_fails(self):
+        """Test that incorrect answer without showing correction fails."""
+        metric = FeedbackAppropriatenessMetric(is_correct=False, correct_answer="school")
+        test_case = LLMTestCase(
+            input="word: school",
+            actual_output="Not quite, keep trying!",
+            expected_output="supportive_with_correction",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 0.0
+        assert not metric.is_successful()
+        assert "doesn't show correct answer" in metric.reason.lower()
+
+
+class TestHasNavigationMetric:
+    """Tests for HasNavigationMetric (Agent 1)."""
+
+    def test_numbered_options_passes(self):
+        """Test that response with numbered options passes."""
+        metric = HasNavigationMetric()
+        test_case = LLMTestCase(
+            input="lesson start",
+            actual_output="Welcome! What would you like to do?\n1. Start with vocabulary\n2. Start with grammar\n3. See progress",
+            expected_output="positive",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 1.0
+        assert metric.is_successful()
+        assert "numbered" in metric.reason.lower()
+
+    def test_navigation_phrase_passes(self):
+        """Test that response with navigation phrase passes."""
+        metric = HasNavigationMetric()
+        test_case = LLMTestCase(
+            input="lesson start",
+            actual_output="Great! You can choose to continue or review.",
+            expected_output="positive",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 1.0
+        assert metric.is_successful()
+
+    def test_no_navigation_fails(self):
+        """Test that response without navigation fails."""
+        metric = HasNavigationMetric()
+        test_case = LLMTestCase(
+            input="lesson start",
+            actual_output="Welcome to the lesson.",
+            expected_output="positive",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 0.0
+        assert not metric.is_successful()
+        assert "no clear navigation" in metric.reason.lower()
+
+
+class TestStructureValidMetric:
+    """Tests for StructureValidMetric (Agent 1)."""
+
+    def test_correct_word_count_no_grammar_leakage_passes(self):
+        """Test that correct word count without grammar leakage passes."""
+        metric = StructureValidMetric(expected_word_count=3)
+        test_case = LLMTestCase(
+            input="batch teaching",
+            actual_output="Let's learn:\n- كِتَاب (kitaab) - book\n- قَلَم (qalam) - pen\n- مَكْتَب (maktab) - desk",
+            expected_output="positive",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 1.0
+        assert metric.is_successful()
+        assert "no grammar leakage" in metric.reason.lower()
+
+    def test_grammar_leakage_fails(self):
+        """Test that grammar leakage in vocab mode fails."""
+        metric = StructureValidMetric(expected_word_count=3)
+        test_case = LLMTestCase(
+            input="batch teaching",
+            actual_output="Let's learn:\n- كِتَاب (kitaab) - book (masculine noun)\n- مَدْرَسَة (madrasa) - school (feminine because it ends with ة)",
+            expected_output="positive",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 0.0
+        assert not metric.is_successful()
+        assert "grammar leakage" in metric.reason.lower()
+
+    def test_acceptable_word_count_range_passes(self):
+        """Test that word count within acceptable range passes."""
+        metric = StructureValidMetric(expected_word_count=3)
+        test_case = LLMTestCase(
+            input="batch teaching",
+            actual_output="Words:\n- كِتَاب (kitaab) - book\n- قَلَم (qalam) - pen\n- مَكْتَب (maktab) - desk\n- مَدْرَسَة (madrasa) - school",
+            expected_output="positive",
+        )
+
+        score = metric.measure(test_case)
+
+        # 4 words when expecting 3 is still within acceptable range (2-5)
+        assert score == 0.8  # Exact expectation for edge case
+        assert metric.is_successful()
+
+    def test_no_word_count_check_only_grammar(self):
+        """Test validation without word count, only grammar leakage."""
+        metric = StructureValidMetric(expected_word_count=None)
+        test_case = LLMTestCase(
+            input="vocab intro",
+            actual_output="Here are some words: book, pen, desk",
+            expected_output="positive",
+        )
+
+        score = metric.measure(test_case)
+
+        assert score == 1.0
+        assert metric.is_successful()

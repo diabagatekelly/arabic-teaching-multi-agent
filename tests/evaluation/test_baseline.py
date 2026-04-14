@@ -179,15 +179,17 @@ class TestBaselineEvaluator:
 
         evaluator = BaselineEvaluator(test_cases_path=mock_test_cases_file)
 
-        # Mock generate_response
-        evaluator.generate_response = MagicMock(return_value="Great response!")
+        # Mock teaching_agent (property) by setting _teaching_agent directly
+        mock_teaching_agent = MagicMock()
+        mock_teaching_agent.handle_teaching_vocab = MagicMock(return_value="Great response!")
+        evaluator._teaching_agent = mock_teaching_agent
 
         responses, results = evaluator.run_teaching_vocab_baseline(sample_size=5)
 
         assert len(responses) == 5
         assert results["total"] == 5
         assert results["passed"] == 4
-        assert evaluator.generate_response.call_count == 5
+        assert mock_teaching_agent.handle_teaching_vocab.call_count == 5
 
     @patch("src.evaluation.baseline.AutoModelForCausalLM")
     @patch("src.evaluation.baseline.AutoTokenizer")
@@ -240,8 +242,13 @@ class TestBaselineEvaluator:
             "grading_vocab": {"total": 10, "passed": 9, "failed": 1},
         }
 
+        outputs_by_mode = {
+            "teaching_vocab": {"teach_vocab_01": "مرحبا means hello"},
+            "grading_vocab": {"grade_vocab_01": '{"correct": true}'},
+        }
+
         output_path = tmp_path / "baseline_report.md"
-        evaluator.save_baseline_report(results_by_mode, output_path=output_path)
+        evaluator.save_baseline_report(results_by_mode, outputs_by_mode, output_path=output_path)
 
         assert output_path.exists()
         content = output_path.read_text()
@@ -267,8 +274,13 @@ class TestBaselineEvaluator:
             "grading_vocab": {"total": 10, "passed": 9, "failed": 1},
         }
 
+        outputs_by_mode = {
+            "teaching_vocab": {"teach_vocab_01": "مرحبا means hello"},
+            "grading_vocab": {"grade_vocab_01": '{"correct": true}'},
+        }
+
         with patch("builtins.open", create=True) as mock_open:
-            evaluator.save_baseline_report(results_by_mode)
+            evaluator.save_baseline_report(results_by_mode, outputs_by_mode)
 
             # Check that open was called with the default path
             assert any(

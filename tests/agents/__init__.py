@@ -1,1 +1,1 @@
-"""Tests for multi-agent system."""
+"""Tests for agent implementations."""

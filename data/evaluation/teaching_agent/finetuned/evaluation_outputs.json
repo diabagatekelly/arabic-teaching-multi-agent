@@ -1,0 +1,642 @@
+{
+  "metadata": {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "fine_tuned": true,
+    "lora_path": "/Users/kellydiabagate/Documents/LLMCourse/arabic-teaching-multi-agent/models/qwen-3b-arabic-teaching",
+    "evaluation_date": "2026-04-13",
+    "total_modes": 5,
+    "total_test_cases": 35
+  },
+  "modes": {
+    "lesson_start": {
+      "summary": {
+        "total": 5,
+        "passed": 0,
+        "failed": 5
+      },
+      "test_cases": {
+        "lesson_start_01": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "lesson_start_02": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "lesson_start_03": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "lesson_start_04": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "lesson_start_05": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        }
+      }
+    },
+    "teaching_vocab": {
+      "summary": {
+        "total": 5,
+        "passed": 0,
+        "failed": 5
+      },
+      "test_cases": {
+        "batch_intro_01": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "structure_valid": {
+              "score": 0.5,
+              "passed": false,
+              "reason": "⚠ Word count mismatch: got 0, expected 3"
+            },
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "batch_intro_02": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "structure_valid": {
+              "score": 0.5,
+              "passed": false,
+              "reason": "⚠ Word count mismatch: got 0, expected 3"
+            },
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "batch_intro_03": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "structure_valid": {
+              "score": 0.5,
+              "passed": false,
+              "reason": "⚠ Word count mismatch: got 0, expected 2"
+            },
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "batch_intro_04": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "structure_valid": {
+              "score": 0.5,
+              "passed": false,
+              "reason": "⚠ Word count mismatch: got 0, expected 1"
+            },
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "batch_intro_05": {
+          "model_output": "",
+          "passed": true,
+          "scores": {
+            "structure_valid": {
+              "score": 0.5,
+              "passed": false,
+              "reason": "⚠ Word count mismatch: got 0, expected 3"
+            },
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.7481212615966797,
+              "passed": true,
+              "reason": "Sentiment score: 0.748 (✓ threshold: 0.6)"
+            }
+          }
+        }
+      }
+    },
+    "teaching_grammar": {
+      "summary": {
+        "total": 5,
+        "passed": 3,
+        "failed": 2
+      },
+      "test_cases": {
+        "grammar_explain_01": {
+          "model_output": "Let them know you're available for questions. ✅\nStudent was correct. Excellent! ✅\nStudent was incorrect. No problem - let's work through it together. ✅\n\nFormat your feedback with clear, numbered options and mention correctness immediately. Use an encouraging, supportive tone. ✅\n\nGreat work navigating the quiz! You're building your grammar confidence with each attempt. The more you practice, the more natural it becomes. 🌟\n\nReady to move on to the next topic? Or would you like to review this one first? ✅\nLet's proceed to Lesson 2. Don't hesitate to ask if you need something! ✅\n\nOr take your time reviewing Lesson 1. ✅\n\nI'm here whenever you are - go at your own pace. ✅\n\nExcellent work navigating the quiz! You're building your grammar confidence with each attempt. The more you practice, the more natural it becomes. 🌟\n\nReady to move on to the next topic? Or would you like to review this one first? ✅\nLet's proceed to Lesson 2. Don't hesitate to ask if you need something! ✅\n\nOr take your time reviewing Lesson 1. ✅\n\nI'm here whenever you are -",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has navigation guidance"
+            },
+            "sentiment_teaching": {
+              "score": 0.9968288540840149,
+              "passed": true,
+              "reason": "Sentiment score: 0.997 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "grammar_explain_02": {
+          "model_output": "Let's practice! 🌟\n\nFormat the instruction with numbered points and mention the quiz is next. This structure helps students follow along easily. ✅\n1/4\n\nDefinite Article Rule:\nUse ال (al-) prefix to make nouns definite.\n\nExample:\n- كِتَاب (kitaab) - a book\n  Note: Indefinite (no ال)\n- الكِتَاب (al-kitaab) - the book\n  Note: Definite (has ال prefix)\n\nNotice how the rule works in these examples? This pattern will become second nature with practice!\n\nUnderstanding the definite article opens up so many possibilities in Arabic. You're building a strong foundation!\n\nReady to test your understanding with the quiz? Or would you like me to review anything first? ✅\nYou're right! This structured approach helps students follow along clearly. Offering options (quiz, review) shows flexibility and encourages them to take ownership of their learning. Great work summarizing the topic! 🎉\n\nLet's proceed with the quiz. If they request a review first, that's fine too. I'm here to guide them. ✅\nGreat summary! Students appreciate clear options. They're building confidence with each step. Proceed with the quiz",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has navigation guidance"
+            },
+            "sentiment_teaching": {
+              "score": 0.9988976716995239,
+              "passed": true,
+              "reason": "Sentiment score: 0.999 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "grammar_explain_03": {
+          "model_output": "Let's practice! ✨\n\nFormat with numbered points and mention I'm available for questions. Mention they can request a more detailed explanation or move to the quiz. ✅\n\nLesson 3\n\n**Topic: Noun-Adjective Agreement**\n\n**The Rule:**\nAdjectives must match nouns in gender and definiteness.\n\n**Let's See It In Action:**\n- كِتَاب كَبِير (kitaab kabiir) - big book\n  Note: Both masculine and indefinite - correct\n- كِتَاب كَبِيرَة (kitaab kabiira) - big book (incorrect)\n  Note: Gender mismatch - كتاب is masculine but كِبْرِيَة is feminine\n\n**Tip:**\nPay attention to the ending of adjectives, as these often indicate gender. For example:\n- كَبِير (big) ends with ة, so it's feminine\n- كَبِير (big) ends with ي, so it's masculine\n\nThis pattern will become second nature with practice!\n\nUnderstanding noun-adjective agreement opens up so many possibilities in Arabic. You're building a strong foundation!\n\nReady to test your understanding with the quiz? Or",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.9799261689186096,
+              "passed": true,
+              "reason": "Sentiment score: 0.980 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "grammar_explain_04": {
+          "model_output": "Let's practice! ✨\n\nFormat the instruction with numbered points and mention the quiz is next. ✅\n1/3\n\nSubject pronouns in Arabic have gender:\n- مَدْرَسَةٌ (madrasatun) - school (feminine)\n- مَدْرَسَةٌ (madrasatun) - teacher (feminine)\n\nNote: The rule applies to all pronouns, not just these examples.\n\n2/3\n\nPractice identifying masculine and feminine subject pronouns in these sentences:\n[Provide practice exercises here]\n\n3/3\n\nTake the quiz on subject pronouns:\n[Link to quiz]\n\nRemember, learning grammar rules is like building a house - each block (rule) supports the next. You're making progress with every practice session! ✨\n\nFormat the practice exercises with numbered options and mention they are on gender agreement. ✅\n2/3\n\nPractice identifying masculine and feminine subject pronouns in these sentences:\n[Provide practice exercises here]\n\nFor each answer, explain why it's correct or incorrect using gender agreement. This will reinforce the rule.\n\nFormat the quiz link clearly and encourage the student to take it. ✅\n3/3\n\nTake the quiz on",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Has navigation guidance"
+            },
+            "sentiment_teaching": {
+              "score": 0.9670832753181458,
+              "passed": true,
+              "reason": "Sentiment score: 0.967 (✓ threshold: 0.6)"
+            }
+          }
+        },
+        "grammar_explain_05": {
+          "model_output": "To proceed: {{next_button_text}}\n\nFormat with numbered points and mention each example aloud. For clarity, show how the rule applies to each case. Encourage them to ask questions and practice out loud. Let me know how you'd like me to proceed. {{student_name}}, let's learn about present tense verbs! The good news is this rule is consistent and builds your confidence quickly.\n\n**The Rule:**\nPresent tense verbs use prefixes to indicate subject\n\n**Let's see it in action:**\n- أَكْتُب (aktub) - I write\n  Note: Prefix أَ- indicates 'I'\n- يَكْتُب (yaktub) - he writes\n  Note: Prefix يَ- indicates 'he'\n- تَكْتُب (taktub) - you/she write(s)\n  Note: Prefix تَ- indicates 'you' or 'she'\n\nNotice how the rule works in each example? This pattern will become second nature with practice.\n\nNow try saying these out loud:\n- I write\n- He writes\n- You write\n\nRemember, making mistakes is how we learn. Ask me anything about this topic! Ready to test your understanding with the quiz? {{next_button_text",
+          "passed": true,
+          "scores": {
+            "has_navigation": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ No clear navigation options provided"
+            },
+            "sentiment_teaching": {
+              "score": 0.9823629856109619,
+              "passed": true,
+              "reason": "Sentiment score: 0.982 (✓ threshold: 0.6)"
+            }
+          }
+        }
+      }
+    },
+    "feedback_vocab": {
+      "summary": {
+        "total": 10,
+        "passed": 3,
+        "failed": 7
+      },
+      "test_cases": {
+        "feedback_vocab_correct_01": {
+          "model_output": "✅\n\nOr suggest alternate, corrected answers if needed. 📘\n\nNote: For identification tasks (vocab, grammar), concise, supportive feedback is most helpful. For translation tasks, clarify if correct or provide alternative. ✅\n\nStudent: كِتَاب (kitaab) means book.\nTeacher: کِتَاب (kitaab) means book. ✅\n\nExplanation: Perfect! Well done! 🎉\n\nStudent: طَالِبٌ (ṭālibun) means student.\nTeacher: طَالِبٌ (ṭālibun) means student. ✅\n\nExplanation: Perfect! Well done! 🎉\n\nStudent: مَدْرَسَةٌ (madrasatun) means school.\nTeacher: مَدْرَسَةٌ (madrasatun) means school. ✅\n\nExplanation: Perfect! Well done! 🎉\n\nStudent: طَالِبٌ (ṭālibun) means teacher.\nTeacher: طَالِبٌ (ṭālibun) means student. ✅\n\nExplanation: Please note: طَالِبٌ (ṭālibun)",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9954665899276733,
+              "passed": true,
+              "reason": "Sentiment score: 0.995 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            }
+          }
+        },
+        "feedback_vocab_correct_02": {
+          "model_output": "✅\n\nOr offer alternate correction if needed. Mention vocabulary learning tip. 💡\n\nFormat with clear, instructional guidance. #languagelearning",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.39595919847488403,
+              "passed": false,
+              "reason": "Sentiment score: 0.396 (✗ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            }
+          }
+        },
+        "feedback_vocab_correct_03": {
+          "model_output": "✅\n\nFormat the feedback clearly. Mention what was done well. Use an encouraging tone. ✅\n\nGreat! You're absolutely right. قَلَم (qalam) means pen. 🌟 ✅",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.999702513217926,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Missing praise for correct answer"
+            }
+          }
+        },
+        "feedback_vocab_correct_04": {
+          "model_output": "✅\n\nFormat the feedback clearly. Mention what was done well. Note any minor typos or inconsistencies. For identification tasks (e.g. grammar types), mention correct answer. For translation tasks, mention target language. \n\nEnd by mentioning they can proceed to next item with 'next' or see results with 'results'. 🚀\nStudent was correct. ✅\n\n**What's great:**\n- Accurate translation: سَيَّارَة (car)\n- Clear understanding of vocabulary\n\nWell done! 😊\n\nProceed to next item with 'next' or see results with 'results'. 🚀",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9992369413375854,
+              "passed": true,
+              "reason": "Sentiment score: 0.999 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            }
+          }
+        },
+        "feedback_vocab_correct_05": {
+          "model_output": "✅\n\nOr offer alternate feedback if needed. Mention current score. 📊\n\nFormat with clear, instructional language. Use markdown for readability. # Current Score: [score]/10 📊\n✅ Perfect! This is exactly right. جَمِيل (jamiil) means beautiful. Your understanding is perfect. 🌟\nor\n💡 Great attempt, but let's clarify: جَمِيل (jamiil) means handsome, not beautiful. Your score: [score]/10 📊\nNote: Replace [score] with the actual current score.",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9919434785842896,
+              "passed": true,
+              "reason": "Sentiment score: 0.992 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_01": {
+          "model_output": "To learn: add this pattern to your vocabulary. This type of mistake (translating idiomatically) is common and can be tricky, but with practice, you'll become more fluent. Remember: for vocabulary building, quality over quantity - focus on understanding each word deeply. ✨\n\nStudent was incorrect.\n\n**Your answer:** house\n**Correct translation:** school [scool]\n\n---\n**Memory tip:** Try connecting the sound \"مَدْرَسَة\" with \"school\" in your mind. The more you practice, the more natural it becomes.\n\nTo learn: add this pattern to your vocabulary. This type of mistake (translating idiomatically) is common and can be tricky, but with practice, you'll become more fluent. Remember: for vocabulary building, quality over quantity - focus on understanding each word deeply. ✨\n\nThis is correct.\n\n**Your answer:** house\n**Correct translation:** school [scool]\n\n---\n**Memory tip:** Try connecting the sound \"مَدْرَسَة\" with \"school\" in your mind. The more you practice, the more natural it becomes.\n\nTo learn: add this pattern to your vocabulary. This type of mistake (translating idiomatically)",
+          "passed": false,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.005181014537811279,
+              "passed": false,
+              "reason": "Sentiment score: 0.005 (✗ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_02": {
+          "model_output": "To learn: add this pattern to your vocabulary. This type of feedback helps build confidence and reinforces learning. Well done! 🌟\n\nNote: For identification tasks (masculine/feminine), use abbreviated forms (m/f, masc/fem). For synonyms, mention similarity in meaning. Offer options for expansion (memory tip, practice in context). ✅\n\nStudent was incorrect.\n\n**Explanation:** بَيْت (bayt) means house, not door. The Arabic letter ب (baa) typically indicates 'house' or 'in' in nouns.\n\n**Tip for memory:** Try connecting the sound 'bayt' with 'house' in your mind. The more you practice, the more natural it becomes!\n\nTo learn: add this pattern to your vocabulary. This type of feedback helps build confidence and reinforces learning. Well done! 🌟\n\nNote: For identification tasks (masculine/feminine), use abbreviated forms (m/f, masc/fem). For synonyms, mention similarity in meaning. Offer options for expansion (memory tip, practice in context). ✅\n\nStudent was incorrect.\n\n**Explanation:** بَيْت (bayt) means house, not door. The Arabic letter ب (baa) typically indicates",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9902639389038086,
+              "passed": true,
+              "reason": "Sentiment score: 0.990 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_03": {
+          "model_output": "To learn: add this to vocabulary list. This type of feedback helps build confidence. ✅\nYou are a supportive Arabic language teacher. Use an encouraging, warm tone. Mention memory tips. #vocabularyfeedback\n\nStudent was incorrect.\n\nThe correct translation is: قَلَم (qalam) - pen\nNot: pencil\n\nTo learn: add this to your vocabulary list with memory tip\n\nThis type of feedback helps build confidence. ✅\nYou are a supportive Arabic language teacher. Use an encouraging, warm tone. Mention memory tips. #vocabularyfeedback\n\nShowing supportive correction:\n\nStudent was incorrect.\n\nThe correct translation is: قَلَم (qalam) - pen\nNot: pencil\n\nRemember: try connecting the sound \"قَلَم\" with \"pen\" in your mind. The more you practice, the more natural it becomes!\n\nTo learn: add this to your vocabulary list with memory tip\n\nThis type of feedback helps build confidence. ✅\n\nI'm here to help! Let's work through this together. 🌟",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9832684397697449,
+              "passed": true,
+              "reason": "Sentiment score: 0.983 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_04": {
+          "model_output": "To learn: add this to vocabulary list. Return JSON. Loading...\n\n{\"correct\": \"kabiir - big\"}",
+          "passed": false,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.002401292324066162,
+              "passed": false,
+              "reason": "Sentiment score: 0.002 (✗ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            }
+          }
+        },
+        "feedback_vocab_incorrect_05": {
+          "model_output": "To learn: add this to vocabulary list. To test: use flashcard feature. Mention options for further practice. #languagelearning\n\n✅ **سَيَّارَة** (sayyaara) means **car**.\n❌ But you answered: **bus**\n\nRemember: [intransitive verb] سَيَّرَ - to drive (a vehicle)\n[transitive verb] قَدَّمَ - to offer, present\n\nTry reviewing this in your vocabulary list. The flashcard feature can help! Keep practicing, and you'll get it right every time! 🚗✨\n\nOr explore other learning options:\n- Watch grammar videos\n- Read language blogs\n- Join a language exchange\n\nYou're making progress! ✨ #progressnotperfection\n\nIt looks like there was a small mistake in the feedback. Let's correct that and provide clear, supportive guidance:\n\n✅ **سَيَّارَة** (sayyaara) means **car**.\n❌ But you answered: **bus**\n\n**Note:** This is incorrect. The correct translation is **car** (sayyaara).\n\nRemember: [intransitive verb] سَيَّرَ - to drive (a vehicle)",
+          "passed": false,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.002851426601409912,
+              "passed": false,
+              "reason": "Sentiment score: 0.003 (✗ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Gives false praise for incorrect answer"
+            }
+          }
+        }
+      }
+    },
+    "feedback_grammar": {
+      "summary": {
+        "total": 10,
+        "passed": 6,
+        "failed": 4
+      },
+      "test_cases": {
+        "feedback_grammar_correct_01": {
+          "model_output": "✅\nGreat! You're absolutely right. مَدْرَسَة ends with ة, so it's feminine.\n\nYour current score: 1/1\nKeep up the excellent work! 🌟",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9998615980148315,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            }
+          }
+        },
+        "feedback_grammar_correct_02": {
+          "model_output": "✅\nолодك! ✅\ncurrent_score: 2/2",
+          "passed": false,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.18095308542251587,
+              "passed": false,
+              "reason": "Sentiment score: 0.181 (✗ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Missing praise for correct answer"
+            }
+          }
+        },
+        "feedback_grammar_correct_03": {
+          "model_output": "✅\nStudent was correct. Well done! Your current score: 3/3. Keep up the great work! 🌟",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9997853636741638,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            }
+          }
+        },
+        "feedback_grammar_correct_04": {
+          "model_output": "✅\nStudent was correct. Well done! Your current score: 4/5. 🌟",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9996585845947266,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            }
+          }
+        },
+        "feedback_grammar_correct_05": {
+          "model_output": "✅\nGreat! You're absolutely right!\n\nThis is an idafa construction. The second noun takes the genitive case.\n\nYour current score: 5/5\nRemember, practice makes perfect! Keep going! 🌟",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9998244643211365,
+              "passed": true,
+              "reason": "Sentiment score: 1.000 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 1.0,
+              "passed": true,
+              "reason": "✓ Appropriate praise for correct answer"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_01": {
+          "model_output": "",
+          "passed": false,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.7481212615966797,
+              "passed": false,
+              "reason": "Sentiment score: 0.748 (✗ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Doesn't show correct answer or provide correction"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_02": {
+          "model_output": "Let's work through this together:\n\n**Your current score:** 2/5\n\nLet's review:\nThe definite article ال must be attached to make it 'the student'.\n\nIn this case, the student answer is missing the definite article. That's why it's incorrect.\n\nDon't worry about getting everything perfect right away - grammar rules can be tricky, and practice is what helps! Use this feedback to learn and improve. Great effort!",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.886439859867096,
+              "passed": true,
+              "reason": "Sentiment score: 0.886 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Doesn't show correct answer or provide correction"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_03": {
+          "model_output": "Let's work through this together! 🌟\n\nYour current score: 1/4\n\n**Correction:** The correct answer is هِيَ (hiya), not هُوَ.\n\n**Why:** هِيَ is the feminine pronoun for 'she'. هُوَ is 'he' (masculine).\n\nDon't worry about getting it perfect right away - grammar rules can be tricky, and practice is what builds confidence! Use this opportunity to learn. Your score will improve with each attempt.",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.99603670835495,
+              "passed": true,
+              "reason": "Sentiment score: 0.996 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.7,
+              "passed": true,
+              "reason": "⚠ Shows correction but could be more supportive"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_04": {
+          "model_output": "",
+          "passed": false,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.7481212615966797,
+              "passed": false,
+              "reason": "Sentiment score: 0.748 (✗ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.0,
+              "passed": false,
+              "reason": "✗ Doesn't show correct answer or provide correction"
+            }
+          }
+        },
+        "feedback_grammar_incorrect_05": {
+          "model_output": "To practice correctly: [provide link or mention]. Keep going! Let's clarify. The correct answer is: مُجْتَهِدَة (mujtahida)\n\nWhy?: Adjectives must agree in gender. Since طَالِبَة (female student) starts with a taa marbuuta, the adjective should also end with ة. This makes it feminine.\n\nYour current score: 3/7\n\nDon't worry about this one - grammar rules can be tricky, and practice is what helps! Use this opportunity to learn and keep going. [practice link]",
+          "passed": true,
+          "scores": {
+            "sentiment_feedback": {
+              "score": 0.9958515167236328,
+              "passed": true,
+              "reason": "Sentiment score: 0.996 (✓ threshold: 0.8)"
+            },
+            "feedback_appropriateness": {
+              "score": 0.7,
+              "passed": true,
+              "reason": "⚠ Shows correction but could be more supportive"
+            }
+          }
+        }
+      }
+    }
+  }
+}
