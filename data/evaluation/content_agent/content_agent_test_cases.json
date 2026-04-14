@@ -1,1026 +1,346 @@
 {
   "metadata": {
-    "version": "3.0",
-    "created": "2026-04-14",
-    "total_test_cases": 40,
-    "description": "Evaluation dataset for Agent 3 (Content/Exercise Generation) - Expanded coverage with 12 exercise types",
+    "version": "2.0",
+    "created": "2026-04-09",
+    "total_test_cases": 94,
+    "description": "Evaluation dataset for Agent 3 (Content/Exercise Generation)",
     "agents_covered": [
       "Agent 3: Content Generation"
-    ],
-    "exercise_types": [
-      "translation",
-      "multiple_choice",
-      "paradigm_table",
-      "transformation_chain",
-      "cloze",
-      "dictation",
-      "error_correction",
-      "fill_in_blank",
-      "noun_adjective_agreement",
-      "pattern_recognition",
-      "sentence_level",
-      "sorting"
-    ],
-    "test_strategy": "4 comprehensive types (translation, multiple_choice, paradigm_table, transformation_chain) + 8 smoke tests + quiz/test/RAG coverage"
-  },
-  "exercise_generation": {
-    "description": "Test cases for exercise generation - 20 cases covering all 12 types",
-    "mode": "exercise_generation",
-    "total_cases": 20,
-    "comprehensive_types": [
-      {
-        "test_id": "gen_translation_01",
-        "description": "English to Arabic translation",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 1,
-          "exercise_type": "translation",
-          "direction": "en_to_ar",
-          "difficulty": "beginner",
-          "count": 3,
-          "learned_items": [
-            "كِتَاب (kitaab) - book",
-            "قَلَم (qalam) - pen",
-            "مَدْرَسَة (madrasa) - school"
-          ]
-        },
-        "expected_output": {
-          "count": 3,
-          "has_question": true,
-          "has_answer": true,
-          "has_instructions": true,
-          "answer_format_specified": true,
-          "uses_learned_vocab": true,
-          "difficulty_appropriate": true,
-          "question_length_min": 10,
-          "question_length_max": 500
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_translation_02",
-        "description": "Arabic to English translation",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 2,
-          "exercise_type": "translation",
-          "direction": "ar_to_en",
-          "difficulty": "beginner",
-          "count": 3,
-          "learned_items": [
-            "الكِتَاب (al-kitaab) - the book",
-            "القَلَم (al-qalam) - the pen",
-            "المَدْرَسَة (al-madrasa) - the school"
-          ]
-        },
-        "expected_output": {
-          "count": 3,
-          "has_question": true,
-          "has_answer": true,
-          "has_instructions": true,
-          "uses_learned_vocab": true,
-          "harakaat_consistent": true,
-          "no_duplicates": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_translation_03",
-        "description": "Sentence-level translation",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 3,
-          "exercise_type": "translation",
-          "level": "sentence",
-          "difficulty": "intermediate",
-          "count": 2,
-          "learned_items": [
-            "الكِتَاب على الطَاوِلَة (the book is on the table)",
-            "القَلَم في الحَقِيبَة (the pen is in the bag)"
-          ]
-        },
-        "expected_output": {
-          "count": 2,
-          "has_question": true,
-          "has_answer": true,
-          "uses_learned_vocab": true,
-          "culturally_appropriate": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_multiple_choice_01",
-        "description": "Multiple choice with 4 options",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 1,
-          "exercise_type": "multiple_choice",
-          "options_count": 4,
-          "difficulty": "beginner",
-          "count": 3,
-          "learned_items": [
-            "كِتَاب (kitaab) - book",
-            "قَلَم (qalam) - pen",
-            "مَكْتَب (maktab) - desk",
-            "كُرْسِي (kursii) - chair"
-          ]
-        },
-        "expected_output": {
-          "count": 3,
-          "has_question": true,
-          "has_answer": true,
-          "has_options": true,
-          "options_count": 4,
-          "uses_learned_vocab": true,
-          "has_distractors": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_multiple_choice_02",
-        "description": "Binary choice (2 options)",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 1,
-          "exercise_type": "multiple_choice",
-          "options_count": 2,
-          "difficulty": "beginner",
-          "count": 3,
-          "learned_items": [
-            "masculine/feminine gender"
-          ]
-        },
-        "expected_output": {
-          "count": 3,
-          "has_question": true,
-          "has_answer": true,
-          "has_options": true,
-          "options_count": 2
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_multiple_choice_03",
-        "description": "Grammar rule identification",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 2,
-          "exercise_type": "multiple_choice",
-          "content_type": "grammar",
-          "options_count": 4,
-          "difficulty": "intermediate",
-          "count": 2,
-          "learned_items": [
-            "Definite article (ال)",
-            "Gender markers (ة)",
-            "Plural forms"
-          ]
-        },
-        "expected_output": {
-          "count": 2,
-          "has_question": true,
-          "has_answer": true,
-          "has_options": true,
-          "tests_grammar": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_paradigm_table_01",
-        "description": "Verb conjugation table",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 4,
-          "exercise_type": "paradigm_table",
-          "table_type": "verb_conjugation",
-          "difficulty": "intermediate",
-          "count": 1,
-          "learned_items": [
-            "كَتَبَ (kataba) - to write (past tense)",
-            "Conjugation: I/you/he/she × singular/dual/plural"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_question": true,
-          "has_answer": true,
-          "has_table_structure": true,
-          "has_rows": true,
-          "has_columns": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_paradigm_table_02",
-        "description": "Noun declension table",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 5,
-          "exercise_type": "paradigm_table",
-          "table_type": "noun_declension",
-          "difficulty": "advanced",
-          "count": 1,
-          "learned_items": [
-            "Case endings: nominative (-u), accusative (-a), genitive (-i)"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_table_structure": true,
-          "tests_grammar": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_paradigm_table_03",
-        "description": "Partial table (some cells pre-filled)",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 4,
-          "exercise_type": "paradigm_table",
-          "partial": true,
-          "difficulty": "intermediate",
-          "count": 1,
-          "learned_items": [
-            "يَكْتُبُ (yaktubu) - he writes (present tense)"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_table_structure": true,
-          "has_prefilled_cells": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_transformation_chain_01",
-        "description": "Singular to plural transformation chain",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 3,
-          "exercise_type": "transformation_chain",
-          "transformation_type": "number",
-          "steps": 3,
-          "difficulty": "intermediate",
-          "count": 2,
-          "learned_items": [
-            "كِتَاب (kitaab) - book (singular)",
-            "كُتُب (kutub) - books (plural)"
-          ]
-        },
-        "expected_output": {
-          "count": 2,
-          "has_question": true,
-          "has_answer": true,
-          "has_steps": true,
-          "steps_count_min": 2
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_transformation_chain_02",
-        "description": "Definite article transformation",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 2,
-          "exercise_type": "transformation_chain",
-          "transformation_type": "definiteness",
-          "steps": 3,
-          "difficulty": "beginner",
-          "count": 2,
-          "learned_items": [
-            "Definite article (ال) prefix"
-          ]
-        },
-        "expected_output": {
-          "count": 2,
-          "has_steps": true,
-          "reversible": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_transformation_chain_03",
-        "description": "Verb conjugation chain",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 4,
-          "exercise_type": "transformation_chain",
-          "transformation_type": "person",
-          "steps": 4,
-          "difficulty": "intermediate",
-          "count": 1,
-          "learned_items": [
-            "أَكْتُبُ (aktubu) - I write",
-            "تَكْتُبُ (taktubu) - you write",
-            "يَكْتُبُ (yaktubu) - he writes"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_steps": true,
-          "tests_grammar": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      }
-    ],
-    "smoke_tests": [
-      {
-        "test_id": "gen_cloze_smoke",
-        "description": "Smoke test: Cloze exercise (grammar rule completion)",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 1,
-          "exercise_type": "cloze",
-          "difficulty": "beginner",
-          "count": 1,
-          "learned_items": [
-            "Feminine nouns end with _____ (ة)"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_question": true,
-          "has_answer": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_dictation_smoke",
-        "description": "Smoke test: Dictation exercise",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 1,
-          "exercise_type": "dictation",
-          "difficulty": "beginner",
-          "count": 1,
-          "learned_items": [
-            "كِتَاب (kitaab) - book"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_question": true,
-          "has_answer": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_error_correction_smoke",
-        "description": "Smoke test: Error correction",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 2,
-          "exercise_type": "error_correction",
-          "difficulty": "intermediate",
-          "count": 1,
-          "learned_items": [
-            "Definite article errors"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_question": true,
-          "has_answer": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_fill_in_blank_smoke",
-        "description": "Smoke test: Fill-in-blank",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 1,
-          "exercise_type": "fill_in_blank",
-          "difficulty": "beginner",
-          "count": 1,
-          "learned_items": [
-            "Gender identification"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_question": true,
-          "has_answer": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_noun_adj_agreement_smoke",
-        "description": "Smoke test: Noun-adjective agreement",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 3,
-          "exercise_type": "noun_adjective_agreement",
-          "difficulty": "intermediate",
-          "count": 1,
-          "learned_items": [
-            "كَبِير/كَبِيرَة (big masculine/feminine)"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_question": true,
-          "has_answer": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_pattern_recognition_smoke",
-        "description": "Smoke test: Pattern recognition",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 1,
-          "exercise_type": "pattern_recognition",
-          "difficulty": "beginner",
-          "count": 1,
-          "learned_items": [
-            "Feminine noun pattern (ة ending)"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_question": true,
-          "has_answer": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_sentence_level_smoke",
-        "description": "Smoke test: Sentence-level exercise",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 3,
-          "exercise_type": "sentence_level",
-          "difficulty": "intermediate",
-          "count": 1,
-          "learned_items": [
-            "Grammar in context"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_question": true,
-          "has_answer": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      },
-      {
-        "test_id": "gen_sorting_smoke",
-        "description": "Smoke test: Sorting exercise",
-        "input": {
-          "mode": "exercise_generation",
-          "lesson_number": 1,
-          "exercise_type": "sorting",
-          "difficulty": "beginner",
-          "count": 1,
-          "learned_items": [
-            "Gender categorization (masculine/feminine)"
-          ]
-        },
-        "expected_output": {
-          "count": 1,
-          "has_question": true,
-          "has_answer": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure",
-          "exercise_quality"
-        ]
-      }
     ]
   },
-  "quiz_generation": {
-    "description": "Test cases for quiz generation - 8 cases",
-    "mode": "quiz_generation",
-    "total_cases": 8,
-    "test_cases": [
+  "exercise_generation": {
+    "description": "Test cases for exercise generation prompts (#19, #20, #21)",
+    "mode": "exercise_generation",
+    "total_cases": 10,
+    "exercise_gen": [
       {
-        "test_id": "gen_quiz_vocab_small",
-        "description": "Small vocabulary quiz (5 questions)",
+        "test_id": "gen_exercise_01",
         "input": {
-          "mode": "quiz_generation",
+          "mode": "exercise_generation",
           "lesson_number": 1,
-          "quiz_type": "vocabulary",
+          "exercise_type": "translation",
+          "content_type": "vocabulary",
           "count": 5,
-          "difficulty": "beginner",
           "learned_items": [
-            "كِتَاب (book)",
-            "قَلَم (pen)",
-            "مَدْرَسَة (school)",
-            "مَكْتَب (desk)",
-            "كُرْسِي (chair)"
-          ]
-        },
-        "expected_output": {
-          "count": 5,
-          "has_variety": true,
-          "uses_learned_vocab": true,
-          "no_duplicates": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure"
-        ]
-      },
-      {
-        "test_id": "gen_quiz_vocab_large",
-        "description": "Large vocabulary quiz (15 questions)",
-        "input": {
-          "mode": "quiz_generation",
-          "lesson_number": 2,
-          "quiz_type": "vocabulary",
-          "count": 15,
-          "difficulty": "beginner",
-          "learned_items": [
-            "10+ vocabulary items from lesson 2"
-          ]
-        },
-        "expected_output": {
-          "count": 15,
-          "has_variety": true,
-          "no_duplicates": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure"
-        ]
-      },
-      {
-        "test_id": "gen_quiz_vocab_mixed_types",
-        "description": "Mixed format vocabulary quiz",
-        "input": {
-          "mode": "quiz_generation",
-          "lesson_number": 1,
-          "quiz_type": "vocabulary",
-          "count": 10,
-          "difficulty": "beginner",
-          "formats": [
-            "translation",
-            "multiple_choice",
-            "fill_in_blank"
+            "مرحبا (marhaba) - hello",
+            "شكرا (shukran) - thank you",
+            "وداعا (wada'an) - goodbye"
           ],
-          "learned_items": [
-            "Lesson 1 vocabulary"
-          ]
+          "difficulty": "beginner"
         },
         "expected_output": {
-          "count": 10,
-          "has_mixed_formats": true,
+          "count": 5,
+          "has_question": true,
+          "has_answer": true,
+          "matches_exercise_type": true,
           "uses_learned_vocab": true
         },
         "metrics": [
           "json_validity",
-          "structure"
+          "structure",
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
-        "test_id": "gen_quiz_grammar_single_topic",
-        "description": "Grammar quiz - single topic focus",
+        "test_id": "gen_exercise_02",
         "input": {
-          "mode": "quiz_generation",
-          "lesson_number": 1,
-          "quiz_type": "grammar",
-          "count": 8,
-          "difficulty": "beginner",
-          "grammar_topics": [
-            "Feminine nouns"
-          ],
-          "learned_items": [
-            "Feminine noun rule (ة ending)"
-          ]
-        },
-        "expected_output": {
-          "count": 8,
-          "tests_grammar": true,
-          "focused_on_topic": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure"
-        ]
-      },
-      {
-        "test_id": "gen_quiz_grammar_mixed_topics",
-        "description": "Grammar quiz - mixed topics",
-        "input": {
-          "mode": "quiz_generation",
+          "mode": "exercise_generation",
           "lesson_number": 3,
-          "quiz_type": "grammar",
-          "count": 10,
-          "difficulty": "intermediate",
-          "grammar_topics": [
-            "Feminine nouns",
-            "Definite article",
-            "Noun-adjective agreement"
-          ]
-        },
-        "expected_output": {
-          "count": 10,
-          "covers_all_topics": true,
-          "has_variety": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure"
-        ]
-      },
-      {
-        "test_id": "gen_quiz_progressive_difficulty",
-        "description": "Progressive difficulty ordering",
-        "input": {
-          "mode": "quiz_generation",
-          "lesson_number": 2,
-          "quiz_type": "mixed",
-          "count": 12,
-          "difficulty_progression": "easy_to_hard",
+          "exercise_type": "fill_in_blank",
+          "content_type": "grammar",
+          "count": 4,
           "learned_items": [
-            "Lesson 2 content"
-          ]
-        },
-        "expected_output": {
-          "count": 12,
-          "difficulty_increases": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure"
-        ]
-      },
-      {
-        "test_id": "gen_quiz_edge_empty_items",
-        "description": "Edge case: empty learned items (should fail gracefully)",
-        "input": {
-          "mode": "quiz_generation",
-          "lesson_number": 1,
-          "quiz_type": "vocabulary",
-          "count": 5,
-          "learned_items": []
-        },
-        "expected_output": {
-          "error": true,
-          "error_message": "No learned items provided"
-        },
-        "metrics": [
-          "error_handling"
-        ]
-      },
-      {
-        "test_id": "gen_quiz_edge_unknown_type",
-        "description": "Edge case: unknown exercise type (should fallback)",
-        "input": {
-          "mode": "quiz_generation",
-          "lesson_number": 1,
-          "quiz_type": "vocabulary",
-          "count": 3,
-          "formats": [
-            "unknown_format_xyz"
+            "كَبِير (kabiir) - big",
+            "صَغِير (saghiir) - small",
+            "Gender agreement rule"
           ],
-          "learned_items": [
-            "كِتَاب (book)"
-          ]
+          "difficulty": "intermediate"
         },
         "expected_output": {
-          "count": 3,
-          "used_fallback_format": true
+          "count": 4,
+          "has_question": true,
+          "has_answer": true,
+          "matches_exercise_type": true,
+          "uses_learned_vocab": true,
+          "tests_grammar_rule": true
         },
         "metrics": [
           "json_validity",
           "structure",
-          "error_handling"
+          "alignment",
+          "exercise_quality"
+        ]
+      },
+      {
+        "test_id": "gen_exercise_03",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 2,
+          "exercise_type": "multiple_choice",
+          "content_type": "vocabulary",
+          "count": 3,
+          "learned_items": [
+            "كِتَاب (kitaab) - book",
+            "قَلَم (qalam) - pen",
+            "مَكْتَب (maktab) - desk"
+          ],
+          "difficulty": "intermediate"
+        },
+        "expected_output": {
+          "count": 3,
+          "has_question": true,
+          "has_answer": true,
+          "matches_exercise_type": true,
+          "uses_learned_vocab": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment",
+          "exercise_quality"
         ]
       }
-    ]
-  },
-  "test_composition": {
-    "description": "Test cases for full test assembly - 6 cases",
-    "mode": "test_composition",
-    "total_cases": 6,
-    "test_cases": [
+    ],
+    "quiz_question_gen": [
       {
-        "test_id": "gen_test_balanced",
-        "description": "Balanced test (50% vocab, 50% grammar)",
+        "test_id": "gen_quiz_01",
         "input": {
-          "mode": "test_composition",
-          "lesson_number": 3,
-          "total_questions": 20,
-          "vocab_ratio": 0.5,
-          "grammar_ratio": 0.5,
-          "difficulty": "intermediate"
-        },
-        "expected_output": {
-          "count": 20,
-          "vocab_count": 10,
-          "grammar_count": 10,
-          "balanced": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure"
-        ]
-      },
-      {
-        "test_id": "gen_test_all_types",
-        "description": "Test with all exercise types represented",
-        "input": {
-          "mode": "test_composition",
-          "lesson_number": 5,
-          "total_questions": 24,
-          "include_all_types": true,
-          "difficulty": "advanced"
-        },
-        "expected_output": {
-          "count": 24,
-          "type_variety_min": 6,
-          "all_types_represented": true
-        },
-        "metrics": [
-          "json_validity",
-          "structure"
-        ]
-      },
-      {
-        "test_id": "gen_test_vocab_heavy",
-        "description": "Vocabulary-heavy test (80% vocab, 20% grammar)",
-        "input": {
-          "mode": "test_composition",
+          "mode": "exercise_generation",
           "lesson_number": 1,
-          "total_questions": 15,
-          "vocab_ratio": 0.8,
-          "grammar_ratio": 0.2,
-          "difficulty": "beginner"
-        },
-        "expected_output": {
-          "count": 15,
-          "vocab_count_min": 10,
-          "grammar_count_min": 2
-        },
-        "metrics": [
-          "json_validity",
-          "structure"
-        ]
-      },
-      {
-        "test_id": "gen_test_grammar_heavy",
-        "description": "Grammar-heavy test (20% vocab, 80% grammar)",
-        "input": {
-          "mode": "test_composition",
-          "lesson_number": 4,
-          "total_questions": 15,
-          "vocab_ratio": 0.2,
-          "grammar_ratio": 0.8,
-          "difficulty": "intermediate"
-        },
-        "expected_output": {
-          "count": 15,
-          "vocab_count_max": 5,
-          "grammar_count_min": 10
-        },
-        "metrics": [
-          "json_validity",
-          "structure"
-        ]
-      },
-      {
-        "test_id": "gen_test_edge_very_short",
-        "description": "Edge case: very short test (5 questions)",
-        "input": {
-          "mode": "test_composition",
-          "lesson_number": 1,
-          "total_questions": 5,
+          "topic_name": "Feminine Nouns",
+          "grammar_rule": "In Arabic, most feminine nouns end with ة (taa marbuuta)",
+          "learned_items": [
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            },
+            {
+              "arabic": "طَاوِلَة",
+              "transliteration": "taawila",
+              "english": "table"
+            },
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book"
+            }
+          ],
+          "count": 5,
           "difficulty": "beginner"
         },
         "expected_output": {
           "count": 5,
+          "has_question": true,
+          "has_answer": true,
+          "has_explanation": true,
+          "uses_learned_vocab": true,
+          "tests_grammar_rule": true,
           "has_variety": true
         },
         "metrics": [
           "json_validity",
-          "structure"
+          "structure",
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
-        "test_id": "gen_test_edge_very_long",
-        "description": "Edge case: long test (50+ questions)",
+        "test_id": "gen_quiz_02",
         "input": {
-          "mode": "test_composition",
-          "lesson_number": 5,
-          "total_questions": 50,
-          "difficulty": "advanced"
+          "mode": "exercise_generation",
+          "lesson_number": 2,
+          "topic_name": "Definite Article",
+          "grammar_rule": "Use ال (al-) prefix to make nouns definite",
+          "learned_items": [
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "a book"
+            },
+            {
+              "arabic": "الكِتَاب",
+              "transliteration": "al-kitaab",
+              "english": "the book"
+            }
+          ],
+          "count": 5,
+          "difficulty": "intermediate"
         },
         "expected_output": {
-          "count": 50,
-          "has_variety": true,
-          "no_duplicates": true
+          "count": 5,
+          "has_question": true,
+          "has_answer": true,
+          "has_explanation": true,
+          "uses_learned_vocab": true,
+          "tests_grammar_rule": true,
+          "has_variety": true
         },
         "metrics": [
           "json_validity",
-          "structure"
+          "structure",
+          "alignment",
+          "exercise_quality"
+        ]
+      },
+      {
+        "test_id": "gen_quiz_03",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 3,
+          "topic_name": "Noun-Adjective Agreement",
+          "grammar_rule": "Adjectives must match nouns in gender and definiteness",
+          "learned_items": [
+            {
+              "arabic": "كِتَاب كَبِير",
+              "transliteration": "kitaab kabiir",
+              "english": "big book"
+            },
+            {
+              "arabic": "مَدْرَسَة كَبِيرَة",
+              "transliteration": "madrasa kabiira",
+              "english": "big school"
+            }
+          ],
+          "count": 5,
+          "difficulty": "intermediate"
+        },
+        "expected_output": {
+          "count": 5,
+          "has_question": true,
+          "has_answer": true,
+          "has_explanation": true,
+          "uses_learned_vocab": true,
+          "tests_grammar_rule": true,
+          "has_variety": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment",
+          "exercise_quality"
         ]
       }
-    ]
-  },
-  "content_retrieval": {
-    "description": "Test cases for RAG-based content retrieval - 6 cases",
-    "mode": "content_retrieval",
-    "total_cases": 6,
-    "test_cases": [
+    ],
+    "test_composition": [
       {
-        "test_id": "rag_lesson_content_01",
-        "description": "Retrieve lesson 1 content (gender)",
+        "test_id": "gen_test_01",
         "input": {
-          "mode": "content_retrieval",
-          "lesson_number": 1,
-          "topic": "gender",
-          "content_type": "all"
+          "mode": "exercise_generation",
+          "lesson_number": 3,
+          "grammar_topics": [
+            "Feminine Nouns",
+            "Definite Article"
+          ],
+          "question_count": 10,
+          "question_types": [
+            "fill_in_blank",
+            "identification",
+            "translation"
+          ],
+          "difficulty": "beginner"
         },
         "expected_output": {
-          "has_vocab": true,
-          "has_grammar_rules": true,
-          "lesson_match": true
+          "test_id": "lesson_3_test",
+          "total_questions": 10,
+          "has_mixed_types": true,
+          "covers_all_topics": true
         },
         "metrics": [
-          "rag_accuracy",
-          "content_completeness"
+          "json_validity",
+          "structure",
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
-        "test_id": "rag_lesson_content_02",
-        "description": "Retrieve lesson 5 content (plurals)",
+        "test_id": "gen_test_02",
         "input": {
-          "mode": "content_retrieval",
+          "mode": "exercise_generation",
           "lesson_number": 5,
-          "topic": "plurals",
-          "content_type": "all"
+          "grammar_topics": [
+            "Present Tense Verbs",
+            "Subject Pronouns",
+            "Negation"
+          ],
+          "question_count": 15,
+          "question_types": [
+            "conjugation",
+            "identification",
+            "correction"
+          ],
+          "difficulty": "intermediate"
         },
         "expected_output": {
-          "has_vocab": true,
-          "has_grammar_rules": true,
-          "lesson_match": true
+          "test_id": "lesson_5_test",
+          "total_questions": 15,
+          "has_mixed_types": true,
+          "covers_all_topics": true
         },
         "metrics": [
-          "rag_accuracy",
-          "content_completeness"
+          "json_validity",
+          "structure",
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
-        "test_id": "rag_format_presentation",
-        "description": "Format content for presentation",
+        "test_id": "gen_test_03",
         "input": {
-          "mode": "content_formatting",
+          "mode": "exercise_generation",
           "lesson_number": 1,
-          "format_type": "presentation",
-          "content": {
-            "vocab": [
-              "كِتَاب",
-              "قَلَم"
-            ],
-            "grammar": [
-              "Feminine nouns end with ة"
-            ]
-          }
+          "grammar_topics": [
+            "Feminine Nouns"
+          ],
+          "question_count": 8,
+          "question_types": [
+            "identification",
+            "fill_in_blank"
+          ],
+          "difficulty": "intermediate"
         },
         "expected_output": {
-          "formatted": true,
-          "readable": true,
-          "structured": true
+          "test_id": "lesson_1_test",
+          "total_questions": 8,
+          "has_mixed_types": true,
+          "covers_all_topics": true
         },
         "metrics": [
-          "formatting_quality"
+          "json_validity",
+          "structure",
+          "alignment",
+          "exercise_quality"
         ]
       },
       {
-        "test_id": "rag_format_practice",
-        "description": "Format content for practice",
+        "test_id": "gen_test_04",
         "input": {
-          "mode": "content_formatting",
-          "lesson_number": 2,
-          "format_type": "practice",
-          "content": {
-            "vocab": [
-              "الكِتَاب",
-              "القَلَم"
-            ],
-            "grammar": [
-              "Definite article (ال)"
-            ]
-          }
+          "mode": "exercise_generation",
+          "lesson_number": 3,
+          "grammar_topics": [
+            "Present Tense Conjugation",
+            "Verb Agreement"
+          ],
+          "question_count": 10,
+          "question_types": [
+            "conjugation",
+            "translation",
+            "fill_in_blank"
+          ],
+          "difficulty": "beginner"
         },
         "expected_output": {
-          "formatted": true,
-          "practice_ready": true
+          "test_id": "lesson_3_test",
+          "total_questions": 10,
+          "has_mixed_types": true,
+          "covers_all_topics": true
         },
         "metrics": [
-          "formatting_quality"
-        ]
-      },
-      {
-        "test_id": "rag_edge_invalid_lesson",
-        "description": "Edge case: invalid lesson number (99)",
-        "input": {
-          "mode": "content_retrieval",
-          "lesson_number": 99,
-          "topic": "nonexistent"
-        },
-        "expected_output": {
-          "error": true,
-          "error_message": "Lesson not found"
-        },
-        "metrics": [
-          "error_handling"
-        ]
-      },
-      {
-        "test_id": "rag_edge_empty_results",
-        "description": "Edge case: RAG returns no content",
-        "input": {
-          "mode": "content_retrieval",
-          "lesson_number": 1,
-          "topic": "unknown_topic_xyz"
-        },
-        "expected_output": {
-          "empty": true,
-          "fallback_used": true
-        },
-        "metrics": [
-          "error_handling"
+          "json_validity",
+          "structure",
+          "alignment",
+          "exercise_quality"
         ]
       }
     ]

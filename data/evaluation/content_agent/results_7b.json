@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "model_size": "7B",
+    "evaluation_date": "2026-04-14T13:36:33.153734",
+    "agent": "Agent 3 (Content/Exercise Generation)"
+  },
+  "exercise_generation": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "metrics": {
+      "exercise_quality": [
+        {
+          "test_id": "gen_exercise_01",
+          "score": 0.9,
+          "passed": true,
+          "reason": "✓ Question: valid (17 chars) | ✓ Answer: present | ✓ Learned_items: 1/3 used | ✓ Difficulty: beginner | ✓ Cultural: appropriate | ✓ Harakaat: consistent (none used) | ✓ Instructions: clear | ⚠ Answer_format: not specified"
+        },
+        {
+          "test_id": "gen_exercise_02",
+          "score": 0.8,
+          "passed": true,
+          "reason": "✓ Question: valid (25 chars) | ✓ Answer: present | ✓ Learned_items: 1/3 used | ✓ Difficulty: intermediate | ✓ Cultural: appropriate | ✓ Harakaat: consistent (none used) | ⚠ Instructions: unclear | ⚠ Answer_format: not specified"
+        },
+        {
+          "test_id": "gen_exercise_03",
+          "score": 0.9,
+          "passed": true,
+          "reason": "✓ Question: valid (48 chars) | ✓ Answer: present | ✓ Learned_items: 3/3 used | ✓ Difficulty: intermediate | ✓ Cultural: appropriate | ✓ Harakaat: consistent (none used) | ✓ Instructions: clear | ⚠ Answer_format: not specified"
+        }
+      ],
+      "json_validity": [
+        {
+          "test_id": "gen_exercise_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "✓ Valid JSON output"
+        },
+        {
+          "test_id": "gen_exercise_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "✓ Valid JSON output"
+        },
+        {
+          "test_id": "gen_exercise_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "✓ Valid JSON output"
+        }
+      ],
+      "alignment": [
+        {
+          "test_id": "gen_exercise_01",
+          "score": 0.93,
+          "passed": true,
+          "reason": "✓ Alignment score: 0.93 (threshold: 0.8)\nScores: 1: 1.0, 2: 0.8, 3: 1.0, 4: 0.7\nOverall: 0.93\nReasoning: The exercises match the translation type perfectly, so score 1 is 1.0. The vocabulary used is appropriate for a beginner level, but some"
+        },
+        {
+          "test_id": "gen_exercise_02",
+          "score": 0.85,
+          "passed": true,
+          "reason": "✓ Alignment score: 0.85 (threshold: 0.8)\nScores: 1: 1.0, 2: 0.8, 3: 0.0, 4: 0.7\nOverall: 0.85\nReasoning: The exercises match the fill_in_blank type perfectly, so it scores 1.0. However, the vocabulary used is not from the learned vocabulary "
+        },
+        {
+          "test_id": "gen_exercise_03",
+          "score": 0.85,
+          "passed": true,
+          "reason": "✓ Alignment score: 0.85 (threshold: 0.8)\nScores: 1: 1.0, 2: 0.8, 3: 0.0, 4: 0.7\nOverall: 0.85\nReasoning: \n1. Matches exercise type: The generated exercises are multiple choice questions, which aligns with the requirement.\n2. Uses learned voc"
+        }
+      ],
+      "structure": [
+        {
+          "test_id": "gen_exercise_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "✓ Valid structure with required keys and types"
+        },
+        {
+          "test_id": "gen_exercise_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "✓ Valid structure with required keys and types"
+        },
+        {
+          "test_id": "gen_exercise_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "✓ Valid structure with required keys and types"
+        }
+      ]
+    }
+  }
+}
