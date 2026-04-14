@@ -18,10 +18,12 @@ Routing: Conditional edges based on conversation state (see routing.py)
 import logging
 
 from langgraph.graph import END, START, StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
 from src.agents import ContentAgent, GradingAgent, TeachingAgent
 
 from .nodes import ContentNode, GradingNode, TeachingNode
+from .routing import get_next_agent_from_user_input, route_next_node
 from .state import SystemState
 
 logger = logging.getLogger(__name__)
@@ -31,7 +33,7 @@ def create_teaching_graph(
     teaching_agent: TeachingAgent,
     grading_agent: GradingAgent,
     content_agent: ContentAgent,
-) -> StateGraph:
+) -> CompiledStateGraph:
     """
     Create the LangGraph orchestrator for multi-agent teaching.
 
@@ -41,7 +43,7 @@ def create_teaching_graph(
         content_agent: Agent 3 (Exercise generation)
 
     Returns:
-        Compiled LangGraph StateGraph
+        Compiled LangGraph graph (usable with `.invoke`)
     """
     nodes = _create_nodes(teaching_agent, grading_agent, content_agent)
     graph = _build_graph(nodes)
@@ -71,24 +73,35 @@ def _build_graph(nodes: dict[str, callable]) -> StateGraph:
     for name, node in nodes.items():
         graph.add_node(name, node)
 
-    graph.add_edge(START, "teaching")
+    # All routing uses centralized route_next_node function
+    graph.add_conditional_edges(
+        START,
+        route_next_node,
+        {
+            "teaching": "teaching",
+            "grading": "grading",
+            "content": "content",
+            "user": END,
+            "end": END,
+        },
+    )
 
     graph.add_conditional_edges(
         "teaching",
-        _route_from_teaching,
+        route_next_node,
         {
-            "content": "content",  # Teaching needs exercise
-            "user": END,  # Wait for user (conversation paused)
-            "end": END,  # Session complete
+            "content": "content",
+            "user": END,
+            "end": END,
         },
     )
 
     graph.add_conditional_edges(
         "content",
-        _route_from_content,
+        route_next_node,
         {
-            "user": END,  # Wait for user to answer exercise
-            "teaching": "teaching",  # Error fallback
+            "user": END,
+            "teaching": "teaching",
         },
     )
 
@@ -97,49 +110,14 @@ def _build_graph(nodes: dict[str, callable]) -> StateGraph:
     return graph
 
 
-def _route_from_teaching(state: SystemState) -> str:
-    """
-    Route after teaching node execution.
-
-    Possible routes:
-    - "content" if teaching agent needs exercise
-    - "user" if waiting for user input
-    - "end" if session complete
-    """
-    if state.next_agent == "agent3":
-        return "content"
-    elif state.next_agent == "user":
-        return "user"
-    elif state.next_agent == "end":
-        return "end"
-    else:
-        # Default: wait for user
-        return "user"
-
-
-def _route_from_content(state: SystemState) -> str:
-    """
-    Route after content node execution.
-
-    Possible routes:
-    - "user" if exercise generated (wait for user answer)
-    - "teaching" if error occurred (fallback)
-    """
-    if state.next_agent == "user":
-        return "user"
-    else:
-        # Error fallback: return to teaching
-        return "teaching"
-
-
 def run_conversation_turn(
-    graph: StateGraph, state: SystemState, user_input: str | None = None
+    graph: CompiledStateGraph, state: SystemState, user_input: str | None = None
 ) -> SystemState:
     """
     Execute one turn of conversation through the graph.
 
     Args:
-        graph: Compiled LangGraph
+        graph: Compiled LangGraph graph
         state: Current system state
         user_input: Optional user message
 
@@ -148,7 +126,8 @@ def run_conversation_turn(
     """
     try:
         if user_input:
-            state = _handle_user_input(state, user_input)
+            state.add_message("user", user_input)
+            state.next_agent = get_next_agent_from_user_input(user_input, state)
 
         result_dict = graph.invoke(state)
 
@@ -160,18 +139,6 @@ def run_conversation_turn(
         logger.error(f"Error in conversation turn: {e}")
         state.add_message("system", f"Error: {str(e)}")
         return state
-
-
-def _handle_user_input(state: SystemState, user_input: str) -> SystemState:
-    """Add user input and determine next agent based on context."""
-    state.add_message("user", user_input)
-
-    if state.pending_exercise and state.awaiting_user_answer:
-        state.next_agent = "agent2"  # User answering exercise → grade it
-    else:
-        state.next_agent = "agent1"  # User talking to teaching agent
-
-    return state
 
 
 def create_new_session(user_id: str, session_id: str) -> SystemState:
@@ -191,9 +158,13 @@ def create_new_session(user_id: str, session_id: str) -> SystemState:
     return state
 
 
-# Example usage (for testing/development)
-def main():
-    """Example usage of the orchestration layer."""
+def _example_main():
+    """
+    Example usage of the orchestration layer.
+
+    NOTE: This is a development example only and should not be imported.
+    For production use, create a separate script that imports from this module.
+    """
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     logger.info("Loading models...")
@@ -218,4 +189,4 @@ def main():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    main()
+    _example_main()

@@ -96,9 +96,8 @@ class TeachingNode:
 
     def _handle_feedback(self, state: SystemState) -> str:
         """Provide feedback after grading."""
-        # Get grading result from last message
         grading_msg = state.conversation_history[-1]
-        is_correct = "correct" in grading_msg.content.lower()
+        is_correct = grading_msg.metadata.get("is_correct", False)
 
         input_data = {
             "is_correct": is_correct,
@@ -218,9 +217,7 @@ class ContentNode:
             Updated system state with generated exercise
         """
         try:
-            # Extract exercise requirements from teaching agent's last message
-            last_msg = state.conversation_history[-1]
-            exercise_request = self._parse_exercise_request(last_msg.content, state)
+            exercise_request = self._parse_exercise_request(state)
 
             # Generate exercise
             response = self.agent.generate_exercise(exercise_request)
@@ -242,9 +239,8 @@ class ContentNode:
             state.next_agent = "agent1"  # Return to teaching
             return state
 
-    def _parse_exercise_request(self, message: str, state: SystemState) -> dict[str, Any]:
-        """Extract exercise requirements from teaching agent message."""
-        # Default exercise request
+    def _parse_exercise_request(self, state: SystemState) -> dict[str, Any]:
+        """Extract exercise requirements from current state."""
         return {
             "exercise_type": "translation",  # Default type
             "difficulty": "beginner",

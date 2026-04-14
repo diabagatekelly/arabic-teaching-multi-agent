@@ -112,6 +112,15 @@ class SystemState:
             "current_mode": self.current_mode,
             "learned_items": self.learned_items,
             "lesson_history": self.lesson_history,
+            "conversation_history": [
+                {
+                    "role": msg.role,
+                    "content": msg.content,
+                    "timestamp": msg.timestamp.isoformat(),
+                    "metadata": msg.metadata,
+                }
+                for msg in self.conversation_history
+            ],
             "pending_exercise": self.pending_exercise.__dict__ if self.pending_exercise else None,
             "awaiting_user_answer": self.awaiting_user_answer,
             "last_agent": self.last_agent,
@@ -146,7 +155,19 @@ class SystemState:
                 state.conversation_history = history
             elif history and isinstance(history[0], dict):
                 # Dicts that need conversion
-                state.conversation_history = [Message(**msg) for msg in history]
+                state.conversation_history = []
+                for msg in history:
+                    timestamp = msg.get("timestamp")
+                    if isinstance(timestamp, str):
+                        timestamp = datetime.fromisoformat(timestamp)
+                    state.conversation_history.append(
+                        Message(
+                            role=msg["role"],
+                            content=msg["content"],
+                            timestamp=timestamp or datetime.now(),
+                            metadata=msg.get("metadata", {}),
+                        )
+                    )
 
         # Restore pending exercise
         if data.get("pending_exercise"):

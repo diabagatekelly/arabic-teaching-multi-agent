@@ -70,7 +70,11 @@ class TestTeachingNode:
         state.add_message(
             "agent2",
             "Your answer is correct!",
-            metadata={"user_answer": "الكِتَاب", "correct_answer": "الكِتَاب"},
+            metadata={
+                "is_correct": True,
+                "user_answer": "الكِتَاب",
+                "correct_answer": "الكِتَاب",
+            },
         )
 
         node = TeachingNode(mock_agent)
