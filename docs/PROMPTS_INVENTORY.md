@@ -300,6 +300,11 @@ Would you like to review and re-test, or move on to the next grammar topic?"
 
 ## Agent 2: Grading Agent (4 prompts)
 
+**Model:** Fine-tuned Qwen2.5-7B  
+**Baseline Evaluated:** 2026-04-13  
+**Status:** Implemented with updated prompts (JSON-only enforcement, harakaat rules)  
+**Fine-tuning planned:** 270+ examples to address format compliance and Arabic grading flexibility
+
 ### Vocabulary Grading (2 prompts)
 
 #### 13. Vocabulary Answer Grading
@@ -321,7 +326,16 @@ or
 {"correct": false}
 ```
 
-**Status:** ✓ Implemented in baseline.py (lines 179-189)
+**Prompt Features:**
+- Explicit JSON-only output instructions with correct/incorrect examples
+- Flexibility rules: Accept synonyms, typos, capitalization variations, articles
+- Max 50 tokens output
+
+**Baseline Results (7B):**
+- JSON compliance: 0-6% (adds explanations)
+- Reasoning: 100% on synonyms, typos, capitalization, wrong answers
+
+**Status:** ✓ Implemented with updated prompt (templates.py lines 290-316)
 
 ---
 
@@ -339,18 +353,15 @@ or
 
 ### Grammar Grading (2 prompts)
 
-#### 15. Grammar Quiz Answer Grading
+#### 15. Grammar Quiz Answer Grading (Single Question)
 **Flow:** 2B - Grammar Teaching - Topic Quiz  
 **Function:** `check_answer()`  
 **Mode:** `grading_grammar`  
 **Context:** Grade student's grammar quiz answer  
 **Input:**
-- `lesson_number`
-- `topic_name`
 - `question`
 - `student_answer`
 - `correct_answer`
-- `grammar_rules` (pre-loaded context)
 
 **Example Output:**
 ```json
@@ -361,34 +372,47 @@ or
 {"correct": false}
 ```
 
-**Status:** ❌ Not yet implemented
+**Prompt Features:**
+- Explicit JSON-only output instructions with correct/incorrect examples
+- Flexibility rules: Accept typos, synonyms, abbreviations (m/f for masculine/feminine)
+- **Arabic harakaat rules:** Internal harakaat OPTIONAL (الكتابُ = الكِتَابُ), case endings REQUIRED (الكتاب ≠ الكِتَابُ)
+- Max 50 tokens output
+
+**Baseline Results (7B):**
+- JSON compliance: 0-6% (adds explanations)
+- Reasoning: 100% on case ending enforcement, 0% on internal harakaat flexibility (too strict)
+
+**Status:** ✓ Implemented with updated prompt (templates.py lines 318-345)
 
 ---
 
-#### 16. Grammar Test Grading (Multiple Answers)
+#### 16. Grammar Test Grading (Multiple Questions)
 **Flow:** 4 - Test Mode  
 **Function:** `grade_test()`  
 **Mode:** `grading_grammar`  
-**Context:** Grade full test with multiple grammar points  
+**Context:** Grade full test with multiple grammar questions  
 **Input:**
 - `lesson_number`
-- `answers` (list of student answers with context)
-- `grammar_rules` (all rules for lesson)
+- `answers_formatted` (formatted string of all questions/answers)
 
 **Example Output:**
 ```json
 {
   "total_score": "8/10",
   "results": [
-    {"answer_id": "q1", "correct": true},
-    {"answer_id": "q2", "correct": false, "expected": "..."},
+    {"question_id": "q1", "correct": true},
+    {"question_id": "q2", "correct": false},
     ...
-  ],
-  "weak_areas": ["definiteness_agreement"]
+  ]
 }
 ```
 
-**Status:** ❌ Not yet implemented
+**Prompt Features:**
+- Explicit JSON-only output with required structure
+- Same flexibility rules as single question grading
+- Batch processing for efficiency
+
+**Status:** ✓ Implemented with updated prompt (templates.py lines 347-379)
 
 ---
 
@@ -516,10 +540,10 @@ or
 | **teaching_grammar** | 4 | 0 | 4 |
 | **feedback_vocab** | 2 | 0 | 2 |
 | **feedback_grammar** | 2 | 0 | 2 |
-| **grading_vocab** | 2 | 1 | 1 |
-| **grading_grammar** | 2 | 0 | 2 |
+| **grading_vocab** | 2 | 2 | 0 |
+| **grading_grammar** | 2 | 2 | 0 |
 | **exercise_generation** | 3 | 0 | 3 |
-| **TOTAL** | **19** | **2** | **17** |
+| **TOTAL** | **19** | **7** | **12** |
 
 ---
 

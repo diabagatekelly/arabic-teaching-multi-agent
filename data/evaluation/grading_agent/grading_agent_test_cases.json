@@ -1,0 +1,625 @@
+{
+  "metadata": {
+    "version": "3.0",
+    "created": "2026-04-13",
+    "total_test_cases": 50,
+    "description": "Evaluation dataset for Agent 2 (Grading) - includes edge cases for nuanced grading decisions",
+    "agents_covered": ["Agent 2: Grading"]
+  },
+  "grading_vocab": {
+    "description": "Test cases for vocabulary grading with edge cases",
+    "mode": "grading_vocab",
+    "total_cases": 40,
+    "exact_match_correct": [
+      {
+        "test_id": "grade_vocab_exact_01",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "كِتَاب",
+          "student_answer": "book",
+          "correct_answer": "book"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_exact_02",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "مَدْرَسَة",
+          "student_answer": "school",
+          "correct_answer": "school"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_exact_03",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "قَلَم",
+          "student_answer": "pen",
+          "correct_answer": "pen"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_exact_04",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "بَيْت",
+          "student_answer": "house",
+          "correct_answer": "house"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_exact_05",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "سَيَّارَة",
+          "student_answer": "car",
+          "correct_answer": "car"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      }
+    ],
+    "clearly_incorrect": [
+      {
+        "test_id": "grade_vocab_wrong_01",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "كِتَاب",
+          "student_answer": "pen",
+          "correct_answer": "book"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_wrong_02",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "مَدْرَسَة",
+          "student_answer": "house",
+          "correct_answer": "school"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_wrong_03",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "بَيْت",
+          "student_answer": "door",
+          "correct_answer": "house"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_wrong_04",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "قَلَم",
+          "student_answer": "pencil",
+          "correct_answer": "pen"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_wrong_05",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "سَيَّارَة",
+          "student_answer": "bus",
+          "correct_answer": "car"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_wrong_06",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "كَبِير",
+          "student_answer": "small",
+          "correct_answer": "big"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_wrong_07",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "جَمِيل",
+          "student_answer": "ugly",
+          "correct_answer": "beautiful"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_vocab_wrong_08",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "جَدِيد",
+          "student_answer": "old",
+          "correct_answer": "new"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      }
+    ],
+    "synonym_variations": [
+      {
+        "test_id": "grade_vocab_synonym_01",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "مُعَلِّم",
+          "student_answer": "instructor",
+          "correct_answer": "teacher"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Synonyms should be accepted"
+      },
+      {
+        "test_id": "grade_vocab_synonym_02",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "بَيْت",
+          "student_answer": "home",
+          "correct_answer": "house"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Close synonyms should be accepted"
+      },
+      {
+        "test_id": "grade_vocab_synonym_03",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "سَيَّارَة",
+          "student_answer": "automobile",
+          "correct_answer": "car"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Formal synonyms should be accepted"
+      }
+    ],
+    "minor_typos": [
+      {
+        "test_id": "grade_vocab_typo_01",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "مَدْرَسَة",
+          "student_answer": "scool",
+          "correct_answer": "school"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Minor typos (1 char extra/missing) should be tolerated"
+      },
+      {
+        "test_id": "grade_vocab_typo_02",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "كِتَاب",
+          "student_answer": "bok",
+          "correct_answer": "book"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Single character missing should be tolerated"
+      },
+      {
+        "test_id": "grade_vocab_typo_03",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "قَلَم",
+          "student_answer": "pn",
+          "correct_answer": "pen"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Too many missing characters - should be marked incorrect"
+      }
+    ],
+    "capitalization_variations": [
+      {
+        "test_id": "grade_vocab_caps_01",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "كِتَاب",
+          "student_answer": "Book",
+          "correct_answer": "book"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Capitalization should not affect correctness"
+      },
+      {
+        "test_id": "grade_vocab_caps_02",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "مَدْرَسَة",
+          "student_answer": "SCHOOL",
+          "correct_answer": "school"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "All caps should not affect correctness"
+      }
+    ],
+    "articles_and_extras": [
+      {
+        "test_id": "grade_vocab_article_01",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "قَلَم",
+          "student_answer": "a pen",
+          "correct_answer": "pen"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Indefinite articles should be ignored"
+      },
+      {
+        "test_id": "grade_vocab_article_02",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "كِتَاب",
+          "student_answer": "the book",
+          "correct_answer": "book"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Definite articles should be ignored"
+      }
+    ],
+    "partial_credit_cases": [
+      {
+        "test_id": "grade_vocab_partial_01",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "كِتَاب",
+          "student_answer": "notebook",
+          "correct_answer": "book"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Related but not correct - should be marked wrong but could acknowledge similarity"
+      },
+      {
+        "test_id": "grade_vocab_partial_02",
+        "input": {
+          "mode": "grading_vocab",
+          "word": "مَدْرَسَة",
+          "student_answer": "classroom",
+          "correct_answer": "school"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Related concept but not correct translation"
+      }
+    ]
+  },
+  "grading_grammar": {
+    "description": "Test cases for grammar grading with edge cases including Arabic text with/without harakaat",
+    "mode": "grading_grammar",
+    "total_cases": 25,
+    "quiz_grading_exact": [
+      {
+        "test_id": "grade_grammar_exact_01",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Is the word مَدْرَسَة masculine or feminine?",
+          "student_answer": "feminine",
+          "correct_answer": "feminine"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_grammar_exact_02",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Is the word كِتَاب masculine or feminine?",
+          "student_answer": "masculine",
+          "correct_answer": "masculine"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_grammar_exact_03",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Complete with correct agreement: كِتَاب ___",
+          "student_answer": "كَبِير",
+          "correct_answer": "كَبِير"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_grammar_exact_04",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Make definite: كِتَاب",
+          "student_answer": "الكِتَاب",
+          "correct_answer": "الكِتَاب"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_grammar_exact_05",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Conjugate 'to write' (كتب) in present tense for 'I'",
+          "student_answer": "أَكْتُب",
+          "correct_answer": "أَكْتُب"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      }
+    ],
+    "harakaat_internal_optional": [
+      {
+        "test_id": "grade_grammar_harakaat_internal_01",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Make definite (nominative): كتاب",
+          "student_answer": "الكتابُ",
+          "correct_answer": "الكِتَابُ"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Internal harakaat optional, but case ending (ُ) required and correct"
+      },
+      {
+        "test_id": "grade_grammar_harakaat_internal_02",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Complete with correct agreement (nominative): كِتَابٌ ___",
+          "student_answer": "كبيرٌ",
+          "correct_answer": "كَبِيرٌ"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Internal harakaat optional, but case ending (ٌ) required and correct"
+      },
+      {
+        "test_id": "grade_grammar_harakaat_internal_03",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Write in accusative: الكتاب",
+          "student_answer": "الكتابَ",
+          "correct_answer": "الكِتَابَ"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Internal harakaat optional, but case ending (َ) required and correct"
+      }
+    ],
+    "harakaat_case_ending_required": [
+      {
+        "test_id": "grade_grammar_case_required_01",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Make definite (nominative): كتاب",
+          "student_answer": "الكتاب",
+          "correct_answer": "الكِتَابُ"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Missing case ending (ُ) - should be marked incorrect"
+      },
+      {
+        "test_id": "grade_grammar_case_required_02",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Make definite (nominative): كتاب",
+          "student_answer": "الكتابَ",
+          "correct_answer": "الكِتَابُ"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Wrong case ending (َ instead of ُ) - accusative instead of nominative"
+      },
+      {
+        "test_id": "grade_grammar_case_required_03",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Write in accusative: الكتاب",
+          "student_answer": "الكتابُ",
+          "correct_answer": "الكِتَابَ"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Wrong case ending (ُ instead of َ) - nominative instead of accusative"
+      }
+    ],
+    "abbreviations_and_flexibility": [
+      {
+        "test_id": "grade_grammar_abbrev_01",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Is مَدْرَسَة masculine or feminine?",
+          "student_answer": "f",
+          "correct_answer": "feminine"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Common abbreviations should be accepted"
+      },
+      {
+        "test_id": "grade_grammar_abbrev_02",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Is كِتَاب masculine or feminine?",
+          "student_answer": "m",
+          "correct_answer": "masculine"
+        },
+        "expected_output": {
+          "correct": true
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Common abbreviations should be accepted"
+      }
+    ],
+    "clearly_incorrect": [
+      {
+        "test_id": "grade_grammar_wrong_01",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Is the word مَدْرَسَة masculine or feminine?",
+          "student_answer": "masculine",
+          "correct_answer": "feminine"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_grammar_wrong_02",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Is the word كِتَاب masculine or feminine?",
+          "student_answer": "feminine",
+          "correct_answer": "masculine"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"]
+      },
+      {
+        "test_id": "grade_grammar_wrong_03",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Complete with correct agreement: كِتَاب ___",
+          "student_answer": "كَبِيرَة",
+          "correct_answer": "كَبِير"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Wrong gender agreement - incorrect"
+      },
+      {
+        "test_id": "grade_grammar_wrong_04",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Make negative (present): أَكْتُب",
+          "student_answer": "ما أَكْتُب",
+          "correct_answer": "لا أَكْتُب"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Wrong negation particle - incorrect"
+      },
+      {
+        "test_id": "grade_grammar_wrong_05",
+        "input": {
+          "mode": "grading_grammar",
+          "question": "Complete: مَدْرَسَة ___",
+          "student_answer": "كَبِير",
+          "correct_answer": "كَبِيرَة"
+        },
+        "expected_output": {
+          "correct": false
+        },
+        "metrics": ["json_validity", "structure", "accuracy"],
+        "notes": "Wrong gender agreement - incorrect"
+      }
+    ]
+  }
+}

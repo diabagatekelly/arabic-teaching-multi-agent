@@ -1,0 +1,328 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "created": "2026-04-09",
+    "total_test_cases": 94,
+    "description": "Evaluation dataset for Agent 3 (Content/Exercise Generation)",
+    "agents_covered": [
+      "Agent 3: Content Generation"
+    ]
+  },
+  "exercise_generation": {
+    "description": "Test cases for exercise generation prompts (#19, #20, #21)",
+    "mode": "exercise_generation",
+    "total_cases": 10,
+    "exercise_gen": [
+      {
+        "test_id": "gen_exercise_01",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 1,
+          "exercise_type": "translation",
+          "content_type": "vocabulary",
+          "count": 5,
+          "learned_items": [
+            "مرحبا (marhaba) - hello",
+            "شكرا (shukran) - thank you",
+            "وداعا (wada'an) - goodbye"
+          ]
+        },
+        "expected_output": {
+          "count": 5,
+          "has_question": true,
+          "has_answer": true,
+          "matches_exercise_type": true,
+          "uses_learned_vocab": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      },
+      {
+        "test_id": "gen_exercise_02",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 3,
+          "exercise_type": "fill_in_blank",
+          "content_type": "grammar",
+          "count": 4,
+          "learned_items": [
+            "كَبِير (kabiir) - big",
+            "صَغِير (saghiir) - small",
+            "Gender agreement rule"
+          ]
+        },
+        "expected_output": {
+          "count": 4,
+          "has_question": true,
+          "has_answer": true,
+          "matches_exercise_type": true,
+          "uses_learned_vocab": true,
+          "tests_grammar_rule": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      },
+      {
+        "test_id": "gen_exercise_03",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 2,
+          "exercise_type": "multiple_choice",
+          "content_type": "vocabulary",
+          "count": 3,
+          "learned_items": [
+            "كِتَاب (kitaab) - book",
+            "قَلَم (qalam) - pen",
+            "مَكْتَب (maktab) - desk"
+          ]
+        },
+        "expected_output": {
+          "count": 3,
+          "has_question": true,
+          "has_answer": true,
+          "matches_exercise_type": true,
+          "uses_learned_vocab": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      }
+    ],
+    "quiz_question_gen": [
+      {
+        "test_id": "gen_quiz_01",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 1,
+          "topic_name": "Feminine Nouns",
+          "grammar_rule": "In Arabic, most feminine nouns end with ة (taa marbuuta)",
+          "learned_items": [
+            {
+              "arabic": "مَدْرَسَة",
+              "transliteration": "madrasa",
+              "english": "school"
+            },
+            {
+              "arabic": "طَاوِلَة",
+              "transliteration": "taawila",
+              "english": "table"
+            },
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "book"
+            }
+          ],
+          "count": 5
+        },
+        "expected_output": {
+          "count": 5,
+          "has_question": true,
+          "has_answer": true,
+          "has_explanation": true,
+          "uses_learned_vocab": true,
+          "tests_grammar_rule": true,
+          "has_variety": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      },
+      {
+        "test_id": "gen_quiz_02",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 2,
+          "topic_name": "Definite Article",
+          "grammar_rule": "Use ال (al-) prefix to make nouns definite",
+          "learned_items": [
+            {
+              "arabic": "كِتَاب",
+              "transliteration": "kitaab",
+              "english": "a book"
+            },
+            {
+              "arabic": "الكِتَاب",
+              "transliteration": "al-kitaab",
+              "english": "the book"
+            }
+          ],
+          "count": 5
+        },
+        "expected_output": {
+          "count": 5,
+          "has_question": true,
+          "has_answer": true,
+          "has_explanation": true,
+          "uses_learned_vocab": true,
+          "tests_grammar_rule": true,
+          "has_variety": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      },
+      {
+        "test_id": "gen_quiz_03",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 3,
+          "topic_name": "Noun-Adjective Agreement",
+          "grammar_rule": "Adjectives must match nouns in gender and definiteness",
+          "learned_items": [
+            {
+              "arabic": "كِتَاب كَبِير",
+              "transliteration": "kitaab kabiir",
+              "english": "big book"
+            },
+            {
+              "arabic": "مَدْرَسَة كَبِيرَة",
+              "transliteration": "madrasa kabiira",
+              "english": "big school"
+            }
+          ],
+          "count": 5
+        },
+        "expected_output": {
+          "count": 5,
+          "has_question": true,
+          "has_answer": true,
+          "has_explanation": true,
+          "uses_learned_vocab": true,
+          "tests_grammar_rule": true,
+          "has_variety": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      }
+    ],
+    "test_composition": [
+      {
+        "test_id": "gen_test_01",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 3,
+          "grammar_topics": [
+            "Feminine Nouns",
+            "Definite Article"
+          ],
+          "question_count": 10,
+          "question_types": [
+            "fill_in_blank",
+            "identification",
+            "translation"
+          ]
+        },
+        "expected_output": {
+          "test_id": "lesson_3_test",
+          "total_questions": 10,
+          "has_mixed_types": true,
+          "covers_all_topics": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      },
+      {
+        "test_id": "gen_test_02",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 5,
+          "grammar_topics": [
+            "Present Tense Verbs",
+            "Subject Pronouns",
+            "Negation"
+          ],
+          "question_count": 15,
+          "question_types": [
+            "conjugation",
+            "identification",
+            "correction"
+          ]
+        },
+        "expected_output": {
+          "test_id": "lesson_5_test",
+          "total_questions": 15,
+          "has_mixed_types": true,
+          "covers_all_topics": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      },
+      {
+        "test_id": "gen_test_03",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 1,
+          "grammar_topics": [
+            "Feminine Nouns"
+          ],
+          "question_count": 8,
+          "question_types": [
+            "identification",
+            "fill_in_blank"
+          ]
+        },
+        "expected_output": {
+          "test_id": "lesson_1_test",
+          "total_questions": 8,
+          "has_mixed_types": true,
+          "covers_all_topics": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      },
+      {
+        "test_id": "gen_test_04",
+        "input": {
+          "mode": "exercise_generation",
+          "lesson_number": 3,
+          "grammar_topics": [
+            "Present Tense Conjugation",
+            "Verb Agreement"
+          ],
+          "question_count": 10,
+          "question_types": [
+            "conjugation",
+            "translation",
+            "fill_in_blank"
+          ]
+        },
+        "expected_output": {
+          "test_id": "lesson_3_test",
+          "total_questions": 10,
+          "has_mixed_types": true,
+          "covers_all_topics": true
+        },
+        "metrics": [
+          "json_validity",
+          "structure",
+          "alignment"
+        ]
+      }
+    ]
+  }
+}

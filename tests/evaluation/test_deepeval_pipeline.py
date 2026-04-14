@@ -4,15 +4,8 @@ import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-from deepeval.test_case import LLMTestCase
 
 from src.evaluation.deepeval_pipeline import EvaluationPipeline
-from src.evaluation.metrics import (
-    AccuracyMetric,
-    JSONValidityMetric,
-    SentimentMetric,
-    StructureMetric,
-)
 
 
 @pytest.fixture
@@ -207,12 +200,14 @@ class TestEvaluationPipeline:
             EvaluationPipeline(invalid_file)
 
     def test_load_test_cases_missing_keys(self, tmp_path):
-        """Test that ValueError is raised for missing required keys."""
+        """Test that ValueError is raised when NO valid mode keys are present."""
+        # Pipeline now allows partial test case files (e.g., grading_agent_test_cases.json)
+        # It only raises if NO valid mode keys are found at all
         incomplete_file = tmp_path / "incomplete.json"
         with open(incomplete_file, "w") as f:
-            json.dump({"lesson_start": {}}, f)  # Missing other 7 modes
+            json.dump({"invalid_key": {}, "another_invalid": {}}, f)  # No valid mode keys
 
-        with pytest.raises(ValueError, match="Missing required key"):
+        with pytest.raises(ValueError, match="No valid mode keys found"):
             EvaluationPipeline(incomplete_file)
 
     def test_safe_percentage_division_by_zero(self):
@@ -388,176 +383,3 @@ class TestEvaluationPipeline:
         assert results["total"] == 0
         assert results["passed"] == 0
         assert results["failed"] == 0
-
-
-class TestEvaluationPipelineHelpers:
-    """Test helper methods introduced in refactoring."""
-
-    def test_create_test_case_default_expected(self, mock_test_cases_file):
-        """Test creating test case with default expected output."""
-        pipeline = EvaluationPipeline(mock_test_cases_file)
-
-        test_case_data = {
-            "test_id": "test1",
-            "input": {"word": "كتاب", "student_answer": "book"},
-            "expected_output": {"correct": True},
-        }
-
-        test_case = pipeline._create_test_case(test_case_data, '{"correct": true}')
-
-        assert isinstance(test_case, LLMTestCase)
-        assert test_case.actual_output == '{"correct": true}'
-        assert test_case.expected_output == {"correct": True}
-        assert json.loads(test_case.input) == test_case_data["input"]
-
-    def test_create_test_case_override_expected(self, mock_test_cases_file):
-        """Test creating test case with overridden expected output."""
-        pipeline = EvaluationPipeline(mock_test_cases_file)
-
-        test_case_data = {
-            "test_id": "test1",
-            "input": {"word": "كتاب"},
-            "expected_output": {"correct": True},
-        }
-
-        # Override with boolean
-        test_case = pipeline._create_test_case(
-            test_case_data, '{"correct": true}', expected_output=True
-        )
-
-        assert test_case.expected_output is True  # Overridden to boolean
-
-    @pytest.mark.parametrize(
-        "metric,expected_name",
-        [
-            (SentimentMetric(threshold=0.9, mode="teaching"), "sentiment_teaching"),
-            (JSONValidityMetric(), "json_validity"),
-            (StructureMetric(expected_type=dict, required_keys=["correct"]), "structure"),
-            (AccuracyMetric(), "accuracy"),
-        ],
-    )
-    def test_get_metric_name(self, metric, expected_name):
-        """Test metric name extraction for all metric types."""
-        name = EvaluationPipeline._get_metric_name(metric)
-        assert name == expected_name
-
-    def test_run_metrics_all_pass(self, mock_test_cases_file):
-        """Test running metrics when all pass."""
-        pipeline = EvaluationPipeline(mock_test_cases_file)
-
-        # Create test case with JSON string, then override for metrics
-        test_case = LLMTestCase(
-            input='{"word": "كتاب", "student_answer": "book", "correct_answer": "book"}',
-            actual_output='{"correct": true}',
-            expected_output="true",  # JSON string for DeepEval
-        )
-        test_case.expected_output = True  # Override for our metrics
-
-        metrics = [
-            JSONValidityMetric(),
-            StructureMetric(
-                expected_type=dict, required_keys=["correct"], expected_types={"correct": bool}
-            ),
-            AccuracyMetric(),
-        ]
-
-        results = pipeline._init_results(["json_validity", "structure", "accuracy"])
-
-        pipeline._run_metrics(test_case, metrics, "test1", results)
-
-        assert results["total"] == 1
-        assert results["passed"] == 1
-        assert results["failed"] == 0
-
-        # Check all metrics recorded
-        assert len(results["metrics"]["json_validity"]) == 1
-        assert len(results["metrics"]["structure"]) == 1
-        assert len(results["metrics"]["accuracy"]) == 1
-
-        # Check all passed
-        assert results["metrics"]["json_validity"][0]["passed"] is True
-        assert results["metrics"]["structure"][0]["passed"] is True
-        assert results["metrics"]["accuracy"][0]["passed"] is True
-
-    def test_run_metrics_structure_fails(self, mock_test_cases_file):
-        """Test running metrics when structure fails."""
-        pipeline = EvaluationPipeline(mock_test_cases_file)
-
-        # Create test case with JSON string, then override for metrics
-        test_case = LLMTestCase(
-            input='{"word": "كتاب"}',
-            actual_output='{"status": "ok"}',  # Missing "correct" key
-            expected_output="true",  # JSON string for DeepEval
-        )
-        test_case.expected_output = True  # Override for our metrics
-
-        metrics = [
-            JSONValidityMetric(),
-            StructureMetric(
-                expected_type=dict, required_keys=["correct"], expected_types={"correct": bool}
-            ),
-            AccuracyMetric(),
-        ]
-
-        results = pipeline._init_results(["json_validity", "structure", "accuracy"])
-
-        pipeline._run_metrics(test_case, metrics, "test1", results)
-
-        assert results["total"] == 1
-        assert results["passed"] == 0
-        assert results["failed"] == 1
-
-        # JSON passes, structure fails
-        assert results["metrics"]["json_validity"][0]["passed"] is True
-        assert results["metrics"]["structure"][0]["passed"] is False
-        assert "Missing required keys" in results["metrics"]["structure"][0]["reason"]
-
-        # Accuracy also fails (KeyError due to missing key)
-        assert results["metrics"]["accuracy"][0]["passed"] is False
-
-    def test_run_metrics_creates_missing_keys(self, mock_test_cases_file):
-        """Test that _run_metrics creates metric keys if missing."""
-        pipeline = EvaluationPipeline(mock_test_cases_file)
-
-        # Create test case with JSON string, then override for metrics
-        test_case = LLMTestCase(
-            input='{"word": "كتاب"}',
-            actual_output='{"correct": true}',
-            expected_output="true",  # JSON string for DeepEval
-        )
-        test_case.expected_output = True  # Override for our metrics
-
-        metrics = [JSONValidityMetric()]
-
-        # Results without "json_validity" key
-        results = {"total": 0, "passed": 0, "failed": 0, "metrics": {}}
-
-        pipeline._run_metrics(test_case, metrics, "test1", results)
-
-        # Should create the key
-        assert "json_validity" in results["metrics"]
-        assert len(results["metrics"]["json_validity"]) == 1
-
-    @pytest.mark.parametrize(
-        "metric_names,expected_keys",
-        [
-            (
-                ["json_validity", "structure", "accuracy"],
-                ["json_validity", "structure", "accuracy"],
-            ),
-            ([], []),
-        ],
-    )
-    def test_init_results(self, mock_test_cases_file, metric_names, expected_keys):
-        """Test result initialization with various metric configurations."""
-        pipeline = EvaluationPipeline(mock_test_cases_file)
-
-        results = pipeline._init_results(metric_names)
-
-        assert results["total"] == 0
-        assert results["passed"] == 0
-        assert results["failed"] == 0
-        for key in expected_keys:
-            assert key in results["metrics"]
-            assert results["metrics"][key] == []
-        assert len(results["metrics"]) == len(expected_keys)

@@ -82,7 +82,7 @@
 
 **Endpoint:** `POST /lesson/initialize`
 
-**Description:** Loads all content into memory (Agent 3 caches vocabulary + grammar, Agent 2 pre-loads rules)
+**Description:** Loads all content into memory (Agent 3 caches vocabulary + grammar, Agent 2 loads with grading flexibility rules)
 
 **Request:**
 ```json
@@ -824,6 +824,12 @@ orchestrator.grade_exercises(
     exercise_set_id="exset_123",
     answers=[...]
 )
+# Internally calls Agent 2 (GradingAgent) for each answer
+# Returns {"correct": true/false} for each, with flexible grading:
+# - Accepts synonyms (e.g., "instructor" → "teacher")
+# - Accepts minor typos (e.g., "scool" → "school")
+# - Accepts capitalization variations (e.g., "Book" → "book")
+# - For Arabic text: Internal harakaat optional, case endings required
 ```
 
 ---
@@ -966,7 +972,7 @@ All errors follow this structure:
 **Agent:**
 - `AGENT_ERROR` (500) - Agent returned invalid response
 - `GENERATION_TIMEOUT` (504) - Exercise/question generation timed out
-- `GRADING_ERROR` (500) - Agent 2 failed to grade
+- `GRADING_ERROR` (500) - Agent 2 (GradingAgent) failed to grade or returned invalid JSON
 
 ### Error Examples
 
@@ -1082,9 +1088,41 @@ All errors follow this structure:
 
 Target latencies:
 - Vocabulary/Grammar content: < 200ms (from cache)
-- Single answer grading: < 500ms (Agent 2 pre-loaded)
+- Single answer grading: < 500ms (Agent 2 GradingAgent with 7B model, max 50 tokens)
 - Exercise generation: < 2s (Agent 3 LLM generation)
 - Lesson initialization: < 3s (RAG query + caching)
+
+### Agent 2 (Grading Agent) Details
+
+**Model:** Fine-tuned Qwen2.5-7B (baseline evaluated 2026-04-13)
+
+**Grading Modes:**
+1. **grading_vocab** - Vocabulary translation grading
+   - Input: word (Arabic), student_answer, correct_answer
+   - Output: `{"correct": true/false}`
+   - Flexibility: Accepts synonyms, typos, capitalization variations
+
+2. **grading_grammar** (single question) - Grammar quiz question grading
+   - Input: question, student_answer, correct_answer
+   - Output: `{"correct": true/false}`
+   - Flexibility: Accepts abbreviations (m/f for masculine/feminine), synonyms, typos
+   - Arabic text: Internal harakaat optional, case endings (final harakaat) required
+
+3. **grading_grammar** (multiple questions) - Test grading
+   - Input: lesson_number, answers (list of question/answer pairs)
+   - Output: `{"total_score": "X/Y", "results": [{"question_id": "...", "correct": true/false}, ...]}`
+
+**Edge Case Handling:**
+- Synonyms: ✓ "instructor" = "teacher"
+- Minor typos: ✓ "scool" = "school"
+- Capitalization: ✓ "Book" = "book"
+- Articles: ✓ "a pen" = "pen"
+- Arabic harakaat: Internal marks optional (الكتابُ = الكِتَابُ), case endings required (الكتاب ≠ الكِتَابُ)
+
+**Baseline Results (7B model, 2026-04-13):**
+- JSON compliance: 0-6% (adds explanations after JSON)
+- Reasoning accuracy: 83% (5/6 correct decisions when ignoring format issues)
+- Fine-tuning planned to address format compliance and harakaat flexibility
 
 ---
 

@@ -1033,10 +1033,13 @@ Or tell me what you'd like to do."
 
 # Agent 2: Grading Agent (4 Prompts)
 
-**Model:** Base Qwen2.5-7B (not fine-tuned initially)  
-**Strategy:** Use detailed prompts with flexibility instructions  
-**Rationale:** Better reasoning for semantic comparison (typos, synonyms, abbreviations)  
-**Note:** Will fine-tune only if baseline evaluation shows accuracy <90%
+**Model:** Fine-tuned Qwen2.5-7B  
+**Strategy:** Detailed prompts + fine-tuning for format compliance and harakaat rules  
+**Rationale:** 7B has strong reasoning (83% correct) but needs fine-tuning for:
+  1. Strict JSON-only output (0-6% baseline compliance)
+  2. Harakaat flexibility (internal optional, case endings required)
+**Baseline Evaluated:** 2026-04-13  
+**Fine-tuning Plan:** 270+ examples (100+ JSON format, 50+ harakaat rules, 120+ edge cases)
 
 These prompts are designed to be self-contained - all grading instructions included in the prompt itself.
 
@@ -1068,8 +1071,17 @@ Evaluate if the student's answer is correct. Be flexible:
 - Accept synonyms (e.g., "instructor" for "teacher")
 - Accept alternate phrasings that convey the same meaning
 
-Return JSON:
-{"correct": true} or {"correct": false}
+IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
+
+Correct output examples:
+{{"correct": true}}
+{{"correct": false}}
+
+Incorrect output examples (DO NOT DO THIS):
+{{"correct": true}} because the answer matches
+The answer is correct: {{"correct": true}}
+
+Your response must be ONLY the JSON object with no additional text.
 
 Response:
 ```
@@ -1100,7 +1112,11 @@ Response:
 
 **Evaluation:** JSONValidityMetric → StructureMetric → AccuracyMetric
 
-**Status:** ✓ Implemented in `baseline.py` (lines 179-189)
+**Baseline Results (7B, 2026-04-13):**
+- JSON compliance: 0-6% (adds explanations after JSON)
+- Reasoning: 100% correct on synonyms, typos, capitalization, wrong answers
+
+**Status:** ✓ Implemented with updated prompt (templates.py lines 290-316)
 
 ---
 
@@ -1144,9 +1160,19 @@ Evaluate if the student's answer is correct. Be flexible:
 - Accept minor typos
 - Accept synonyms or alternate phrasings that convey the same meaning
 - For identification questions (masculine/feminine), accept abbreviated forms (m/f, masc/fem)
+- For Arabic text answers: Internal harakaat (vowel marks) are OPTIONAL, but case endings (final harakaat like ُ َ ِ ٌ ً ٍ) are REQUIRED and must match exactly
 
-Return JSON:
-{"correct": true} or {"correct": false}
+IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
+
+Correct output examples:
+{{"correct": true}}
+{{"correct": false}}
+
+Incorrect output examples (DO NOT DO THIS):
+{{"correct": true}} The student correctly identified the gender
+Explanation: {{"correct": false}}
+
+Your response must be ONLY the JSON object with no additional text.
 
 Response:
 ```
@@ -1177,7 +1203,11 @@ Response:
 
 **Evaluation:** JSONValidityMetric → StructureMetric → AccuracyMetric
 
-**Status:** ❌ Not implemented
+**Baseline Results (7B, 2026-04-13):**
+- JSON compliance: 0-6% (adds explanations after JSON)
+- Reasoning: 100% correct on case ending enforcement, 0% on internal harakaat flexibility (too strict)
+
+**Status:** ✓ Implemented with updated prompt (templates.py lines 318-345)
 
 ---
 
@@ -1205,26 +1235,27 @@ Lesson {lesson_number} - Final Test Grading
 
 Grade the following answers:
 
-Question 1 (ID: {question_id}):
-Q: {question}
-Student: "{student_answer}"
-Correct: "{correct_answer}"
+{answers_formatted}
 
-Question 2 (ID: {question_id}):
-Q: {question}
-Student: "{student_answer}"
-Correct: "{correct_answer}"
+For each answer, evaluate correctness with flexibility:
+- Accept minor typos, synonyms, abbreviations
+- For Arabic text answers: Internal harakaat (vowel marks) are OPTIONAL, but case endings (final harakaat like ُ َ ِ ٌ ً ٍ) are REQUIRED and must match exactly
 
-...
+IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
 
-Return JSON with results for each question:
-{
+Required JSON format:
+{{
   "total_score": "X/Y",
   "results": [
-    {"question_id": "...", "correct": true/false},
+    {{"question_id": "q1", "correct": true}},
+    {{"question_id": "q2", "correct": false}},
     ...
   ]
-}
+}}
+
+The "correct" field must be a boolean (true or false, not strings).
+
+Your response must be ONLY the JSON object with no additional text.
 
 Response:
 ```
@@ -1272,7 +1303,7 @@ Response:
 
 **Evaluation:** JSONValidityMetric → StructureMetric (custom for test results)
 
-**Status:** ❌ Not implemented
+**Status:** ✓ Implemented with updated prompt (templates.py lines 347-379)
 
 ---
 
@@ -1646,16 +1677,17 @@ When offering numbered options, always end with: "Or tell me what you'd like to 
 
 ## Phase 1: Core Teaching & Grading (Enable Baseline Evaluation)
 1. ✓ Vocabulary batch introduction (#3) - **needs update for navigation**
-2. ✓ Vocabulary answer grading (#15, #16)
+2. ✓ Vocabulary answer grading (#15, #16) - **updated with JSON-only enforcement**
 3. ❌ Vocabulary quiz feedback - correct (#6)
 4. ❌ Vocabulary quiz feedback - incorrect (#7)
 5. ❌ Grammar topic explanation (#10)
 6. ❌ Grammar quiz question (#11)
-7. ❌ Grammar answer grading (#17)
+7. ✓ Grammar answer grading (#17) - **implemented with JSON-only and harakaat rules**
 8. ❌ Grammar quiz feedback - correct (#12)
 9. ❌ Grammar quiz feedback - incorrect (#13)
 
-**Goal:** Enable baseline evaluation for teaching and grading modes
+**Goal:** Enable baseline evaluation for teaching and grading modes  
+**Agent 2 Status:** All 4 grading prompts implemented, baseline evaluated (7B), fine-tuning planned
 
 ---
 
@@ -1694,15 +1726,17 @@ When offering numbered options, always end with: "Or tell me what you'd like to 
 | feedback_vocab | 2 | 2 | 0 | 0 |
 | feedback_grammar | 2 | 2 | 0 | 0 |
 | grading_vocab | 2 | 2 | 0 | 0 |
-| grading_grammar | 2 | 1 | 0 | 1 |
+| grading_grammar | 2 | 2 | 0 | 0 |
 | exercise_generation | 3 | 0 | 0 | 3 |
-| **TOTAL** | **21** | **10** | **7** | **4** |
+| **TOTAL** | **21** | **11** | **7** | **3** |
 
 ## Implementation Status
 
-- ✅ 2 prompts implemented (1 needs navigation update)
-- ❌ 19 prompts need implementation
-- Phase 1 focus: 10 prompts (8 remaining + 1 update)
+- ✅ 5 prompts implemented (1 needs navigation update, 4 fully implemented)
+  - Agent 1: 1 prompt (vocab batch intro - needs navigation update)
+  - Agent 2: 4 prompts (all grading modes with JSON-only and harakaat rules)
+- ❌ 16 prompts need implementation
+- Phase 1 focus: 11 prompts (6 remaining + 1 update)
 
 ---
 

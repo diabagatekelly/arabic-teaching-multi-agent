@@ -62,7 +62,7 @@ This module implements **Eval-Driven Development** (TDD for AI) using DeepEval f
 - `__init__.py` - Module exports
 - `metrics.py` - Custom DeepEval metrics (5 metrics + shared `extract_json` helper)
 - `deepeval_pipeline.py` - Main evaluation runner (8 mode-specific evaluators)
-- `baseline.py` - Baseline evaluation using base Qwen2.5-3B/7B (dual-model strategy)
+- `baseline.py` - Baseline evaluation using base Qwen2.5-3B/7B (dual-model strategy: 3B for Agent 1/3, 7B for Agent 2)
 
 **Documentation:**
 - `.notes/deepeval-baseline-evaluator.md` - Detailed baseline implementation
@@ -167,17 +167,41 @@ grading_results = pipeline.evaluate_grading_vocab(grading_responses)
 
 ## Test Cases
 
-**Total:** 94 test cases in `data/evaluation/test_cases.json`
+**Total:** 94 test cases across two files:
+
+### Teaching/Feedback Test Cases
+**File:** `data/evaluation/teaching_agent/teaching_agent_test_cases.json`
+**Total:** 44 cases
 
 **Breakdown by Mode:**
 1. **lesson_start**: 5 cases - Initial lesson introduction
 2. **teaching_vocab**: 16 cases - Vocabulary batch teaching
 3. **teaching_grammar**: 15 cases - Grammar rule explanations
-4. **feedback_vocab**: 20 cases (10 correct, 10 incorrect) - Vocabulary quiz feedback
-5. **feedback_grammar**: 20 cases (10 correct, 10 incorrect) - Grammar quiz feedback
-6. **grading_vocab**: 8 cases - Vocabulary answer grading
-7. **grading_grammar**: 5 cases - Grammar answer grading
-8. **exercise_generation**: 5 cases - Exercise generation requests
+4. **feedback_vocab**: 4 cases (2 correct, 2 incorrect) - Vocabulary quiz feedback
+5. **feedback_grammar**: 4 cases (2 correct, 2 incorrect) - Grammar quiz feedback
+
+### Grading Test Cases
+**File:** `data/evaluation/grading_agent_test_cases.json`
+**Total:** 50 cases (comprehensive edge case test suite)
+
+**Breakdown:**
+- **grading_vocab**: 30 cases
+  - Exact matches (correct/incorrect)
+  - Synonym variations
+  - Minor typos
+  - Capitalization variations
+  - Articles and extras
+  - Partial credit cases
+- **grading_grammar**: 20 cases
+  - Exact matches
+  - Harakaat (internal optional)
+  - Harakaat (case endings required)
+  - Abbreviations and flexibility
+  - Clearly incorrect answers
+
+### Exercise Generation Test Cases
+**File:** (to be created)
+**Total:** 5 cases - Exercise generation requests
 
 ## Success Criteria
 
@@ -185,16 +209,36 @@ grading_results = pipeline.evaluate_grading_vocab(grading_responses)
 - [x] DeepEval pipeline implemented (8 mode-specific evaluators)
 - [x] Custom metrics created (5 metrics: Sentiment, JSONValidity, Structure, Accuracy, Alignment)
 - [x] Baseline evaluation fully implemented (dual-model, 8 baseline methods)
-- [ ] Baseline evaluation run and documented (generates `data/evaluation/baseline_report.md`)
-- [ ] Baseline report shows clear room for improvement via fine-tuning
+- [x] Agent 2 implemented with comprehensive edge case test suite (50 cases)
+- [x] Agent 2 baseline evaluation run (7B model, 2026-04-13)
+- [ ] Agent 1 baseline evaluation run and documented
+- [ ] Complete baseline report showing room for improvement
+
+**Agent 2 Baseline Results (7B, 2026-04-13):**
+- **JSON compliance:** 0-6% (adds explanations after JSON) ❌
+- **Reasoning accuracy:** 83% (5/6 correct decisions when ignoring format) ✓
+- **Edge case performance:**
+  - Synonyms: 100% ✓
+  - Typos: 100% ✓
+  - Capitalization: 100% ✓
+  - Wrong answers: 100% ✓
+  - Case endings (Arabic): 100% ✓
+  - Internal harakaat (Arabic): 0% (too strict) ❌
+
+**Conclusion:** 7B shows strong reasoning but needs fine-tuning for:
+1. JSON-only output enforcement
+2. Harakaat flexibility rules
 
 **Fine-Tuning Success (Phase 2):**
-Fine-tuned model should significantly outperform baseline:
-- **Teaching/Feedback sentiment:** >0.9/0.8 (vs baseline expected ~0.6-0.7)
-- **Grading accuracy:** >90% aggregate (vs baseline expected ~60-70%)
-- **Grading JSON validity:** 100% (vs baseline expected ~50-70%)
-- **Grading structure:** 100% (vs baseline expected ~50-70%)
-- **Exercise alignment:** >0.8 (vs baseline expected ~0.4-0.6)
+Agent 2 fine-tuned model (7B) should achieve:
+- **Grading accuracy:** >90% aggregate (baseline: 83%)
+- **JSON validity:** >95% (baseline: 0-6%)
+- **JSON structure:** >95% (baseline: 0-6%)
+- **Harakaat handling:** >90% (baseline: 50% - too strict on internal)
+
+Agent 1 fine-tuned model (3B) should achieve:
+- **Teaching/Feedback sentiment:** >0.9/0.8 (baseline TBD)
+- **Exercise alignment:** >0.8 (baseline TBD)
 
 ## Next Steps
 

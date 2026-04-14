@@ -266,162 +266,122 @@ Take your time reviewing these. When you're ready, let's test your knowledge!"
 
 ---
 
-### ✅ Agent 2: Error Detection Agent (The "Grader")
+### ✅ Agent 2: Grading Agent (The "Grader")
 
-**Role:** Strict grading - receives JSON, returns JSON
+**Role:** Flexible, accurate grading - receives structured input, returns JSON
 
-**Single Job:** Evaluate student answers against grammar rules and return structured results
+**Single Job:** Evaluate student answers with semantic understanding and flexible matching
 
-**Pre-Loading Strategy:**
-```
-User enters Lesson 3
-    ↓
-Agent 3 retrieves content
-    ├─→ Agent 1: Gets teaching prompt → teaches
-    └─→ Agent 2: Gets grammar rules → waits in background (rules loaded)
+**Implementation Status:** ✅ **IMPLEMENTED** (baseline evaluated, fine-tuning planned)
 
-When student answers:
-    ↓
-Agent 2 already has: All Lesson 3 rules, detection patterns, expected formats
-Agent 2 just needs: Student answer(s)
-```
+**Model:** Qwen2.5-7B-Instruct
+- **Baseline Results:** Strong reasoning (83% correct on edge cases), poor JSON compliance (0-6%)
+- **Status:** Needs fine-tuning for format compliance and harakaat rules
+- **Next Step:** Fine-tune on 270+ examples for JSON-only output and flexible grading
 
 **Responsibilities:**
-- Determine if answer is correct/incorrect
-- Identify specific error types (in order of occurrence)
-- Provide structured error analysis
-- Grade single answers or multiple exercises
+- Grade vocabulary translations (English ↔ Arabic)
+- Grade grammar quiz answers (single questions)
+- Grade grammar tests (multiple questions)
+- Handle edge cases: synonyms, typos, capitalization, articles, harakaat variations
 
 **Does NOT:**
-- ❌ Access RAG during grading (rules pre-loaded at lesson start)
-- ❌ Be encouraging (just factual analysis)
-- ❌ Format for user (Agent 1 handles presentation)
+- ❌ Access RAG (answers and rules passed via prompt)
+- ❌ Be encouraging (just factual correctness)
+- ❌ Format for user (Agent 1 wraps output in friendly tone)
 
-**Input JSON:**
+**Grading Modes:**
 
-Single answer (rapid quiz):
-```json
+**1. Vocabulary Grading (mode: grading_vocab)**
+```python
+# Input
 {
-  "lesson": 3,
-  "answers": [
-    {
-      "answer_id": "q1",
-      "question_type": "grammar_check",
-      "student_answer": "الكتاب كبيرة",
-      "expected_pattern": "الكتاب الكبير",
-      "grammar_points": ["gender_agreement", "definiteness_agreement"]
-    }
-  ]
+    "word": "كِتَاب",
+    "student_answer": "book",
+    "correct_answer": "book"
 }
+
+# Output
+{"correct": true}  # or {"correct": false}
 ```
 
-Multiple answers (exercise set):
-```json
+**2. Grammar Quiz (mode: grading_grammar, single question)**
+```python
+# Input
 {
-  "lesson": 3,
-  "answers": [
-    {
-      "answer_id": "q1",
-      "student_answer": "كتاب كبيرة",
-      "expected_pattern": "كتاب كبير",
-      "grammar_points": ["gender_agreement"]
-    },
-    {
-      "answer_id": "q2",
-      "student_answer": "مدرسة كبيرة",
-      "expected_pattern": "مدرسة كبيرة",
-      "grammar_points": ["gender_agreement"]
-    }
-  ]
+    "question": "Is the word مَدْرَسَة masculine or feminine?",
+    "student_answer": "feminine",
+    "correct_answer": "feminine"
 }
+
+# Output
+{"correct": true}  # or {"correct": false}
 ```
 
-**Output JSON:**
-
-Errors ordered by: (1) question order, (2) occurrence in answer
-```json
+**3. Grammar Test (mode: grading_grammar, multiple questions)**
+```python
+# Input
 {
-  "lesson": 3,
-  "total_score": "1/2",
-  "results": [
-    {
-      "answer_id": "q1",
-      "correct": false,
-      "errors": [
+    "lesson_number": 3,
+    "answers": [
         {
-          "error_type": "gender_mismatch",
-          "grammar_point": "noun_adjective_agreement",
-          "details": "كتاب (masculine) paired with كبيرة (feminine)",
-          "correction": "Use كبير (masculine) to match كتاب"
+            "question_id": "q1",
+            "question": "Is مَدْرَسَة masculine or feminine?",
+            "student_answer": "feminine",
+            "correct_answer": "feminine"
         },
         {
-          "error_type": "definiteness_mismatch",
-          "grammar_point": "noun_adjective_agreement",
-          "details": "الكتاب (definite) paired with كبيرة (indefinite)",
-          "correction": "Add ال to adjective: الكبيرة"
+            "question_id": "q2",
+            "question": "Is كِتَاب masculine or feminine?",
+            "student_answer": "feminine",
+            "correct_answer": "masculine"
         }
-      ],
-      "total_errors": 2,
-      "correct_form": "الكتاب الكبير"
-    },
-    {
-      "answer_id": "q2",
-      "correct": true,
-      "errors": [],
-      "total_errors": 0
-    }
-  ]
+    ]
+}
+
+# Output
+{
+    "total_score": "1/2",
+    "results": [
+        {"question_id": "q1", "correct": true},
+        {"question_id": "q2", "correct": false}
+    ]
 }
 ```
 
-**Tools:**
-1. **Pre-loaded grammar rules** - Received from Agent 3 at lesson start
-2. **LangChain PromptTemplate** - Formats grading instructions + rules + answers
-3. **Base LLM** (Qwen2.5-7B - better reasoning) - Returns structured JSON
+**Edge Cases Handled:**
 
-**Why 7B Base Model (Not Fine-Tuned)?**
+The grading agent must handle real-world student variations:
 
-The base Qwen2.5-7B provides:
-- ✅ Strong reasoning for semantic comparison (typos, synonyms, abbreviations)
-- ✅ Good Arabic comprehension
-- ✅ Reliable JSON output with proper prompting
-- ✅ No fine-tuning needed initially (prompting is sufficient)
-- ⚠️ May fine-tune later if grading accuracy needs improvement
+| Edge Case | Example | Expected Behavior |
+|-----------|---------|-------------------|
+| **Synonyms** | "instructor" vs "teacher" | ✅ Accept both |
+| **Minor typos** | "scool" vs "school" | ✅ Accept with 1-2 char errors |
+| **Capitalization** | "Book" vs "book" | ✅ Ignore case differences |
+| **Articles** | "a pen" vs "pen" | ✅ Ignore articles |
+| **Harakaat (Arabic)** | Internal vowels | ✅ Optional (الكتابُ = الكِتَابُ) |
+| **Case endings (Arabic)** | Final harakaat | ❌ **Required** (الكتاب ≠ الكِتَابُ) |
 
-**Flexible Grading:**
-Prompt instructs model to accept:
-- Minor typos (e.g., "scool" for "school")
-- Synonyms (e.g., "instructor" for "teacher")
-- Alternate phrasings with same meaning
-- Abbreviated forms for grammar (e.g., "m" for "masculine")
+**Baseline Evaluation Results (7B - 2026-04-13):**
 
-Prompt provides **content:**
-- ✅ Specific grammar rules for this lesson
-- ✅ Student's actual answers
-- ✅ Which grammar points to check
+| Category | 7B Performance | Notes |
+|----------|----------------|-------|
+| **JSON Compliance** | 0-6% ✗ | Adds explanations after JSON |
+| **Synonyms** | 100% ✓ | Correctly accepted "instructor"→"teacher" |
+| **Typos** | 100% ✓ | Correctly accepted "scool"→"school" |
+| **Capitalization** | 100% ✓ | Correctly accepted "Book"→"book" |
+| **Wrong answers** | 100% ✓ | Correctly rejected "pen"→"book" |
+| **Case endings** | 100% ✓ | Correctly enforced nominative/accusative |
+| **Internal harakaat** | 0% ✗ | Too strict - didn't follow "optional" rule |
+| **Overall reasoning** | 83% (5/6) | Strong reasoning, format issues |
 
-**Example: LangChain Template**
-```python
-grading_template = PromptTemplate(
-    template="""You are grading student answers.
+**Why Fine-Tuning is Needed:**
 
-GRAMMAR RULES FOR LESSON {lesson}:
-{grammar_rules}
+1. **Format compliance**: Model outputs `{"correct": true} Here's why...` instead of just JSON
+2. **Harakaat flexibility**: Model doesn't follow the "internal optional, case endings required" rule
+3. **Strong reasoning baseline**: The 7B model makes correct grading decisions, just needs format training
 
-STUDENT ANSWERS:
-{student_answers}
-
-For each answer, output JSON with:
-- correct: true/false
-- errors: list of all errors (ordered by occurrence)
-- correct_form: the right answer
-
-Be strict and factual.""",
-    input_variables=["lesson", "grammar_rules", "student_answers"]
-)
-```
-
-**Note:** Using base model with good prompting initially. Will fine-tune only if baseline evaluation shows grading accuracy needs improvement.
+**Fine-Tuning Plan:** 270+ examples covering JSON-only format, harakaat rules, and edge case handling.
 
 ---
 
@@ -1029,12 +989,12 @@ If negation particle doesn't match tense → ERROR
 - Lightweight (2GB with 4-bit quantization)
 - Fast inference for real-time teaching interactions
 
-**Agent 2 (Grading):** Qwen2.5-7B-Instruct (base, not fine-tuned)
+**Agent 2 (Grading):** Qwen2.5-7B-Instruct (fine-tuning required)
 - Better reasoning for semantic comparison
 - Strong Arabic comprehension
 - Handles flexible grading (typos, synonyms, abbreviations)
-- Base model sufficient with good prompting
-- May fine-tune later if accuracy needs improvement
+- **Baseline evaluation (2026-04-13)**: 83% correct reasoning but poor JSON compliance (0-6%)
+- **Fine-tuning planned**: 270+ examples for JSON-only output and harakaat rules
 
 **Agent 3 (Generation):** Qwen2.5-3B-Instruct (base with prompting)
 - Uses base 3B model initially (no fine-tuning needed)

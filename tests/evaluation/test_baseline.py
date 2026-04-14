@@ -102,7 +102,9 @@ class TestBaselineEvaluator:
         # Models should NOT be loaded yet (lazy loading)
         mock_tokenizer.from_pretrained.assert_not_called()
         mock_model.from_pretrained.assert_not_called()
-        mock_pipeline.assert_called_once_with(mock_test_cases_file)
+        # Baseline evaluator now creates 3 EvaluationPipeline instances:
+        # 1. teaching_agent_test_cases.json, 2. grading_agent_test_cases.json, 3. test_cases.json
+        assert mock_pipeline.call_count == 3
 
     @patch("src.evaluation.baseline.AutoModelForCausalLM")
     @patch("src.evaluation.baseline.AutoTokenizer")
@@ -119,10 +121,19 @@ class TestBaselineEvaluator:
 
     @patch("src.evaluation.baseline.AutoModelForCausalLM")
     @patch("src.evaluation.baseline.AutoTokenizer")
-    def test_initialization_test_cases_not_found(self, mock_tokenizer, mock_model):
-        """Test that FileNotFoundError is raised when test cases file doesn't exist."""
-        with pytest.raises(FileNotFoundError):
-            BaselineEvaluator(test_cases_path="/nonexistent/path/test_cases.json")
+    @patch("src.evaluation.baseline.EvaluationPipeline")
+    def test_initialization_with_missing_optional_files(
+        self, mock_pipeline, mock_tokenizer, mock_model
+    ):
+        """Test that initialization succeeds gracefully with missing optional test case files."""
+        # BaselineEvaluator now allows missing optional files (grading_agent, exercise_generation)
+        # Initialization should succeed even with non-existent paths
+        evaluator = BaselineEvaluator(test_cases_path="/nonexistent/path/test_cases.json")
+
+        # Verify initialization succeeds without raising exceptions
+        assert evaluator.test_cases_path == Path("/nonexistent/path/test_cases.json")
+        assert evaluator.model_3b_name is not None
+        assert evaluator.model_7b_name is not None
 
     @patch("src.evaluation.baseline.AutoModelForCausalLM")
     @patch("src.evaluation.baseline.AutoTokenizer")
@@ -227,10 +238,24 @@ class TestBaselineEvaluator:
     @patch("src.evaluation.baseline.AutoModelForCausalLM")
     @patch("src.evaluation.baseline.AutoTokenizer")
     @patch("src.evaluation.baseline.EvaluationPipeline")
+    @pytest.mark.parametrize(
+        "use_custom_path,expected_path_check",
+        [
+            (True, "custom_path"),
+            (False, "default_path"),
+        ],
+    )
     def test_save_baseline_report(
-        self, mock_pipeline_class, mock_tokenizer, mock_model, mock_test_cases_file, tmp_path
+        self,
+        mock_pipeline_class,
+        mock_tokenizer,
+        mock_model,
+        mock_test_cases_file,
+        tmp_path,
+        use_custom_path,
+        expected_path_check,
     ):
-        """Test saving baseline report with new signature."""
+        """Test saving baseline report with custom or default path."""
         mock_pipeline_instance = MagicMock()
         mock_pipeline_class.return_value = mock_pipeline_instance
         mock_pipeline_instance.generate_report.return_value = "# Mock Report"
@@ -247,42 +272,25 @@ class TestBaselineEvaluator:
             "grading_vocab": {"grade_vocab_01": '{"correct": true}'},
         }
 
-        output_path = tmp_path / "baseline_report.md"
-        evaluator.save_baseline_report(results_by_mode, outputs_by_mode, output_path=output_path)
-
-        assert output_path.exists()
-        content = output_path.read_text()
-        assert "# Baseline Evaluation Report" in content
-        assert "Qwen/Qwen2.5-3B-Instruct" in content
-        assert "# Mock Report" in content
-
-    @patch("src.evaluation.baseline.AutoModelForCausalLM")
-    @patch("src.evaluation.baseline.AutoTokenizer")
-    @patch("src.evaluation.baseline.EvaluationPipeline")
-    def test_save_baseline_report_uses_default_path(
-        self, mock_pipeline_class, mock_tokenizer, mock_model, mock_test_cases_file
-    ):
-        """Test that save_baseline_report uses default path when not provided."""
-        mock_pipeline_instance = MagicMock()
-        mock_pipeline_class.return_value = mock_pipeline_instance
-        mock_pipeline_instance.generate_report.return_value = "# Mock Report"
-
-        evaluator = BaselineEvaluator(test_cases_path=mock_test_cases_file)
-
-        results_by_mode = {
-            "teaching_vocab": {"total": 5, "passed": 4, "failed": 1},
-            "grading_vocab": {"total": 10, "passed": 9, "failed": 1},
-        }
-
-        outputs_by_mode = {
-            "teaching_vocab": {"teach_vocab_01": "مرحبا means hello"},
-            "grading_vocab": {"grade_vocab_01": '{"correct": true}'},
-        }
-
-        with patch("builtins.open", create=True) as mock_open:
-            evaluator.save_baseline_report(results_by_mode, outputs_by_mode)
-
-            # Check that open was called with the default path
-            assert any(
-                str(DEFAULT_BASELINE_REPORT_PATH) in str(call) for call in mock_open.call_args_list
+        if use_custom_path:
+            # Test with explicit output path
+            output_path = tmp_path / "baseline_report.md"
+            evaluator.save_baseline_report(
+                results_by_mode, outputs_by_mode, output_path=output_path
             )
+
+            assert output_path.exists()
+            content = output_path.read_text()
+            assert "# Baseline Evaluation Report" in content
+            assert "Qwen/Qwen2.5-3B-Instruct" in content
+            assert "# Mock Report" in content
+        else:
+            # Test with default path
+            with patch("builtins.open", create=True) as mock_open:
+                evaluator.save_baseline_report(results_by_mode, outputs_by_mode)
+
+                # Check that open was called with the default path
+                assert any(
+                    str(DEFAULT_BASELINE_REPORT_PATH) in str(call)
+                    for call in mock_open.call_args_list
+                )
