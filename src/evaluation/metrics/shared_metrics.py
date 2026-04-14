@@ -212,8 +212,7 @@ class StructureMetric(BaseMetric):
             value = parsed.get(key)
             if value is not None and not isinstance(value, expected_type):
                 raise ValueError(
-                    f"Key '{key}': expected {expected_type.__name__}, "
-                    f"got {type(value).__name__}"
+                    f"Key '{key}': expected {expected_type.__name__}, got {type(value).__name__}"
                 )
 
     def _validate_list_value_types(self, parsed: list) -> None:
