@@ -254,8 +254,8 @@ class ContentAgent:
 
 Exercise Type: {exercise_type}
 Difficulty: {difficulty}
-Learned Items: {', '.join(learned_items[:5])}
-Lesson Vocabulary: {', '.join(lesson_vocab[:10])}
+Learned Items: {", ".join(learned_items[:5])}
+Lesson Vocabulary: {", ".join(lesson_vocab[:10])}
 {examples_text}
 CRITICAL REQUIREMENTS:
 1. Output ONLY valid JSON matching the example format EXACTLY
@@ -324,8 +324,8 @@ Generate ONE exercise now:
 
 Quiz Type: {quiz_type}
 Difficulty: {difficulty}
-Learned Items: {', '.join(learned_items[:10])}
-Lesson Vocabulary: {', '.join(lesson_vocab[:10])}
+Learned Items: {", ".join(learned_items[:10])}
+Lesson Vocabulary: {", ".join(lesson_vocab[:10])}
 {examples_text}
 
 REQUIREMENTS:
@@ -398,9 +398,9 @@ Generate the JSON array now:
 Test Specifications:
 - Total Questions: {question_count} (Vocab: {vocab_count}, Grammar: {grammar_count})
 - Difficulty: {difficulty}
-- Learned Items: {', '.join(learned_items[:10])}
-- Lesson Vocabulary: {', '.join(lesson_vocab[:10])}
-- Grammar Points: {', '.join(grammar_points)}
+- Learned Items: {", ".join(learned_items[:10])}
+- Lesson Vocabulary: {", ".join(lesson_vocab[:10])}
+- Grammar Points: {", ".join(grammar_points)}
 {examples_text}
 
 REQUIREMENTS:
