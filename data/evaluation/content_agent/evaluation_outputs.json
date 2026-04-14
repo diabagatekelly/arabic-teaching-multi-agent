@@ -1,0 +1,798 @@
+{
+  "gen_translation_01": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 1,
+      "exercise_type": "translation",
+      "direction": "en_to_ar",
+      "difficulty": "beginner",
+      "count": 3,
+      "learned_items": [
+        "كِتَاب (kitaab) - book",
+        "قَلَم (qalam) - pen",
+        "مَدْرَسَة (madrasa) - school"
+      ]
+    },
+    "expected_output": {
+      "count": 3,
+      "has_question": true,
+      "has_answer": true,
+      "has_instructions": true,
+      "answer_format_specified": true,
+      "uses_learned_vocab": true,
+      "difficulty_appropriate": true,
+      "question_length_min": 10,
+      "question_length_max": 500
+    },
+    "model_output": "{\n  \"question\": \"أَخْبِرْنِي عَنْ الأَصْلَامِ الْمَعْرُوفَةِ فِي بَيْتِكَ وَمَدْرَسَتِكَ وَمَكْتَبِكَ. فَقَدْ وَجَدْتَ كِتَابًا وَقَلَمًا وَطَاوِيلَةً وَبَيْتًا وَمَدْرَسَةً وَبَابًا وَكُرْسِيًّا وَنَافِذَةً وَغُرْفَةً. فَقَدْ وَجَدْتَ كِتَابًا وَقَلَمًا وَطَاوِيلَةً وَبَيْتًا وَمَدْرَسَةً وَبَابًا وَكُرْسِيًّا وَنَافِذَةً وَغُرْفَةً. فَقَدْ وَجَدْتَ كِتَابًا وَقَلَمًا وَطَاوِيلَةً وَبَيْتًا وَمَدْرَسَةً وَبَابًا وَكُرْسِيًّا وَنَافِذَةً وَغُرْفَةً. فَقَدْ وَجَدْتَ كِتَابًا وَقَلَمًا وَطَاوِيلَةً وَبَيْتًا وَمَدْرَسَةً وَبَابًا وَكُرْسِيًّا وَنَافِذَةً وَغُرْفَةً. فَقَدْ وَجَدْتَ كِتَابًا وَقَلَمًا وَطَاوِيلَةً وَبَيْت",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Unterminated string starting at: line 2 column 15 (char 16)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Unterminated string starting at: line 2 column 15 (char 16)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Unterminated string starting at: line 2 column 15 (char 16)"
+      }
+    }
+  },
+  "gen_translation_02": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 2,
+      "exercise_type": "translation",
+      "direction": "ar_to_en",
+      "difficulty": "beginner",
+      "count": 3,
+      "learned_items": [
+        "الكِتَاب (al-kitaab) - the book",
+        "القَلَم (al-qalam) - the pen",
+        "المَدْرَسَة (al-madrasa) - the school"
+      ]
+    },
+    "expected_output": {
+      "count": 3,
+      "has_question": true,
+      "has_answer": true,
+      "has_instructions": true,
+      "uses_learned_vocab": true,
+      "harakaat_consistent": true,
+      "no_duplicates": true
+    },
+    "model_output": "{\n  \"question\": \"أكتب الكلمات التالية باللغة العربية: الكِتَاب، القَلَم، المَدْرَسَة.\",\n  \"answer\": \"الكتاب، القلم، المدرسة\",\n  \"correct\": \"الكتاب، القلم، المدرسة\",\n  \"type\": \"translation\",\n  \"difficulty\": \"beginner\"\n} Exercise Type: translation\nDifficulty: beginner\nLearned Items: \n- الكِتَاب (al-kitaab)\n- القَلَم (al-qalam)\n- المَدْرَسَة (al-madrasa)\nLesson Vocabulary: \n\n{\n  \"question\": \"أكتب الكلمات التالية باللغة العربية: الكِتَاب، القَلَم، المَدْرَسَة.\",\n  \"answer\": \"الكتاب، القلم، المدرسة\",\n  \"correct\": \"الكتاب، القلم، المدرسة\",\n  \"type\": \"translation\",\n  \"difficulty\": \"beginner\"\n}",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Extra data: line 7 column 3 (char 219)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Extra data: line 7 column 3 (char 219)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Extra data: line 7 column 3 (char 219)"
+      }
+    }
+  },
+  "gen_translation_03": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 3,
+      "exercise_type": "translation",
+      "level": "sentence",
+      "difficulty": "intermediate",
+      "count": 2,
+      "learned_items": [
+        "الكِتَاب على الطَاوِلَة (the book is on the table)",
+        "القَلَم في الحَقِيبَة (the pen is in the bag)"
+      ]
+    },
+    "expected_output": {
+      "count": 2,
+      "has_question": true,
+      "has_answer": true,
+      "uses_learned_vocab": true,
+      "culturally_appropriate": true
+    },
+    "model_output": "{\n  \"question\": \"ماذا يُعْرَف بـ (الكتاب على الطاولة)؟\",\n  \"answer\": \"الكتاب على الطاولة\",\n  \"correct\": \"الكتاب على الطاولة\",\n  \"type\": \"translation\",\n  \"difficulty\": \"intermediate\"\n} Exercise Type: translation\nDifficulty: intermediate\nLearned Items: الكِتَاب على الطَاوِلَة (the book is on the table), القَلَم في الحَقِيبَة (the pen is in the bag)\nLesson Vocabulary: \n{\n  \"question\": \"ماذا يُعْرَف بـ (الكتاب على الطاولة)؟\",\n  \"answer\": \"الكتاب على الطاولة\",\n  \"correct\": \"الكتاب على الطاولة\",\n  \"type\": \"translation\",\n  \"difficulty\": \"intermediate\"\n}",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Extra data: line 7 column 3 (char 184)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Extra data: line 7 column 3 (char 184)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Extra data: line 7 column 3 (char 184)"
+      }
+    }
+  },
+  "gen_multiple_choice_01": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 1,
+      "exercise_type": "multiple_choice",
+      "options_count": 4,
+      "difficulty": "beginner",
+      "count": 3,
+      "learned_items": [
+        "كِتَاب (kitaab) - book",
+        "قَلَم (qalam) - pen",
+        "مَكْتَب (maktab) - desk",
+        "كُرْسِي (kursii) - chair"
+      ]
+    },
+    "expected_output": {
+      "count": 3,
+      "has_question": true,
+      "has_answer": true,
+      "has_options": true,
+      "options_count": 4,
+      "uses_learned_vocab": true,
+      "has_distractors": true
+    },
+    "model_output": "{\n  \"question\": \"Which word means 'desk'?\\na) كِتَاب\\nb) قَلَم\\nc) مَكْتَب\\nd) كُرْسِي\",\n  \"answer\": \"c\",\n  \"correct\": \"c\",\n  \"type\": \"multiple_choice\",\n  \"difficulty\": \"beginner\"\n} Exercise:\n{\n  \"question\": \"Which word means 'desk'?\\na) كِتَاب\\nb) قَلَم\\nc) مَكْتَب\\nd) كُرْسِي\",\n  \"answer\": \"c\",\n  \"correct\": \"c\",\n  \"type\": \"multiple_choice\",\n  \"difficulty\": \"beginner\"\n}",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Extra data: line 7 column 3 (char 182)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Extra data: line 7 column 3 (char 182)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Extra data: line 7 column 3 (char 182)"
+      }
+    }
+  },
+  "gen_multiple_choice_02": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 1,
+      "exercise_type": "multiple_choice",
+      "options_count": 2,
+      "difficulty": "beginner",
+      "count": 3,
+      "learned_items": [
+        "masculine/feminine gender"
+      ]
+    },
+    "expected_output": {
+      "count": 3,
+      "has_question": true,
+      "has_answer": true,
+      "has_options": true,
+      "options_count": 2
+    },
+    "model_output": "{\n  \"question\": \"Which word is feminine?\\na) كِتَابٌ\\nb) مَدْرَسَةٌ\\nc) قَلَمٌ\\nd) بَيْتٌ\",\n  \"answer\": \"b\",\n  \"correct\": \"b\",\n  \"type\": \"multiple_choice\",\n  \"difficulty\": \"beginner\"\n} Exercise:\n{\n  \"question\": \"Which word is feminine?\\na) كِتَابٌ\\nb) مَدْرَسَةٌ\\nc) قَلَمٌ\\nd) بَيْتٌ\",\n  \"answer\": \"b\",\n  \"correct\": \"b\",\n  \"type\": \"multiple_choice\",\n  \"difficulty\": \"beginner\"\n}",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Extra data: line 7 column 3 (char 185)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Extra data: line 7 column 3 (char 185)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Extra data: line 7 column 3 (char 185)"
+      }
+    }
+  },
+  "gen_cloze_smoke": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 1,
+      "exercise_type": "cloze",
+      "difficulty": "beginner",
+      "count": 1,
+      "learned_items": [
+        "Feminine nouns end with _____ (ة)"
+      ]
+    },
+    "expected_output": {
+      "count": 1,
+      "has_question": true,
+      "has_answer": true
+    },
+    "model_output": "{\n  \"question\": \"كِتَابٌ، طَاوِلَةٌ، بَيْتٌ، مَدْرَسَةٌ، قَلَمٌ، بَابٌ، كُرْسِيٌّ، نَافِذَةٌ، غُرْفَةٌ، مَكْتَبٌ _____ تُنْقَلُ بِهَا الأَشْيَاءُ.\",\n  \"answer\": \"مَكْتَبٌ\",\n  \"correct\": \"مَكْتَبٌ\",\n  \"type\": \"cloze\",\n  \"difficulty\": \"beginner\"\n} Exercise Type: cloze\nDifficulty: beginner\nLearned Items: Feminine nouns end with (ة)\nLesson Vocabulary: كِتَابٌ, طَاوِلَةٌ, بَيْتٌ, مَدْرَسَةٌ, قَلَمٌ, بَابٌ, كُرْسِيٌّ, نَافِذَةٌ, غُرْفَةٌ, مَكْتَبٌ\n\n{\n  \"question\": \"كِتَابٌ، طَاوِلَةٌ، بَيْتٌ، مَدْرَسَةٌ، قَلَمٌ، بَابٌ، كُرْسِيٌّ، نَافِذَةٌ، غُرْفَةٌ، مَكْتَبٌ _____ تُنْقَلُ بِهَا الأَشْيَاءُ.\",\n  \"answer\": \"مَكْتَبٌ\",\n  \"correct\": \"مَكْتَبٌ\",\n  \"type\": \"cloze\",\n  \"difficulty\": \"beginner\"\n}",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Extra data: line 7 column 3 (char 246)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Extra data: line 7 column 3 (char 246)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Extra data: line 7 column 3 (char 246)"
+      }
+    }
+  },
+  "gen_dictation_smoke": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 1,
+      "exercise_type": "dictation",
+      "difficulty": "beginner",
+      "count": 1,
+      "learned_items": [
+        "كِتَاب (kitaab) - book"
+      ]
+    },
+    "expected_output": {
+      "count": 1,
+      "has_question": true,
+      "has_answer": true
+    },
+    "model_output": "{\n  \"question\": \"Write in Arabic: كِتَابٌ (the book)\",\n  \"answer\": \"كِتَابٌ\",\n  \"correct\": \"كِتَابٌ\",\n  \"type\": \"dictation\",\n  \"difficulty\": \"beginner\"\n} Exercise:\n{\n  \"question\": \"Write in Arabic: كِتَابٌ (the book)\",\n  \"answer\": \"كِتَابٌ\",\n  \"correct\": \"كِتَابٌ\",\n  \"type\": \"dictation\",\n  \"difficulty\": \"beginner\"\n}",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Extra data: line 7 column 3 (char 154)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Extra data: line 7 column 3 (char 154)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Extra data: line 7 column 3 (char 154)"
+      }
+    }
+  },
+  "gen_error_correction_smoke": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 2,
+      "exercise_type": "error_correction",
+      "difficulty": "intermediate",
+      "count": 1,
+      "learned_items": [
+        "Definite article errors"
+      ]
+    },
+    "expected_output": {
+      "count": 1,
+      "has_question": true,
+      "has_answer": true
+    },
+    "model_output": "{\n  \"question\": \"أكتب الجملة الصحيحة من الجملتين التاليتين:\",\n  \"options\": [\n    \"{الحروف المقطعة}\",\n    \"الحروف المقطعة\"\n  ],\n  \"answer\": \"الحروف المقطعة\",\n  \"type\": \"error_correction\",\n  \"difficulty\": \"intermediate\",\n  \"vocabulary\": \"Definite article errors\"\n} Exercise Type: error_correction\nDifficulty: intermediate\nLearned Items: Definite article errors\nLesson Vocabulary: \n\n{\n  \"question\": \"أكتب الجملة الصحيحة من الجملتين التاليتين:\\n\\n1. أنا أحب الكتاب.\\n2. أنا أحب الكتاب.\",\n  \"options\": [\n    \"أنا أحب الكتاب.\",\n    \"أنا أحب الكتاب.\"\n  ],\n  \"answer\": \"أنا أحب الكتاب.\",\n  \"type\": \"error_correction\",\n  \"difficulty\": \"intermediate\",\n  \"vocabulary\": \"Definite article errors\"\n}",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Extra data: line 11 column 3 (char 263)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Extra data: line 11 column 3 (char 263)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Extra data: line 11 column 3 (char 263)"
+      }
+    }
+  },
+  "gen_fill_in_blank_smoke": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 1,
+      "exercise_type": "fill_in_blank",
+      "difficulty": "beginner",
+      "count": 1,
+      "learned_items": [
+        "Gender identification"
+      ]
+    },
+    "expected_output": {
+      "count": 1,
+      "has_question": true,
+      "has_answer": true
+    },
+    "model_output": "{\n  \"question\": \"كَانَ الْحَاضِرُ فِي ________ يَدَعُ الْقَلَمَ وَيَتَصَدَّقُ.\",\n  \"answer\": \"مَدْرَسَةٌ\",\n  \"correct\": \"مَدْرَسَةٌ\",\n  \"type\": \"fill_in_blank\",\n  \"difficulty\": \"beginner\"\n} Exercise:\n{\n  \"question\": \"كَانَ الْحَاضِرُ فِي ________ يَدَعُ الْقَلَمَ وَيَتَصَدَّقُ.\",\n  \"answer\": \"مَدْرَسَةٌ\",\n  \"correct\": \"مَدْرَسَةٌ\",\n  \"type\": \"fill_in_blank\",\n  \"difficulty\": \"beginner\"\n}",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Extra data: line 7 column 3 (char 190)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Extra data: line 7 column 3 (char 190)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Extra data: line 7 column 3 (char 190)"
+      }
+    }
+  },
+  "gen_noun_adj_agreement_smoke": {
+    "input": {
+      "mode": "exercise_generation",
+      "lesson_number": 3,
+      "exercise_type": "noun_adjective_agreement",
+      "difficulty": "intermediate",
+      "count": 1,
+      "learned_items": [
+        "كَبِير/كَبِيرَة (big masculine/feminine)"
+      ]
+    },
+    "expected_output": {
+      "count": 1,
+      "has_question": true,
+      "has_answer": true
+    },
+    "model_output": "{\n  \"question\": \"Which is correct?\\na) المَدْرَسَة الكَبِير\\nb) المَدْرَسَة الكَبِيرَة\\nc) مَدْرَسَة الكَبِيرَة\\nd) المَدْرَسَةُ كَبِيرَةٌ\",\n  \"answer\": \"b\",\n  \"correct\": \"b\",\n  \"type\": \"noun_adjective_agreement\",\n  \"difficulty\": \"intermediate\"\n} Exercise Type: noun_adjective_agreement\nDifficulty: intermediate\nLearned Items: كَبِير/كَبِيرَة (big masculine/feminine)\nLesson Vocabulary: \n\n{\n  \"question\": \"Which is correct?\\na) المَدْرَسَة الكَبِير\\nb) المَدْرَسَة الكَبِيرَة\\nc) مَدْرَسَة الكَبِيرَة\\nd) المَدْرَسَةُ كَبِيرَةٌ\",\n  \"answer\": \"b\",\n  \"correct\": \"b\",\n  \"type\": \"noun_adjective_agreement\",\n  \"difficulty\": \"intermediate\"\n}",
+    "passed": false,
+    "scores": {
+      "exercise_quality": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Parsing error: Extra data: line 7 column 3 (char 247)"
+      },
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Extra data: line 7 column 3 (char 247)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Extra data: line 7 column 3 (char 247)"
+      }
+    }
+  },
+  "gen_quiz_vocab_small": {
+    "input": {
+      "mode": "quiz_generation",
+      "lesson_number": 1,
+      "quiz_type": "vocabulary",
+      "count": 5,
+      "difficulty": "beginner",
+      "learned_items": [
+        "كِتَاب (book)",
+        "قَلَم (pen)",
+        "مَدْرَسَة (school)",
+        "مَكْتَب (desk)",
+        "كُرْسِي (chair)"
+      ]
+    },
+    "expected_output": {
+      "count": 5,
+      "has_variety": true,
+      "uses_learned_vocab": true,
+      "no_duplicates": true
+    },
+    "model_output": "[\n  {\n    \"question\": \"ما هو اسم الكتاب؟\\na) كِتَابٌ\\nb) مَدْرَسَةٌ\\nc) قَلَمٌ\\nd) بَيْتٌ\",\n    \"answer\": \"a\",\n    \"correct\": \"a\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"إذا كنت تكتب في ______، فهذا مكان يسمى مكتباً.\\na) طَاوِلَةٌ\\nb) مَدْرَسَةٌ\\nc) كُرْسِيٌّ\\nd) مَكْتَبٌ\",\n    \"answer\": \"d\",\n    \"correct\": \"d\",\n    \"type\": \"multiple_choice\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"أين يوجد القلم؟\\na) في ______\\nb) في ______\\nc) في ______\\nd) في ______\",\n    \"answer\": \"d\",\n    \"correct\": \"d\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"ما هي الطاولة؟\\na) طَاوِلَةٌ\\nb) مَدْرَسَةٌ\\nc) قَلَمٌ\\nd) بَيْتٌ\",\n    \"answer\": \"a\",\n    \"correct\": \"a\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"إذا كان هناك كتاب وقلم وطاولة في ______، فهذا مكان يسمى مدرسةً.\\na) بيت\\nb) مكتبة\\nc) مدرسة\\nd) كرسي\",\n    \"answer\": \"c\",\n    \"correct\": \"c\",\n    \"type\": \"multiple_choice\",\n    \"difficulty\": \"beginner\"\n  }\n]",
+    "passed": true,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Expected dict, got list"
+      },
+      "json_validity": {
+        "score": 1.0,
+        "passed": true,
+        "reason": "✓ Valid JSON output"
+      }
+    }
+  },
+  "gen_quiz_vocab_large": {
+    "input": {
+      "mode": "quiz_generation",
+      "lesson_number": 2,
+      "quiz_type": "vocabulary",
+      "count": 15,
+      "difficulty": "beginner",
+      "learned_items": [
+        "10+ vocabulary items from lesson 2"
+      ]
+    },
+    "expected_output": {
+      "count": 15,
+      "has_variety": true,
+      "no_duplicates": true
+    },
+    "model_output": "[\n    {\n        \"question\": \"ما هو معنى كلمة 'صباح'؟\",\n        \"answer\": \"صباح\",\n        \"correct\": \"صباح\",\n        \"type\": \"fill_in_blank\",\n        \"difficulty\": \"beginner\"\n    },\n    {\n        \"question\": \"أين توجد المدرسة؟\\na) في البيت\\nb) في الصندوق\\nc) في المدرسة\\nd) في الحديقة\",\n        \"answer\": \"c\",\n        \"correct\": \"c\",\n        \"type\": \"multiple_choice\",\n        \"difficulty\": \"beginner\"\n    },\n    {\n        \"question\": \"ما هي الكلمة التي تعني 'الحاجة'؟\",\n        \"answer\": \"حاجة\",\n        \"correct\": \"حاجة\",\n        \"type\": \"fill_in_blank\",\n        \"difficulty\": \"beginner\"\n    },\n    {\n        \"question\": \"أين توجد الكتب؟\\na) في المكتبة\\nb) في المنزل\\nc) في القاعة\\nd) في الحديقة\",\n        \"answer\": \"a\",\n        \"correct\": \"a\",\n        \"type\": \"multiple_choice\",\n        \"difficulty\": \"beginner\"\n    },\n    {\n        \"question\": \"ما هي الكلمة التي تعني 'الحافلة'؟\",\n        \"answer\": \"حافلة\",\n        \"correct\": \"حافلة\",\n        \"type\": \"fill_in_blank\",\n        \"difficulty\": \"beginner\"\n    },\n    {\n        \"question\": \"أين توجد الأشجار؟\\na) في البيت\\nb) في الحديقة\\nc) في المدرسة\\nd) في الصندوق\",\n        \"answer\": \"b\",\n        \"correct\": \"b\",\n        \"type\": \"multiple_choice\",\n        \"difficulty\": \"beginner\"\n    },\n    {\n        \"question\": \"ما هي الكلمة التي تعني 'الحذاء'؟\",\n        \"answer\": \"حذاء\",\n        \"correct\": \"حذاء\",\n        \"type\": \"fill_in_blank\",\n        \"difficulty\": \"beginner\"\n    },\n    {\n        \"question\": \"أين توجد الألعاب؟\\na) في البيت\\nb) في الحديقة\\nc) في المدرسة\\nd) في الصندوق\",\n        \"answer\": \"b\",\n        \"correct\": \"b\",\n        \"type\": \"",
+    "passed": false,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Unterminated string starting at: line 55 column 17 (char 1595)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Unterminated string starting at: line 55 column 17 (char 1595)"
+      }
+    }
+  },
+  "gen_quiz_vocab_mixed_types": {
+    "input": {
+      "mode": "quiz_generation",
+      "lesson_number": 1,
+      "quiz_type": "vocabulary",
+      "count": 10,
+      "difficulty": "beginner",
+      "formats": [
+        "translation",
+        "multiple_choice",
+        "fill_in_blank"
+      ],
+      "learned_items": [
+        "Lesson 1 vocabulary"
+      ]
+    },
+    "expected_output": {
+      "count": 10,
+      "has_mixed_formats": true,
+      "uses_learned_vocab": true
+    },
+    "model_output": "[\n  {\n    \"question\": \"ما هو الكلمة التي تعني 'كتاب'؟\",\n    \"answer\": \"كتاب\",\n    \"correct\": \"كتاب\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"من هي الطاولة؟\",\n    \"answer\": \"طاولة\",\n    \"correct\": \"طاولة\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"ما هو البيت؟\",\n    \"answer\": \"بيت\",\n    \"correct\": \"بيت\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"ما هو المدرسة؟\",\n    \"answer\": \"مدرسة\",\n    \"correct\": \"مدرسة\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"من هو القلم؟\",\n    \"answer\": \"قلم\",\n    \"correct\": \"قلم\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"من هو الباب؟\",\n    \"answer\": \"باب\",\n    \"correct\": \"باب\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"من هو الكرسي؟\",\n    \"answer\": \"كرسي\",\n    \"correct\": \"كرسي\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"من هي النافذة؟\",\n    \"answer\": \"نافذة\",\n    \"correct\": \"نافذة\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"من هي الغرفة؟\",\n    \"answer\": \"غرفة\",\n    \"correct\": \"غرفة\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"من هو المكتب؟\",\n    \"answer\": \"مكتب\",\n    \"correct\": \"مكتب\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  }\n]",
+    "passed": true,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Expected dict, got list"
+      },
+      "json_validity": {
+        "score": 1.0,
+        "passed": true,
+        "reason": "✓ Valid JSON output"
+      }
+    }
+  },
+  "gen_quiz_grammar_single_topic": {
+    "input": {
+      "mode": "quiz_generation",
+      "lesson_number": 1,
+      "quiz_type": "grammar",
+      "count": 8,
+      "difficulty": "beginner",
+      "grammar_topics": [
+        "Feminine nouns"
+      ],
+      "learned_items": [
+        "Feminine noun rule (ة ending)"
+      ]
+    },
+    "expected_output": {
+      "count": 8,
+      "tests_grammar": true,
+      "focused_on_topic": true
+    },
+    "model_output": "[\n  {\n    \"question\": \"ما هو الاسم النسائي؟\\na) كِتَاب\\nb) مَدْرَسَة\\nc) قَلَم\\nd) بَيْت\",\n    \"answer\": \"a\",\n    \"correct\": \"a\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"من هو اسم النسائية؟\\na) كِتَابٌ\\nb) مَدْرَسَةٌ\\nc) قَلَمٌ\\nd) بَيْتٌ\",\n    \"answer\": \"c\",\n    \"correct\": \"c\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"إذا كان هناك كتاب وطاولة وبيت ومدرسة وقلم وكسرى ونافذة وغرفة ومكتب، فما هو اسم النسائية؟\\na) كتاب\\nb) طاولة\\nc) بيت\\nd) قلم\",\n    \"answer\": \"d\",\n    \"correct\": \"d\",\n    \"type\": \"multiple_choice\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"أين يوجد الكرسي النسائي؟\\na) في الغرفة\\nb) في المكتب\\nc) في القلم\\nd) في الطاولة\",\n    \"answer\": \"a\",\n    \"correct\": \"a\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"من هو اسم النسائية في كلمة (مكتب)؟\\na) مكتب\\nb) مكتبة\\nc) مكتبية\\nd) مكتبة\",\n    \"answer\": \"a\",\n    \"correct\": \"a\",\n    \"type\": \"fill_in_blank\",\n    \"difficulty\": \"beginner\"\n  },\n  {\n    \"question\": \"إذا كان هناك كاتب وكاتبة، فما الفرق بينهما؟\\na) الكاتب هو ذكر والكاتبة هي أنثى\\nb) الكاتب هو أنثى والكاتبة هي ذكر\\nc) لا فرق بينهما\\nd) الكل من الذكور\",\n    \"answer\": \"a\",",
+    "passed": false,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Expecting property name enclosed in double quotes: line 39 column 19 (char 1236)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Expecting property name enclosed in double quotes: line 39 column 19 (char 1236)"
+      }
+    }
+  },
+  "gen_quiz_grammar_mixed_topics": {
+    "input": {
+      "mode": "quiz_generation",
+      "lesson_number": 3,
+      "quiz_type": "grammar",
+      "count": 10,
+      "difficulty": "intermediate",
+      "grammar_topics": [
+        "Feminine nouns",
+        "Definite article",
+        "Noun-adjective agreement"
+      ]
+    },
+    "expected_output": {
+      "count": 10,
+      "covers_all_topics": true,
+      "has_variety": true
+    },
+    "model_output": "[\n    {\n        \"question\": \"ما هو الجملة الصحيحة؟\\na) البيت كبير جداً\\nb) البيت كبير\\nc) بيت كبير جداً\\nd) كبير جداً البيت\",\n        \"answer\": \"c\",\n        \"correct\": \"c\",\n        \"type\": \"multiple_choice\",\n        \"difficulty\": \"intermediate\"\n    },\n    {\n        \"question\": \"أين توضع العلامة النهائية في الجملة التالية: \\\"الحديقة جميلة جداً\\\"؟\\na) في نهاية الجملة\\nb) قبل \\\"جميلة\\\"\\nc) بعد \\\"جميلة\\\"\\nd) لا يوجد مكان للعلامة النهائية\",\n        \"answer\": \"a\",\n        \"correct\": \"a\",\n        \"type\": \"fill_in_blank\",\n        \"difficulty\": \"intermediate\"\n    },\n    {\n        \"question\": \"من الجملتين التاليتين التي واحدة صحيحة وواضحة؟\\na) هذا الكتاب رائع جداً، والرجل يحبه.\\nb) هذا الكتاب رائع جداً، الرجل يحبه.\",\n        \"answer\": \"a\",\n        \"correct\": \"a\",\n        \"type\": \"multiple_choice\",\n        \"difficulty\": \"intermediate\"\n    },\n    {\n        \"question\": \"أكمل الجملة: \\\"الصورة _____ كبيرة جداً\\\".\\na) كبيرة\\nb) كبيرة جداً\\nc) كبيرة جداً الصورة\\nd) الصورة كبيرة جداً\",\n        \"answer\": \"d\",\n        \"correct\": \"d\",\n        \"type\": \"fill_in_blank\",\n        \"difficulty\": \"intermediate\"\n    },\n    {\n        \"question\": \"أين توضع العلامة النهائية في الجملة التالية: \\\"الحديقة جميلة جداً، والرجل يحبها\\\"؟\\na) في نهاية الجملة\\nb) قبل \\\"يحبها\\\"\\nc) بعد \\\"يحبها\\\"\\nd) لا يوجد مكان للعلامة النهائية\",\n        \"answer\": \"a\",\n        \"correct\": \"a\",\n        \"type\": \"fill_in_blank\",\n        \"difficulty\": \"intermediate\"\n    },\n    {\n        \"question\": \"أكمل الجملة: \\\"الحديقة _____ جميلة جداً\\\".\\na) جميلة\\nb) جميلة جداً\\nc) جميلة جداً الحديقة\\nd) الحديقة جميلة جدا",
+    "passed": false,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Unterminated string starting at: line 38 column 21 (char 1459)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Unterminated string starting at: line 38 column 21 (char 1459)"
+      }
+    }
+  },
+  "gen_test_balanced": {
+    "input": {
+      "mode": "test_composition",
+      "lesson_number": 3,
+      "total_questions": 20,
+      "vocab_ratio": 0.5,
+      "grammar_ratio": 0.5,
+      "difficulty": "intermediate"
+    },
+    "expected_output": {
+      "count": 20,
+      "vocab_count": 10,
+      "grammar_count": 10,
+      "balanced": true
+    },
+    "model_output": "{\"test\": [{\"question\": \"ما هو اسم القمر الصناعي الذي أطلقته الولايات المتحدة الأمريكية؟\", \"answer\": \"كويبرا\", \"correct\": \"كويبرا\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}, {\"question\": \"أين تقع الأرض في نظامنا الشمسي؟\", \"answer\": \"الثامنة\", \"correct\": \"الثامنة\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}, {\"question\": \"ما هي الجملة الصحيحة؟\", \"answer\": \"الجملة الصحيحة هي الجملة التي تكون صحيحة دائماً.\", \"correct\": \"الجملة الصحيحة هي الجملة التي تكون صحيحة دائماً.\", \"type\": \"fill_in_the_blank\", \"section\": \"grammar\", \"difficulty\": \"intermediate\"}, {\"question\": \"من هو الرئيس الحالي للولايات المتحدة الأمريكية؟\", \"answer\": \"جو بايدن\", \"correct\": \"جو بايدن\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}, {\"question\": \"ما هو اسم القمر الصناعي الذي أطلقته روسيا؟\", \"answer\": \"فولغاغراف\", \"correct\": \"فولغاغراف\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}, {\"question\": \"ما هو الفرق بين الجملة الصحيحة والجملة الخاطئة؟\", \"answer\": \"الجملة الصحيحة هي الجملة التي تكون صحيحة دائماً، بينما الجملة الخاطئة هي الجملة التي قد تكون خاطئة في بعض الأحيان.\", \"correct\": \"الجملة الصحيحة هي الجملة التي تكون صحيحة دائماً، بينما الجملة الخاطئة هي الجملة التي قد تكون خاطئة في بعض الأحيان.\", \"type\": \"fill_in_the_blank\", \"section\": \"grammar\", \"difficulty\": \"intermediate\"}, {\"question\": \"ما هو اسم القمر الصناعي الذي أطلقته الصين؟\", \"answer\": \"بانتيس\", \"correct\": \"بانتيس\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}",
+    "passed": false,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Expecting ',' delimiter: line 1 column 1584 (char 1583)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Expecting ',' delimiter: line 1 column 1584 (char 1583)"
+      }
+    }
+  },
+  "gen_test_all_types": {
+    "input": {
+      "mode": "test_composition",
+      "lesson_number": 5,
+      "total_questions": 24,
+      "include_all_types": true,
+      "difficulty": "advanced"
+    },
+    "expected_output": {
+      "count": 24,
+      "type_variety_min": 6,
+      "all_types_represented": true
+    },
+    "model_output": "{\"test\": [{\"question\": \"ما هو الفرق بين الجملة المجرورة والجملة المبهمة؟\", \"answer\": \"الجملة المجرورة هي جملة تحتوي على فعل ماضي أو فعل مضارع، بينما الجملة المبهمة هي جملة تحتوي على فعلين ماضيين أو فعل واحد ماضٍ وآخر مستقبلي.\", \"correct\": \"الجملة المجرورة هي جملة تحتوي على فعل ماضي أو فعل مضارع، بينما الجملة المبهمة هي جملة تحتوي على فعلين ماضيين أو فعل واحد ماضٍ وآخر مستقبلي.\", \"type\": \"definition\", \"section\": \"grammar\", \"difficulty\": \"advanced\"}, {\"question\": \"أكمل الجملة: \\\"عندما تشعر بال..., يجب عليك الاتصال بمحاميك.\\\"\", \"answer\": \"ضيق\", \"correct\": \"ضيق\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"advanced\"}, {\"question\": \"ما هو الفرق بين \\\"أنا أحب القراءة\\\" و \\\"أنا أحب قراءة الكتب\\\"؟\", \"answer\": \"في \\\"أنا أحب القراءة\\\" يشير الفعل إلى الفعل نفسه، بينما في \\\"أنا أحب قراءة الكتب\\\" يشير الفعل إلى الفعل المستقبلي.\", \"correct\": \"في \\\"أنا أحب القراءة\\\" يشير الفعل إلى الفعل نفسه، بينما في \\\"أنا أحب قراءة الكتب\\\" يشير الفعل إلى الفعل المستقبلي.\", \"type\": \"definition\", \"section\": \"grammar\", \"difficulty\": \"advanced\"}, {\"question\": \"أكمل الجملة: \\\"لقد انتهيت من كتاب...\\\".\", \"answer\": \"القراءة\", \"correct\": \"القراءة\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"advanced\"}",
+    "passed": false,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Expecting ',' delimiter: line 1 column 1223 (char 1222)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Expecting ',' delimiter: line 1 column 1223 (char 1222)"
+      }
+    }
+  },
+  "gen_test_vocab_heavy": {
+    "input": {
+      "mode": "test_composition",
+      "lesson_number": 1,
+      "total_questions": 15,
+      "vocab_ratio": 0.8,
+      "grammar_ratio": 0.2,
+      "difficulty": "beginner"
+    },
+    "expected_output": {
+      "count": 15,
+      "vocab_count_min": 10,
+      "grammar_count_min": 2
+    },
+    "model_output": "{\"test\": [{\"question\": \"ما هو الاسم الذي يدل على كتاب؟\", \"answer\": \"كتابٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"أين توجد الطاولة؟\", \"answer\": \"على الطاولة\", \"correct\": true, \"type\": \"sentence_translation\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"ما هو الاسم الذي يدل على المدرسة؟\", \"answer\": \"مدرسةٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"أين يوجد القلم؟\", \"answer\": \"في القلم\", \"correct\": true, \"type\": \"sentence_translation\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"ما هو الاسم الذي يدل على البيت؟\", \"answer\": \"بيتٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"أين يوجد الكرسي؟\", \"answer\": \"على الكرسي\", \"correct\": true, \"type\": \"sentence_translation\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"ما هو الاسم الذي يدل على الغرفة؟\", \"answer\": \"غرفةٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"أين يوجد النافذة؟\", \"answer\": \"في النافذة\", \"correct\": true, \"type\": \"sentence_translation\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"ما هو الاسم الذي يدل على المكتب؟\", \"answer\": \"مكتبٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"ما هو الاسم الذي يدل على الكاتب؟\", \"answer\": \"كاتبٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}",
+    "passed": false,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Expecting ',' delimiter: line 1 column 1585 (char 1584)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Expecting ',' delimiter: line 1 column 1585 (char 1584)"
+      }
+    }
+  },
+  "gen_test_grammar_heavy": {
+    "input": {
+      "mode": "test_composition",
+      "lesson_number": 4,
+      "total_questions": 15,
+      "vocab_ratio": 0.2,
+      "grammar_ratio": 0.8,
+      "difficulty": "intermediate"
+    },
+    "expected_output": {
+      "count": 15,
+      "vocab_count_max": 5,
+      "grammar_count_min": 10
+    },
+    "model_output": "{\"test\": [{\"question\": \"ما هو اسم القمر الصناعي الذي أطلقته الولايات المتحدة الأمريكية؟\", \"answer\": \"كويبرا\", \"correct\": \"كويبرا\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}, {\"question\": \"أين تقع الأرض في نظامنا الشمسي؟\", \"answer\": \"الثامنة\", \"correct\": \"الثامنة\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}, {\"question\": \"من هو الرئيس الحالي للولايات المتحدة الأمريكية؟\", \"answer\": \"بايدن\", \"correct\": \"بايدن\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}, {\"question\": \"ما هي السنة التي تلي السنة الماضية؟\", \"answer\": \"السنة التالية\", \"correct\": \"السنة التالية\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}, {\"question\": \"ما هو اسم القمر الصناعي الذي أطلقته روسيا؟\", \"answer\": \"فولغوراد\", \"correct\": \"فولغوراد\", \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"intermediate\"}, {\"question\": \"ما هو الفرق بين 'أنا' و 'أنت'؟\", \"answer\": \"'أنا' هو أنا، 'أنت' هو أنت\", \"correct\": \"'أنا' هو أنا، 'أنت' هو أنت\", \"type\": \"multiple_choice\", \"section\": \"grammar\", \"difficulty\": \"intermediate\"}, {\"question\": \"ما هو الفرق بين 'أنا' و 'أنت'؟\", \"answer\": \"'أنا' هو أنا، 'أنت' هو أنت\", \"correct\": \"'أنا' هو أنا، 'أنت' هو أنت\", \"type\": \"multiple_choice\", \"section\": \"grammar\", \"difficulty\": \"intermediate\"}",
+    "passed": false,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Expecting ',' delimiter: line 1 column 1351 (char 1350)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Expecting ',' delimiter: line 1 column 1351 (char 1350)"
+      }
+    }
+  },
+  "gen_test_edge_very_short": {
+    "input": {
+      "mode": "test_composition",
+      "lesson_number": 1,
+      "total_questions": 5,
+      "difficulty": "beginner"
+    },
+    "expected_output": {
+      "count": 5,
+      "has_variety": true
+    },
+    "model_output": "{\"test\": [{\"question\": \"ما هو الاسم الذي يدل على كتاب؟\", \"answer\": \"كتابٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"أين يوجد القلم؟\", \"answer\": \"في المكتب\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"grammar\", \"difficulty\": \"beginner\"}, {\"question\": \"ما هو الاسم الذي يدل على الطاولة؟\", \"answer\": \"طاولةٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"أين يوجد البيت؟\", \"answer\": \"في الأرض\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"grammar\", \"difficulty\": \"beginner\"}, {\"question\": \"ما هو الاسم الذي يدل على المدرسة؟\", \"answer\": \"مدرسةٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"أين يوجد الكرسي؟\", \"answer\": \"في الغرفة\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"grammar\", \"difficulty\": \"beginner\"}, {\"question\": \"ما هو الاسم الذي يدل على القلم؟\", \"answer\": \"قَلَمٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"أين يوجد الباب؟\", \"answer\": \"في البيت\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"grammar\", \"difficulty\": \"beginner\"}, {\"question\": \"ما هو الاسم الذي يدل على النافذة؟\", \"answer\": \"نافذةٌ\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"vocab\", \"difficulty\": \"beginner\"}, {\"question\": \"أين يوجد المكتب؟\", \"answer\": \"في الغرفة\", \"correct\": true, \"type\": \"fill_in_the_blank\", \"section\": \"grammar\", \"difficulty\": \"beginner\"}",
+    "passed": false,
+    "scores": {
+      "structure": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Expecting ',' delimiter: line 1 column 1568 (char 1567)"
+      },
+      "json_validity": {
+        "score": 0.0,
+        "passed": false,
+        "reason": "✗ Invalid JSON: Expecting ',' delimiter: line 1 column 1568 (char 1567)"
+      }
+    }
+  },
+  "rag_lesson_content_01": {
+    "input": {
+      "mode": "content_retrieval",
+      "lesson_number": 1,
+      "topic": "gender",
+      "content_type": "all"
+    },
+    "expected_output": {
+      "has_vocab": true,
+      "has_grammar_rules": true,
+      "lesson_match": true
+    },
+    "model_output": "{\n  \"lesson\": 1,\n  \"lesson_name\": \"Gender and Definite Article\",\n  \"difficulty\": \"beginner\",\n  \"vocabulary\": [\n    \"كِتَابٌ\",\n    \"طَاوِلَةٌ\",\n    \"بَيْتٌ\",\n    \"مَدْرَسَةٌ\",\n    \"قَلَمٌ\",\n    \"بَابٌ\",\n    \"كُرْسِيٌّ\",\n    \"نَافِذَةٌ\",\n    \"غُرْفَةٌ\",\n    \"مَكْتَبٌ\"\n  ],\n  \"grammar_points\": [\n    \"masculine_feminine_nouns\",\n    \"definite_article_al\"\n  ],\n  \"grammar_rules\": [\n    \"### Rule\\n\\nIn Arabic, **both nouns and adjectives** are either **masculine** or **feminine**. The feminine singular is most commonly marked by **ة** (taa marbuuta).\\n\",\n    \"### Rule\\n\\nAdd **ال** (al-) to the beginning of a noun to make it **definite** (like \\\"the\\\" in English).\\n\\n**IMPORTANT**: Indefinite nouns end with **tanween** (ٌ ً ٍ - double vowels). When you add ال, the tanween disappears!\\n\"\n  ],\n  \"full_content\": \"\\n# Lesson 1: Gender and Definite Article\\n\\n## Overview\\n\\nThis lesson introduces two fundamental concepts in Arabic:\\n1. **Noun Gender**: Every Arabic noun is either masculine or feminine\\n2. **Definite Article**: Using ال (al-) to make nouns definite\\n\\nThese concepts are essential building blocks for all Arabic grammar.\\n\\n---\\n\\n## Grammar Point 1: Masculine and Feminine Nouns\\n\\n### Rule\\n\\nIn Arabic, **both nouns and adjectives** are either **masculine** or **feminine**. The feminine singular is most commonly marked by **ة** (taa marbuuta).\\n\\n### Human vs. Non-Human Nouns\\n\\n**Human nouns** (people): Gender comes from the person\\n- مُعَلِّمٌ (mu'allimun) - teacher (male) → masculine\\n- مُعَلِّمَةٌ (mu'allimatun) - teacher (female) → feminine  \\n- طَبِيبٌ (Tabiibun) - doctor (male) → masculine\\n- طَبِيبَةٌ (Tabiibatun) - doctor (female) → feminine\\n\\n**Non-human nouns** (things): Gender is **fixed** and must be **memorized**\\n- كِتَابٌ (kitaabun) - book → masculine (doesn't change)\\n- طَاوِلَةٌ (taawilatun)\"\n}",
+    "passed": false,
+    "scores": {}
+  },
+  "rag_lesson_content_02": {
+    "input": {
+      "mode": "content_retrieval",
+      "lesson_number": 5,
+      "topic": "plurals",
+      "content_type": "all"
+    },
+    "expected_output": {
+      "has_vocab": true,
+      "has_grammar_rules": true,
+      "lesson_match": true
+    },
+    "model_output": "{\"error\": \"Lesson 5 not found\", \"available_lessons\": [1]}",
+    "passed": false,
+    "scores": {}
+  },
+  "rag_format_presentation": {
+    "input": {
+      "mode": "content_formatting",
+      "lesson_number": 1,
+      "format_type": "presentation",
+      "content": {
+        "vocab": [
+          "كِتَاب",
+          "قَلَم"
+        ],
+        "grammar": [
+          "Feminine nouns end with ة"
+        ]
+      }
+    },
+    "expected_output": {
+      "formatted": true,
+      "readable": true,
+      "structured": true
+    },
+    "model_output": "{\n  \"question\": \"أَخْبِرْنِي عَنْ الأَصْلَامِ الَّتِي تَعْرِفُهَا، وَقُلْ لِي أَيْضًا مَا هِيَ الطَاوِلَةُ وَالكِتَابُ وَالبَيْتُ وَالمَدْرَسَةُ وَالقَلَمُ وَالبَابُ وَالكُرْسِيُّ وَالنَّافِذَةُ وَالغُرْفَةُ وَالمَكْتَبُ.\",\n  \"answer\": \"الكتاب: كِتَابٌ، الطاولة: طَاوِلَةٌ، البيت: بَيْتٌ، المدرسة: مَدْرَسَةٌ، القلم: قَلَمٌ، الباب: بَابٌ، الكرسي: كُرْسِيٌّ، النافذة: نَافِذَةٌ، الغرفة: غُرْفَةٌ، المكتب: مَكْتَبٌ\",\n  \"correct\": \"الكتاب: كِتَابٌ، الطاولة: طَاوِلَةٌ، البيت: بَيْتٌ، المدرسة: مَدْرَسَةٌ، القلم: قَلَمٌ، الباب: بَابٌ، الكرسي: كُرْسِيٌّ، النافذة: نَافِذَةٌ، الغرفة: غُرْفَةٌ، المكتب: مَكْتَبٌ\",\n  \"type\": \"translation\",\n  \"difficulty\": \"beginner\"\n}",
+    "passed": false,
+    "scores": {}
+  },
+  "rag_format_practice": {
+    "input": {
+      "mode": "content_formatting",
+      "lesson_number": 2,
+      "format_type": "practice",
+      "content": {
+        "vocab": [
+          "الكِتَاب",
+          "القَلَم"
+        ],
+        "grammar": [
+          "Definite article (ال)"
+        ]
+      }
+    },
+    "expected_output": {
+      "formatted": true,
+      "practice_ready": true
+    },
+    "model_output": "{\n  \"question\": \"ما هو المعنى المُعَرَّف للكلمة العربية 'صَفِيَّة'؟\",\n  \"answer\": \"صَفِيَّة تعني نقياً وطاهرة.\",\n  \"type\": \"translation\",\n  \"difficulty\": \"beginner\"\n} Exercise Type: translation\nDifficulty: beginner\nLearned Items: \nLesson Vocabulary: \n{\n  \"question\": \"ما هو المعنى المُعَرَّف للكلمة العربية 'صَفِيَّة'؟\",\n  \"answer\": \"صَفِيَّة تعني نقياً وطاهرة.\",\n  \"type\": \"translation\",\n  \"difficulty\": \"beginner\"\n}",
+    "passed": false,
+    "scores": {}
+  },
+  "rag_edge_invalid_lesson": {
+    "input": {
+      "mode": "content_retrieval",
+      "lesson_number": 99,
+      "topic": "nonexistent"
+    },
+    "expected_output": {
+      "error": true,
+      "error_message": "Lesson not found"
+    },
+    "model_output": "{\"error\": \"Lesson 99 not found\", \"available_lessons\": [1]}",
+    "passed": false,
+    "scores": {}
+  }
+}

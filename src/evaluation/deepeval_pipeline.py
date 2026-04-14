@@ -10,6 +10,7 @@ from deepeval.test_case import LLMTestCase
 
 from src.evaluation.metrics import (
     AccuracyMetric,
+    ExerciseQualityMetric,
     FeedbackAppropriatenessMetric,
     HasNavigationMetric,
     JSONValidityMetric,
@@ -67,6 +68,10 @@ class EvaluationPipeline:
                 "feedback_grammar",
                 "grading_vocab",
                 "grading_grammar",
+                "exercise_generation",
+                "quiz_generation",
+                "test_composition",
+                "content_retrieval",
             ]
             found_modes = [key for key in valid_mode_keys if key in test_cases]
             if not found_modes:
@@ -298,8 +303,18 @@ class EvaluationPipeline:
                 )
             elif metric_name == "accuracy":
                 metrics_list.append(AccuracyMetric())
-            elif metric_name == "alignment":
-                metrics_list.append()
+            elif metric_name == "exercise_quality":
+                # Extract learned items from input (required for Agent 3)
+                learned_items = input_data.get("learned_items", [])
+                # For duplicate detection, would need batch_exercises context
+                # For now, create metric with just learned_items
+                metrics_list.append(
+                    ExerciseQualityMetric(
+                        learned_items=learned_items,
+                        batch_exercises=[],  # TODO: Pass batch context for duplicate detection
+                        use_llm_judge=False,  # Fast mode by default
+                    )
+                )
             else:
                 logger.warning(f"Unknown metric requested: {metric_name}")
 
@@ -625,6 +640,49 @@ class EvaluationPipeline:
             # Skip metadata fields
             if isinstance(sub_group_cases, list):
                 self._evaluate_grading_test_cases(sub_group_cases, model_responses, results)
+
+        return results
+
+    def evaluate_content_agent(self, model_responses: dict[str, str]) -> dict[str, Any]:
+        """
+        Evaluate Agent 3 (Content Generation) responses across all test modes.
+
+        Handles 4 test modes:
+        1. exercise_generation - Individual exercise creation (12 types)
+        2. quiz_generation - Quiz composition from multiple exercises
+        3. test_composition - Full test creation with balanced content
+        4. content_retrieval - RAG-based content retrieval
+
+        Args:
+            model_responses: Dict mapping test_id to model output
+
+        Returns:
+            Evaluation results with metrics: json_validity, structure, exercise_quality
+        """
+        # Collect all test cases from all 4 modes
+        all_test_cases = []
+
+        # Mode 1: Exercise generation (has subgroups)
+        if "exercise_generation" in self.test_cases:
+            exercise_gen = self.test_cases["exercise_generation"]
+            all_test_cases.extend(exercise_gen.get("comprehensive_types", []))
+            all_test_cases.extend(exercise_gen.get("smoke_tests", []))
+
+        # Mode 2-4: Quiz generation, test composition, content retrieval (simple structure)
+        for mode_name in ["quiz_generation", "test_composition", "content_retrieval"]:
+            if mode_name in self.test_cases:
+                all_test_cases.extend(self.test_cases[mode_name].get("test_cases", []))
+
+        # Collect all unique metric names
+        metric_names = set()
+        for tc in all_test_cases:
+            for metric in tc.get("metrics", []):
+                metric_names.add(self._normalize_metric_name(metric))
+
+        results = self._init_results(list(metric_names))
+
+        # Evaluate all test cases using dynamic metric creation
+        self._evaluate_teaching_test_cases(all_test_cases, model_responses, results)
 
         return results
 

@@ -1,12 +1,116 @@
 ---
-exercise_type: agreement_matching
-grammar_point: noun_adjective_agreement
-difficulty: beginner
+exercise_type: noun_adjective_agreement
+grammar_point: gender_and_definiteness_agreement
+difficulty: all
 lesson_number: 1
-target_skill: matching_gender_and_definiteness
-reusable: true
-reusable_for: [adjective_agreement, verb_subject_agreement, pronoun_agreement]
 ---
+
+# Noun-Adjective Agreement Exercise Examples
+
+## Beginner Examples
+
+### Example 1
+```json
+{
+  "question": "Match the adjective to the noun: كِتَاب + كَبِير/كَبِيرَة\nWhich is correct?",
+  "answer": "كَبِير",
+  "correct": "كَبِير",
+  "type": "noun_adjective_agreement",
+  "difficulty": "beginner"
+}
+```
+
+### Example 2
+```json
+{
+  "question": "Complete: مَدْرَسَة _____ (new)\nOptions: a) جَدِيد  b) جَدِيدَة",
+  "answer": "b",
+  "correct": "b",
+  "type": "noun_adjective_agreement",
+  "difficulty": "beginner"
+}
+```
+
+### Example 3
+```json
+{
+  "question": "Make definite: كِتَاب كَبِير → ?",
+  "answer": "الكِتَاب الكَبِير",
+  "correct": "الكِتَاب الكَبِير",
+  "type": "noun_adjective_agreement",
+  "difficulty": "beginner"
+}
+```
+
+## Intermediate Examples
+
+### Example 1
+```json
+{
+  "question": "Which is correct?\na) المَدْرَسَة الجَدِيد\nb) المَدْرَسَة الجَدِيدَة\nc) مَدْرَسَة الجَدِيدَة\nd) المَدْرَسَةُ جَدِيدَةٌ",
+  "answer": "b",
+  "correct": "b",
+  "type": "noun_adjective_agreement",
+  "difficulty": "intermediate"
+}
+```
+
+### Example 2
+```json
+{
+  "question": "Add the adjective correctly: الكِتَاب + صَغِير (small)\nMake them agree.",
+  "answer": "الكِتَاب الصَّغِير",
+  "correct": "الكِتَاب الصَّغِير",
+  "type": "noun_adjective_agreement",
+  "difficulty": "intermediate"
+}
+```
+
+### Example 3
+```json
+{
+  "question": "Fix agreement: الطَّاوِلَة الكَبِير\nWhat's the correct form?",
+  "answer": "الطَّاوِلَة الكَبِيرَة",
+  "correct": "الطَّاوِلَة الكَبِيرَة",
+  "type": "noun_adjective_agreement",
+  "difficulty": "intermediate"
+}
+```
+
+## Advanced Examples
+
+### Example 1
+```json
+{
+  "question": "Complete with full case marking: قَرَأْتُ الكِتَاب_____ الجَدِيد_____ (I read the new book - object)\nFill in case endings.",
+  "answer": "قَرَأْتُ الكِتَابَ الجَدِيدَ",
+  "correct": "قَرَأْتُ الكِتَابَ الجَدِيدَ",
+  "type": "noun_adjective_agreement",
+  "difficulty": "advanced"
+}
+```
+
+### Example 2
+```json
+{
+  "question": "Make both noun and adjective agree in إضافة: كِتَاب + الطَّالِب + جَدِيد\nCombine correctly.",
+  "answer": "كِتَابُ الطَّالِبِ الجَدِيدِ",
+  "correct": "كِتَابُ الطَّالِبِ الجَدِيدِ",
+  "type": "noun_adjective_agreement",
+  "difficulty": "advanced"
+}
+```
+
+### Example 3
+```json
+{
+  "question": "Add two adjectives with agreement: المَدْرَسَة + كَبِير + جَدِيد\nHow do you say 'the big new school'?",
+  "answer": "المَدْرَسَة الكَبِيرَة الجَدِيدَة",
+  "correct": "المَدْرَسَة الكَبِيرَة الجَدِيدَة",
+  "type": "noun_adjective_agreement",
+  "difficulty": "advanced"
+}
+```
 
 # Noun-Adjective Agreement Exercise
 

@@ -141,22 +141,87 @@ def mock_test_cases_file(tmp_path):
             "test_grading": [],
         },
         "exercise_generation": {
-            "total_cases": 1,
-            "exercise_gen": [
+            "total_cases": 2,
+            "comprehensive_types": [
                 {
-                    "test_id": "exercise_01",
+                    "test_id": "gen_translation_01",
                     "input": {
                         "mode": "exercise_generation",
-                        "exercise_type": "fill_in_blank",
-                        "learned_vocab": ["word1"],
-                        "grammar_rule": "test rule",
+                        "lesson_number": 1,
+                        "exercise_type": "translation",
+                        "difficulty": "beginner",
+                        "count": 3,
+                        "learned_items": ["كِتَاب (book)", "قَلَم (pen)"],
                     },
-                    "expected_output": {"question": "test", "answer": "test"},
-                    "metrics": ["json_validity", "structure", "alignment"],
+                    "expected_output": {
+                        "count": 3,
+                        "has_question": True,
+                        "has_answer": True,
+                    },
+                    "metrics": ["json_validity", "structure", "exercise_quality"],
                 }
             ],
-            "quiz_question_gen": [],
-            "test_composition": [],
+            "smoke_tests": [
+                {
+                    "test_id": "gen_cloze_01",
+                    "input": {
+                        "mode": "exercise_generation",
+                        "lesson_number": 2,
+                        "exercise_type": "cloze",
+                        "difficulty": "beginner",
+                        "count": 1,
+                        "learned_items": ["grammar rule"],
+                    },
+                    "expected_output": {"has_question": True},
+                    "metrics": ["json_validity", "exercise_quality"],
+                }
+            ],
+        },
+        "quiz_generation": {
+            "total_cases": 1,
+            "test_cases": [
+                {
+                    "test_id": "quiz_gen_01",
+                    "input": {
+                        "mode": "quiz_generation",
+                        "lesson_number": 1,
+                        "question_count": 5,
+                        "learned_items": ["word1", "word2"],
+                    },
+                    "expected_output": {"count": 5},
+                    "metrics": ["json_validity", "structure"],
+                }
+            ],
+        },
+        "test_composition": {
+            "total_cases": 1,
+            "test_cases": [
+                {
+                    "test_id": "test_comp_01",
+                    "input": {
+                        "mode": "test_composition",
+                        "lesson_number": 1,
+                        "question_count": 20,
+                        "learned_items": [],
+                    },
+                    "expected_output": {"count": 20},
+                    "metrics": ["json_validity", "structure"],
+                }
+            ],
+        },
+        "content_retrieval": {
+            "total_cases": 1,
+            "test_cases": [
+                {
+                    "test_id": "content_ret_01",
+                    "input": {
+                        "mode": "content_retrieval",
+                        "lesson_number": 1,
+                    },
+                    "expected_output": {"has_content": True},
+                    "metrics": ["json_validity"],
+                }
+            ],
         },
     }
 
@@ -339,3 +404,63 @@ class TestEvaluationPipeline:
         assert results["total"] == 0
         assert results["passed"] == 0
         assert results["failed"] == 0
+
+    @patch("src.evaluation.deepeval_pipeline.JSONValidityMetric")
+    @patch("src.evaluation.deepeval_pipeline.StructureMetric")
+    @patch("src.evaluation.deepeval_pipeline.ExerciseQualityMetric")
+    def test_evaluate_content_agent(
+        self,
+        mock_exercise_quality,
+        mock_structure_metric,
+        mock_json_metric,
+        mock_test_cases_file,
+    ):
+        """Test content_agent evaluation across all 4 modes."""
+        # Mock JSON validity metric
+        mock_json_instance = MagicMock()
+        mock_json_instance.measure.return_value = 1.0
+        mock_json_instance.is_successful.return_value = True
+        mock_json_instance.reason = "✓ Valid JSON output"
+        mock_json_instance.__name__ = "JSON Validity"
+        mock_json_metric.return_value = mock_json_instance
+
+        # Mock structure metric
+        mock_structure_instance = MagicMock()
+        mock_structure_instance.measure.return_value = 1.0
+        mock_structure_instance.is_successful.return_value = True
+        mock_structure_instance.reason = "✓ Valid structure"
+        mock_structure_instance.__name__ = "Structure"
+        mock_structure_metric.return_value = mock_structure_instance
+
+        # Mock exercise quality metric
+        mock_quality_instance = MagicMock()
+        mock_quality_instance.measure.return_value = 0.85
+        mock_quality_instance.is_successful.return_value = True
+        mock_quality_instance.reason = "✓ Exercise quality: 0.85"
+        mock_quality_instance.__name__ = "Exercise Quality"
+        mock_exercise_quality.return_value = mock_quality_instance
+
+        pipeline = EvaluationPipeline(mock_test_cases_file)
+
+        # Provide responses for all 5 test cases (2 exercise_gen + 1 quiz + 1 test + 1 content)
+        model_responses = {
+            "gen_translation_01": '{"question": "Translate: book", "answer": "كِتَاب", "difficulty": "beginner"}',
+            "gen_cloze_01": '{"question": "Complete: The verb is ___", "answer": "يَكْتُبُ"}',
+            "quiz_gen_01": '{"questions": [{"q": "test", "a": "test"}]}',
+            "test_comp_01": '{"test": [{"q": "test", "a": "test"}]}',
+            "content_ret_01": '{"content": "Lesson 1 content"}',
+        }
+
+        results = pipeline.evaluate_content_agent(model_responses)
+
+        # Should have 5 total test cases (2 exercise_gen + 1 quiz + 1 test + 1 content)
+        assert results["total"] == 5
+        assert results["passed"] == 5
+        assert results["failed"] == 0
+
+        # Check that exercise_quality metric was used (for 2 exercise_gen cases)
+        assert "exercise_quality" in results["metrics"]
+        assert len(results["metrics"]["exercise_quality"]) == 2
+
+        # Verify metrics were called
+        assert mock_quality_instance.measure.call_count == 2
