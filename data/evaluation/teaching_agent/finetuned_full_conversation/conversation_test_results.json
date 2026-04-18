@@ -1,0 +1,814 @@
+{
+  "metadata": {
+    "model": "Qwen2.5-7B Teaching (LoRA) from /Users/kellydiabagate/Documents/LLMCourse/arabic-teaching-multi-agent/models/qwen-7b-arabic-teaching",
+    "evaluation_date": "2026-04-16T23:52:25.344603",
+    "test_type": "End-to-end conversation flows"
+  },
+  "summary": {
+    "total_scenarios": 12,
+    "passed_scenarios": 0,
+    "failed_scenarios": 12,
+    "overall_pass_rate": 0.0
+  },
+  "by_category": {
+    "happy_path": {
+      "total": 2,
+      "passed": 0,
+      "scenarios": [
+        "e2e_vocab_learning_happy_path",
+        "e2e_grammar_learning_flow"
+      ]
+    },
+    "edge_case": {
+      "total": 4,
+      "passed": 0,
+      "scenarios": [
+        "e2e_off_topic_redirect",
+        "e2e_profanity_boundary",
+        "e2e_unstudied_content_question",
+        "e2e_boredom_distraction"
+      ]
+    },
+    "error_recovery": {
+      "total": 2,
+      "passed": 0,
+      "scenarios": [
+        "e2e_error_recovery_flow",
+        "e2e_multiple_mistakes_encouragement"
+      ]
+    },
+    "navigation": {
+      "total": 4,
+      "passed": 0,
+      "scenarios": [
+        "e2e_navigation_back_forth",
+        "e2e_see_all_words_then_continue",
+        "e2e_lesson_progress_check",
+        "e2e_switch_modes_mid_lesson"
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "test_id": "e2e_vocab_learning_happy_path",
+      "description": "Complete vocab learning flow: lesson start → batch intro → quiz with mixed results",
+      "category": "happy_path",
+      "total_turns": 4,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "lesson_start",
+          "response": "Welcome to Lesson 1! 🌟 I'm so excited to start this Arabic learning journey with you!\n\nToday you'll learn:\n- **Vocabulary:** 10 new words (كِتَاب, قَلَم, etc.)\n- **Grammar:** 2 topics (Feminine Nouns, Definite Article)\n\nWhere would you like to start?\n1. Start with vocabulary (10 words)\n2. Start with grammar (2 topics)\n3. See lesson progress\n\nOr tell me what you'd like to do!",
+          "expected_behaviors": [
+            "greets_warmly",
+            "presents_vocabulary_count",
+            "presents_grammar_topics",
+            "offers_3_navigation_choices"
+          ],
+          "behaviors_passed": [
+            "greets_warmly",
+            "presents_vocabulary_count",
+            "presents_grammar_topics",
+            "offers_3_navigation_choices"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "teaching_vocab",
+          "response": "Let's learn Batch 1! Here are your first three words:\n\n📚 كِتَاب (kitaab) - book\n🡴 قَلَم (qalam) - pen\n_Office_ 桌子 (maktab) - desk\n\nWhat would you like to do next?\n1. Take quiz on Batch 1\n2. Go to Batch 2\n3. See all 8 words\n\nOr tell me what you'd like to do.",
+          "expected_behaviors": [
+            "shows_3_words_with_arabic",
+            "mentions_flashcards",
+            "offers_quiz_next_all_options"
+          ],
+          "behaviors_passed": [
+            "shows_3_words_with_arabic",
+            "offers_quiz_next_all_options"
+          ],
+          "behaviors_failed": [
+            "mentions_flashcards"
+          ],
+          "metrics": {}
+        },
+        {
+          "turn": 3,
+          "mode": "feedback_vocab",
+          "response": "Correct! ✓ كِتَاب = book. Great job!",
+          "expected_behaviors": [
+            "praise_present",
+            "checkmark_or_confirmation",
+            "word_mentioned"
+          ],
+          "behaviors_passed": [
+            "praise_present",
+            "checkmark_or_confirmation",
+            "word_mentioned"
+          ],
+          "behaviors_failed": [],
+          "metrics": {
+            "sentiment": {
+              "passed": true,
+              "value": 0.8
+            },
+            "has_praise": {
+              "passed": true,
+              "value": true
+            }
+          }
+        },
+        {
+          "turn": 4,
+          "mode": "feedback_vocab",
+          "response": "Nope! The word مَدْرَسَة (madrasa) means 'school', not 'house'.\n\nTry using the flashcard to review this word a few times - that'll help it stick!",
+          "expected_behaviors": [
+            "supportive_correction",
+            "shows_correct_answer",
+            "flashcard_suggestion",
+            "no_false_praise"
+          ],
+          "behaviors_passed": [
+            "supportive_correction",
+            "shows_correct_answer",
+            "flashcard_suggestion",
+            "no_false_praise"
+          ],
+          "behaviors_failed": [],
+          "metrics": {
+            "sentiment": {
+              "passed": false,
+              "value": 0.5
+            },
+            "has_correction": {
+              "passed": true,
+              "value": true
+            },
+            "no_praise_words": {
+              "passed": true,
+              "value": true
+            }
+          }
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 2: Missing mentions_flashcards",
+        "Turn 4: Metric sentiment failed"
+      ],
+      "pass_rate": 0.75
+    },
+    {
+      "test_id": "e2e_grammar_learning_flow",
+      "description": "Grammar learning: lesson start → grammar topic explanation → quiz with results",
+      "category": "happy_path",
+      "total_turns": 4,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "lesson_start",
+          "response": "Welcome to Lesson 1! 🌟 I'm so excited to start this Arabic learning journey with you!\n\nToday you'll learn:\n- **Vocabulary:** 10 new words (كِتَاب/book, قَلَام/pen, and more!)\n- **Grammar:** 2 topics (Feminine Nouns and Definite Article)\n\nWhere would you like to start?\n1. Start with vocabulary (10 words)\n2. Start with grammar (2 topics)\n3. See lesson progress\n\nOr tell me what you'd like to do!",
+          "expected_behaviors": [
+            "greets_warmly",
+            "offers_navigation"
+          ],
+          "behaviors_passed": [
+            "greets_warmly",
+            "offers_navigation"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "teaching_grammar",
+          "response": "Let's learn about Feminine Nouns! 🌟\n\n**Rule:** In Arabic, most nouns that refer to females or female concepts will end with a ة (taa marbuuta).\n\n**Examples:**\n- مَدْرَسَة (madrasa) - **school** (ends with ة, so it's feminine)\n- طَاوِلَة (taawila) - **table** (ends with ة, so it's feminine)\n- كِتَاب (kitaab) - **book** (no ة ending, so it's masculine)\n\nRemember, look for the ة at the end - that's your clue!\n\nReady to test your understanding? I'll have a quiz for you soon.",
+          "expected_behaviors": [
+            "explains_rule_clearly",
+            "shows_examples",
+            "mentions_key_indicator_taa_marbuuta"
+          ],
+          "behaviors_passed": [
+            "explains_rule_clearly",
+            "shows_examples",
+            "mentions_key_indicator_taa_marbuuta"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 3,
+          "mode": "feedback_grammar",
+          "response": "Correct! ✓ مَدْرَسَة is feminine (ends with ة). You're doing great! (1/1 so far)",
+          "expected_behaviors": [
+            "praise_present",
+            "mentions_score",
+            "references_rule"
+          ],
+          "behaviors_passed": [
+            "praise_present",
+            "mentions_score",
+            "references_rule"
+          ],
+          "behaviors_failed": [],
+          "metrics": {
+            "sentiment": {
+              "passed": true,
+              "value": 0.8
+            }
+          }
+        },
+        {
+          "turn": 4,
+          "mode": "feedback_grammar",
+          "response": "Not quite. The ة (taa marbuuta) at the end is the key indicator - that makes the word feminine. So مُعَلِّمَة (muʿallima) is a feminine noun (teacher). In Arabic, you look for this ة ending to identify feminine words. Try again!",
+          "expected_behaviors": [
+            "supportive_correction",
+            "explains_with_rule_reference",
+            "mentions_score"
+          ],
+          "behaviors_passed": [
+            "supportive_correction",
+            "explains_with_rule_reference"
+          ],
+          "behaviors_failed": [
+            "mentions_score"
+          ],
+          "metrics": {
+            "sentiment": {
+              "passed": false,
+              "value": 0.5
+            },
+            "has_correction": {
+              "passed": true,
+              "value": true
+            }
+          }
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 4: Missing mentions_score",
+        "Turn 4: Metric sentiment failed"
+      ],
+      "pass_rate": 0.75
+    },
+    {
+      "test_id": "e2e_off_topic_redirect",
+      "description": "Edge case: student goes off-topic during vocab batch, model redirects and offers break",
+      "category": "edge_case",
+      "total_turns": 2,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "response": "Let's learn Batch 1! Here are your first 2 words:\n\n📚 كِتَاب (kitaab) - book\n🡴 قَلَم (qalam) - pen\n\nTake your time learning with the flashcards!\n\nWhat would you like to do next?\n1. Take quiz on Batch 1\n2. Go to Batch 2\n3. See all 8 words\n\nOr tell me what you'd like to do.",
+          "expected_behaviors": [
+            "presents_batch",
+            "offers_choices"
+          ],
+          "behaviors_passed": [
+            "presents_batch",
+            "offers_choices"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "handle_off_topic",
+          "response": "I'm here to teach Arabic! Not sure where to start - let's begin with:\n\nVocabulary Batch 1:\n- مَدْرَسَةٌ/school\n- كِتَابٌ/book\n- طَاوِلَةٌ/table\n- بَيْتٌ/house\n- قُمْرَطٌ/cap/hat\n\nWould you like to:\n1. Take quiz on Batch 1\n2. Go to Batch 2\n3. See all vocab\n\nWhat would you like to do?",
+          "expected_behaviors": [
+            "acknowledges_politely",
+            "states_arabic_teaching_focus",
+            "mentions_save_and_break_option",
+            "redirects_to_lesson"
+          ],
+          "behaviors_passed": [
+            "acknowledges_politely",
+            "states_arabic_teaching_focus",
+            "redirects_to_lesson"
+          ],
+          "behaviors_failed": [
+            "mentions_save_and_break_option"
+          ],
+          "metrics": {
+            "professional_boundary": {
+              "passed": true,
+              "value": true
+            },
+            "offers_break": {
+              "passed": true,
+              "value": true
+            },
+            "no_harsh_rejection": {
+              "passed": true,
+              "value": true
+            }
+          }
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 2: Missing mentions_save_and_break_option"
+      ],
+      "pass_rate": 0.5
+    },
+    {
+      "test_id": "e2e_profanity_boundary",
+      "description": "Edge case: student uses profanity, model sets professional boundary",
+      "category": "edge_case",
+      "total_turns": 2,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "response": "Here is Batch 1 - the first of your Arabic vocabulary batch:\n\n📚 Kitaab (китaab) - book\n\nTake your time learning with the app!\n\nWhat would you like to do next?\n1. Go to Batch 2\n2. See all 8 words\n\nOr tell me what you'd like to do.",
+          "expected_behaviors": [
+            "presents_batch"
+          ],
+          "behaviors_passed": [
+            "presents_batch"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "handle_boundary",
+          "response": "I'm sorry, I don't understand what you mean by \"boring as hell\". Let's focus on the vocabulary lesson!\n\nIn this batch, you'll learn words related to school supplies. Here are your first three words:\n\n📚 كِتَابٌ (kitaabun) - book\n🪑 طَاوِلَةٌ (taawilatun) - table\n📝 حَقْلَةٌ/مُحَافِظَةٌ (haqlaatun/muhāfiżatun) - notebook/briefcase\n\nTake your time learning with the flashcards! When you're ready to practice, let me know.",
+          "expected_behaviors": [
+            "maintains_professional_tone",
+            "sets_respectful_learning_boundary",
+            "offers_break_option",
+            "redirects_to_lesson_options"
+          ],
+          "behaviors_passed": [
+            "maintains_professional_tone",
+            "sets_respectful_learning_boundary"
+          ],
+          "behaviors_failed": [
+            "offers_break_option",
+            "redirects_to_lesson_options"
+          ],
+          "metrics": {
+            "professional_boundary": {
+              "passed": true,
+              "value": true
+            },
+            "no_lecturing": {
+              "passed": true,
+              "value": true
+            },
+            "offers_break": {
+              "passed": true,
+              "value": true
+            }
+          }
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 2: Missing offers_break_option",
+        "Turn 2: Missing redirects_to_lesson_options"
+      ],
+      "pass_rate": 0.5
+    },
+    {
+      "test_id": "e2e_unstudied_content_question",
+      "description": "Edge case: student asks about word not in current lesson",
+      "category": "edge_case",
+      "total_turns": 2,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "lesson_start",
+          "response": "Welcome to Lesson 1! 🌟 I'm so excited to start this Arabic learning journey with you!\n\nToday you'll learn:\n- **Vocabulary:** 10 new words (كِتَاب book, قَلَام pen, and more!)\n- **Grammar:** 1 topic - Feminine Nouns\n\nWhere would you like to start?\n1. Start with vocabulary (10 words)\n2. Start with grammar (1 topic)\n3. See lesson progress\n\nOr tell me what you'd like to do!",
+          "expected_behaviors": [
+            "greets",
+            "presents_lesson"
+          ],
+          "behaviors_passed": [
+            "greets"
+          ],
+          "behaviors_failed": [
+            "presents_lesson"
+          ],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "handle_off_curriculum",
+          "response": "Welcome! I'm so excited to start this Arabic learning journey with you!\n\nLet's learn our first word:\n** carro (カー) - car**\n\nTry saying it with me: CAR-ro\n\nTake your time - there's no rush!\n\nWhat would you like to do next?\n1. Take quiz on these words\n2. Go back to see all words\n3. Exit lesson\n\nOr tell me what you'd like to do!",
+          "expected_behaviors": [
+            "answers_briefly_if_possible",
+            "mentions_not_in_current_lesson",
+            "redirects_to_lesson_1_content",
+            "maintains_encouraging_tone"
+          ],
+          "behaviors_passed": [
+            "mentions_not_in_current_lesson",
+            "maintains_encouraging_tone"
+          ],
+          "behaviors_failed": [
+            "answers_briefly_if_possible",
+            "redirects_to_lesson_1_content"
+          ],
+          "metrics": {
+            "helpful_but_brief": {
+              "passed": true,
+              "value": true
+            },
+            "redirects_appropriately": {
+              "passed": true,
+              "value": true
+            }
+          }
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 1: Missing presents_lesson",
+        "Turn 2: Missing answers_briefly_if_possible",
+        "Turn 2: Missing redirects_to_lesson_1_content"
+      ],
+      "pass_rate": 0.0
+    },
+    {
+      "test_id": "e2e_boredom_distraction",
+      "description": "Edge case: student expresses boredom, model offers break with encouragement",
+      "category": "edge_case",
+      "total_turns": 2,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "teaching_grammar",
+          "response": "Let's learn about Feminine Nouns! 🌟\n\n**The Rule:** In Arabic, most feminine nouns end with the letter ة (taa marbuuta).\n\n**Examples:**\n- مَدْرَسَة (madrasatun) - school ✓ (feminine because it ends in ة)\n- كِتَاب (kitaabun) - book (no ة, so masculine)\n\n**More examples:**\n- طَاوِلَةٌ (table) - feminine (ends in ة)\n- بَيْتٌ (house) - masculine (no ة)\n\nRemember, you look for the ة at the end to identify a feminine noun!\n\nReady to test your understanding? Take the quiz next.",
+          "expected_behaviors": [
+            "explains_topic"
+          ],
+          "behaviors_passed": [
+            "explains_topic"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "handle_distraction",
+          "response": "Sorry to hear that! Let's make this fun. How about you take a break first and then we'll start with Lesson 1? That way you won't feel overwhelmed.\n\nWould you like to save your progress before taking a break?",
+          "expected_behaviors": [
+            "acknowledges_feeling",
+            "understanding_tone",
+            "mentions_save_and_break",
+            "offers_continue_or_break_choice",
+            "no_guilt_tripping"
+          ],
+          "behaviors_passed": [
+            "understanding_tone",
+            "offers_continue_or_break_choice",
+            "no_guilt_tripping"
+          ],
+          "behaviors_failed": [
+            "acknowledges_feeling",
+            "mentions_save_and_break"
+          ],
+          "metrics": {
+            "empathetic": {
+              "passed": true,
+              "value": true
+            },
+            "offers_break": {
+              "passed": true,
+              "value": true
+            },
+            "no_pressure": {
+              "passed": true,
+              "value": true
+            }
+          }
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 2: Missing acknowledges_feeling",
+        "Turn 2: Missing mentions_save_and_break"
+      ],
+      "pass_rate": 0.5
+    },
+    {
+      "test_id": "e2e_error_recovery_flow",
+      "description": "Error recovery: incorrect answer → flashcard practice → retry → success",
+      "category": "error_recovery",
+      "total_turns": 2,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "feedback_vocab",
+          "response": "Nope! The word مَدْرَسَة (madrasa) means 'school', not 'house'.\n\nTry using the flashcard to review this word a few times - that'll help it stick!",
+          "expected_behaviors": [
+            "supportive_correction",
+            "shows_correct_answer",
+            "flashcard_suggestion"
+          ],
+          "behaviors_passed": [
+            "supportive_correction",
+            "shows_correct_answer",
+            "flashcard_suggestion"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "feedback_vocab",
+          "response": "Correct! ✓ مَدْرَسَة = school. Great job!",
+          "expected_behaviors": [
+            "praise_recovery",
+            "acknowledges_improvement",
+            "encourages_learning_from_mistake"
+          ],
+          "behaviors_passed": [
+            "praise_recovery",
+            "encourages_learning_from_mistake"
+          ],
+          "behaviors_failed": [
+            "acknowledges_improvement"
+          ],
+          "metrics": {
+            "sentiment": {
+              "passed": false,
+              "value": 0.8
+            },
+            "celebrates_recovery": {
+              "passed": true,
+              "value": true
+            }
+          }
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 2: Missing acknowledges_improvement",
+        "Turn 2: Metric sentiment failed"
+      ],
+      "pass_rate": 0.5
+    },
+    {
+      "test_id": "e2e_multiple_mistakes_encouragement",
+      "description": "Multiple mistakes: model maintains encouragement and support",
+      "category": "error_recovery",
+      "total_turns": 3,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "feedback_vocab",
+          "response": "Nope! The word مَدْرَسَة (madrasa) means 'school', not 'house'.\n\nTry using the flashcard to review this word a few times - that'll help it stick!",
+          "expected_behaviors": [
+            "supportive_correction"
+          ],
+          "behaviors_passed": [
+            "supportive_correction"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "feedback_vocab",
+          "response": "Not quite! The word قَلَم (qalam) means 'pen', not 'pencil'.\n\nTry using the flashcard to review this word a few times - that'll help it stick!",
+          "expected_behaviors": [
+            "still_supportive",
+            "no_frustration",
+            "continues_gentle_correction"
+          ],
+          "behaviors_passed": [
+            "still_supportive",
+            "no_frustration",
+            "continues_gentle_correction"
+          ],
+          "behaviors_failed": [],
+          "metrics": {
+            "sentiment": {
+              "passed": false,
+              "value": 0.5
+            }
+          }
+        },
+        {
+          "turn": 3,
+          "mode": "feedback_vocab",
+          "response": "Not quite! The word مَكْтَب (maktab) means 'desk', not 'office'.\n\nTry using the flashcard to review this word a few times - that'll help it stick!",
+          "expected_behaviors": [
+            "maintains_encouragement",
+            "suggests_review",
+            "no_negativity",
+            "offers_practice_option"
+          ],
+          "behaviors_passed": [
+            "maintains_encouragement",
+            "suggests_review",
+            "no_negativity",
+            "offers_practice_option"
+          ],
+          "behaviors_failed": [],
+          "metrics": {
+            "sentiment": {
+              "passed": false,
+              "value": 0.5
+            },
+            "maintains_support": {
+              "passed": true,
+              "value": true
+            }
+          }
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 2: Metric sentiment failed",
+        "Turn 3: Metric sentiment failed"
+      ],
+      "pass_rate": 1.0
+    },
+    {
+      "test_id": "e2e_navigation_back_forth",
+      "description": "Navigation: batch 2 → back to batch 1 → quiz",
+      "category": "navigation",
+      "total_turns": 2,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "response": "Here is your first word!\n\n📚 Madarsa (madrasa) - school\n\nTake your time learning with the others!",
+          "expected_behaviors": [
+            "shows_batch_2",
+            "offers_choices"
+          ],
+          "behaviors_passed": [],
+          "behaviors_failed": [
+            "shows_batch_2",
+            "offers_choices"
+          ],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "teaching_vocab",
+          "response": "Here is Batch 1 - the first of your Arabic vocabulary batch:\n\n📚 Kitaab (китaab) - book\n\nTake your time learning with the app!\n\nWhat would you like to do next?\n1. Go to Batch 2\n2. See all 8 words\n\nOr tell me what you'd like to do.",
+          "expected_behaviors": [
+            "shows_batch_1_again",
+            "handles_backward_navigation",
+            "offers_choices"
+          ],
+          "behaviors_passed": [
+            "shows_batch_1_again",
+            "handles_backward_navigation",
+            "offers_choices"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 1: Missing shows_batch_2",
+        "Turn 1: Missing offers_choices"
+      ],
+      "pass_rate": 0.5
+    },
+    {
+      "test_id": "e2e_see_all_words_then_continue",
+      "description": "Navigation: batch 1 → see all words → back to current batch",
+      "category": "navigation",
+      "total_turns": 2,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "response": "Here is Batch 1 - the first of your Arabic vocabulary batch:\n\n📚 Kitaab (китaab) - book\n\nTake your time learning with the app!\n\nWhat would you like to do next?\n1. Go to Batch 2\n2. See all 8 words\n\nOr tell me what you'd like to do.",
+          "expected_behaviors": [
+            "shows_batch",
+            "offers_see_all_option"
+          ],
+          "behaviors_passed": [
+            "shows_batch",
+            "offers_see_all_option"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "show_all_words",
+          "response": "Let's start! Here are your first 3 words:\n\n📚 كِتَابٌ (kitaabun) - book\n🪑 طَاوِلَةٌ (taawilatun) - table\n🏠 بَيْتٌ (baytun) - house\n\nTake it one word at a time!\n\nHow would you like to proceed:\n1. Take quiz on all 3 words\n2. Go back to see full list of words\n3. Exit lesson\n\nWhat would you like to do?",
+          "expected_behaviors": [
+            "shows_all_words",
+            "indicates_current_position",
+            "offers_navigation_back"
+          ],
+          "behaviors_passed": [
+            "shows_all_words",
+            "offers_navigation_back"
+          ],
+          "behaviors_failed": [
+            "indicates_current_position"
+          ],
+          "metrics": {}
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 2: Missing indicates_current_position"
+      ],
+      "pass_rate": 0.5
+    },
+    {
+      "test_id": "e2e_lesson_progress_check",
+      "description": "Navigation: lesson start → option 3 (progress) → see status → continue",
+      "category": "navigation",
+      "total_turns": 2,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "lesson_start",
+          "response": "Welcome to Lesson 1! 🌟 I'm so excited to start this Arabic learning journey with you!\n\nToday you'll learn:\n- **Vocabulary:** 10 new words (like كِتَاب/book)\n- **Grammar:** 1 topic (Feminine Nouns)\n\nWhere would you like to start?\n1. Start with vocabulary (10 words)\n2. Start with grammar (1 topic)\n3. See lesson progress\n\nOr tell me what you'd like to do!",
+          "expected_behaviors": [
+            "greets",
+            "offers_3_choices"
+          ],
+          "behaviors_passed": [
+            "greets",
+            "offers_3_choices"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "show_progress",
+          "response": "It looks like you've started your Arabic learning journey! 🌟 Let's get started!\n\n**Lesson 1:** Gender and Definite Article (النِّسَاءُ وَالْمَدْحُورٌ وَالكِتَابُ الْعَامٌّ)\n\nHere are your first 3 words:\n- **قُرْآنٌ** (Qur'an) - Holy Book\n- **بَيْتٌ** (bayt) - house\n- **فَاتِحَةٌ** (fatiha) - Opening Chapter\n\nTake your time learning with the flashcards!\n\nWhat would you like to do next?\n1. Take quiz on Batch 1\n2. Go to vocabulary list\n3. See all 8 words\n\nOr tell me what you'd like to do.",
+          "expected_behaviors": [
+            "shows_progress_status",
+            "offers_continue_options"
+          ],
+          "behaviors_passed": [
+            "offers_continue_options"
+          ],
+          "behaviors_failed": [
+            "shows_progress_status"
+          ],
+          "metrics": {}
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 2: Missing shows_progress_status"
+      ],
+      "pass_rate": 0.5
+    },
+    {
+      "test_id": "e2e_switch_modes_mid_lesson",
+      "description": "Mode switching: vocab batch → student requests grammar instead",
+      "category": "navigation",
+      "total_turns": 2,
+      "turn_results": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "response": "Here is Batch 1 - the first of your Arabic vocabulary batch:\n\n📚 Kitaab (китaab) - book\n\nTake your time learning with the app!\n\nWhat would you like to do next?\n1. Go to Batch 2\n2. See all 8 words\n\nOr tell me what you'd like to do.",
+          "expected_behaviors": [
+            "shows_vocab_batch"
+          ],
+          "behaviors_passed": [],
+          "behaviors_failed": [
+            "shows_vocab_batch"
+          ],
+          "metrics": {}
+        },
+        {
+          "turn": 2,
+          "mode": "mode_switch",
+          "response": "Welcome to Lesson 1! I'm so excited to start this journey with you!\n\nToday we'll learn:\n- **Vocabulary:** 3 words\n- **Grammar:** 2 topics\n\nLet's begin with Batch 1 - Vocabulary:\n\n**Batch 1:**\n- School: مَدْرَسَةٌ/madrasatun/school\n- Bag: جِيْبٌ/jib/un pocket/bag\n- Book: كُتْبَةٌ/kutbatun/book\n\nTake your time learning with the flashcards!\n\nWhere would you like to start?\n1. Take quiz on Batch 1\n2. Go to Batch 2\n3. See all 3 words\n\nOr tell me what you'd like to do.",
+          "expected_behaviors": [
+            "acknowledges_switch_request",
+            "transitions_smoothly",
+            "starts_grammar_teaching"
+          ],
+          "behaviors_passed": [
+            "acknowledges_switch_request",
+            "transitions_smoothly",
+            "starts_grammar_teaching"
+          ],
+          "behaviors_failed": [],
+          "metrics": {}
+        }
+      ],
+      "overall_pass": false,
+      "issues": [
+        "Turn 1: Missing shows_vocab_batch"
+      ],
+      "pass_rate": 0.5
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: Teaching Vocabulary\nLesson: 1 - Gender and Definite Article\nPhase: Batch Introduction\nObjective: Present batch, offer navigation choices, handle quiz request.\n\nAvailable Content:\n- Current batch: كِتَابٌ/kitaabun/book, طَاوِلَةٌ/taawilatun/table, بَيْتٌ/baytun/house\n- Batch: 1 of 3\n- Total in lesson: 8 words"
+      },
+      {
+        "role": "assistant",
+        "content": "Let's learn Batch 1! Here are your first 3 words:\n\n📚 كِتَابٌ (kitaabun) - book\n🪑 طَاوِلَةٌ (taawilatun) - table\n🏠 بَيْتٌ (baytun) - house\n\nTake your time learning with the flashcards!\n\nWhat would you like to do next?\n1. Take quiz on Batch 1\n2. Go to Batch 2\n3. See all 8 words\n\nOr tell me what you'd like to do."
+      },
+      {
+        "role": "user",
+        "content": "1"
+      },
+      {
+        "role": "assistant",
+        "content": "Great! Let's test your knowledge. What does كِتَابٌ mean?"
+      },
+      {
+        "role": "user",
+        "content": "book"
+      },
+      {
+        "role": "assistant",
+        "content": "Correct! ✓ كِتَابٌ = book. Great job!"
+      },
+      {
+        "role": "user",
+        "content": "next"
+      },
+      {
+        "role": "assistant",
+        "content": "Perfect! What does طَاوِلَةٌ mean?"
+      }
+    ]
+  }
+]

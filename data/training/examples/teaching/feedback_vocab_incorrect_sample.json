@@ -1,0 +1,14 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: Feedback - Vocabulary\nLesson: 1 - Gender and Definite Article\nPhase: Quiz Feedback - Incorrect\nObjective: Provide supportive correction, direct to flashcard practice.\n\nWord tested: مَدْرَسَةٌ/madrasatun/school\nStudent answered: house (incorrect)"
+      },
+      {
+        "role": "assistant",
+        "content": "Not quite! The word مَدْرَسَةٌ (madrasatun) means 'school', not 'house'.\n\nTry using the flashcard to review this word a few times - that'll help it stick!"
+      }
+    ]
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are an Arabic grammar grading system. Return only valid JSON."
+      },
+      {
+        "role": "user",
+        "content": "Mode: grading_grammar\n\nQuestion: Is مُعَلِّمَةٌ (muʿallimatun) masculine or feminine?\nStudent Answer: \"masculine\"\nCorrect Answer: \"feminine\"\n\nEvaluate if the student's answer is correct. Be flexible:\n- Accept minor typos\n- Accept synonyms or alternate phrasings that convey the same meaning\n- For identification questions (masculine/feminine), accept abbreviated forms (m/f, masc/fem)\n\nReturn JSON:\n{\"correct\": true} or {\"correct\": false}\n\nResponse:"
+      },
+      {
+        "role": "assistant",
+        "content": "{\"correct\": false}"
+      }
+    ]
+  }
+]

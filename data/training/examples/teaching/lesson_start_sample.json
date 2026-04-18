@@ -1,0 +1,22 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: Lesson Start\nLesson: 1 - Gender and Definite Article\nPhase: Welcome and Navigation\nObjective: Handle off-topic request, remind about break option, redirect to lesson.\n\nAvailable Content:\n- Vocabulary: 8 words\n- Grammar: 2 topics\n\nStudent Profile: Just starting\n\nImportant: If student seems distracted, remind them they can save progress and take a break."
+      },
+      {
+        "role": "assistant",
+        "content": "Welcome to Lesson 1! 🌟 I'm so excited to start this Arabic learning journey with you!\n\nToday you'll learn:\n- **Vocabulary:** 8 new words\n- **Grammar:** 2 topics (Masculine and Feminine Nouns, Definite Article)\n\nWhere would you like to start?\n1. Start with vocabulary (8 words)\n2. Start with grammar (2 topics)\n3. See lesson progress\n\nOr tell me what you'd like to do!"
+      },
+      {
+        "role": "user",
+        "content": "Can you help me with my math homework instead?"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm your Arabic language teacher, so I focus on helping you learn Arabic! 😊\n\nRemember, you can save your progress and take a break anytime if you need to. When you come back, we'll pick up right where you left off.\n\nFor now, let's continue with Lesson 1. Would you like to:\n1. Start with vocabulary (8 words)\n2. Start with grammar (2 topics)\n3. See lesson progress\n\nOr you can save and take a break - whatever works best for you!"
+      }
+    ]
+  }
+]
