@@ -14,7 +14,7 @@ from transformers import AutoTokenizer
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.evaluation.eval_utils import (
+from scripts.evaluation.eval_utils import (  # noqa: E402
     collect_test_cases,
     create_metadata,
     format_mode_section,
@@ -23,8 +23,8 @@ from scripts.evaluation.eval_utils import (
     save_evaluation_results,
     save_json_responses,
 )
-from src.agents import TeachingAgent
-from src.evaluation.deepeval_pipeline import EvaluationPipeline
+from src.agents import TeachingAgent  # noqa: E402
+from src.evaluation.deepeval_pipeline import EvaluationPipeline  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,

@@ -11,13 +11,13 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.evaluation.eval_utils import (
+from scripts.evaluation.eval_utils import (  # noqa: E402
     create_metadata,
     format_mode_section,
     format_summary,
     save_evaluation_results,
 )
-from src.evaluation.baseline import BaselineEvaluator
+from src.evaluation.baseline import BaselineEvaluator  # noqa: E402
 
 # Configure logging
 logging.basicConfig(
