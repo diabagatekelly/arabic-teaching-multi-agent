@@ -27,11 +27,14 @@ logger = logging.getLogger(__name__)
 # Global components (loaded once)
 orchestrator = None
 current_state = None
+teaching_model = None
+grading_model = None
+embedder_model = None
 
 
 def initialize_models():
     """Initialize models and orchestrator (runs once at startup)."""
-    global orchestrator
+    global orchestrator, teaching_model, grading_model, embedder_model
 
     logger.info("Loading fine-tuned models...")
 
@@ -61,9 +64,9 @@ def initialize_models():
         from src.rag.rag_retriever import RAGRetriever
         from src.rag.sentence_transformer_client import SentenceTransformerClient
 
-        embedder = SentenceTransformerClient()
+        embedder_model = SentenceTransformerClient()
         vector_db = PineconeClient()
-        rag_retriever = RAGRetriever(embedder, vector_db)
+        rag_retriever = RAGRetriever(embedder_model, vector_db)
         content_loader = LessonContentLoader(rag_retriever)
 
         content_agent = ContentAgent(
@@ -100,7 +103,13 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
     Returns:
         Tuple of (updated_chat, exercises, correct, accuracy, learned_items, status)
     """
-    global current_state
+    global current_state, teaching_model, grading_model, embedder_model
+
+    # Move models to GPU (ZeroGPU requirement)
+    logger.info("Moving models to GPU...")
+    teaching_model.to("cuda")
+    grading_model.to("cuda")
+    embedder_model.model.to("cuda")
 
     logger.info(f"Starting lesson {lesson_number}...")
 
@@ -180,7 +189,12 @@ def send_message(user_message: str, chat_history: list) -> tuple:
     Returns:
         Tuple of (updated_chat, exercises, correct, accuracy, learned_items, cleared_input)
     """
-    global current_state
+    global current_state, teaching_model, grading_model, embedder_model
+
+    # Move models to GPU (ZeroGPU requirement)
+    teaching_model.to("cuda")
+    grading_model.to("cuda")
+    embedder_model.model.to("cuda")
 
     if not current_state:
         chat_history.append({"role": "user", "content": user_message})
