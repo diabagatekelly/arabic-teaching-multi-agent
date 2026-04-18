@@ -41,6 +41,8 @@ dependencies = [
     "deepeval>=0.21.0",
     "sentence-transformers>=2.2.0",
     "pinecone>=8.1.2",
+    "python-levenshtein>=0.27.3",
+    "gradio>=6.12.0",
 ]
 
 [project.optional-dependencies]
@@ -61,6 +63,7 @@ packages = ["src"]  # v2: Will contain agents, orchestration, rag, evaluation
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = [
