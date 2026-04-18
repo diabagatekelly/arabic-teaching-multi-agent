@@ -4,15 +4,21 @@ HuggingFace Space entry point with GPU acceleration.
 """
 
 import logging
+import sys
 from datetime import datetime
+from pathlib import Path
 
 import gradio as gr
 import spaces
 
-from src.agents import ContentAgent, GradingAgent, TeachingAgent
-from src.models.hf_model_loader import load_grading_model, load_teaching_model
-from src.orchestrator.graph import create_teaching_graph
-from src.orchestrator.state import Message, SystemState
+# Add project root to path for src imports
+PROJECT_ROOT = Path(__file__).parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.agents import ContentAgent, GradingAgent, TeachingAgent  # noqa: E402
+from src.models.hf_model_loader import load_grading_model, load_teaching_model  # noqa: E402
+from src.orchestrator.graph import create_teaching_graph  # noqa: E402
+from src.orchestrator.state import Message, SystemState  # noqa: E402
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
