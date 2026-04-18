@@ -1,0 +1,753 @@
+{
+  "metadata": {
+    "model": "Fine-tuned Qwen2.5-7B (LoRA) from /Users/kellydiabagate/Documents/LLMCourse/arabic-teaching-multi-agent/models/qwen-7b-arabic-grading",
+    "evaluation_date": "2026-04-16T10:31:03.325198",
+    "agent": "Agent 2 (Grading)"
+  },
+  "grading_vocab": {
+    "total": 22,
+    "passed": 21,
+    "failed": 1,
+    "metrics": {
+      "json_validity": [
+        {
+          "test_id": "grade_vocab_exact_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_exact_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_exact_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_exact_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_exact_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_wrong_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_wrong_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_wrong_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_wrong_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_wrong_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_synonym_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_synonym_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_synonym_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_typo_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_typo_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_typo_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_caps_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_caps_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_article_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_article_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_partial_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_vocab_partial_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        }
+      ],
+      "structure": [
+        {
+          "test_id": "grade_vocab_exact_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_exact_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_exact_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_exact_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_exact_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_wrong_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_wrong_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_wrong_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_wrong_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_wrong_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_synonym_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_synonym_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_synonym_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_typo_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_typo_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_typo_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_caps_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_caps_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_article_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_article_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_partial_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_vocab_partial_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        }
+      ],
+      "accuracy": [
+        {
+          "test_id": "grade_vocab_exact_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_exact_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_exact_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_exact_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_exact_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_wrong_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_vocab_wrong_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_vocab_wrong_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_vocab_wrong_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_vocab_wrong_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_vocab_synonym_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_synonym_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_synonym_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_typo_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_typo_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_typo_03",
+          "score": 0.0,
+          "passed": false,
+          "reason": "\u2717 Expected incorrect, got True"
+        },
+        {
+          "test_id": "grade_vocab_caps_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_caps_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_article_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_article_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_vocab_partial_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_vocab_partial_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        }
+      ]
+    }
+  },
+  "grading_grammar": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "metrics": {
+      "json_validity": [
+        {
+          "test_id": "grade_grammar_exact_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_exact_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_exact_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_exact_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_exact_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_harakaat_internal_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_harakaat_internal_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_harakaat_internal_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_case_required_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_case_required_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_case_required_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_abbrev_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_abbrev_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_wrong_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_wrong_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_wrong_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_wrong_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        },
+        {
+          "test_id": "grade_grammar_wrong_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid JSON output"
+        }
+      ],
+      "structure": [
+        {
+          "test_id": "grade_grammar_exact_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_exact_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_exact_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_exact_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_exact_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_harakaat_internal_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_harakaat_internal_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_harakaat_internal_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_case_required_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_case_required_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_case_required_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_abbrev_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_abbrev_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_wrong_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_wrong_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_wrong_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_wrong_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        },
+        {
+          "test_id": "grade_grammar_wrong_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Valid structure with required keys and types"
+        }
+      ],
+      "accuracy": [
+        {
+          "test_id": "grade_grammar_exact_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_exact_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_exact_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_exact_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_exact_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_harakaat_internal_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_harakaat_internal_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_harakaat_internal_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_case_required_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_grammar_case_required_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_grammar_case_required_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_grammar_abbrev_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_abbrev_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as correct"
+        },
+        {
+          "test_id": "grade_grammar_wrong_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_grammar_wrong_02",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_grammar_wrong_03",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_grammar_wrong_04",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        },
+        {
+          "test_id": "grade_grammar_wrong_05",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Correctly classified as incorrect"
+        }
+      ]
+    }
+  }
+}

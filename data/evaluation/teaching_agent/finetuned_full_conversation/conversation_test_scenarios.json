@@ -1,0 +1,643 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2026-04-16",
+    "description": "End-to-end conversation flow tests for Agent 1 (Teaching). Tests multi-turn interactions, context retention, and real user pathways.",
+    "total_scenarios": 12
+  },
+  "scenarios": [
+    {
+      "test_id": "e2e_vocab_learning_happy_path",
+      "description": "Complete vocab learning flow: lesson start → batch intro → quiz with mixed results",
+      "category": "happy_path",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "lesson_start",
+          "input": {
+            "mode": "lesson_start",
+            "lesson_number": 1,
+            "vocab_summary": {
+              "total_words": 10,
+              "topics_preview": ["كِتَاب (book)", "قَلَم (pen)", "مَكْتَب (desk)"]
+            },
+            "grammar_summary": {
+              "topics": ["Feminine Nouns", "Definite Article"],
+              "topics_count": 2
+            }
+          },
+          "expected_behaviors": [
+            "greets_warmly",
+            "presents_vocabulary_count",
+            "presents_grammar_topics",
+            "offers_3_navigation_choices"
+          ],
+          "user_response": "vocabulary"
+        },
+        {
+          "turn": 2,
+          "mode": "teaching_vocab",
+          "input": {
+            "mode": "teaching_vocab",
+            "lesson_number": 1,
+            "batch_number": 1,
+            "total_batches": 4,
+            "words": [
+              {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"},
+              {"arabic": "قَلَم", "transliteration": "qalam", "english": "pen"},
+              {"arabic": "مَكْتَب", "transliteration": "maktab", "english": "desk"}
+            ]
+          },
+          "expected_behaviors": [
+            "shows_3_words_with_arabic",
+            "mentions_flashcards",
+            "offers_quiz_next_all_options"
+          ],
+          "user_response": "1"
+        },
+        {
+          "turn": 3,
+          "mode": "feedback_vocab",
+          "input": {
+            "mode": "feedback_vocab",
+            "word_arabic": "كِتَاب",
+            "word_transliteration": "kitaab",
+            "english": "book",
+            "is_correct": true
+          },
+          "expected_behaviors": [
+            "praise_present",
+            "checkmark_or_confirmation",
+            "word_mentioned"
+          ],
+          "metrics": {
+            "sentiment": 0.8,
+            "has_praise": true
+          },
+          "user_response": "next word"
+        },
+        {
+          "turn": 4,
+          "mode": "feedback_vocab",
+          "input": {
+            "mode": "feedback_vocab",
+            "word_arabic": "مَدْرَسَة",
+            "word_transliteration": "madrasa",
+            "english": "school",
+            "student_answer": "house",
+            "is_correct": false
+          },
+          "expected_behaviors": [
+            "supportive_correction",
+            "shows_correct_answer",
+            "flashcard_suggestion",
+            "no_false_praise"
+          ],
+          "metrics": {
+            "sentiment": 0.7,
+            "has_correction": true,
+            "no_praise_words": true
+          },
+          "user_response": "ok"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_grammar_learning_flow",
+      "description": "Grammar learning: lesson start → grammar topic explanation → quiz with results",
+      "category": "happy_path",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "lesson_start",
+          "input": {
+            "mode": "lesson_start",
+            "lesson_number": 1,
+            "vocab_summary": {
+              "total_words": 10,
+              "topics_preview": ["كِتَاب (book)", "قَلَم (pen)"]
+            },
+            "grammar_summary": {
+              "topics": ["Feminine Nouns", "Definite Article"],
+              "topics_count": 2
+            }
+          },
+          "expected_behaviors": ["greets_warmly", "offers_navigation"],
+          "user_response": "2"
+        },
+        {
+          "turn": 2,
+          "mode": "teaching_grammar",
+          "input": {
+            "mode": "teaching_grammar",
+            "lesson_number": 1,
+            "topic_name": "Feminine Nouns",
+            "grammar_rule": "Feminine nouns usually end in ة (taa marbuuta)",
+            "examples_formatted": "- مَدْرَسَة (madrasa) - school\n  Note: Ends with ة so it's feminine\n- طَاوِلَة (taawila) - table\n  Note: Ends with ة so it's feminine\n- كِتَاب (kitaab) - book\n  Note: No ة ending, so it's masculine"
+          },
+          "expected_behaviors": [
+            "explains_rule_clearly",
+            "shows_examples",
+            "mentions_key_indicator_taa_marbuuta"
+          ],
+          "user_response": "ready for quiz"
+        },
+        {
+          "turn": 3,
+          "mode": "feedback_grammar",
+          "input": {
+            "mode": "feedback_grammar",
+            "question": "Is the word مَدْرَسَة masculine or feminine?",
+            "student_answer": "feminine",
+            "correct_answer": "feminine",
+            "explanation": "مَدْرَسَة ends with ة so it's feminine",
+            "current_score": "1/1",
+            "is_correct": true
+          },
+          "expected_behaviors": [
+            "praise_present",
+            "mentions_score",
+            "references_rule"
+          ],
+          "metrics": {
+            "sentiment": 0.8
+          },
+          "user_response": "next"
+        },
+        {
+          "turn": 4,
+          "mode": "feedback_grammar",
+          "input": {
+            "mode": "feedback_grammar",
+            "question": "Is the word مُعَلِّمَة (muʿallima - teacher f) masculine or feminine?",
+            "student_answer": "masculine",
+            "correct_answer": "feminine",
+            "explanation": "مُعَلِّمَة ends with ة so it's feminine. It's the female form of teacher",
+            "current_score": "1/2",
+            "is_correct": false
+          },
+          "expected_behaviors": [
+            "supportive_correction",
+            "explains_with_rule_reference",
+            "mentions_score"
+          ],
+          "metrics": {
+            "sentiment": 0.7,
+            "has_correction": true
+          },
+          "user_response": "got it"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_off_topic_redirect",
+      "description": "Edge case: student goes off-topic during vocab batch, model redirects and offers break",
+      "category": "edge_case",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "input": {
+            "mode": "teaching_vocab",
+            "lesson_number": 1,
+            "batch_number": 1,
+            "total_batches": 4,
+            "words": [
+              {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"},
+              {"arabic": "قَلَم", "transliteration": "qalam", "english": "pen"}
+            ]
+          },
+          "expected_behaviors": ["presents_batch", "offers_choices"],
+          "user_response": "Can you help me with my math homework?"
+        },
+        {
+          "turn": 2,
+          "mode": "handle_off_topic",
+          "input": {
+            "mode": "teaching_vocab",
+            "user_message": "Can you help me with my math homework?",
+            "context": "student went off-topic"
+          },
+          "expected_behaviors": [
+            "acknowledges_politely",
+            "states_arabic_teaching_focus",
+            "mentions_save_and_break_option",
+            "redirects_to_lesson"
+          ],
+          "metrics": {
+            "professional_boundary": true,
+            "offers_break": true,
+            "no_harsh_rejection": true
+          },
+          "user_response": "ok let's continue"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_profanity_boundary",
+      "description": "Edge case: student uses profanity, model sets professional boundary",
+      "category": "edge_case",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "input": {
+            "mode": "teaching_vocab",
+            "lesson_number": 1,
+            "batch_number": 1,
+            "total_batches": 4,
+            "words": [
+              {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"}
+            ]
+          },
+          "expected_behaviors": ["presents_batch"],
+          "user_response": "this is boring as hell"
+        },
+        {
+          "turn": 2,
+          "mode": "handle_boundary",
+          "input": {
+            "mode": "teaching_vocab",
+            "user_message": "this is boring as hell",
+            "context": "mild profanity"
+          },
+          "expected_behaviors": [
+            "maintains_professional_tone",
+            "sets_respectful_learning_boundary",
+            "offers_break_option",
+            "redirects_to_lesson_options"
+          ],
+          "metrics": {
+            "professional_boundary": true,
+            "no_lecturing": true,
+            "offers_break": true
+          },
+          "user_response": "ok sorry"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_unstudied_content_question",
+      "description": "Edge case: student asks about word not in current lesson",
+      "category": "edge_case",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "lesson_start",
+          "input": {
+            "mode": "lesson_start",
+            "lesson_number": 1,
+            "vocab_summary": {
+              "total_words": 10,
+              "topics_preview": ["كِتَاب (book)", "قَلَم (pen)"]
+            },
+            "grammar_summary": {
+              "topics": ["Feminine Nouns"],
+              "topics_count": 1
+            }
+          },
+          "expected_behaviors": ["greets", "presents_lesson"],
+          "user_response": "How do you say 'car' in Arabic?"
+        },
+        {
+          "turn": 2,
+          "mode": "handle_off_curriculum",
+          "input": {
+            "mode": "lesson_start",
+            "user_message": "How do you say 'car' in Arabic?",
+            "context": "asking about unstudied content"
+          },
+          "expected_behaviors": [
+            "answers_briefly_if_possible",
+            "mentions_not_in_current_lesson",
+            "redirects_to_lesson_1_content",
+            "maintains_encouraging_tone"
+          ],
+          "metrics": {
+            "helpful_but_brief": true,
+            "redirects_appropriately": true
+          },
+          "user_response": "ok start vocab"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_boredom_distraction",
+      "description": "Edge case: student expresses boredom, model offers break with encouragement",
+      "category": "edge_case",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "teaching_grammar",
+          "input": {
+            "mode": "teaching_grammar",
+            "lesson_number": 1,
+            "topic_name": "Feminine Nouns",
+            "grammar_rule": "Feminine nouns usually end in ة",
+            "examples_formatted": "- مَدْرَسَة (school) - feminine\n- كِتَاب (book) - masculine"
+          },
+          "expected_behaviors": ["explains_topic"],
+          "user_response": "I'm bored can we do something else"
+        },
+        {
+          "turn": 2,
+          "mode": "handle_distraction",
+          "input": {
+            "mode": "teaching_grammar",
+            "user_message": "I'm bored can we do something else",
+            "context": "student distracted/bored"
+          },
+          "expected_behaviors": [
+            "acknowledges_feeling",
+            "understanding_tone",
+            "mentions_save_and_break",
+            "offers_continue_or_break_choice",
+            "no_guilt_tripping"
+          ],
+          "metrics": {
+            "empathetic": true,
+            "offers_break": true,
+            "no_pressure": true
+          },
+          "user_response": "let me take a break"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_error_recovery_flow",
+      "description": "Error recovery: incorrect answer → flashcard practice → retry → success",
+      "category": "error_recovery",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "feedback_vocab",
+          "input": {
+            "mode": "feedback_vocab",
+            "word_arabic": "مَدْرَسَة",
+            "word_transliteration": "madrasa",
+            "english": "school",
+            "student_answer": "house",
+            "is_correct": false
+          },
+          "expected_behaviors": [
+            "supportive_correction",
+            "shows_correct_answer",
+            "flashcard_suggestion"
+          ],
+          "user_response": "ok let me practice"
+        },
+        {
+          "turn": 2,
+          "mode": "feedback_vocab",
+          "input": {
+            "mode": "feedback_vocab",
+            "word_arabic": "مَدْرَسَة",
+            "word_transliteration": "madrasa",
+            "english": "school",
+            "student_answer": "school",
+            "is_correct": true,
+            "context": "retry after practice"
+          },
+          "expected_behaviors": [
+            "praise_recovery",
+            "acknowledges_improvement",
+            "encourages_learning_from_mistake"
+          ],
+          "metrics": {
+            "sentiment": 0.9,
+            "celebrates_recovery": true
+          },
+          "user_response": "great!"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_multiple_mistakes_encouragement",
+      "description": "Multiple mistakes: model maintains encouragement and support",
+      "category": "error_recovery",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "feedback_vocab",
+          "input": {
+            "mode": "feedback_vocab",
+            "word_arabic": "مَدْرَسَة",
+            "word_transliteration": "madrasa",
+            "english": "school",
+            "student_answer": "house",
+            "is_correct": false
+          },
+          "expected_behaviors": ["supportive_correction"],
+          "user_response": "next"
+        },
+        {
+          "turn": 2,
+          "mode": "feedback_vocab",
+          "input": {
+            "mode": "feedback_vocab",
+            "word_arabic": "قَلَم",
+            "word_transliteration": "qalam",
+            "english": "pen",
+            "student_answer": "pencil",
+            "is_correct": false
+          },
+          "expected_behaviors": [
+            "still_supportive",
+            "no_frustration",
+            "continues_gentle_correction"
+          ],
+          "metrics": {
+            "sentiment": 0.7
+          },
+          "user_response": "next"
+        },
+        {
+          "turn": 3,
+          "mode": "feedback_vocab",
+          "input": {
+            "mode": "feedback_vocab",
+            "word_arabic": "مَكْتَب",
+            "word_transliteration": "maktab",
+            "english": "desk",
+            "student_answer": "office",
+            "is_correct": false
+          },
+          "expected_behaviors": [
+            "maintains_encouragement",
+            "suggests_review",
+            "no_negativity",
+            "offers_practice_option"
+          ],
+          "metrics": {
+            "sentiment": 0.7,
+            "maintains_support": true
+          },
+          "user_response": "let me review"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_navigation_back_forth",
+      "description": "Navigation: batch 2 → back to batch 1 → quiz",
+      "category": "navigation",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "input": {
+            "mode": "teaching_vocab",
+            "lesson_number": 1,
+            "batch_number": 2,
+            "total_batches": 4,
+            "words": [
+              {"arabic": "مَدْرَسَة", "transliteration": "madrasa", "english": "school"}
+            ]
+          },
+          "expected_behaviors": ["shows_batch_2", "offers_choices"],
+          "user_response": "go back to batch 1"
+        },
+        {
+          "turn": 2,
+          "mode": "teaching_vocab",
+          "input": {
+            "mode": "teaching_vocab",
+            "lesson_number": 1,
+            "batch_number": 1,
+            "total_batches": 4,
+            "words": [
+              {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"}
+            ]
+          },
+          "expected_behaviors": [
+            "shows_batch_1_again",
+            "handles_backward_navigation",
+            "offers_choices"
+          ],
+          "user_response": "take quiz"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_see_all_words_then_continue",
+      "description": "Navigation: batch 1 → see all words → back to current batch",
+      "category": "navigation",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "input": {
+            "mode": "teaching_vocab",
+            "lesson_number": 1,
+            "batch_number": 1,
+            "total_batches": 4,
+            "words": [
+              {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"}
+            ]
+          },
+          "expected_behaviors": ["shows_batch", "offers_see_all_option"],
+          "user_response": "3"
+        },
+        {
+          "turn": 2,
+          "mode": "show_all_words",
+          "input": {
+            "mode": "teaching_vocab",
+            "action": "show_all",
+            "lesson_number": 1,
+            "all_words": [
+              {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"},
+              {"arabic": "قَلَم", "transliteration": "qalam", "english": "pen"},
+              {"arabic": "مَكْتَب", "transliteration": "maktab", "english": "desk"}
+            ],
+            "current_batch": 1
+          },
+          "expected_behaviors": [
+            "shows_all_words",
+            "indicates_current_position",
+            "offers_navigation_back"
+          ],
+          "user_response": "back to batch 1"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_lesson_progress_check",
+      "description": "Navigation: lesson start → option 3 (progress) → see status → continue",
+      "category": "navigation",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "lesson_start",
+          "input": {
+            "mode": "lesson_start",
+            "lesson_number": 1,
+            "vocab_summary": {
+              "total_words": 10,
+              "topics_preview": ["كِتَاب (book)"]
+            },
+            "grammar_summary": {
+              "topics": ["Feminine Nouns"],
+              "topics_count": 1
+            }
+          },
+          "expected_behaviors": ["greets", "offers_3_choices"],
+          "user_response": "3"
+        },
+        {
+          "turn": 2,
+          "mode": "show_progress",
+          "input": {
+            "mode": "lesson_progress",
+            "lesson_number": 1,
+            "vocab_progress": "0/10 words learned",
+            "grammar_progress": "0/1 topics completed"
+          },
+          "expected_behaviors": [
+            "shows_progress_status",
+            "offers_continue_options"
+          ],
+          "user_response": "start vocab"
+        }
+      ]
+    },
+    {
+      "test_id": "e2e_switch_modes_mid_lesson",
+      "description": "Mode switching: vocab batch → student requests grammar instead",
+      "category": "navigation",
+      "turns": [
+        {
+          "turn": 1,
+          "mode": "teaching_vocab",
+          "input": {
+            "mode": "teaching_vocab",
+            "lesson_number": 1,
+            "batch_number": 1,
+            "total_batches": 4,
+            "words": [
+              {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"}
+            ]
+          },
+          "expected_behaviors": ["shows_vocab_batch"],
+          "user_response": "can we do grammar instead?"
+        },
+        {
+          "turn": 2,
+          "mode": "mode_switch",
+          "input": {
+            "mode": "teaching_grammar",
+            "lesson_number": 1,
+            "topic_name": "Feminine Nouns",
+            "grammar_rule": "Feminine nouns end in ة",
+            "examples_formatted": "- مَدْرَسَة (school) - feminine"
+          },
+          "expected_behaviors": [
+            "acknowledges_switch_request",
+            "transitions_smoothly",
+            "starts_grammar_teaching"
+          ],
+          "user_response": "thanks"
+        }
+      ]
+    }
+  ]
+}

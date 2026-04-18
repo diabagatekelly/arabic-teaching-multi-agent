@@ -1,0 +1,18 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are an Arabic vocabulary grading system. Return only valid JSON."
+      },
+      {
+        "role": "user",
+        "content": "Mode: grading_vocab\n\nQuestion: What does \"كِتَابٌ\" mean?\nStudent Answer: \"book\"\nCorrect Answer: \"book\"\n\nEvaluate if the student's answer is correct. Be flexible:\n- Accept minor typos (e.g., \"scool\" for \"school\")\n- Accept synonyms (e.g., \"instructor\" for \"teacher\")\n- Accept alternate phrasings that convey the same meaning\n\nReturn JSON:\n{\"correct\": true} or {\"correct\": false}\n\nResponse:"
+      },
+      {
+        "role": "assistant",
+        "content": "{\"correct\": true}"
+      }
+    ]
+  }
+]

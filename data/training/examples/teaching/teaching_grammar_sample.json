@@ -1,0 +1,30 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: Teaching Grammar\nLesson: 1 - Gender and Definite Article\nPhase: Topic Explanation\nObjective: Explain feminine noun rule with examples, then offer quiz.\n\nAvailable Content:\n- Topic: Masculine and Feminine Nouns\n- Rule: Most feminine nouns end with ة (taa marbuuta)\n- Examples: مَدْرَسَةٌ/school (f), طَاوِلَةٌ/table (f), كِتَابٌ/book (m)"
+      },
+      {
+        "role": "assistant",
+        "content": "Let's learn about Masculine and Feminine Nouns! 🌟\n\n**The Rule:**\nIn Arabic, most feminine nouns end with ة (taa marbuuta).\n\n**Examples:**\n- مَدْرَسَةٌ (madrasatun) - school ✓ (ends in ة, so feminine)\n- طَاوِلَةٌ (taawilatun) - table ✓ (ends in ة, so feminine)\n- كِتَابٌ (kitaabun) - book (no ة, so masculine)\n\n**Quick tip:** Look for the ة at the end - that's your clue!\n\nReady to test your understanding with a quiz?"
+      },
+      {
+        "role": "user",
+        "content": "yes"
+      },
+      {
+        "role": "assistant",
+        "content": "Perfect! Question 1 of 5: Is the word بَيْتٌ (baytun - house) masculine or feminine?"
+      },
+      {
+        "role": "user",
+        "content": "masculine"
+      },
+      {
+        "role": "assistant",
+        "content": "Correct! ✓ بَيْتٌ is masculine (no ة ending). You're doing great! (1/1 so far)"
+      }
+    ]
+  }
+]

@@ -1,0 +1,154 @@
+{
+  "metadata": {
+    "model": "Fine-tuned Qwen2.5-3B (LoRA) from /Users/kellydiabagate/Documents/LLMCourse/arabic-teaching-multi-agent/models/qwen-3b-arabic-teaching",
+    "evaluation_date": "2026-04-16T16:22:11.139013",
+    "agent": "Agent 1 (Teaching/Presentation)"
+  },
+  "lesson_start": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "metrics": {
+      "has_navigation": [
+        {
+          "test_id": "lesson_start_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Has numbered navigation options"
+        }
+      ],
+      "sentiment_teaching": [
+        {
+          "test_id": "lesson_start_01",
+          "score": 0.9922795295715332,
+          "passed": true,
+          "reason": "Sentiment score: 0.992 (\u2713 threshold: 0.6)"
+        }
+      ]
+    }
+  },
+  "teaching_vocab": {
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "metrics": {
+      "structure_valid": [
+        {
+          "test_id": "batch_intro_01",
+          "score": 0.5,
+          "passed": false,
+          "reason": "\u26a0 Word count mismatch: got 0, expected 3"
+        }
+      ],
+      "has_navigation": [
+        {
+          "test_id": "batch_intro_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Has numbered navigation options"
+        }
+      ],
+      "sentiment_teaching": [
+        {
+          "test_id": "batch_intro_01",
+          "score": 0.0033208131790161133,
+          "passed": false,
+          "reason": "Sentiment score: 0.003 (\u2717 threshold: 0.6)"
+        }
+      ]
+    }
+  },
+  "teaching_grammar": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "metrics": {
+      "has_navigation": [
+        {
+          "test_id": "grammar_explain_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Has navigation guidance"
+        }
+      ],
+      "sentiment_teaching": [
+        {
+          "test_id": "grammar_explain_01",
+          "score": 0.9992634654045105,
+          "passed": true,
+          "reason": "Sentiment score: 0.999 (\u2713 threshold: 0.6)"
+        }
+      ]
+    }
+  },
+  "feedback_vocab": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "metrics": {
+      "sentiment_feedback": [
+        {
+          "test_id": "feedback_vocab_correct_01",
+          "score": 0.9877512454986572,
+          "passed": true,
+          "reason": "Sentiment score: 0.988 (\u2713 threshold: 0.8)"
+        },
+        {
+          "test_id": "feedback_vocab_incorrect_01",
+          "score": 0.0032883882522583008,
+          "passed": false,
+          "reason": "Sentiment score: 0.003 (\u2717 threshold: 0.8)"
+        }
+      ],
+      "feedback_appropriateness": [
+        {
+          "test_id": "feedback_vocab_correct_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Appropriate praise for correct answer"
+        },
+        {
+          "test_id": "feedback_vocab_incorrect_01",
+          "score": 0.0,
+          "passed": false,
+          "reason": "\u2717 Gives false praise for incorrect answer"
+        }
+      ]
+    }
+  },
+  "feedback_grammar": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "metrics": {
+      "sentiment_feedback": [
+        {
+          "test_id": "feedback_grammar_correct_01",
+          "score": 0.9986237287521362,
+          "passed": true,
+          "reason": "Sentiment score: 0.999 (\u2713 threshold: 0.8)"
+        },
+        {
+          "test_id": "feedback_grammar_incorrect_01",
+          "score": 0.009392142295837402,
+          "passed": false,
+          "reason": "Sentiment score: 0.009 (\u2717 threshold: 0.8)"
+        }
+      ],
+      "feedback_appropriateness": [
+        {
+          "test_id": "feedback_grammar_correct_01",
+          "score": 1.0,
+          "passed": true,
+          "reason": "\u2713 Appropriate praise for correct answer"
+        },
+        {
+          "test_id": "feedback_grammar_incorrect_01",
+          "score": 0.0,
+          "passed": false,
+          "reason": "\u2717 Gives false praise for incorrect answer"
+        }
+      ]
+    }
+  }
+}

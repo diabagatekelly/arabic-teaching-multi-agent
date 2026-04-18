@@ -1,0 +1,20 @@
+{
+  "grade_grammar_exact_01": "{\"correct\": true}",
+  "grade_grammar_exact_02": "{\"correct\": true}",
+  "grade_grammar_exact_03": "{\"correct\": true}",
+  "grade_grammar_exact_04": "{\"correct\": true}",
+  "grade_grammar_exact_05": "{\"correct\": true}",
+  "grade_grammar_harakaat_internal_01": "{\"correct\": true}",
+  "grade_grammar_harakaat_internal_02": "{\"correct\": true}",
+  "grade_grammar_harakaat_internal_03": "{\"correct\": true}",
+  "grade_grammar_case_required_01": "{\"correct\": false}",
+  "grade_grammar_case_required_02": "{\"correct\": false}",
+  "grade_grammar_case_required_03": "{\"correct\": false}",
+  "grade_grammar_abbrev_01": "{\"correct\": true}",
+  "grade_grammar_abbrev_02": "{\"correct\": true}",
+  "grade_grammar_wrong_01": "{\"correct\": false}",
+  "grade_grammar_wrong_02": "{\"correct\": false}",
+  "grade_grammar_wrong_03": "{\"correct\": false}",
+  "grade_grammar_wrong_04": "{\"correct\": false}",
+  "grade_grammar_wrong_05": "{\"correct\": false}"
+}
