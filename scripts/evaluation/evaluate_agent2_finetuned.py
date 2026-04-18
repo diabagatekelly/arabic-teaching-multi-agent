@@ -1,5 +1,7 @@
 """Evaluate fine-tuned Agent 2 (Grading) model vs baseline."""
 
+from __future__ import annotations
+
 import argparse
 import json
 import logging
@@ -11,14 +13,18 @@ import torch
 from peft import AutoPeftModelForCausalLM
 from transformers import AutoTokenizer
 
-# Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from scripts.evaluation.eval_utils import (
+    create_metadata,
+    format_summary,
+    save_evaluation_results,
+    save_json_responses,
+)
 from src.agents import ContentAgent, GradingAgent
 from src.evaluation.deepeval_pipeline import EvaluationPipeline
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -26,7 +32,6 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# Paths
 TEST_CASES_PATH = (
     PROJECT_ROOT / "data" / "evaluation" / "grading_agent" / "grading_agent_test_cases.json"
 )
@@ -34,11 +39,10 @@ FINETUNED_MODEL_PATH = PROJECT_ROOT / "models" / "qwen-7b-arabic-grading"
 OUTPUT_DIR = PROJECT_ROOT / "data" / "evaluation" / "grading_agent" / "finetuned"
 
 
-def load_finetuned_model(model_path: Path):
+def load_finetuned_model(model_path: Path) -> tuple:
     """Load fine-tuned LoRA model with base model."""
     logger.info(f"Loading fine-tuned model from {model_path}...")
 
-    # Load LoRA model (automatically loads base model + adapters)
     model = AutoPeftModelForCausalLM.from_pretrained(
         str(model_path),
         device_map="auto",
@@ -51,58 +55,85 @@ def load_finetuned_model(model_path: Path):
     return model, tokenizer
 
 
-def save_results(
-    output_dir: Path,
+def retrieve_rag_context(
+    test_case: dict,
+    content_agent: ContentAgent,
+    content_type: str,
+) -> dict | None:
+    """Retrieve RAG context for a test case."""
+    lesson_num = test_case.get("lesson_number", 1)
+    try:
+        rag_context_raw = content_agent.retrieve_content(
+            {"lesson_number": lesson_num, "content_type": content_type, "format": "practice"}
+        )
+        rag_context = json.loads(rag_context_raw)
+        logger.info(f"  └─ RAG context retrieved for lesson {lesson_num}")
+        return rag_context
+    except Exception as e:
+        logger.warning(f"  └─ No RAG context: {e}")
+        return None
+
+
+def evaluate_grading_mode(
+    mode_name: str,
+    test_cases: list[dict],
+    grading_func: callable,
+    content_agent: ContentAgent,
+    content_type: str,
+) -> dict[str, str]:
+    """Evaluate a grading mode (vocab or grammar) with RAG context."""
+    logger.info("=" * 80)
+    logger.info(mode_name.upper())
+    logger.info("=" * 80)
+
+    responses = {}
+    for i, test_case in enumerate(test_cases, 1):
+        test_id = test_case["test_id"]
+        logger.info(f"[{i}/{len(test_cases)}] Grading {content_type}: {test_id}")
+
+        rag_context = retrieve_rag_context(test_case, content_agent, content_type)
+        response = grading_func(test_case["input"], rag_context=rag_context)
+        responses[test_id] = response
+
+    logger.info(f"\n✓ {mode_name} complete")
+    return responses
+
+
+def collect_test_cases(
+    mode_data: dict,
+    sample_size: int | None,
+) -> list[dict]:
+    """Collect test cases from mode data with optional sampling."""
+    test_cases = []
+    for subgroup_name, subgroup_cases in mode_data.items():
+        if isinstance(subgroup_cases, list):
+            sampled = subgroup_cases[:sample_size] if sample_size else subgroup_cases
+            test_cases.extend(sampled)
+            logger.info(f"  {subgroup_name}: {len(sampled)} test cases")
+    return test_cases
+
+
+def calculate_pass_rate(results: dict) -> float:
+    """Calculate pass rate from results."""
+    total = results.get("total", 0)
+    if total == 0:
+        return 0.0
+    return results.get("passed", 0) / total
+
+
+def generate_markdown_report(
     vocab_results: dict,
     grammar_results: dict,
     model_name: str,
-    vocab_responses: dict = None,
-    grammar_responses: dict = None,
-):
-    """Save evaluation results to files."""
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Save responses (for inspection)
-    if vocab_responses:
-        with open(output_dir / "vocab_responses.json", "w", encoding="utf-8") as f:
-            json.dump(vocab_responses, f, indent=2, ensure_ascii=False)
-
-    if grammar_responses:
-        with open(output_dir / "grammar_responses.json", "w", encoding="utf-8") as f:
-            json.dump(grammar_responses, f, indent=2, ensure_ascii=False)
-
-    # Save detailed results as JSON
-    results_json = {
-        "metadata": {
-            "model": model_name,
-            "evaluation_date": datetime.now().isoformat(),
-            "agent": "Agent 2 (Grading)",
-        },
-        "grading_vocab": vocab_results,
-        "grading_grammar": grammar_results,
-    }
-
-    with open(output_dir / "results.json", "w") as f:
-        json.dump(results_json, f, indent=2)
-
-    # Generate markdown report
-    report = generate_markdown_report(vocab_results, grammar_results, model_name)
-    with open(output_dir / "evaluation_report.md", "w") as f:
-        f.write(report)
-
-    logger.info(f"✓ Results saved to {output_dir}")
-
-
-def generate_markdown_report(vocab_results: dict, grammar_results: dict, model_name: str) -> str:
+) -> str:
     """Generate markdown evaluation report."""
-    # Calculate pass rates
     vocab_total = vocab_results.get("total", 0)
     vocab_passed = vocab_results.get("passed", 0)
-    vocab_pass_rate = vocab_passed / vocab_total if vocab_total > 0 else 0
+    vocab_pass_rate = calculate_pass_rate(vocab_results)
 
     grammar_total = grammar_results.get("total", 0)
     grammar_passed = grammar_results.get("passed", 0)
-    grammar_pass_rate = grammar_passed / grammar_total if grammar_total > 0 else 0
+    grammar_pass_rate = calculate_pass_rate(grammar_results)
 
     overall_total = vocab_total + grammar_total
     overall_passed = vocab_passed + grammar_passed
@@ -183,10 +214,8 @@ def format_test_results(results: dict) -> str:
     if not metrics:
         return "No test results available"
 
-    # Group test results by test_id
-    test_status = {}  # test_id -> {metric_name: (passed, score, reason)}
+    test_status = {}
 
-    # Process each metric
     for metric_name, metric_results in metrics.items():
         if not metric_results:
             continue
@@ -201,10 +230,8 @@ def format_test_results(results: dict) -> str:
                 test_status[test_id] = {}
             test_status[test_id][metric_name] = (passed, score, reason)
 
-    # Format by test case
     for test_id in sorted(test_status.keys()):
         metrics_data = test_status[test_id]
-        # Test passes if all metrics pass
         all_passed = all(passed for passed, _, _ in metrics_data.values())
         status = "✓" if all_passed else "✗"
 
@@ -217,14 +244,81 @@ def format_test_results(results: dict) -> str:
                 f"- {metric_status} **{metric_name.replace('_', ' ').title()}:** {score:.2f}"
             )
             if reason:
-                # Truncate long reasons
                 display_reason = reason if len(reason) <= 200 else reason[:197] + "..."
                 output.append(f"  - {display_reason}")
 
     return "\n".join(output)
 
 
-def main():
+def run_vocab_grading(
+    pipeline: EvaluationPipeline,
+    grading_agent: GradingAgent,
+    content_agent: ContentAgent,
+    sample_size: int | None,
+) -> tuple[dict[str, str], dict]:
+    """Run vocabulary grading evaluation."""
+    vocab_cases = collect_test_cases(pipeline.test_cases["grading_vocab"], sample_size)
+    logger.info(f"\nTotal vocab test cases: {len(vocab_cases)}\n")
+
+    vocab_responses = evaluate_grading_mode(
+        "Vocabulary Grading",
+        vocab_cases,
+        grading_agent.grade_vocab,
+        content_agent,
+        "vocab",
+    )
+
+    logger.info("Running evaluation metrics...")
+    vocab_results = pipeline.evaluate_grading_vocab(vocab_responses)
+    return vocab_responses, vocab_results
+
+
+def run_grammar_grading(
+    pipeline: EvaluationPipeline,
+    grading_agent: GradingAgent,
+    content_agent: ContentAgent,
+    sample_size: int | None,
+) -> tuple[dict[str, str], dict]:
+    """Run grammar grading evaluation."""
+    grammar_cases = collect_test_cases(pipeline.test_cases["grading_grammar"], sample_size)
+    logger.info(f"\nTotal grammar test cases: {len(grammar_cases)}\n")
+
+    grammar_responses = evaluate_grading_mode(
+        "Grammar Grading",
+        grammar_cases,
+        grading_agent.grade_grammar_quiz,
+        content_agent,
+        "grammar",
+    )
+
+    logger.info("Running evaluation metrics...")
+    grammar_results = pipeline.evaluate_grading_grammar(grammar_responses)
+    return grammar_responses, grammar_results
+
+
+def save_results(
+    output_dir: Path,
+    vocab_results: dict,
+    grammar_results: dict,
+    model_name: str,
+    vocab_responses: dict,
+    grammar_responses: dict,
+) -> None:
+    """Save evaluation results to files."""
+    save_json_responses(output_dir, vocab_responses, "vocab_responses.json")
+    save_json_responses(output_dir, grammar_responses, "grammar_responses.json")
+
+    results_data = {
+        "metadata": create_metadata(model_name, "Agent 2 (Grading)"),
+        "grading_vocab": vocab_results,
+        "grading_grammar": grammar_results,
+    }
+
+    report = generate_markdown_report(vocab_results, grammar_results, model_name)
+    save_evaluation_results(output_dir, results_data, report)
+
+
+def main() -> None:
     """Run fine-tuned model evaluation."""
     parser = argparse.ArgumentParser(description="Evaluate fine-tuned Agent 2 (Grading) model")
     parser.add_argument(
@@ -246,15 +340,13 @@ def main():
     logger.info("=" * 80)
     logger.info("")
 
-    # Load fine-tuned model
     model, tokenizer = load_finetuned_model(Path(args.model_path))
 
-    # Create agents with fine-tuned model
     logger.info("Initializing GradingAgent and ContentAgent (with RAG)...")
     grading_agent = GradingAgent(
         model=model,
         tokenizer=tokenizer,
-        max_new_tokens=50,  # Grading should be short
+        max_new_tokens=50,
     )
     content_agent = ContentAgent(
         model=model,
@@ -265,106 +357,22 @@ def main():
         f"  RAG loaded: {len(content_agent.lessons)} lessons, {len(content_agent.exercise_templates)} templates"
     )
 
-    # Load test cases
     logger.info(f"Loading test cases from {TEST_CASES_PATH}...")
     pipeline = EvaluationPipeline(TEST_CASES_PATH)
     logger.info("✓ Test cases loaded")
 
-    sample_size = args.sample_size
-    sample_text = f"(sampling {sample_size} per subgroup)" if sample_size else "(all test cases)"
+    sample_text = f"(sampling {args.sample_size} per subgroup)" if args.sample_size else "(all test cases)"
     logger.info(f"\nEvaluating {sample_text}\n")
 
-    # ========================================================================
-    # Vocabulary Grading
-    # ========================================================================
-    logger.info("=" * 80)
-    logger.info("VOCABULARY GRADING")
-    logger.info("=" * 80)
+    vocab_responses, vocab_results = run_vocab_grading(
+        pipeline, grading_agent, content_agent, args.sample_size
+    )
 
-    vocab_responses = {}
-    grading_mode = pipeline.test_cases["grading_vocab"]
+    logger.info("\n")
+    grammar_responses, grammar_results = run_grammar_grading(
+        pipeline, grading_agent, content_agent, args.sample_size
+    )
 
-    # Sample from all subgroups
-    vocab_cases = []
-    for subgroup_name, subgroup_cases in grading_mode.items():
-        if isinstance(subgroup_cases, list):
-            sampled = subgroup_cases[:sample_size] if sample_size else subgroup_cases
-            vocab_cases.extend(sampled)
-            logger.info(f"  {subgroup_name}: {len(sampled)} test cases")
-
-    logger.info(f"\nTotal vocab test cases: {len(vocab_cases)}\n")
-
-    for i, test_case in enumerate(vocab_cases, 1):
-        test_id = test_case["test_id"]
-        logger.info(f"[{i}/{len(vocab_cases)}] Grading vocab: {test_id}")
-
-        # Get RAG context for this test (simulating production flow)
-        lesson_num = test_case.get("lesson_number", 1)
-        try:
-            rag_context_raw = content_agent.retrieve_content(
-                {"lesson_number": lesson_num, "content_type": "vocab", "format": "practice"}
-            )
-            rag_context = json.loads(rag_context_raw)
-            logger.info(f"  └─ RAG context retrieved for lesson {lesson_num}")
-        except Exception as e:
-            logger.warning(f"  └─ No RAG context: {e}")
-            rag_context = None
-
-        # Grade with RAG context (production flow)
-        response = grading_agent.grade_vocab(test_case["input"], rag_context=rag_context)
-        vocab_responses[test_id] = response
-
-    logger.info("\n✓ Vocabulary grading complete")
-    logger.info("Running evaluation metrics...")
-    vocab_results = pipeline.evaluate_grading_vocab(vocab_responses)
-
-    # ========================================================================
-    # Grammar Grading
-    # ========================================================================
-    logger.info("\n" + "=" * 80)
-    logger.info("GRAMMAR GRADING")
-    logger.info("=" * 80)
-
-    grammar_responses = {}
-    grading_mode = pipeline.test_cases["grading_grammar"]
-
-    # Sample from all subgroups
-    grammar_cases = []
-    for subgroup_name, subgroup_cases in grading_mode.items():
-        if isinstance(subgroup_cases, list):
-            sampled = subgroup_cases[:sample_size] if sample_size else subgroup_cases
-            grammar_cases.extend(sampled)
-            logger.info(f"  {subgroup_name}: {len(sampled)} test cases")
-
-    logger.info(f"\nTotal grammar test cases: {len(grammar_cases)}\n")
-
-    for i, test_case in enumerate(grammar_cases, 1):
-        test_id = test_case["test_id"]
-        logger.info(f"[{i}/{len(grammar_cases)}] Grading grammar: {test_id}")
-
-        # Get RAG context for this test (simulating production flow)
-        lesson_num = test_case.get("lesson_number", 1)
-        try:
-            rag_context_raw = content_agent.retrieve_content(
-                {"lesson_number": lesson_num, "content_type": "grammar", "format": "practice"}
-            )
-            rag_context = json.loads(rag_context_raw)
-            logger.info(f"  └─ RAG context retrieved for lesson {lesson_num}")
-        except Exception as e:
-            logger.warning(f"  └─ No RAG context: {e}")
-            rag_context = None
-
-        # Grade with RAG context (production flow)
-        response = grading_agent.grade_grammar_quiz(test_case["input"], rag_context=rag_context)
-        grammar_responses[test_id] = response
-
-    logger.info("\n✓ Grammar grading complete")
-    logger.info("Running evaluation metrics...")
-    grammar_results = pipeline.evaluate_grading_grammar(grammar_responses)
-
-    # ========================================================================
-    # Save Results
-    # ========================================================================
     model_name = f"Fine-tuned Qwen2.5-7B (LoRA) from {args.model_path}"
     save_results(
         OUTPUT_DIR,
@@ -375,18 +383,9 @@ def main():
         grammar_responses,
     )
 
-    # ========================================================================
-    # Summary
-    # ========================================================================
     logger.info("\n" + "=" * 80)
     logger.info("SUMMARY")
     logger.info("=" * 80)
-
-    def format_summary(results: dict) -> str:
-        total = results.get("total", 0)
-        passed = results.get("passed", 0)
-        pass_rate = passed / total if total > 0 else 0
-        return f"{passed}/{total} passed ({pass_rate:.1%})"
 
     logger.info(f"\nVocabulary Grading: {format_summary(vocab_results)}")
     logger.info(f"Grammar Grading:    {format_summary(grammar_results)}")

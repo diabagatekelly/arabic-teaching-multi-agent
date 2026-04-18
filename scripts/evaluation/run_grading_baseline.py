@@ -1,16 +1,24 @@
 """Run Agent 2 (Grading) baseline evaluations."""
 
+from __future__ import annotations
+
+import argparse
 import json
 import logging
 import sys
 from datetime import datetime
 from pathlib import Path
 
-# Add project root to path
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.evaluation.baseline import BaselineEvaluator  # noqa: E402
+from scripts.evaluation.eval_utils import (
+    create_metadata,
+    format_mode_section,
+    format_summary,
+    save_evaluation_results,
+)
+from src.evaluation.baseline import BaselineEvaluator
 
 # Configure logging
 logging.basicConfig(
@@ -21,64 +29,43 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Output directory
-OUTPUT_DIR = PROJECT_ROOT / "data" / "evaluation" / "grading_agent"
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "evaluation" / "grading_agent"
+DEFAULT_SAMPLE_SIZE = 10
 
 
-def save_results(output_dir: Path, vocab_results: dict, grammar_results: dict, model_size: str):
+def save_results(
+    output_dir: Path, vocab_results: dict, grammar_results: dict, model_size: str
+) -> None:
     """Save evaluation results to files."""
-    output_dir.mkdir(parents=True, exist_ok=True)
+    metadata = create_metadata(
+        f"Qwen/Qwen2.5-{model_size}-Instruct", "Agent 2 (Grading)"
+    )
+    metadata["model_size"] = model_size
 
-    # Save detailed results as JSON
     results_json = {
-        "metadata": {
-            "model_size": model_size,
-            "evaluation_date": datetime.now().isoformat(),
-            "agent": "Agent 2 (Grading)",
-        },
+        "metadata": metadata,
         "grading_vocab": vocab_results,
         "grading_grammar": grammar_results,
     }
 
-    with open(output_dir / "results.json", "w") as f:
-        json.dump(results_json, f, indent=2)
-
-    # Generate markdown report
     report = generate_markdown_report(vocab_results, grammar_results, model_size)
-    with open(output_dir / "evaluation_report.md", "w") as f:
-        f.write(report)
-
-    logger.info(f"✓ Results saved to {output_dir}")
+    save_evaluation_results(output_dir, results_json, report)
 
 
-def generate_markdown_report(vocab_results: dict, grammar_results: dict, model_size: str) -> str:
+def generate_markdown_report(
+    vocab_results: dict, grammar_results: dict, model_size: str
+) -> str:
     """Generate markdown evaluation report."""
-    # Calculate pass rates
-    vocab_total = vocab_results.get("total", 0)
-    vocab_passed = vocab_results.get("passed", 0)
-    vocab_pass_rate = vocab_passed / vocab_total if vocab_total > 0 else 0
-
-    grammar_total = grammar_results.get("total", 0)
-    grammar_passed = grammar_results.get("passed", 0)
-    grammar_pass_rate = grammar_passed / grammar_total if grammar_total > 0 else 0
-
-    report = f"""# Agent 2 (Grading) - {model_size} Baseline Evaluation
+    return f"""# Agent 2 (Grading) - {model_size} Baseline Evaluation
 
 **Model:** Qwen/Qwen2.5-{model_size}-Instruct
 **Evaluation Date:** {datetime.now().strftime("%Y-%m-%d")}
 
 ## Summary
 
-### Grading Vocabulary
-- **Total Test Cases:** {vocab_total}
-- **Passed:** {vocab_passed}
-- **Failed:** {vocab_results.get("failed", 0)}
-- **Pass Rate:** {vocab_pass_rate:.1%}
+{format_mode_section("Grading Vocabulary", vocab_results)}
 
-### Grading Grammar
-- **Total Test Cases:** {grammar_total}
-- **Passed:** {grammar_passed}
-- **Failed:** {grammar_results.get("failed", 0)}
-- **Pass Rate:** {grammar_pass_rate:.1%}
+{format_mode_section("Grading Grammar", grammar_results)}
 
 ## Detailed Results
 
@@ -88,7 +75,6 @@ def generate_markdown_report(vocab_results: dict, grammar_results: dict, model_s
 ### Grading Grammar
 {format_test_results(grammar_results)}
 """
-    return report
 
 
 def format_test_results(results: dict) -> str:
@@ -135,56 +121,63 @@ def format_test_results(results: dict) -> str:
     return "\n".join(summary_lines + output)
 
 
-def main():
-    """Run grading baseline evaluation with 7B model."""
-    logger.info("Initializing BaselineEvaluator...")
-    evaluator = BaselineEvaluator()
-
-    # Test sample size (use smaller number for quick testing, or None for all)
-    sample_size = 10
-
-    # ========================================================================
-    # 7B Baseline
-    # ========================================================================
-    logger.info("\n" + "=" * 80)
-    logger.info("AGENT 2 (GRADING) - 7B BASELINE")
+def run_baseline_evaluation(
+    evaluator: BaselineEvaluator, sample_size: int | None, model_size: str = "7B"
+) -> tuple[dict, dict]:
+    """Run baseline evaluation for both vocab and grammar."""
+    logger.info("=" * 80)
+    logger.info(f"AGENT 2 (GRADING) - {model_size} BASELINE")
     logger.info("=" * 80 + "\n")
 
-    # Vocab grading - 7B
     logger.info("Running grading_vocab with 7B model...")
-    vocab_responses_7b, vocab_results_7b = evaluator.run_grading_vocab_baseline(
+    _, vocab_results = evaluator.run_grading_vocab_baseline(
         sample_size=sample_size, use_7b=True
     )
     logger.info("✓ Vocab grading (7B) complete")
 
-    # Grammar grading - 7B
     logger.info("Running grading_grammar with 7B model...")
-    grammar_responses_7b, grammar_results_7b = evaluator.run_grading_grammar_baseline(
+    _, grammar_results = evaluator.run_grading_grammar_baseline(
         sample_size=sample_size, use_7b=True
     )
     logger.info("✓ Grammar grading (7B) complete")
 
-    # Save results
-    save_results(OUTPUT_DIR, vocab_results_7b, grammar_results_7b, "7B")
+    return vocab_results, grammar_results
 
-    # ========================================================================
-    # Summary
-    # ========================================================================
+
+def main() -> None:
+    """Run grading baseline evaluation with 7B model."""
+    parser = argparse.ArgumentParser(
+        description="Run baseline grading evaluation"
+    )
+    parser.add_argument(
+        "--sample-size",
+        type=int,
+        default=DEFAULT_SAMPLE_SIZE,
+        help="Number of test cases to evaluate per subgroup (None = all)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=str(DEFAULT_OUTPUT_DIR),
+        help="Path to output directory",
+    )
+    args = parser.parse_args()
+
+    logger.info("Initializing BaselineEvaluator...")
+    evaluator = BaselineEvaluator()
+
+    vocab_results, grammar_results = run_baseline_evaluation(
+        evaluator, args.sample_size
+    )
+
+    save_results(Path(args.output_dir), vocab_results, grammar_results, "7B")
+
     logger.info("\n" + "=" * 80)
     logger.info("SUMMARY")
     logger.info("=" * 80 + "\n")
 
-    def format_summary(results: dict) -> str:
-        total = results.get("total", 0)
-        passed = results.get("passed", 0)
-        pass_rate = passed / total if total > 0 else 0
-        return f"{passed}/{total} passed ({pass_rate:.1%})"
-
-    logger.info("Vocabulary Grading:")
-    logger.info(f"  7B: {format_summary(vocab_results_7b)}")
-
-    logger.info("\nGrammar Grading:")
-    logger.info(f"  7B: {format_summary(grammar_results_7b)}")
+    logger.info(f"Vocabulary Grading: {format_summary(vocab_results)}")
+    logger.info(f"Grammar Grading:    {format_summary(grammar_results)}")
 
     logger.info("\n✓ Evaluation complete!")
 
