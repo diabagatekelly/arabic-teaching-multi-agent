@@ -142,8 +142,9 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
         else:
             welcome_msg = "Welcome to the lesson!"
 
-        # Update chat history (Gradio 5 format: dict with role and content)
-        chat_history.append({"role": "assistant", "content": welcome_msg})
+        # Update chat history (Gradio format: list of [user_msg, bot_msg] tuples)
+        # For initial welcome, add empty user message
+        chat_history.append([None, welcome_msg])
 
         exercises, correct, accuracy, learned = _format_progress_stats(result)
 
@@ -197,8 +198,7 @@ def send_message(user_message: str, chat_history: list) -> tuple:
     embedder_model.model.to("cuda")
 
     if not current_state:
-        chat_history.append({"role": "user", "content": user_message})
-        chat_history.append({"role": "assistant", "content": "⚠️ Please start a lesson first!"})
+        chat_history.append([user_message, "⚠️ Please start a lesson first!"])
         return chat_history, 0, 0, "0%", "", ""
 
     if not user_message.strip():
@@ -221,8 +221,7 @@ def send_message(user_message: str, chat_history: list) -> tuple:
         conversation_history = result.get("conversation_history", [])
         agent_response = _extract_agent_response(conversation_history)
 
-        chat_history.append({"role": "user", "content": user_message})
-        chat_history.append({"role": "assistant", "content": agent_response})
+        chat_history.append([user_message, agent_response])
 
         exercises, correct, accuracy, learned = _format_progress_stats(result)
 
@@ -230,8 +229,7 @@ def send_message(user_message: str, chat_history: list) -> tuple:
 
     except Exception as e:
         logger.error(f"Error processing message: {e}")
-        chat_history.append({"role": "user", "content": user_message})
-        chat_history.append({"role": "assistant", "content": f"❌ Error: {e}"})
+        chat_history.append([user_message, f"❌ Error: {e}"])
         return chat_history, 0, 0, "0%", "", ""
 
 

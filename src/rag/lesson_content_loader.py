@@ -92,10 +92,10 @@ class LessonContentLoader:
             metadata = result.get("metadata", {})
             section_title = metadata.get("section_title", "")
 
-            # Check if this is a grammar section
-            if "grammar" in section_title.lower() or "rule" in text.lower():
+            # Check if this is a grammar section (exclude detection rules for grading)
+            if "grammar point" in section_title.lower():
                 topic_name = self._extract_topic_name(section_title, text)
-                if topic_name:
+                if topic_name and "detection" not in topic_name.lower():
                     grammar_content[topic_name] = {
                         "rule": self._extract_rule(text),
                         "examples": self._extract_examples(text),
