@@ -55,10 +55,22 @@ def initialize_models():
             max_new_tokens=50,
         )
 
+        # Initialize RAG retriever and content loader
+        from src.rag.lesson_content_loader import LessonContentLoader
+        from src.rag.pinecone_client import PineconeClient
+        from src.rag.rag_retriever import RAGRetriever
+        from src.rag.sentence_transformer_client import SentenceTransformerClient
+
+        embedder = SentenceTransformerClient()
+        vector_db = PineconeClient()
+        rag_retriever = RAGRetriever(embedder, vector_db)
+        content_loader = LessonContentLoader(rag_retriever)
+
         content_agent = ContentAgent(
             model=teaching_model,  # Reuse teaching model
             tokenizer=teaching_tokenizer,
             max_new_tokens=512,
+            content_loader=content_loader,
         )
 
         # Create orchestrator
@@ -121,7 +133,8 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
         else:
             welcome_msg = "Welcome to the lesson!"
 
-        chat_history.append((None, welcome_msg))
+        # Update chat history (Gradio 5 format: dict with role and content)
+        chat_history.append({"role": "assistant", "content": welcome_msg})
 
         exercises, correct, accuracy, learned = _format_progress_stats(result)
 
@@ -170,7 +183,8 @@ def send_message(user_message: str, chat_history: list) -> tuple:
     global current_state
 
     if not current_state:
-        chat_history.append((user_message, "⚠️ Please start a lesson first!"))
+        chat_history.append({"role": "user", "content": user_message})
+        chat_history.append({"role": "assistant", "content": "⚠️ Please start a lesson first!"})
         return chat_history, 0, 0, "0%", "", ""
 
     if not user_message.strip():
@@ -193,7 +207,8 @@ def send_message(user_message: str, chat_history: list) -> tuple:
         conversation_history = result.get("conversation_history", [])
         agent_response = _extract_agent_response(conversation_history)
 
-        chat_history.append((user_message, agent_response))
+        chat_history.append({"role": "user", "content": user_message})
+        chat_history.append({"role": "assistant", "content": agent_response})
 
         exercises, correct, accuracy, learned = _format_progress_stats(result)
 
@@ -201,7 +216,8 @@ def send_message(user_message: str, chat_history: list) -> tuple:
 
     except Exception as e:
         logger.error(f"Error processing message: {e}")
-        chat_history.append((user_message, f"❌ Error: {e}"))
+        chat_history.append({"role": "user", "content": user_message})
+        chat_history.append({"role": "assistant", "content": f"❌ Error: {e}"})
         return chat_history, 0, 0, "0%", "", ""
 
 

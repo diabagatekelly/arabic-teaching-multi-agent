@@ -61,7 +61,7 @@ def _create_nodes(
 ) -> dict[str, Callable]:
     """Create node wrappers for each agent."""
     return {
-        "teaching": TeachingNode(teaching_agent),
+        "teaching": TeachingNode(teaching_agent, content_agent=content_agent),
         "grading": GradingNode(grading_agent),
         "content": ContentNode(content_agent),
     }

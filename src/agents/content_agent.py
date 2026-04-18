@@ -46,6 +46,7 @@ class ContentAgent:
         model: PreTrainedModel,
         tokenizer: PreTrainedTokenizer,
         max_new_tokens: int = 512,
+        content_loader=None,
     ) -> None:
         """
         Initialize content agent.
@@ -54,10 +55,12 @@ class ContentAgent:
             model: Fine-tuned content generation model (Qwen2.5-3B-Instruct)
             tokenizer: Model tokenizer
             max_new_tokens: Maximum tokens to generate in response
+            content_loader: Optional LessonContentLoader for RAG-based content retrieval
         """
         self.model = model
         self.tokenizer = tokenizer
         self.max_new_tokens = max_new_tokens
+        self.content_loader = content_loader
 
         # Load RAG database at initialization
         self.exercise_templates = self._load_exercise_templates()
@@ -67,6 +70,8 @@ class ContentAgent:
             f"ContentAgent initialized with {len(self.exercise_templates)} templates "
             f"and {len(self.lessons)} lessons"
         )
+        if content_loader:
+            logger.info("ContentAgent has RAG content loader enabled")
 
     def _load_exercise_templates(self) -> dict[str, dict]:
         """
@@ -188,12 +193,20 @@ class ContentAgent:
         """
         Generate response from content model.
 
+        Supports both API adapters (Together.ai, Ollama) and local transformers models.
+
         Args:
             prompt: Input prompt
 
         Returns:
             Generated content response
         """
+        # Check if model is API adapter (Together.ai, Ollama)
+        if hasattr(self.model, "generate_response"):
+            # API adapter - delegate directly
+            return self.model.generate_response(prompt, max_new_tokens=self.max_new_tokens)
+
+        # Local transformers model
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
 
         outputs = self.model.generate(
@@ -224,7 +237,7 @@ class ContentAgent:
                 - lesson_number: Optional lesson number for context
 
         Returns:
-            JSON string with exercise data
+            JSON string with exercise data including required metadata fields
         """
         exercise_type = input_data.get("exercise_type", "translation")
         difficulty = input_data.get("difficulty", "beginner")
@@ -261,10 +274,11 @@ CRITICAL REQUIREMENTS:
 1. Output ONLY valid JSON matching the example format EXACTLY
 2. Use the learned items provided above in your question
 3. Include ALL fields shown in the examples: "question", "answer", "correct", "type", "difficulty"
-4. The "correct" field must contain the expected answer
-5. Use proper Arabic with harakaat (vowel marks) where shown in examples
-6. Make the question clear and self-contained
-7. NO explanations, NO markdown, NO commentary - ONLY the JSON object
+4. REQUIRED: Add metadata fields: "word_arabic", "word_transliteration", "english" (the word being tested)
+5. The "correct" field must contain the expected answer
+6. Use proper Arabic with harakaat (vowel marks) where shown in examples
+7. Make the question clear and self-contained
+8. NO explanations, NO markdown, NO commentary - ONLY the JSON object
 
 Generate ONE exercise now:
 """
@@ -274,15 +288,63 @@ Generate ONE exercise now:
         # Extract JSON from response (handles markdown code blocks)
         json_match = re.search(r"```json\n(.*?)\n```", response, re.DOTALL)
         if json_match:
-            return json_match.group(1).strip()
+            json_str = json_match.group(1).strip()
+        else:
+            # Try to find JSON object
+            json_match = re.search(r"\{.*\}", response, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(0).strip()
+            else:
+                # Return as-is if no JSON found
+                json_str = response.strip()
 
-        # Try to find JSON object
-        json_match = re.search(r"\{.*\}", response, re.DOTALL)
-        if json_match:
-            return json_match.group(0).strip()
+        # Parse and ensure required metadata fields exist
+        try:
+            exercise_data = json.loads(json_str)
 
-        # Return as-is if no JSON found
-        return response.strip()
+            # If model didn't include required fields, extract from learned_items
+            if "word_arabic" not in exercise_data or "english" not in exercise_data:
+                # Try to extract from question/answer or learned_items
+                if learned_items:
+                    # Use first learned item as fallback
+                    first_item = learned_items[0]
+                    if "(" in first_item and ")" in first_item:
+                        # Format: "مَرْحَبا (marhaban) - Hello"
+                        parts = first_item.split(" - ")
+                        if len(parts) == 2:
+                            arabic_part = parts[0].strip()
+                            english = parts[1].strip()
+
+                            # Extract transliteration from parentheses
+                            arabic_clean = arabic_part.split("(")[0].strip()
+                            translit_match = re.search(r"\((.*?)\)", arabic_part)
+                            transliteration = (
+                                translit_match.group(1) if translit_match else arabic_clean
+                            )
+
+                            exercise_data["word_arabic"] = arabic_clean
+                            exercise_data["word_transliteration"] = transliteration
+                            exercise_data["english"] = english
+                        else:
+                            # Fallback: use learned_item as-is
+                            exercise_data["word_arabic"] = first_item
+                            exercise_data["word_transliteration"] = first_item
+                            exercise_data["english"] = first_item
+                    else:
+                        # No structured format, use as-is
+                        exercise_data["word_arabic"] = first_item
+                        exercise_data["word_transliteration"] = first_item
+                        exercise_data["english"] = first_item
+                else:
+                    # No learned items, use placeholders
+                    exercise_data["word_arabic"] = "مَرْحَبا"
+                    exercise_data["word_transliteration"] = "marhaban"
+                    exercise_data["english"] = "hello"
+
+            return json.dumps(exercise_data, ensure_ascii=False)
+        except json.JSONDecodeError:
+            # If parsing fails, return original
+            return json_str
 
     def generate_quiz(self, input_data: dict[str, Any]) -> str:
         """

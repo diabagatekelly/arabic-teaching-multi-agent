@@ -31,6 +31,37 @@ These concepts are essential building blocks for all Arabic grammar.
 
 ---
 
+## Vocabulary
+
+This lesson includes 10 core vocabulary words and 3 essential phrases:
+
+**Nouns (6 masculine, 4 feminine):**
+
+| Arabic | Transliteration | English |
+|--------|----------------|---------|
+| كِتَابٌ | kitaabun | book |
+| بَيْتٌ | baytun | house |
+| قَلَمٌ | qalamun | pen |
+| بَابٌ | baabun | door |
+| كُرْسِيٌّ | kursiyyun | chair |
+| مَكْتَبٌ | maktabun | office |
+| طَاوِلَةٌ | taawilatun | table |
+| مَدْرَسَةٌ | madrasatun | school |
+| نَافِذَةٌ | naafidhatun | window |
+| غُرْفَةٌ | ghurfatun | room |
+
+**Essential Phrases:**
+
+| Arabic | Transliteration | English |
+|--------|----------------|---------|
+| مَرْحَبًا | marhaban | Hello |
+| كَيْفَ حَالُكَ؟ | kayfa haaluka? | How are you? (m) |
+| اسْمِي... | ismii... | My name is... |
+
+**Note**: Nouns ending in ة (taa marbuuta) are feminine. All others in this list are masculine.
+
+---
+
 ## Grammar Point 1: Masculine and Feminine Nouns
 
 ### Rule
@@ -419,38 +450,6 @@ IF missing harakaat → ERROR
 ```
 
 **Correction**: "All Arabic words in this course must include harakaat (vowel marks). Use proper diacritics."
-
----
-
-## Vocabulary List (Full)
-
-### Masculine Nouns
-
-| Indefinite | Definite | Transliteration | English |
-|------------|----------|----------------|---------|
-| كِتَابٌ | الْكِتَابُ | kitaabun / al-kitaabu | book / the book |
-| بَيْتٌ | الْبَيْتُ | baytun / al-baytu | house / the house |
-| قَلَمٌ | الْقَلَمُ | qalamun / al-qalamu | pen / the pen |
-| بَابٌ | الْبَابُ | baabun / al-baabu | door / the door |
-| كُرْسِيٌّ | الْكُرْسِيُّ | kursiyyun / al-kursiyyu | chair / the chair |
-| مَكْتَبٌ | الْمَكْتَبُ | maktabun / al-maktabu | office / the office |
-
-### Feminine Nouns
-
-| Indefinite | Definite | Transliteration | English |
-|------------|----------|----------------|---------|
-| طَاوِلَةٌ | الطَّاوِلَةُ | taawilatun / at-taawilatu | table / the table |
-| مَدْرَسَةٌ | الْمَدْرَسَةُ | madrasatun / al-madrasatu | school / the school |
-| نَافِذَةٌ | النَّافِذَةُ | naafidhatun / an-naafidhatu | window / the window |
-| غُرْفَةٌ | الْغُرْفَةُ | ghurfatun / al-ghurfatu | room / the room |
-
-### Essential Phrases
-
-| Arabic | Transliteration | English |
-|--------|----------------|---------|
-| مَرْحَبًا | marhaban | Hello |
-| كَيْفَ حَالُكَ؟ | kayfa haaluka? | How are you? (m) |
-| اسْمِي... | ismii... | My name is... |
 
 ---
 

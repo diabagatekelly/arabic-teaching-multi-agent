@@ -30,9 +30,10 @@ class TeachingNode:
     - Progress guidance
     """
 
-    def __init__(self, agent: TeachingAgent):
-        """Initialize teaching node with agent."""
+    def __init__(self, agent: TeachingAgent, content_agent: ContentAgent | None = None):
+        """Initialize teaching node with agent and optional content agent for RAG."""
         self.agent = agent
+        self.content_agent = content_agent
 
     def __call__(self, state: SystemState) -> SystemState:
         """
@@ -44,11 +45,21 @@ class TeachingNode:
         Returns:
             Updated system state
         """
+        logger.info(f"TeachingNode called - conversation length: {len(state.conversation_history)}")
         try:
             # Get the most recent message
             if not state.conversation_history:
-                # Start new session
+                # Start new session - initialize lesson content first
+                logger.info("Handling lesson start...")
+                # Initialize lesson content from RAG before starting
+                if not state.lesson_initialized and self.content_agent:
+                    state = self._initialize_lesson_content(state)
                 response = self._handle_lesson_start(state)
+                logger.info(f"Lesson start response generated: {len(response)} chars")
+            elif state.last_agent == "agent3" and state.pending_exercise:
+                # Coming from content agent - present the exercise to user
+                logger.info("Presenting exercise from content agent...")
+                response = self._present_exercise(state)
             elif state.last_agent == "agent2":
                 # Coming from grading - provide feedback
                 response = self._handle_feedback(state)
@@ -60,12 +71,20 @@ class TeachingNode:
             state.add_message("agent1", response)
             state.last_agent = "agent1"
 
+            logger.info(f"TeachingNode response being returned: {response[:200]}...")
+
             # Determine next step
-            # TODO: Replace keyword detection with structured output
-            # Current approach is fragile - fails on "No exercise needed" or "Question later"
-            # Consider having agent return explicit flag: response.get("generate_exercise", False)
-            if "exercise" in response.lower() or "question" in response.lower():
-                # Agent wants to generate exercise
+            # If we just presented an exercise, wait for user to answer
+            if state.pending_exercise and state.awaiting_user_answer:
+                logger.info("Exercise presented, waiting for user answer")
+                state.next_agent = "user"
+            # Look for explicit exercise generation markers
+            elif "[GENERATE_EXERCISE]" in response:
+                # Agent wants to generate exercise - strip marker from response
+                response = response.replace("[GENERATE_EXERCISE]", "").strip()
+                state.next_agent = "agent3"
+            elif "exercise" in response.lower() or "quiz" in response.lower():
+                # Fallback: keyword detection (less reliable but catches informal requests)
                 state.next_agent = "agent3"
             else:
                 # Wait for user response
@@ -88,17 +107,130 @@ class TeachingNode:
             state.next_agent = "user"  # Fallback to user
             return state
 
+    def _initialize_lesson_content(self, state: SystemState) -> SystemState:
+        """Initialize lesson content from RAG."""
+        logger.info(f"Initializing lesson {state.current_lesson} content from RAG")
+
+        try:
+            # Check if content agent has content_loader (RAG-based)
+            if hasattr(self.content_agent, "content_loader") and self.content_agent.content_loader:
+                logger.info("Loading vocabulary and grammar from RAG...")
+
+                # Load vocabulary from RAG
+                vocab_words = self.content_agent.content_loader.load_vocabulary(
+                    state.current_lesson
+                )
+                state.cached_vocab_words = vocab_words
+
+                # Load grammar from RAG
+                grammar_content = self.content_agent.content_loader.load_grammar(
+                    state.current_lesson
+                )
+                state.cached_grammar_content = grammar_content
+
+                state.lesson_initialized = True
+                logger.info(
+                    f"Lesson {state.current_lesson} initialized: "
+                    f"{len(vocab_words)} words, {len(grammar_content)} grammar topics"
+                )
+            else:
+                logger.warning("Content agent has no content_loader - skipping RAG initialization")
+
+        except Exception as e:
+            logger.error(f"Failed to initialize lesson content: {e}", exc_info=True)
+            # Don't fail - teaching can continue with empty content
+            state.lesson_initialized = False
+
+        return state
+
     def _handle_lesson_start(self, state: SystemState) -> str:
         """Start a new lesson."""
+        # Use cached content from initialize_lesson_content
+        vocab_words = state.cached_vocab_words if state.cached_vocab_words else []
+        grammar_topics = (
+            list(state.cached_grammar_content.keys()) if state.cached_grammar_content else []
+        )
+
+        # Format vocabulary preview (first 10 words) with double newlines for Gradio markdown
+        vocab_preview_list = []
+        for i, word in enumerate(vocab_words[:10], 1):
+            vocab_preview_list.append(
+                f"{i}. {word['arabic']} ({word['transliteration']}) - {word['english']}"
+            )
+        topics_preview = "\n\n".join(vocab_preview_list)
+
+        # Format grammar topics
+        grammar_topics_formatted = ", ".join(
+            [topic.replace("_", " ").title() for topic in grammar_topics]
+        )
+
         input_data = {
             "lesson_number": state.current_lesson,
-            "mode": "vocabulary",  # Start with vocabulary
+            "mode": "lesson_start",
+            "total_words": len(vocab_words),
+            "topics_preview": topics_preview,
+            "topics_count": len(grammar_topics),
+            "grammar_topics": grammar_topics_formatted,
         }
-        return self.agent.start_lesson(input_data)
+        # Call the actual fine-tuned model
+        logger.info(
+            f"Calling teaching agent start_lesson with {len(vocab_words)} vocab words, {len(grammar_topics)} grammar topics"
+        )
+        response = self.agent.start_lesson(input_data)
+        logger.info(f"Teaching agent returned: {len(response)} chars")
+        return response
 
     def _handle_user_message(self, state: SystemState) -> str:
         """Handle regular user message."""
         last_msg = state.conversation_history[-1]
+        user_input = last_msg.content.lower().strip()
+
+        # Detect mode changes from user input and initiate teaching
+        if user_input in ["1", "vocab", "vocabulary"]:
+            state.current_mode = "teaching_vocab"
+            logger.info("Mode changed to teaching_vocab - initiating vocabulary teaching")
+
+            # Prepare vocabulary batch from cached content
+            vocab_words = state.cached_vocab_words[:3] if state.cached_vocab_words else []
+            words_formatted = "\n".join(
+                [
+                    f"{i + 1}. {w['arabic']} ({w['transliteration']}) - {w['english']}"
+                    for i, w in enumerate(vocab_words)
+                ]
+            )
+
+            input_data = {
+                "lesson_number": state.current_lesson,
+                "batch_number": 1,
+                "total_batches": (len(state.cached_vocab_words) + 2) // 3
+                if state.cached_vocab_words
+                else 1,
+                "words": words_formatted,
+                "mode": "teaching_vocab",
+            }
+            return self.agent.handle_teaching_vocab(input_data)
+
+        elif user_input in ["2", "grammar"]:
+            state.current_mode = "teaching_grammar"
+            logger.info("Mode changed to teaching_grammar - initiating grammar teaching")
+
+            # Prepare grammar overview from cached content
+            grammar_topics = (
+                list(state.cached_grammar_content.keys()) if state.cached_grammar_content else []
+            )
+            topics_list = "\n".join(
+                [f"- {topic.replace('_', ' ').title()}" for topic in grammar_topics]
+            )
+
+            input_data = {
+                "lesson_number": state.current_lesson,
+                "topics_count": len(grammar_topics),
+                "topics_list": topics_list,
+                "mode": "teaching_grammar",
+            }
+            return self.agent.handle_teaching_grammar(input_data)
+
+        # General user message (not mode change)
         input_data = {
             "user_input": last_msg.content,
             "learned_items": state.learned_items,
@@ -106,16 +238,47 @@ class TeachingNode:
         }
         return self.agent.handle_user_message(input_data)
 
+    def _present_exercise(self, state: SystemState) -> str:
+        """Present an exercise that was just generated by ContentAgent.
+
+        This is called after agent3 generates an exercise and routes to agent1.
+        The teaching agent should present the exercise question to the user in a
+        friendly way, then the system waits for the user's answer.
+        """
+        if not state.pending_exercise:
+            logger.warning("_present_exercise called but no pending exercise")
+            return "Let's continue learning!"
+
+        exercise = state.pending_exercise
+
+        # Format the exercise question nicely
+        if state.current_mode == "teaching_vocab":
+            presentation = f"**Quiz Time!** 📝\n\n{exercise.question}\n\nType your answer below:"
+        elif state.current_mode == "teaching_grammar":
+            presentation = f"**Grammar Quiz!** 📖\n\n{exercise.question}\n\nWhat's your answer?"
+        else:
+            presentation = f"{exercise.question}"
+
+        logger.info(f"Presenting exercise to user: {presentation[:100]}...")
+        return presentation
+
     def _handle_feedback(self, state: SystemState) -> str:
         """Provide feedback after grading."""
         grading_msg = state.conversation_history[-1]
         is_correct = grading_msg.metadata.get("is_correct", False)
 
+        # Map internal mode names to agent-expected modes
+        mode_map = {
+            "teaching_vocab": "vocabulary",
+            "teaching_grammar": "grammar",
+        }
+        agent_mode = mode_map.get(state.current_mode, state.current_mode)
+
         input_data = {
             "is_correct": is_correct,
             "user_answer": grading_msg.metadata.get("user_answer", ""),
             "correct_answer": grading_msg.metadata.get("correct_answer", ""),
-            "mode": state.current_mode,
+            "mode": agent_mode,
         }
         return self.agent.provide_feedback(input_data)
 
@@ -197,17 +360,31 @@ class GradingNode:
             # Parse result
             is_correct = self._is_answer_correct(grading_result)
 
-            # Update state
+            # Update state - include all exercise metadata for feedback template
+            metadata = {
+                "user_answer": user_answer,
+                "correct_answer": state.pending_exercise.answer,
+                "is_correct": is_correct,
+            }
+            # Add exercise metadata (word_arabic, word_english, etc.)
+            if state.pending_exercise.metadata:
+                metadata.update(state.pending_exercise.metadata)
+
             state.add_message(
                 "agent2",
                 grading_result,
-                metadata={
-                    "user_answer": user_answer,
-                    "correct_answer": state.pending_exercise.answer,
-                    "is_correct": is_correct,
-                },
+                metadata=metadata,
             )
             state.record_exercise_result(is_correct)
+
+            # Add to learned items if correct
+            if is_correct:
+                # Extract word/concept from exercise metadata
+                item_to_add = state.pending_exercise.metadata.get(
+                    "word_arabic", state.pending_exercise.question
+                )
+                state.add_learned_item(item_to_add)
+
             state.clear_pending_exercise()
 
             state.last_agent = "agent2"
@@ -324,7 +501,11 @@ class ContentNode:
             state.set_pending_exercise(exercise)
             state.add_message("agent3", response)
             state.last_agent = "agent3"
-            state.next_agent = "user"  # Wait for user to answer exercise
+
+            # FIX: Route to teaching agent to PRESENT the exercise to user
+            # Previously set to "user" which caused orchestrator to stop,
+            # leading to auto-grading bug where next user message would be graded
+            state.next_agent = "agent1"  # Teaching agent presents exercise
 
             return state
 
@@ -345,7 +526,7 @@ class ContentNode:
 
     def initialize_lesson(self, state: SystemState) -> SystemState:
         """
-        Initialize lesson by caching ALL content upfront.
+        Initialize lesson by caching ALL content upfront using RAG retrieval.
 
         Per ARCHITECTURE.md, Agent 3 should:
         - Retrieve all vocabulary words for the lesson
@@ -358,48 +539,55 @@ class ContentNode:
         Returns:
             Updated SystemState with cached content
         """
-        logger.info(f"Initializing lesson {state.current_lesson} - caching all content")
+        logger.info(f"Initializing lesson {state.current_lesson} - caching all content from RAG")
 
         try:
-            # TODO: Integrate with actual RAG retriever when available
-            # PLACEHOLDER DATA - Remove before production
-            # In production, would call:
-            # vocab_content = self.agent.rag_retriever.get_lesson_vocabulary(state.current_lesson)
-            # grammar_content = self.agent.rag_retriever.get_lesson_grammar(state.current_lesson)
+            # Check if agent has content_loader (RAG-based) or use fallback
+            if hasattr(self.agent, "content_loader") and self.agent.content_loader is not None:
+                logger.info("Using RAG retrieval for lesson content")
 
-            # PLACEHOLDER: vocabulary (would come from RAG)
-            state.cached_vocab_words = [
-                {
-                    "arabic": "كِتَاب",
-                    "transliteration": "kitaab",
-                    "english": "book",
-                    "word_id": "w1",
-                },
-                {
-                    "arabic": "مَدْرَسَة",
-                    "transliteration": "madrasa",
-                    "english": "school",
-                    "word_id": "w2",
-                },
-                {
-                    "arabic": "قَلَم",
-                    "transliteration": "qalam",
-                    "english": "pen",
-                    "word_id": "w3",
-                },
-            ]
+                # Load vocabulary from RAG
+                vocab_words = self.agent.content_loader.load_vocabulary(state.current_lesson)
+                state.cached_vocab_words = vocab_words
 
-            # PLACEHOLDER: grammar (would come from RAG)
-            state.cached_grammar_content = {
-                "gender": {
-                    "rule": "Nouns are either masculine or feminine",
-                    "examples": ["كِتَاب (masculine)", "مَدْرَسَة (feminine)"],
-                },
-                "definite_article": {
-                    "rule": "Use ال for 'the'",
-                    "examples": ["الكِتَاب (the book)", "المَدْرَسَة (the school)"],
-                },
-            }
+                # Load grammar from RAG
+                grammar_content = self.agent.content_loader.load_grammar(state.current_lesson)
+                state.cached_grammar_content = grammar_content
+
+            else:
+                logger.warning("No content_loader found, using fallback placeholder data")
+                # FALLBACK: Use placeholder data if RAG not initialized
+                state.cached_vocab_words = [
+                    {
+                        "arabic": "كِتَاب",
+                        "transliteration": "kitaab",
+                        "english": "book",
+                        "word_id": "w1",
+                    },
+                    {
+                        "arabic": "مَدْرَسَة",
+                        "transliteration": "madrasa",
+                        "english": "school",
+                        "word_id": "w2",
+                    },
+                    {
+                        "arabic": "قَلَم",
+                        "transliteration": "qalam",
+                        "english": "pen",
+                        "word_id": "w3",
+                    },
+                ]
+
+                state.cached_grammar_content = {
+                    "gender": {
+                        "rule": "Nouns are either masculine or feminine",
+                        "examples": ["كِتَاب (masculine)", "مَدْرَسَة (feminine)"],
+                    },
+                    "definite_article": {
+                        "rule": "Use ال for 'the'",
+                        "examples": ["الكِتَاب (the book)", "المَدْرَسَة (the school)"],
+                    },
+                }
 
             state.lesson_initialized = True
             logger.info(

@@ -1,8 +1,10 @@
 """Agent 1: Teaching Agent for Arabic language instruction."""
 
 import logging
+import re
 from typing import Any
 
+import torch
 from transformers import PreTrainedModel, PreTrainedTokenizer
 
 from src.prompts.formatters import flatten_nested_input
@@ -17,6 +19,42 @@ from src.prompts.templates import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def remove_chinese_text(text: str) -> str:
+    """
+    Remove Chinese characters from text output.
+
+    Qwen models sometimes generate Chinese text due to multilingual training.
+    This post-processing filter removes Chinese characters while preserving
+    Arabic, English, and common symbols.
+
+    Args:
+        text: Generated text that may contain Chinese characters
+
+    Returns:
+        Text with Chinese characters removed
+    """
+    # Chinese Unicode ranges:
+    # CJK Unified Ideographs: 4E00-9FFF
+    # CJK Extension A: 3400-4DBF
+    # CJK Compatibility: F900-FAFF
+    chinese_pattern = r"[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+"
+
+    # Remove Chinese characters
+    cleaned = re.sub(chinese_pattern, "", text)
+
+    # Remove common weird formatting patterns that appear with Chinese
+    # Matches: _Office_, _Office Building_, _Building Center_, etc.
+    cleaned = re.sub(r"_[A-Z][a-zA-Z\s]+_\s*", "", cleaned)
+
+    # Remove standalone underscored patterns
+    cleaned = re.sub(r"_[A-Z][a-z]+_", "", cleaned)
+
+    # Clean up extra spaces
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+
+    return cleaned
 
 
 class TeachingAgent:
@@ -70,27 +108,86 @@ class TeachingAgent:
         """
         Generate response from teaching model.
 
+        Supports both Ollama adapter and transformers models.
+
+        IMPORTANT: For fine-tuned models, uses chat template format to match training.
+
         Args:
-            prompt: Input prompt
+            prompt: Input prompt (raw text or system message content)
 
         Returns:
             Generated teaching response
         """
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        # Check if model is Ollama adapter or Together.ai adapter
+        if hasattr(self.model, "generate_response"):
+            # Ollama or Together.ai adapter
+            return self.model.generate_response(prompt, max_new_tokens=self.max_new_tokens)
+        else:
+            # Local transformers model - use chat template format (matches training!)
+            # Convert raw prompt to chat format that model was trained on
+            messages = [{"role": "system", "content": prompt}]
+            logger.info(f"Messages for generation: {messages} ")
 
-        outputs = self.model.generate(
-            **inputs,
-            max_new_tokens=self.max_new_tokens,
-            do_sample=False,  # Deterministic for evaluation
-            pad_token_id=self.tokenizer.eos_token_id,
-        )
+            # Apply chat template (Qwen format: <|im_start|>...<|im_end|>)
+            formatted_prompt = self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,  # Adds <|im_start|>assistant
+            )
 
-        response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+            # Use current device and handle BFloat16/Float dtype mismatch
+            inputs = self.tokenizer(formatted_prompt, return_tensors="pt").to(self.model.device)
 
-        if response.startswith(prompt):
-            response = response[len(prompt) :].strip()
+            logger.info(
+                f"Inputs shape: {inputs['input_ids'].shape}, device: {inputs['input_ids'].device}"
+            )
+            logger.info(f"About to call model.generate() with max_new_tokens={self.max_new_tokens}")
 
-        return response
+            # Use autocast to handle BFloat16/Float mismatch automatically
+            device_type = "cuda" if self.model.device.type == "cuda" else "cpu"
+            with torch.amp.autocast(
+                device_type=device_type, dtype=torch.bfloat16, enabled=(device_type == "cuda")
+            ):
+                outputs = self.model.generate(
+                    input_ids=inputs["input_ids"],
+                    attention_mask=inputs.get("attention_mask"),
+                    max_new_tokens=self.max_new_tokens,
+                    pad_token_id=self.tokenizer.pad_token_id
+                    if self.tokenizer.pad_token_id
+                    else self.tokenizer.eos_token_id,
+                    eos_token_id=self.tokenizer.eos_token_id,
+                    do_sample=True,  # Enable sampling for faster generation
+                    temperature=0.7,  # Lower = more focused
+                    top_p=0.9,  # Nucleus sampling
+                    top_k=50,  # Limit vocabulary per step
+                )
+
+            logger.info(f"Generation complete! Output shape: {outputs.shape}")
+
+            response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+            # Extract only the assistant's response (after the prompt)
+            # Handle both special tokens and literal text
+            if "<|im_start|>assistant" in response:
+                # Has special tokens
+                response = response.split("<|im_start|>assistant")[-1]
+                response = response.replace("<|im_end|>", "").strip()
+            elif "\nassistant\n" in response:
+                # Special tokens decoded as literal text
+                response = response.split("\nassistant\n")[-1].strip()
+            elif "assistant\n" in response:
+                # Variant without leading newline
+                response = response.split("assistant\n")[-1].strip()
+            elif response.startswith(formatted_prompt):
+                # Fallback: remove the full prompt
+                response = response[len(formatted_prompt) :].strip()
+
+            # Remove Chinese text contamination (post-processing filter)
+            response = remove_chinese_text(response)
+
+            logger.info(f"Generated response (post-processed): {response}")
+
+            return response
 
     def handle_lesson_start(self, input_data: dict[str, Any]) -> str:
         """
@@ -102,9 +199,13 @@ class TeachingAgent:
         Returns:
             Welcoming teaching response with navigation options
         """
+        logger.info("handle_lesson_start called")
         flattened = flatten_nested_input(input_data)
         prompt = LESSON_WELCOME.format(**flattened)
-        return self.generate_response(prompt)
+        logger.info(f"Calling generate_response with prompt length: {len(prompt)}")
+        response = self.generate_response(prompt)
+        logger.info(f"generate_response returned: {len(response)} chars")
+        return response
 
     def handle_teaching_vocab(self, input_data: dict[str, Any]) -> str:
         """
@@ -183,9 +284,7 @@ class TeachingAgent:
         student_context: dict[str, Any] | None = None,
     ) -> str:
         """
-        Handle arbitrary user input (placeholder - not yet implemented).
-
-        Use specific handle_* methods instead for evaluation.
+        Handle arbitrary user input using the fine-tuned model.
 
         Args:
             user_input: User's message
@@ -193,10 +292,24 @@ class TeachingAgent:
             student_context: Student profile and progress
 
         Returns:
-            Placeholder message
+            Model-generated response
         """
-        logger.warning("handle_input() not implemented - use specific handle_* methods")
-        return "I'm still learning how to have conversations! Please use the specific teaching modes for now."
+        # Build a conversational prompt for the fine-tuned model
+        context = student_context or {}
+        mode = context.get("mode", "vocabulary")
+        learned_items = context.get("learned_items", [])
+
+        # Create a simple prompt for general conversation
+        prompt = f"""You are an Arabic language teacher. The student said: "{user_input}"
+
+Current mode: {mode}
+Learned items: {len(learned_items)} items
+
+Respond naturally and helpfully. Guide them through the lesson, answer their questions, and keep them motivated.
+
+Your response:"""
+
+        return self.generate_response(prompt)
 
     # Orchestrator adapter methods
 

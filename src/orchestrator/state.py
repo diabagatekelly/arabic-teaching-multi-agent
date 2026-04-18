@@ -238,3 +238,27 @@ class SystemState:
                 state.session_start_time = start_time
 
         return state
+
+
+def create_initial_state(lesson_number: int, user_id: str = "user_1") -> SystemState:
+    """
+    Create initial state for lesson start - single source of truth.
+
+    This is the canonical way to create state for a new lesson.
+    Used by app.py and all tests to ensure consistency.
+
+    Args:
+        lesson_number: Lesson number to start
+        user_id: User identifier (default: "user_1")
+
+    Returns:
+        SystemState configured for lesson start
+    """
+    return SystemState(
+        user_id=user_id,
+        session_id=f"session_{lesson_number}_{datetime.now().timestamp()}",
+        current_lesson=lesson_number,
+        conversation_history=[],
+        next_agent="agent1",
+        last_agent="",
+    )

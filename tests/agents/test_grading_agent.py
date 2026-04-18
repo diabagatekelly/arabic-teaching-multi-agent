@@ -23,6 +23,9 @@ def mock_tokenizer():
     tokenizer = MagicMock()
     tokenizer.eos_token_id = 2
 
+    # Mock apply_chat_template to return the prompt as-is
+    tokenizer.apply_chat_template.return_value = "formatted prompt"
+
     # Create a mock that behaves like tokenizer output with .to() method
     mock_tokens = MagicMock()
     mock_tokens.to.return_value = mock_tokens  # .to() returns itself
@@ -67,15 +70,19 @@ class TestGenerateResponse:
 
     def test_generate_response_basic(self, grading_agent, mock_tokenizer, mock_model):
         """Test response generation with deterministic sampling, prompt stripping, and max tokens."""
-        # Mock tokenizer decode to return prompt + response
+        # Mock tokenizer decode to return formatted_prompt + response
         prompt = "Test prompt"
+        formatted_prompt = "formatted prompt"
         expected_response = '{"correct": true}'
-        mock_tokenizer.decode.return_value = f"{prompt}{expected_response}"
+        mock_tokenizer.decode.return_value = f"{formatted_prompt}{expected_response}"
 
         response = grading_agent.generate_response(prompt)
 
-        # Verify tokenizer was called with prompt
-        mock_tokenizer.assert_called_with(prompt, return_tensors="pt")
+        # Verify apply_chat_template was called
+        mock_tokenizer.apply_chat_template.assert_called_once()
+
+        # Verify tokenizer was called with formatted prompt (after chat template applied)
+        mock_tokenizer.assert_called_with(formatted_prompt, return_tensors="pt")
 
         # Verify model.generate was called with correct parameters
         mock_model.generate.assert_called_once()

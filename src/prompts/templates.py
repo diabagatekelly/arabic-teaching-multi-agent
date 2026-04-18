@@ -31,22 +31,20 @@ MODE_EXERCISE_GENERATION = "exercise_generation"
 # -----------------------------------------------------------------------------
 
 LESSON_WELCOME = PromptTemplate(
-    template="""Mode: lesson_start
+    template="""Mode: Lesson Start
+Lesson: {lesson_number}
+Phase: Welcome and Navigation
+Objective: Warmly welcome student, present lesson structure, guide them to choose starting point.
 
-Lesson {lesson_number} Overview
+Available Content:
+- Vocabulary: {total_words} words
+  Preview: {topics_preview}
+- Grammar: {topics_count} topics
+  Topics: {grammar_topics}
 
-Vocabulary: {total_words} words
-Preview: {topics_preview}
+Student Profile: Starting lesson {lesson_number}
 
-Grammar: {topics_count} topics
-Topics: {grammar_topics}
-
-Greet the student warmly and present the lesson structure. Offer navigation:
-1. Start with vocabulary
-2. Start with grammar
-3. See lesson progress
-
-Or tell me what you'd like to do.""",
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=[
         "lesson_number",
         "total_words",
@@ -80,19 +78,21 @@ Format with numbered options and mention they can request something else.""",
 )
 
 VOCAB_BATCH_INTRO = PromptTemplate(
-    template="""Mode: teaching_vocab
+    template="""Mode: Teaching Vocabulary
+Lesson: {lesson_number}
+Phase: Batch Introduction
+Objective: Present batch, offer navigation choices.
 
-Lesson {lesson_number}, Batch {batch_number} of {total_batches}
-
-Words:
+Available Content:
+- Batch: {batch_number} of {total_batches}
+- Words in this batch:
 {words}
 
-Present these words with Arabic, transliteration, and English translation. Remind them flashcards are available for learning. Offer options:
-1. Take quiz on these words
-2. Go to next batch
-3. See all words
+Student Context: Learning vocabulary in batches
 
-Or tell me what you'd like to do.""",
+After presenting the words, if you want to generate a quiz, include [GENERATE_EXERCISE] in your response.
+
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["lesson_number", "batch_number", "total_batches", "words"],
 )
 
@@ -162,22 +162,24 @@ Or tell me what you'd like to do.""",
 )
 
 GRAMMAR_EXPLANATION = PromptTemplate(
-    template="""Mode: teaching_grammar
+    template="""Mode: Teaching Grammar
+Lesson: {lesson_number}
+Phase: Topic Explanation
+Objective: Explain grammar rule with examples, then offer quiz.
 
-Lesson {lesson_number}
-
-Topic: {topic_name}
-
-Rule: {grammar_rule}
-
-Examples:
+Available Content:
+- Topic: {topic_name}
+- Rule: {grammar_rule}
+- Examples:
 {examples_formatted}
 
-Explain this grammar topic to the student in an encouraging way.
+Important: Include case endings (final harakaat) in Arabic text - they are grammatically significant.
 
-IMPORTANT: When presenting Arabic text with examples, include case endings (final harakaat) as they are grammatically significant. When mentioning the quiz, remind students that case endings matter for correctness.
+Student Context: Learning new grammar concept
 
-End by mentioning the quiz is next.""",
+End by mentioning the quiz is next. If you want to generate a quiz question, include [GENERATE_EXERCISE] in your response.
+
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
@@ -219,39 +221,51 @@ Or tell me what you'd like to do.""",
 # -----------------------------------------------------------------------------
 
 FEEDBACK_VOCAB_CORRECT = PromptTemplate(
-    template="""Mode: feedback_vocab
+    template="""Mode: Feedback - Vocabulary
+Phase: Quiz Feedback - Correct
+Objective: Provide brief, encouraging feedback for correct answer.
 
-Word: {word_arabic} ({word_transliteration})
+Word tested: {word_arabic} ({word_transliteration})
 Translation: {english}
-Student was correct.
+Student answered: correct
 
-Provide brief, encouraging feedback. Confirm correctness with checkmark.""",
+Student Context: Answered correctly
+
+After giving feedback, you can offer another quiz question by including [GENERATE_EXERCISE] in your response, or let the student decide what to do next.
+
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["word_arabic", "word_transliteration", "english"],
 )
 
 FEEDBACK_VOCAB_INCORRECT = PromptTemplate(
-    template="""Mode: feedback_vocab
+    template="""Mode: Feedback - Vocabulary
+Phase: Quiz Feedback - Incorrect
+Objective: Provide supportive correction, direct to flashcard practice.
 
-Word: {word_arabic} ({word_transliteration})
-Correct Translation: {english}
-Student Answer: {student_answer}
-Student was incorrect.
+Word tested: {word_arabic} ({word_transliteration})
+Correct translation: {english}
+Student answered: {student_answer} (incorrect)
 
-Provide supportive correction. Show correct answer with transliteration. Give memory tip.""",
+Student Context: First mistake, needs gentle correction
+
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["word_arabic", "word_transliteration", "english", "student_answer"],
 )
 
 FEEDBACK_GRAMMAR_CORRECT = PromptTemplate(
-    template="""Mode: feedback_grammar
+    template="""Mode: Feedback - Grammar
+Phase: Quiz Feedback - Correct
+Objective: Provide brief, encouraging feedback with explanation.
 
 Question: {question}
-Student Answer: {student_answer}
-Correct Answer: {correct_answer}
+Student answered: {student_answer} (correct)
+Correct answer: {correct_answer}
 Explanation: {explanation}
-Current Score: {current_score}
-Student was correct.
+Current score: {current_score}
 
-Provide brief, encouraging feedback. Mention current score.""",
+Student Context: Answered correctly
+
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=[
         "question",
         "student_answer",
@@ -262,16 +276,19 @@ Provide brief, encouraging feedback. Mention current score.""",
 )
 
 FEEDBACK_GRAMMAR_INCORRECT = PromptTemplate(
-    template="""Mode: feedback_grammar
+    template="""Mode: Feedback - Grammar
+Phase: Quiz Feedback - Incorrect
+Objective: Provide supportive correction with explanation.
 
 Question: {question}
-Student Answer: {student_answer}
-Correct Answer: {correct_answer}
+Student answered: {student_answer} (incorrect)
+Correct answer: {correct_answer}
 Explanation: {explanation}
-Current Score: {current_score}
-Student was incorrect.
+Current score: {current_score}
 
-Provide supportive correction. Explain why with reference to grammar rule. Mention current score.""",
+Student Context: Needs gentle correction with grammar rule reference
+
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=[
         "question",
         "student_answer",
@@ -292,26 +309,18 @@ Provide supportive correction. Explain why with reference to grammar rule. Menti
 GRADING_VOCAB = PromptTemplate(
     template="""Mode: grading_vocab
 
-Question: What does "{word}" mean?
-Student Answer: "{student_answer}"
-Correct Answer: "{correct_answer}"
+Compare the two answers:
+Student: "{student_answer}"
+Correct: "{correct_answer}"
 
-Evaluate if the student's answer is correct. Be flexible:
-- Accept minor typos (e.g., "scool" for "school")
-- Accept synonyms (e.g., "instructor" for "teacher")
-- Accept alternate phrasings that convey the same meaning
+Are they:
+- Exact match? [Check if identical]
+- Synonyms? [Check if same meaning - e.g., automobile = car, instructor = teacher]
+- 1-char typo? [Check if only 1 character different - e.g., scool = school]
+- Article difference only? [Check if only "a"/"the" differ - e.g., "a pen" = "pen"]
+- Related but different? [Check if different concepts - e.g., pencil ≠ pen]
 
-IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
-
-Correct output examples:
-{{"correct": true}}
-{{"correct": false}}
-
-Incorrect output examples (DO NOT DO THIS):
-{{"correct": true}} because the answer matches
-The answer is correct: {{"correct": true}}
-
-Your response must be ONLY the JSON object with no additional text.
+Return ONLY JSON: {{"correct": true}} or {{"correct": false}}
 
 Response:""",
     input_variables=["word", "student_answer", "correct_answer"],
@@ -321,26 +330,18 @@ GRADING_GRAMMAR_QUIZ = PromptTemplate(
     template="""Mode: grading_grammar
 
 Question: {question}
-Student Answer: "{student_answer}"
-Correct Answer: "{correct_answer}"
+Compare answers:
+Student: "{student_answer}"
+Correct: "{correct_answer}"
 
-Evaluate if the student's answer is correct. Be flexible:
-- Accept minor typos
-- Accept synonyms or alternate phrasings that convey the same meaning
-- For identification questions (masculine/feminine), accept abbreviated forms (m/f, masc/fem)
-- For Arabic text answers: Internal harakaat (vowel marks) are OPTIONAL, but case endings (final harakaat like ُ َ ِ ٌ ً ٍ) are REQUIRED and must match exactly
+Check:
+- Exact match? [Compare directly]
+- Abbreviations? [Accept m=masculine, f=feminine, nom=nominative, acc=accusative, gen=genitive]
+- Question asks for case? [Check if nominative/accusative/genitive mentioned]
+- Internal harakaat (َ ِ ُ in middle)? [OPTIONAL - can differ, e.g., كبيرٌ = كَبِيرٌ]
+- Case ending (final َ ِ ُ ً ٌ ٍ)? [REQUIRED - must match if question asks for case]
 
-IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
-
-Correct output examples:
-{{"correct": true}}
-{{"correct": false}}
-
-Incorrect output examples (DO NOT DO THIS):
-{{"correct": true}} The student correctly identified the gender
-Explanation: {{"correct": false}}
-
-Your response must be ONLY the JSON object with no additional text.
+Return ONLY JSON: {{"correct": true}} or {{"correct": false}}
 
 Response:""",
     input_variables=["question", "student_answer", "correct_answer"],
@@ -355,9 +356,12 @@ Grade the following answers:
 
 {answers_formatted}
 
-For each answer, evaluate correctness with flexibility:
-- Accept minor typos, synonyms, abbreviations
-- For Arabic text answers: Internal harakaat (vowel marks) are OPTIONAL, but case endings (final harakaat like ُ َ ِ ٌ ً ٍ) are REQUIRED and must match exactly
+For each question, compare student vs correct answer using these checks:
+- Exact match? [Compare directly]
+- Abbreviations? [Accept m=masculine, f=feminine, nom=nominative, acc=accusative, gen=genitive]
+- Question asks for case? [Check if nominative/accusative/genitive mentioned]
+- Internal harakaat (َ ِ ُ in middle)? [OPTIONAL - can differ, e.g., كبيرٌ = كَبِيرٌ]
+- Case ending (final َ ِ ُ ً ٌ ٍ)? [REQUIRED - must match if question asks for case]
 
 IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
 
