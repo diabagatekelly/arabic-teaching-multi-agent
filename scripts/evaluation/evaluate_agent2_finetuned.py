@@ -361,7 +361,9 @@ def main() -> None:
     pipeline = EvaluationPipeline(TEST_CASES_PATH)
     logger.info("✓ Test cases loaded")
 
-    sample_text = f"(sampling {args.sample_size} per subgroup)" if args.sample_size else "(all test cases)"
+    sample_text = (
+        f"(sampling {args.sample_size} per subgroup)" if args.sample_size else "(all test cases)"
+    )
     logger.info(f"\nEvaluating {sample_text}\n")
 
     vocab_responses, vocab_results = run_vocab_grading(

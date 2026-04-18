@@ -245,9 +245,7 @@ def generate_markdown_report(results_by_mode: dict[str, dict], model_name: str) 
 
     all_results = list(results_by_mode.values())
 
-    overall_total, overall_passed, overall_pass_rate = generate_overall_summary(
-        all_results
-    )
+    overall_total, overall_passed, overall_pass_rate = generate_overall_summary(all_results)
 
     report = f"""# Agent 1 (Teaching/Presentation) - Fine-Tuned Evaluation
 
@@ -301,9 +299,7 @@ def log_summary(results_by_mode: dict[str, dict]) -> None:
 
 def main() -> None:
     """Run fine-tuned model evaluation."""
-    parser = argparse.ArgumentParser(
-        description="Evaluate fine-tuned Agent 1 (Teaching) model"
-    )
+    parser = argparse.ArgumentParser(description="Evaluate fine-tuned Agent 1 (Teaching) model")
     parser.add_argument(
         "--sample-size",
         type=int,
@@ -338,16 +334,10 @@ def main() -> None:
     logger.info("✓ Test cases loaded")
 
     sample_size = args.sample_size
-    sample_text = (
-        f"(sampling {sample_size} per subgroup)"
-        if sample_size
-        else "(all test cases)"
-    )
+    sample_text = f"(sampling {sample_size} per subgroup)" if sample_size else "(all test cases)"
     logger.info(f"\nEvaluating {sample_text}\n")
 
-    all_responses, results_by_mode = collect_all_results(
-        teaching_agent, pipeline, sample_size
-    )
+    all_responses, results_by_mode = collect_all_results(teaching_agent, pipeline, sample_size)
 
     model_name = f"Fine-tuned Qwen2.5-3B (LoRA) from {args.model_path}"
 

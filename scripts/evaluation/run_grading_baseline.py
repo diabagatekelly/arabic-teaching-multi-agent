@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import sys
 from datetime import datetime
@@ -37,9 +36,7 @@ def save_results(
     output_dir: Path, vocab_results: dict, grammar_results: dict, model_size: str
 ) -> None:
     """Save evaluation results to files."""
-    metadata = create_metadata(
-        f"Qwen/Qwen2.5-{model_size}-Instruct", "Agent 2 (Grading)"
-    )
+    metadata = create_metadata(f"Qwen/Qwen2.5-{model_size}-Instruct", "Agent 2 (Grading)")
     metadata["model_size"] = model_size
 
     results_json = {
@@ -52,9 +49,7 @@ def save_results(
     save_evaluation_results(output_dir, results_json, report)
 
 
-def generate_markdown_report(
-    vocab_results: dict, grammar_results: dict, model_size: str
-) -> str:
+def generate_markdown_report(vocab_results: dict, grammar_results: dict, model_size: str) -> str:
     """Generate markdown evaluation report."""
     return f"""# Agent 2 (Grading) - {model_size} Baseline Evaluation
 
@@ -130,9 +125,7 @@ def run_baseline_evaluation(
     logger.info("=" * 80 + "\n")
 
     logger.info("Running grading_vocab with 7B model...")
-    _, vocab_results = evaluator.run_grading_vocab_baseline(
-        sample_size=sample_size, use_7b=True
-    )
+    _, vocab_results = evaluator.run_grading_vocab_baseline(sample_size=sample_size, use_7b=True)
     logger.info("✓ Vocab grading (7B) complete")
 
     logger.info("Running grading_grammar with 7B model...")
@@ -146,9 +139,7 @@ def run_baseline_evaluation(
 
 def main() -> None:
     """Run grading baseline evaluation with 7B model."""
-    parser = argparse.ArgumentParser(
-        description="Run baseline grading evaluation"
-    )
+    parser = argparse.ArgumentParser(description="Run baseline grading evaluation")
     parser.add_argument(
         "--sample-size",
         type=int,
@@ -166,9 +157,7 @@ def main() -> None:
     logger.info("Initializing BaselineEvaluator...")
     evaluator = BaselineEvaluator()
 
-    vocab_results, grammar_results = run_baseline_evaluation(
-        evaluator, args.sample_size
-    )
+    vocab_results, grammar_results = run_baseline_evaluation(evaluator, args.sample_size)
 
     save_results(Path(args.output_dir), vocab_results, grammar_results, "7B")
 

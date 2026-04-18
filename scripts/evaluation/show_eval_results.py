@@ -24,11 +24,7 @@ def load_files(eval_dir: Path) -> tuple[dict, dict, dict, dict]:
 
     try:
         test_cases_path = (
-            PROJECT_ROOT
-            / "data"
-            / "evaluation"
-            / "grading_agent"
-            / "grading_agent_test_cases.json"
+            PROJECT_ROOT / "data" / "evaluation" / "grading_agent" / "grading_agent_test_cases.json"
         )
         with open(test_cases_path) as f:
             test_cases = json.load(f)
@@ -162,8 +158,7 @@ def display_results(
             total = len(metric_results)
             rate = passed / total if total > 0 else 0
             print(
-                f"    - {metric_name.replace('_', ' ').title()}: "
-                f"{passed}/{total} ({rate:.1%})"
+                f"    - {metric_name.replace('_', ' ').title()}: " f"{passed}/{total} ({rate:.1%})"
             )
 
     print("\n" + "=" * 80)
@@ -183,9 +178,7 @@ def display_results(
 
 def main() -> None:
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Display grading agent evaluation results"
-    )
+    parser = argparse.ArgumentParser(description="Display grading agent evaluation results")
     parser.add_argument(
         "--eval-dir",
         type=str,
