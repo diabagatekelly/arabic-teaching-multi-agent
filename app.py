@@ -30,27 +30,11 @@ current_state = None
 teaching_model = None
 grading_model = None
 embedder_model = None
-content_agent = None
-
-
-@spaces.GPU(duration=120)
-def _run_lesson_start_with_gpu(initial_state: SystemState) -> dict:
-    """Run lesson start with GPU (model inference only)."""
-    global teaching_model, grading_model, embedder_model
-
-    # Move models to GPU
-    logger.info("Moving models to GPU...")
-    teaching_model.to("cuda")
-    grading_model.to("cuda")
-    embedder_model.model.to("cuda")
-
-    # Run orchestrator (GPU-accelerated model inference)
-    return orchestrator.invoke(initial_state)
 
 
 def initialize_models():
     """Initialize models and orchestrator (runs once at startup)."""
-    global orchestrator, teaching_model, grading_model, embedder_model, content_agent
+    global orchestrator, teaching_model, grading_model, embedder_model
 
     logger.info("Loading fine-tuned models...")
 
@@ -107,9 +91,10 @@ def initialize_models():
         return f"❌ Initialization failed: {e}"
 
 
+@spaces.GPU(duration=120)  # Reserve GPU for 120 seconds per call
 def start_lesson(lesson_number: int, chat_history: list) -> tuple:
     """
-    Start a new lesson.
+    Start a new lesson (GPU-accelerated).
 
     Args:
         lesson_number: Lesson to start (1-10)
@@ -118,7 +103,13 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
     Returns:
         Tuple of (updated_chat, exercises, correct, accuracy, learned_items, status)
     """
-    global current_state, content_agent
+    global current_state, teaching_model, grading_model, embedder_model
+
+    # Move models to GPU (ZeroGPU requirement)
+    logger.info("Moving models to GPU...")
+    teaching_model.to("cuda")
+    grading_model.to("cuda")
+    embedder_model.model.to("cuda")
 
     logger.info(f"Starting lesson {lesson_number}...")
 
@@ -133,24 +124,8 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
             last_agent="",
         )
 
-        # Pre-load RAG content on CPU (no GPU needed - saves ~30s of GPU time)
-        logger.info("Pre-loading lesson content from RAG (CPU)...")
-        if (
-            content_agent
-            and hasattr(content_agent, "content_loader")
-            and content_agent.content_loader
-        ):
-            vocab_words = content_agent.content_loader.load_vocabulary(lesson_number)
-            grammar_content = content_agent.content_loader.load_grammar(lesson_number)
-            initial_state.cached_vocab_words = vocab_words
-            initial_state.cached_grammar_content = grammar_content
-            initial_state.lesson_initialized = True
-            logger.info(
-                f"Pre-loaded: {len(vocab_words)} words, {len(grammar_content)} grammar topics"
-            )
-
-        # Now run GPU-accelerated inference (model generation only)
-        result = _run_lesson_start_with_gpu(initial_state)
+        # Run orchestrator (GPU-accelerated model inference)
+        result = orchestrator.invoke(initial_state)
 
         # Update global state
         current_state = result
@@ -204,22 +179,9 @@ def _format_progress_stats(result: dict) -> tuple:
 
 
 @spaces.GPU(duration=120)
-def _run_message_with_gpu(state: SystemState) -> dict:
-    """Run message processing with GPU (model inference only)."""
-    global teaching_model, grading_model, embedder_model
-
-    # Move models to GPU
-    teaching_model.to("cuda")
-    grading_model.to("cuda")
-    embedder_model.model.to("cuda")
-
-    # Run orchestrator (GPU-accelerated model inference)
-    return orchestrator.invoke(state)
-
-
 def send_message(user_message: str, chat_history: list) -> tuple:
     """
-    Process user message.
+    Process user message (GPU-accelerated).
 
     Args:
         user_message: User's input
@@ -228,7 +190,12 @@ def send_message(user_message: str, chat_history: list) -> tuple:
     Returns:
         Tuple of (updated_chat, exercises, correct, accuracy, learned_items, cleared_input)
     """
-    global current_state
+    global current_state, teaching_model, grading_model, embedder_model
+
+    # Move models to GPU (ZeroGPU requirement)
+    teaching_model.to("cuda")
+    grading_model.to("cuda")
+    embedder_model.model.to("cuda")
 
     if not current_state:
         chat_history.append([user_message, "⚠️ Please start a lesson first!"])
@@ -248,8 +215,7 @@ def send_message(user_message: str, chat_history: list) -> tuple:
         else:
             current_state["next_agent"] = "teaching"
 
-        # Run GPU-accelerated inference
-        result = _run_message_with_gpu(current_state)
+        result = orchestrator.invoke(current_state)
         current_state = result
 
         conversation_history = result.get("conversation_history", [])
