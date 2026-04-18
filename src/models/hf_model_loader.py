@@ -16,11 +16,7 @@ from pathlib import Path
 import torch
 from dotenv import load_dotenv
 from peft import PeftModel
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    BitsAndBytesConfig,
-)
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Load environment variables (including HF_TOKEN)
 load_dotenv()
@@ -37,20 +33,6 @@ FINETUNED_7B_TEACHING_PATH_HF = "kdiabagate/qwen-7b-arabic-teaching"
 FINETUNED_7B_GRADING_PATH_HF = "kdiabagate/qwen-7b-arabic-grading"
 
 BASE_7B_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-
-
-def get_quantization_config() -> BitsAndBytesConfig:
-    """Get 4-bit quantization config for memory efficiency.
-
-    Returns:
-        BitsAndBytesConfig for 4-bit quantization with bfloat16 compute
-    """
-    return BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_compute_dtype=torch.bfloat16,
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_quant_type="nf4",
-    )
 
 
 def load_teaching_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, AutoTokenizer]:
@@ -132,9 +114,10 @@ def load_teaching_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, Aut
             token=hf_token,
         )
 
+        # Log memory usage (CUDA-safe)
+        memory_gb = torch.cuda.memory_allocated() / 1e9 if torch.cuda.is_available() else 0
         logger.info(
-            f"✓ Fine-tuned 7B teaching model loaded successfully "
-            f"(memory: ~{torch.cuda.memory_allocated() / 1e9:.1f}GB)"
+            f"✓ Fine-tuned 7B teaching model loaded successfully (memory: ~{memory_gb:.1f}GB)"
         )
 
         return model, tokenizer
