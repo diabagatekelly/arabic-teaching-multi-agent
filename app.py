@@ -109,7 +109,6 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
         # Update global state
         current_state = result
 
-        # Extract welcome message
         conversation_history = result.get("conversation_history", [])
         if conversation_history:
             last_message = conversation_history[-1]
@@ -122,14 +121,9 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
         else:
             welcome_msg = "Welcome to the lesson!"
 
-        # Update chat history
         chat_history.append((None, welcome_msg))
 
-        # Update progress stats
-        exercises = result.get("total_exercises_completed", 0)
-        correct = result.get("total_correct_answers", 0)
-        accuracy = f"{(correct / exercises * 100):.1f}%" if exercises > 0 else "0%"
-        learned = ", ".join(list(result.get("learned_items", [])))[:100]
+        exercises, correct, accuracy, learned = _format_progress_stats(result)
 
         status = f"✓ Lesson {lesson_number} started!"
 
@@ -140,7 +134,25 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
         return chat_history, 0, 0, "0%", "", f"❌ Error: {e}"
 
 
-@spaces.GPU(duration=120)  # Reserve GPU for inference
+def _extract_agent_response(conversation_history: list) -> str:
+    """Extract last agent response, skipping agent3 messages."""
+    for msg in reversed(conversation_history):
+        msg_role = msg.role if hasattr(msg, "role") else msg.get("role")
+        if msg_role in ["agent1", "agent2", "assistant"]:
+            return msg.content if hasattr(msg, "content") else msg.get("content", "")
+    return "I'm here to help!"
+
+
+def _format_progress_stats(result: dict) -> tuple:
+    """Format progress statistics for UI display."""
+    exercises = result.get("total_exercises_completed", 0)
+    correct = result.get("total_correct_answers", 0)
+    accuracy = f"{(correct / exercises * 100):.1f}%" if exercises > 0 else "0%"
+    learned = ", ".join(list(result.get("learned_items", [])))[:100]
+    return exercises, correct, accuracy, learned
+
+
+@spaces.GPU(duration=120)
 def send_message(user_message: str, chat_history: list) -> tuple:
     """
     Process user message (GPU-accelerated).
@@ -164,52 +176,25 @@ def send_message(user_message: str, chat_history: list) -> tuple:
     logger.info(f"Processing user message: {user_message[:50]}...")
 
     try:
-        # Add user message to state
         user_msg = Message(role="user", content=user_message)
         current_state["conversation_history"].append(user_msg)
 
-        # Set next agent (grading if pending exercise AND awaiting answer, teaching otherwise)
-        # FIX: Check both pending_exercise AND awaiting_user_answer
-        # This prevents auto-grading of non-answer messages like "quiz time!"
         if current_state.get("pending_exercise") and current_state.get("awaiting_user_answer"):
             current_state["next_agent"] = "grading"
         else:
             current_state["next_agent"] = "teaching"
 
-        # Run orchestrator (GPU-accelerated)
         result = orchestrator.invoke(current_state)
-
-        # Update global state
         current_state = result
 
-        # Extract agent response - skip agent3 messages (exercises), find last agent1/agent2
         conversation_history = result.get("conversation_history", [])
-        agent_response = None
-        if conversation_history:
-            # Loop through messages in reverse, skip agent3
-            for msg in reversed(conversation_history):
-                msg_role = msg.role if hasattr(msg, "role") else msg.get("role")
+        agent_response = _extract_agent_response(conversation_history)
 
-                if msg_role in ["agent1", "agent2", "assistant"]:
-                    agent_response = (
-                        msg.content if hasattr(msg, "content") else msg.get("content", "")
-                    )
-                    break
-
-        # Fallback if no agent message found
-        if not agent_response:
-            agent_response = "I'm here to help!"
-
-        # Update chat history
         chat_history.append((user_message, agent_response))
 
-        # Update progress stats
-        exercises = result.get("total_exercises_completed", 0)
-        correct = result.get("total_correct_answers", 0)
-        accuracy = f"{(correct / exercises * 100):.1f}%" if exercises > 0 else "0%"
-        learned = ", ".join(list(result.get("learned_items", [])))[:100]
+        exercises, correct, accuracy, learned = _format_progress_stats(result)
 
-        return chat_history, exercises, correct, accuracy, learned, ""  # Clear input
+        return chat_history, exercises, correct, accuracy, learned, ""
 
     except Exception as e:
         logger.error(f"Error processing message: {e}")

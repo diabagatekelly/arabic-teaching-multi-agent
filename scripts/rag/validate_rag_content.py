@@ -107,7 +107,6 @@ def validate_file(file_path: Path) -> dict[str, Any]:
         result["status"] = "FAIL"
         result["issues"].append("File encoding error (not UTF-8)")
     except Exception:
-        # Log full details so unexpected operational issues are not mistaken for parse errors
         logger.exception("Unexpected error while validating RAG content")
         result["status"] = "FAIL"
         result["issues"].append(
@@ -117,21 +116,8 @@ def validate_file(file_path: Path) -> dict[str, Any]:
     return result
 
 
-def print_validation_result(result: dict[str, Any]) -> None:
-    """Print validation result in a nice format."""
-
-    status_icons = {
-        "PASS": "✅",
-        "WARNING": "⚠️",
-        "FAIL": "❌",
-    }
-
-    icon = status_icons.get(result["status"], "❓")
-
-    print(f"\n📋 Validating: {result['path']}")
-    print("━" * 60)
-
-    # Frontmatter
+def _print_frontmatter(result: dict[str, Any]) -> None:
+    """Print frontmatter validation status."""
     if result["frontmatter_valid"]:
         print("✅ Frontmatter: Valid YAML")
         if "metadata" in result:
@@ -142,7 +128,9 @@ def print_validation_result(result: dict[str, Any]) -> None:
     else:
         print("❌ Frontmatter: Missing or invalid")
 
-    # Sections
+
+def _print_sections(result: dict[str, Any]) -> None:
+    """Print section structure analysis."""
     if result["sections"]:
         print(f"\n✅ Section Structure: {len(result['sections'])} sections found")
         for section in result["sections"]:
@@ -157,22 +145,25 @@ def print_validation_result(result: dict[str, Any]) -> None:
                 f"   {status_icon} {section['section']}: {section['chars']} chars (~{section['tokens']} tokens)"
             )
 
-    # Chunk analysis summary
-    if result["chunks"]:
-        _print_chunk_analysis(result)
-    # Issues
+
+def _print_issues_warnings(result: dict[str, Any]) -> None:
+    """Print issues and warnings."""
     if result["issues"]:
         print("\n❌ Issues Found:")
         for issue in result["issues"]:
             print(f"   • {issue}")
 
-    # Warnings
     if result["warnings"]:
         print("\n⚠️  Warnings:")
         for warning in result["warnings"]:
             print(f"   • {warning}")
 
-    # Final status
+
+def _print_final_status(result: dict[str, Any]) -> None:
+    """Print final validation status."""
+    status_icons = {"PASS": "✅", "WARNING": "⚠️", "FAIL": "❌"}
+    icon = status_icons.get(result["status"], "❓")
+
     print(f"\n{icon} {result['status']}: ", end="")
     if result["status"] == "PASS":
         print("File is RAG-ready!")
@@ -180,6 +171,21 @@ def print_validation_result(result: dict[str, Any]) -> None:
         print("File is usable but could be improved")
     else:
         print("File needs fixes before use")
+
+
+def print_validation_result(result: dict[str, Any]) -> None:
+    """Print validation result in a nice format."""
+    print(f"\n📋 Validating: {result['path']}")
+    print("━" * 60)
+
+    _print_frontmatter(result)
+    _print_sections(result)
+
+    if result["chunks"]:
+        _print_chunk_analysis(result)
+
+    _print_issues_warnings(result)
+    _print_final_status(result)
 
     print("━" * 60)
 
