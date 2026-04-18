@@ -83,15 +83,16 @@ def _load_finetuned_model(
         logger.info(f"Base model: {base_model_name}")
 
         logger.info("Loading base model...")
+        # For ZeroGPU: Load on CPU first, move to GPU in @spaces.GPU functions
         base_model = AutoModelForCausalLM.from_pretrained(
             base_model_name,
-            device_map="auto",
+            device_map="cpu",
             trust_remote_code=True,
             token=hf_token,
         )
 
         logger.info("Loading LoRA adapter...")
-        model = PeftModel.from_pretrained(base_model, model_path, device_map="auto", token=hf_token)
+        model = PeftModel.from_pretrained(base_model, model_path, device_map="cpu", token=hf_token)
 
         memory_gb = torch.cuda.memory_allocated() / 1e9 if torch.cuda.is_available() else 0
         logger.info(
