@@ -1,0 +1,23 @@
+# HuggingFace Space requirements for Arabic Teaching System
+
+# Core ML frameworks
+torch>=2.0.0
+transformers>=4.56.0
+peft>=0.18.0
+accelerate>=0.25.0
+bitsandbytes>=0.41.0
+
+# LangChain/LangGraph
+langgraph>=0.2.51
+langchain-core>=0.3.25
+langchain-community>=0.3.15
+
+# Gradio UI
+gradio>=5.0.0
+spaces>=0.30.0  # HuggingFace zero-GPU support
+
+# Vector DB (for content agent)
+sentence-transformers>=2.2.0
+
+# Utilities
+python-dotenv>=1.0.0
