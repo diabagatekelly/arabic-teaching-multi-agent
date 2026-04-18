@@ -339,7 +339,7 @@ def main() -> None:
 
     all_responses, results_by_mode = collect_all_results(teaching_agent, pipeline, sample_size)
 
-    model_name = f"Fine-tuned Qwen2.5-3B (LoRA) from {args.model_path}"
+    model_name = f"Fine-tuned Qwen2.5-7B (LoRA) from {args.model_path}"
 
     save_json_responses(OUTPUT_DIR, all_responses, "all_responses.json")
 
