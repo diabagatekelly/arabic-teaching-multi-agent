@@ -31,18 +31,22 @@ MODE_EXERCISE_GENERATION = "exercise_generation"
 # -----------------------------------------------------------------------------
 
 LESSON_WELCOME = PromptTemplate(
-    template="""Mode: Lesson Start
-Lesson: {lesson_number}
-Phase: Welcome and Navigation
-Objective: Warmly welcome student, present lesson structure, guide them to choose starting point.
+    template="""Mode: lesson_start
 
-Available Content:
-- Vocabulary: {total_words} words
-  Preview: {topics_preview}
-- Grammar: {topics_count} topics
-  Topics: {grammar_topics}
+Lesson {lesson_number} Overview
 
-Student Profile: Starting lesson {lesson_number}
+Vocabulary: {total_words} words
+Preview: {topics_preview}
+
+Grammar: {topics_count} topics
+Topics: {grammar_topics}
+
+Greet the student warmly and present the lesson structure. Offer navigation:
+1. Start with vocabulary
+2. Start with grammar
+3. See lesson progress
+
+Format with numbered options and mention they can request something else.
 
 IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=[
