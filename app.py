@@ -139,7 +139,10 @@ def _extract_agent_response(conversation_history: list) -> str:
     for msg in reversed(conversation_history):
         msg_role = msg.role if hasattr(msg, "role") else msg.get("role")
         if msg_role in ["agent1", "agent2", "assistant"]:
-            return msg.content if hasattr(msg, "content") else msg.get("content", "")
+            content = msg.content if hasattr(msg, "content") else msg.get("content", "")
+            # Preserve fallback for empty/None content
+            if content:
+                return content
     return "I'm here to help!"
 
 
