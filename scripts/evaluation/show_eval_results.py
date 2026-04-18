@@ -47,7 +47,7 @@ def load_files(eval_dir: Path) -> tuple[dict, dict, dict, dict]:
 def find_test_case(test_id: str, mode: str, test_cases: dict) -> dict | None:
     """Find test case by ID."""
     test_data = test_cases[f"grading_{mode}"]
-    for category, cases in test_data.items():
+    for _category, cases in test_data.items():
         if isinstance(cases, list):
             for case in cases:
                 if case["test_id"] == test_id:
@@ -157,9 +157,7 @@ def display_results(
             passed = sum(1 for r in metric_results if r.get("passed", False))
             total = len(metric_results)
             rate = passed / total if total > 0 else 0
-            print(
-                f"    - {metric_name.replace('_', ' ').title()}: " f"{passed}/{total} ({rate:.1%})"
-            )
+            print(f"    - {metric_name.replace('_', ' ').title()}: {passed}/{total} ({rate:.1%})")
 
     print("\n" + "=" * 80)
     print("FAILING TESTS (DETAILED)")
