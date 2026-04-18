@@ -10,15 +10,20 @@ Memory Requirements:
 """
 
 import logging
+import os
 from pathlib import Path
 
 import torch
+from dotenv import load_dotenv
 from peft import PeftModel
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
 )
+
+# Load environment variables (including HF_TOKEN)
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -82,9 +87,13 @@ def load_teaching_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, Aut
 
     try:
         # Load tokenizer
+        # Get HF token from environment
+        hf_token = os.getenv("HF_TOKEN")
+
         tokenizer = AutoTokenizer.from_pretrained(
             model_path,
             trust_remote_code=True,
+            token=hf_token,
         )
 
         # Read adapter config to get base model
@@ -93,7 +102,9 @@ def load_teaching_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, Aut
         if use_hub:
             from huggingface_hub import hf_hub_download
 
-            config_path = hf_hub_download(repo_id=model_path, filename="adapter_config.json")
+            config_path = hf_hub_download(
+                repo_id=model_path, filename="adapter_config.json", token=hf_token
+            )
             with open(config_path) as f:
                 adapter_config = json.load(f)
         else:
@@ -109,6 +120,7 @@ def load_teaching_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, Aut
             base_model_name,
             device_map="auto",
             trust_remote_code=True,
+            token=hf_token,
         )
 
         # Load LoRA adapter
@@ -117,6 +129,7 @@ def load_teaching_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, Aut
             base_model,
             model_path,
             device_map="auto",
+            token=hf_token,
         )
 
         logger.info(
@@ -164,9 +177,13 @@ def load_grading_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, Auto
 
     try:
         # Load tokenizer
+        # Get HF token from environment
+        hf_token = os.getenv("HF_TOKEN")
+
         tokenizer = AutoTokenizer.from_pretrained(
             model_path,
             trust_remote_code=True,
+            token=hf_token,
         )
 
         # Read adapter config to get base model
@@ -175,7 +192,9 @@ def load_grading_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, Auto
         if use_hub:
             from huggingface_hub import hf_hub_download
 
-            config_path = hf_hub_download(repo_id=model_path, filename="adapter_config.json")
+            config_path = hf_hub_download(
+                repo_id=model_path, filename="adapter_config.json", token=hf_token
+            )
             with open(config_path) as f:
                 adapter_config = json.load(f)
         else:
@@ -191,6 +210,7 @@ def load_grading_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, Auto
             base_model_name,
             device_map="auto",
             trust_remote_code=True,
+            token=hf_token,
         )
 
         # Load LoRA adapter
@@ -199,6 +219,7 @@ def load_grading_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, Auto
             base_model,
             model_path,
             device_map="auto",
+            token=hf_token,
         )
 
         logger.info(
