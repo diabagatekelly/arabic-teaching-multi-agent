@@ -16,7 +16,7 @@ langchain-community>=0.1.0
 chromadb>=0.4.0
 openai>=1.0.0
 tiktoken>=0.5.0
-pinecone-client>=3.0.0
+pinecone>=3.0.0
 
 # Model (for fine-tuned Qwen)
 torch>=2.0.0
