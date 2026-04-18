@@ -65,7 +65,7 @@ def initialize_models():
         teaching_agent = TeachingAgent(
             model=teaching_model,
             tokenizer=teaching_tokenizer,
-            max_new_tokens=256,
+            max_new_tokens=512,  # Increased for complete responses
         )
 
         grading_agent = GradingAgent(
