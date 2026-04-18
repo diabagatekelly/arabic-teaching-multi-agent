@@ -83,11 +83,10 @@ class TeachingNode:
                 # Agent wants to generate exercise - strip marker from response
                 response = response.replace("[GENERATE_EXERCISE]", "").strip()
                 state.next_agent = "agent3"
-            elif "exercise" in response.lower() or "quiz" in response.lower():
-                # Fallback: keyword detection (less reliable but catches informal requests)
-                state.next_agent = "agent3"
             else:
                 # Wait for user response
+                # Note: Removed keyword detection ("exercise"/"quiz") - too prone to false positives
+                # (e.g., lesson welcome mentioning "practice exercises" shouldn't trigger generation)
                 state.next_agent = "user"
 
             return state
