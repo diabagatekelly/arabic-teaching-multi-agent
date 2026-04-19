@@ -651,10 +651,24 @@ class ContentNode:
 
     def _parse_exercise_request(self, state: SystemState) -> dict[str, Any]:
         """Extract exercise requirements from current state."""
+        # Get words for current batch (3 words per batch)
+        batch_size = 3
+        start_idx = (state.current_vocab_batch - 1) * batch_size
+        end_idx = start_idx + batch_size
+        current_batch_words = (
+            state.cached_vocab_words[start_idx:end_idx] if state.cached_vocab_words else []
+        )
+
+        # Format as strings: "كِتَاب (kitaabun) - book"
+        learned_items = [
+            f"{word['arabic']} ({word['transliteration']}) - {word['english']}"
+            for word in current_batch_words
+        ]
+
         return {
             "exercise_type": "translation",  # Default type
             "difficulty": "beginner",
-            "learned_items": state.learned_items[-3:] if state.learned_items else [],
+            "learned_items": learned_items,  # ONLY current batch words
             "lesson_number": state.current_lesson,
             "mode": "exercise_generation",
             "question_type": "arabic_to_english",  # Hard-coded for demo: always ask for English
