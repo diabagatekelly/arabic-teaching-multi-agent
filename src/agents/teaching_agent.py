@@ -225,18 +225,25 @@ class TeachingAgent:
 
     def handle_teaching_grammar(self, input_data: dict[str, Any]) -> str:
         """
-        Handle grammar teaching scenario (topic explanation).
+        Handle grammar teaching scenario (overview or topic explanation).
 
         Args:
-            input_data: Input with mode, sub_mode, grammar_topic, examples, etc.
+            input_data: Input with mode, topics_list (for overview) or topic_name (for explanation)
 
         Returns:
-            Teaching response with grammar explanation
+            Teaching response with grammar overview or explanation
         """
         flattened = flatten_nested_input(input_data)
 
-        # Use topic_explanation template (primary grammar teaching mode)
-        prompt = GRAMMAR_EXPLANATION.format(**flattened)
+        # Check if this is overview (topics_list) or topic explanation (topic_name)
+        if "topics_list" in flattened and "topic_name" not in flattened:
+            # Grammar overview - show all topics
+            from src.prompts.templates import GRAMMAR_OVERVIEW
+
+            prompt = GRAMMAR_OVERVIEW.format(**flattened)
+        else:
+            # Topic explanation with examples
+            prompt = GRAMMAR_EXPLANATION.format(**flattened)
         return self.generate_response(prompt)
 
     def handle_feedback_vocab(self, input_data: dict[str, Any]) -> str:
