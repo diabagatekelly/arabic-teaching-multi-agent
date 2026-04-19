@@ -84,33 +84,7 @@ def initialize_models():
         )
 
         logger.info("✓ All components initialized")
-
-        # OPTIMIZATION: Pre-load Lesson 1 content immediately (don't wait for user)
-        # This gives us a head start - by the time user clicks "Start", content is ready
-        logger.info("Pre-loading Lesson 1 content in background...")
-        try:
-            vocab_words = content_loader.load_vocabulary(1)
-            grammar_content = content_loader.load_grammar(1)
-
-            # Create a pre-cached state with Lesson 1 content
-            current_state = SystemState(
-                user_id="user_1",
-                session_id="precache",
-                current_lesson=1,
-                conversation_history=[],
-                next_agent="agent1",  # Ready for teaching when user clicks Start
-                last_agent="",
-                cached_vocab_words=vocab_words,
-                cached_grammar_content=grammar_content,
-                lesson_initialized=True,
-            )
-            logger.info(
-                f"✓ Pre-cached Lesson 1: {len(vocab_words)} words, {len(grammar_content)} grammar topics"
-            )
-            return f"✓ Models loaded! Lesson 1 ready ({len(vocab_words)} words, {len(grammar_content)} topics)"
-        except Exception as e:
-            logger.warning(f"Pre-caching failed (will load on-demand): {e}")
-            return "✓ Models loaded successfully!"
+        return "✓ Models loaded successfully!"
 
     except Exception as e:
         logger.error(f"Failed to initialize: {e}")
@@ -140,36 +114,15 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
     logger.info(f"Starting lesson {lesson_number}...")
 
     try:
-        # Check if we have pre-cached content for this lesson
-        if (
-            current_state
-            and current_state.get("current_lesson") == lesson_number
-            and current_state.get("lesson_initialized")
-        ):
-            logger.info(f"Using pre-cached content for Lesson {lesson_number}")
-            # Reset conversation but keep cached content
-            initial_state = SystemState(
-                user_id="user_1",
-                session_id=f"session_{lesson_number}_{int(datetime.now().timestamp())}",
-                current_lesson=lesson_number,
-                conversation_history=[],
-                next_agent="agent1",  # Go straight to teaching (content already loaded)
-                last_agent="",
-                cached_vocab_words=current_state.get("cached_vocab_words", []),
-                cached_grammar_content=current_state.get("cached_grammar_content", {}),
-                lesson_initialized=True,
-            )
-        else:
-            logger.info(f"Loading content for Lesson {lesson_number} on-demand")
-            # Create initial state - content will be loaded by TeachingNode
-            initial_state = SystemState(
-                user_id="user_1",
-                session_id=f"session_{lesson_number}_{int(datetime.now().timestamp())}",
-                current_lesson=lesson_number,
-                conversation_history=[],
-                next_agent="agent1",  # TeachingNode will load content
-                last_agent="",
-            )
+        # Create initial state - content will be loaded by TeachingNode
+        initial_state = SystemState(
+            user_id="user_1",
+            session_id=f"session_{lesson_number}_{int(datetime.now().timestamp())}",
+            current_lesson=lesson_number,
+            conversation_history=[],
+            next_agent="agent1",
+            last_agent="",
+        )
 
         # Run orchestrator (GPU-accelerated model inference)
         result = orchestrator.invoke(initial_state)
