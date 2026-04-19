@@ -11,6 +11,7 @@ import gradio as gr
 import spaces  # Import at module level for ZeroGPU detection
 from fastapi import FastAPI
 
+from content_loader import load_lesson
 from engine import process_message as engine_process_message
 
 
@@ -25,8 +26,25 @@ def process_message(message, chat_history, session_id):
 # Initialize FastAPI
 app = FastAPI(title="Arabic Teaching API")
 
-# Simple in-memory session store
+# Global lesson cache (loaded at startup, shared across all users)
+lesson_cache = {}
+
+# Per-user session store
 sessions = {}
+
+
+@app.on_event("startup")
+def load_all_lessons():
+    """Pre-load all lesson content at startup for fast access."""
+    print("===== Loading lessons into cache =====")
+    for lesson_num in range(1, 11):  # Lessons 1-10
+        try:
+            lesson_data = load_lesson(lesson_num)
+            lesson_cache[lesson_num] = lesson_data
+            print(f"✓ Loaded Lesson {lesson_num}: {lesson_data['lesson_name']}")
+        except FileNotFoundError:
+            print(f"✗ Lesson {lesson_num} not found, skipping")
+    print(f"===== {len(lesson_cache)} lessons cached =====")
 
 
 @app.get("/api/health")
@@ -81,7 +99,7 @@ def get_session(session_id: str):
 @app.post("/api/start_lesson")
 def start_lesson(session_id: str, lesson_number: int):
     """
-    Start a lesson and pre-load content.
+    Start a lesson and load content from cache.
 
     Args:
         session_id: Session identifier
@@ -94,13 +112,23 @@ def start_lesson(session_id: str, lesson_number: int):
     if session_id not in sessions:
         sessions[session_id] = {"history": [], "count": 0}
 
-    # Placeholder: will load from RAG
-    sessions[session_id]["lesson"] = lesson_number
+    # Get lesson from cache
+    if lesson_number not in lesson_cache:
+        return {"error": f"Lesson {lesson_number} not found"}
+
+    lesson_data = lesson_cache[lesson_number]
+
+    # Store lesson data in session
+    sessions[session_id]["lesson_number"] = lesson_number
+    sessions[session_id]["lesson_name"] = lesson_data["lesson_name"]
+    sessions[session_id]["vocabulary"] = lesson_data["vocabulary"]
+    sessions[session_id]["grammar_sections"] = lesson_data["grammar_sections"]
     sessions[session_id]["mode"] = "vocab"
 
     return {
         "lesson_number": lesson_number,
-        "lesson_name": "Gender and Definite Article",
+        "lesson_name": lesson_data["lesson_name"],
+        "vocab_count": len(lesson_data["vocabulary"]),
         "status": "started",
     }
 
@@ -123,7 +151,11 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         # Center panel - Chat (1/2 width)
         with gr.Column(scale=2):
             gr.Markdown("### 💬 Chat")
-            chatbot = gr.Chatbot(height=500, type="messages")
+            # type="messages" only works in Gradio 5.x (Spaces), not local 6.12
+            try:
+                chatbot = gr.Chatbot(height=500, type="messages")
+            except TypeError:
+                chatbot = gr.Chatbot(height=500)
             msg = gr.Textbox(
                 label="Your message",
                 placeholder="Try: hello, vocab, grammar...",
