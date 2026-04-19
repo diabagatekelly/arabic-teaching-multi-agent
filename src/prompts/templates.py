@@ -93,13 +93,15 @@ Lesson {lesson_number}, Batch {batch_number} of {total_batches}
 Words to teach:
 {words}
 
-Present these words encouragingly. Remind them flashcards are available for practice. Then offer:
-1. Take quiz on this batch
-2. Go to next batch
+INSTRUCTIONS:
+1. First, greet the student warmly and introduce this batch
+2. Show ALL the words above with their Arabic, transliteration, and English meanings
+3. Encourage them to review with flashcards before taking the quiz
+4. Then offer these TWO options:
+   1. Take quiz on this batch
+   2. Go to next batch
 
-Format with numbered options.
-
-IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
+IMPORTANT: Actually show the words, don't just say "here are the words". Use ONLY English and Arabic text.""",
     input_variables=["lesson_number", "batch_number", "total_batches", "words"],
 )
 
