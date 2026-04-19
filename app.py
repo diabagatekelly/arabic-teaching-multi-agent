@@ -66,31 +66,30 @@ def get_session(session_id: str):
     return sessions[session_id]
 
 
-# Gradio UI
-def gradio_chat(message, history, session_id):
-    """Gradio interface that calls FastAPI endpoint."""
+# GPU-accelerated agent function (must be at module level for Spaces detection)
+@spaces.GPU(duration=60)
+def process_message(message, chat_history, session_id):
+    """Process user message with agent (GPU-accelerated)."""
     import uuid
 
     # Generate session ID if not provided
     if not session_id:
         session_id = str(uuid.uuid4())[:8]
 
-    # Call FastAPI endpoint
-    try:
-        # In production, this would be the actual API URL
-        # For demo, we'll just use the agent logic directly
-        if "hello" in message.lower():
-            response = "مرحباً! Hello!"
-        elif "vocab" in message.lower():
-            response = "📚 Vocabulary mode activated!"
-        elif "grammar" in message.lower():
-            response = "📖 Grammar mode activated!"
-        else:
-            response = f"Echo: {message}"
+    # Simple agent logic
+    if "hello" in message.lower():
+        response = "مرحباً! Hello!"
+    elif "vocab" in message.lower():
+        response = "📚 Vocabulary mode activated!"
+    elif "grammar" in message.lower():
+        response = "📖 Grammar mode activated!"
+    else:
+        response = f"Echo: {message}"
 
-        return response
-    except Exception as e:
-        return f"Error: {e}"
+    # Use messages format
+    chat_history.append({"role": "user", "content": message})
+    chat_history.append({"role": "assistant", "content": response})
+    return "", chat_history
 
 
 # Build Gradio interface with 3-column layout
@@ -125,17 +124,9 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 
     session_id = gr.State("")
 
-    @spaces.GPU(duration=60)
-    def respond(message, chat_history, sess_id):
-        # Get response from agent (GPU-accelerated placeholder)
-        bot_message = gradio_chat(message, chat_history, sess_id)
-        # Use messages format: list of dicts with 'role' and 'content'
-        chat_history.append({"role": "user", "content": message})
-        chat_history.append({"role": "assistant", "content": bot_message})
-        return "", chat_history
-
-    msg.submit(respond, [msg, chatbot, session_id], [msg, chatbot])
-    submit.click(respond, [msg, chatbot, session_id], [msg, chatbot])
+    # Wire up the GPU-accelerated function
+    msg.submit(process_message, [msg, chatbot, session_id], [msg, chatbot])
+    submit.click(process_message, [msg, chatbot, session_id], [msg, chatbot])
     clear.click(lambda: [], None, chatbot)
 
 
