@@ -185,7 +185,9 @@ def _format_progress_stats(result: dict) -> tuple:
 
 
 @spaces.GPU(duration=120)
-def send_message(user_message: str, chat_history: list, state_dict: dict):
+def send_message(
+    user_message: str, chat_history: list, state_dict: dict, auto_continue: bool = False
+):
     """
     Process user message (GPU-accelerated).
 
@@ -193,6 +195,7 @@ def send_message(user_message: str, chat_history: list, state_dict: dict):
         user_message: User's input
         chat_history: Current chat history
         state_dict: Gradio State for persisting orchestrator state
+        auto_continue: If True, skip empty message check (for auto-continue flow)
 
     Returns:
         Tuple of (state_dict, updated_chat, exercises, correct, accuracy, learned_items, cleared_input)
@@ -205,11 +208,17 @@ def send_message(user_message: str, chat_history: list, state_dict: dict):
     embedder_model.model.to(DEVICE)
 
     if not state_dict:
-        chat_history.append([user_message, "⚠️ Please start a lesson first!"])
+        if user_message:  # Only show error if there's a message to display
+            chat_history.append([user_message, "⚠️ Please start a lesson first!"])
         return state_dict, chat_history, 0, 0, "0%", "", "", "false"
 
-    if not user_message.strip():
-        return state_dict, chat_history, 0, 0, "0%", "", "", "false"
+    # Skip empty check if this is auto-continue (used for triggering next quiz)
+    if not auto_continue and not user_message.strip():
+        exercises = state_dict.get("total_exercises_completed", 0)
+        correct = state_dict.get("total_correct_answers", 0)
+        accuracy = f"{(correct / exercises * 100):.1f}%" if exercises > 0 else "0%"
+        learned = ", ".join(list(state_dict.get("learned_items", [])))[:100]
+        return state_dict, chat_history, exercises, correct, accuracy, learned, "", "false"
 
     logger.info(f"Processing user message: {user_message[:50]}...")
 
@@ -352,8 +361,8 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
 
         if trigger == "true":
             time.sleep(2)
-            # Trigger send_message with empty user message to get next quiz
-            return send_message("", current_chat, current_state)
+            # Trigger send_message with auto_continue=True to skip empty check
+            return send_message("", current_chat, current_state, auto_continue=True)
         return (
             gr.skip(),
             gr.skip(),
