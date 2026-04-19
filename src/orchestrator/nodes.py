@@ -357,6 +357,12 @@ class TeachingNode:
         feedback = self.agent.provide_feedback(input_data)
 
         # Check if batch is complete (all words quizzed)
+        import re
+
+        def normalize_arabic(text):
+            """Remove Arabic diacritics for comparison."""
+            return re.sub(r"[\u064B-\u0652\u0670]", "", text)
+
         batch_size = 3
         start_idx = (state.current_vocab_batch - 1) * batch_size
         end_idx = start_idx + batch_size
@@ -365,7 +371,14 @@ class TeachingNode:
         )
         batch_words_arabic = [w["arabic"] for w in current_batch_words]
 
-        all_quizzed = all(word in state.batch_quizzed_words for word in batch_words_arabic)
+        # Use normalized comparison for harakaat-insensitive matching
+        all_quizzed = all(
+            any(
+                normalize_arabic(quizzed) == normalize_arabic(w)
+                for quizzed in state.batch_quizzed_words
+            )
+            for w in batch_words_arabic
+        )
 
         if all_quizzed and state.current_mode == "teaching_vocab":
             # Batch complete - offer options and WAIT for user
@@ -375,8 +388,17 @@ class TeachingNode:
             else:
                 feedback += "\n\n✅ Excellent! You've completed all vocabulary batches. Ready to move to grammar?"
         else:
-            # More words to quiz in this batch - auto-continue after brief message
-            remaining = len([w for w in batch_words_arabic if w not in state.batch_quizzed_words])
+            # More words to quiz in this batch - calculate remaining with normalization
+            remaining = len(
+                [
+                    w
+                    for w in batch_words_arabic
+                    if not any(
+                        normalize_arabic(quizzed) == normalize_arabic(w)
+                        for quizzed in state.batch_quizzed_words
+                    )
+                ]
+            )
             if remaining > 0:
                 feedback += (
                     f"\n\nGreat! Next word coming up... ({remaining} remaining in this batch)"
@@ -621,11 +643,25 @@ class ContentNode:
                 if arabic_match:
                     word_arabic = arabic_match.group(0)
 
-            if word_arabic and word_arabic not in state.batch_quizzed_words:
-                state.batch_quizzed_words.append(word_arabic)
-                logger.info(
-                    f"Tracked quizzed word: {word_arabic} ({len(state.batch_quizzed_words)} total)"
+            if word_arabic:
+                import re
+
+                def normalize_arabic(text):
+                    """Remove Arabic diacritics (harakaat, tanween, shadda) for comparison."""
+                    # Unicode range for Arabic diacritics
+                    return re.sub(r"[\u064B-\u0652\u0670]", "", text)
+
+                normalized = normalize_arabic(word_arabic)
+                # Check if this word (normalized) is already tracked
+                already_tracked = any(
+                    normalize_arabic(w) == normalized for w in state.batch_quizzed_words
                 )
+
+                if not already_tracked:
+                    state.batch_quizzed_words.append(word_arabic)
+                    logger.info(
+                        f"Tracked quizzed word: {word_arabic} ({len(state.batch_quizzed_words)} total)"
+                    )
 
             # Update state
             state.set_pending_exercise(exercise)

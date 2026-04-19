@@ -267,10 +267,19 @@ class ContentAgent:
                 examples_text += f"Example {i}:\n{example}\n\n"
 
         # Filter out already quizzed words from learned items
+        import re
+
+        def normalize_arabic(text):
+            """Remove Arabic diacritics (harakaat, tanween, shadda) for comparison."""
+            return re.sub(r"[\u064B-\u0652\u0670]", "", text)
+
         available_items = [
             item
             for item in learned_items
-            if not any(quizzed in item for quizzed in batch_quizzed_words)
+            if not any(
+                normalize_arabic(quizzed) in normalize_arabic(item)
+                for quizzed in batch_quizzed_words
+            )
         ]
 
         if not available_items and learned_items:
@@ -322,10 +331,10 @@ Generate ONE exercise now:
 
             # If model didn't include required fields, extract from learned_items
             if "word_arabic" not in exercise_data or "english" not in exercise_data:
-                # Try to extract from question/answer or learned_items
-                if learned_items:
-                    # Use first learned item as fallback
-                    first_item = learned_items[0]
+                # Try to extract from question/answer or available_items (filtered)
+                if available_items:
+                    # Use first AVAILABLE item as fallback (respects batch_quizzed_words filtering)
+                    first_item = available_items[0]
                     if "(" in first_item and ")" in first_item:
                         # Format: "مَرْحَبا (marhaban) - Hello"
                         parts = first_item.split(" - ")
