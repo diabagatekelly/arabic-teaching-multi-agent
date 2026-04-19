@@ -19,7 +19,7 @@ app = FastAPI(title="Arabic Teaching API")
 sessions = {}
 
 
-@app.get("/")
+@app.get("/api/health")
 def read_root():
     """Health check endpoint."""
     return {"status": "ok", "message": "Arabic Teaching API is running"}
@@ -68,6 +68,33 @@ def get_session(session_id: str):
     return sessions[session_id]
 
 
+@app.post("/api/start_lesson")
+def start_lesson(session_id: str, lesson_number: int):
+    """
+    Start a lesson and pre-load content.
+
+    Args:
+        session_id: Session identifier
+        lesson_number: Lesson number to start
+
+    Returns:
+        Lesson info and content
+    """
+    # Initialize session if needed
+    if session_id not in sessions:
+        sessions[session_id] = {"history": [], "count": 0}
+
+    # Placeholder: will load from RAG
+    sessions[session_id]["lesson"] = lesson_number
+    sessions[session_id]["mode"] = "vocab"
+
+    return {
+        "lesson_number": lesson_number,
+        "lesson_name": "Gender and Definite Article",
+        "status": "started",
+    }
+
+
 # GPU function imported from engine.py for ZeroGPU detection
 
 
@@ -86,7 +113,7 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         # Center panel - Chat (1/2 width)
         with gr.Column(scale=2):
             gr.Markdown("### 💬 Chat")
-            chatbot = gr.Chatbot(height=500, type="messages")
+            chatbot = gr.Chatbot(height=500)
             msg = gr.Textbox(
                 label="Your message",
                 placeholder="Try: hello, vocab, grammar...",
@@ -103,11 +130,36 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 
     session_id = gr.State("")
 
+    def start_lesson_ui(sid):
+        """Start lesson and update UI."""
+        import uuid
+
+        import requests
+
+        if not sid:
+            sid = str(uuid.uuid4())[:8]
+
+        response = requests.post(
+            "http://localhost:7860/api/start_lesson", params={"session_id": sid, "lesson_number": 1}
+        )
+        data = response.json()
+
+        info_text = f"**Lesson:** {data['lesson_name']}\n\n**Status:** {data['status']}"
+        return info_text, sid
+
     # Wire up the GPU-accelerated function
     msg.submit(process_message, [msg, chatbot, session_id], [msg, chatbot])
     submit.click(process_message, [msg, chatbot, session_id], [msg, chatbot])
     clear.click(lambda: [], None, chatbot)
+    start_lesson_btn.click(start_lesson_ui, [session_id], [lesson_info, session_id])
 
 
 # Mount Gradio in FastAPI
-app = gr.mount_gradio_app(app, demo, path="/")
+# Note: Gradio must be mounted AFTER FastAPI routes are defined
+# Routes defined after mounting will override Gradio paths
+gr.mount_gradio_app(app, demo, path="/")
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=7860)
