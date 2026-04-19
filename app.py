@@ -8,9 +8,18 @@ Demonstrates:
 """
 
 import gradio as gr
+import spaces  # Import at module level for ZeroGPU detection
 from fastapi import FastAPI
 
 from engine import process_message  # GPU function in separate module
+
+
+# Dummy function to trigger ZeroGPU detection when using FastAPI mounting
+@spaces.GPU
+def detector_trigger():
+    """Dummy function to ensure ZeroGPU detects @spaces.GPU usage."""
+    return None
+
 
 # Initialize FastAPI
 app = FastAPI(title="Arabic Teaching API")
@@ -157,9 +166,4 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 # Mount Gradio in FastAPI
 # Note: Gradio must be mounted AFTER FastAPI routes are defined
 # Routes defined after mounting will override Gradio paths
-gr.mount_gradio_app(app, demo, path="/")
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+app = gr.mount_gradio_app(app, demo, path="/")
