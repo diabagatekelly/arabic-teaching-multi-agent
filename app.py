@@ -7,6 +7,7 @@ Demonstrates:
 """
 
 import gradio as gr
+import spaces
 from fastapi import FastAPI
 
 # Initialize FastAPI
@@ -124,8 +125,9 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 
     session_id = gr.State("")
 
+    @spaces.GPU(duration=60)
     def respond(message, chat_history, sess_id):
-        # Get response from agent
+        # Get response from agent (GPU-accelerated placeholder)
         bot_message = gradio_chat(message, chat_history, sess_id)
         # Use messages format: list of dicts with 'role' and 'content'
         chat_history.append({"role": "user", "content": message})
