@@ -115,16 +115,22 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
                 submit = gr.Button("Send", variant="primary")
                 clear = gr.Button("Clear")
 
-        # Right panel - Info/Controls (1/4 width)
+        # Right panel - Controls & Progress (1/4 width)
         with gr.Column(scale=1):
-            gr.Markdown("### ℹ️ Lesson Info")
-            lesson_info = gr.Markdown("**Lesson:** Not started\n\n**Mode:** None")
-            start_lesson_btn = gr.Button("Start Lesson 1", variant="primary")
+            gr.Markdown("### 🎮 Lesson Controls")
+            start_lesson_btn = gr.Button("Start Lesson", variant="primary")
+            with gr.Row():
+                end_lesson_btn = gr.Button("⏹️ End Lesson", variant="secondary", scale=1)
+                reset_lesson_btn = gr.Button("🔄 Reset", variant="stop", scale=1)
+
+            gr.Markdown("### 📊 Progress")
+            lesson_info = gr.Markdown("**Status:** Not started")
+            progress_display = gr.Markdown("**Learned:** 0 words\n\n**Quizzes:** 0/0")
 
     session_id = gr.State("")
 
     def start_lesson_ui(sid):
-        """Start lesson and show cached content."""
+        """Start lesson and initialize session."""
         import uuid
 
         if not sid:
@@ -133,38 +139,76 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         # Get lesson from cache
         lesson_number = 1
         if lesson_number not in lesson_cache:
-            return "**Error:** Lesson not found", sid
+            return "**Status:** Error - Lesson not found", "**Learned:** 0 words", sid
 
         lesson_data = lesson_cache[lesson_number]
 
-        # Display cached content
-        vocab_preview = "\n".join(
-            [
-                f"- {v['arabic']} ({v['transliteration']}) - {v['english']}"
-                for v in lesson_data["vocabulary"][:3]
-            ]
+        # Initialize session with lesson data
+        if sid not in sessions:
+            sessions[sid] = {}
+
+        sessions[sid].update(
+            {
+                "lesson_number": lesson_number,
+                "lesson_name": lesson_data["lesson_name"],
+                "vocabulary": lesson_data["vocabulary"],
+                "grammar_sections": lesson_data["grammar_sections"],
+                "learned_words": [],
+                "quiz_scores": [],
+                "status": "active",
+            }
         )
 
-        info_text = f"""**Lesson {lesson_number}:** {lesson_data['lesson_name']}
+        lesson_info = f"""**Status:** Active
 
-**Vocabulary:** {len(lesson_data['vocabulary'])} words
-{vocab_preview}
-... ({len(lesson_data['vocabulary']) - 3} more)
+**Lesson {lesson_number}:** {lesson_data['lesson_name']}
 
-**Grammar Points:** {', '.join(lesson_data['grammar_points'])}
-
-**Grammar Sections Cached:**
-{', '.join(lesson_data['grammar_sections'].keys())}
-
-**Difficulty:** {lesson_data['difficulty']}
+**Total Vocab:** {len(lesson_data['vocabulary'])} words
+**Grammar:** {', '.join(lesson_data['grammar_points'])}
 """
-        return info_text, sid
+        progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
+        return lesson_info, progress, sid
 
-    # Wire up the GPU-accelerated function
+    def end_lesson_ui(sid):
+        """End lesson - session saved but marked inactive."""
+        if sid in sessions and "status" in sessions[sid]:
+            sessions[sid]["status"] = "ended"
+            learned = len(sessions[sid].get("learned_words", []))
+            quizzes = len(sessions[sid].get("quiz_scores", []))
+
+            lesson_info = f"""**Status:** Ended
+
+**Lesson:** {sessions[sid].get('lesson_name', 'Unknown')}
+**Session saved** ✓
+"""
+            progress = f"**Learned:** {learned} words\n\n**Quizzes:** {quizzes} completed"
+        else:
+            lesson_info = "**Status:** No active lesson"
+            progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
+
+        return lesson_info, progress
+
+    def reset_lesson_ui(sid):
+        """Reset lesson - wipes session cache and progress."""
+        if sid in sessions:
+            # Clear all lesson data from session
+            del sessions[sid]
+
+        lesson_info = "**Status:** Reset complete\n\n*Session data cleared*"
+        progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
+        return lesson_info, progress
+
+    # Wire up chat functions
     msg.submit(process_message, [msg, chatbot, session_id], [msg, chatbot])
     submit.click(process_message, [msg, chatbot, session_id], [msg, chatbot])
     clear.click(lambda: [], None, chatbot)
-    start_lesson_btn.click(start_lesson_ui, [session_id], [lesson_info, session_id])
+
+    # Wire up lesson control functions
+    start_lesson_btn.click(
+        start_lesson_ui, [session_id], [lesson_info, progress_display, session_id]
+    )
+    end_lesson_btn.click(end_lesson_ui, [session_id], [lesson_info, progress_display])
+    reset_lesson_btn.click(reset_lesson_ui, [session_id], [lesson_info, progress_display])
 
 
 # Launch Gradio (standard for Spaces)
