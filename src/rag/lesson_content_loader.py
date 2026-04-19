@@ -82,8 +82,9 @@ class LessonContentLoader:
             Dict mapping grammar topics to their content (rule, examples, etc.)
         """
         # Query for grammar sections in this lesson
-        query = f"grammar rules lesson {lesson_number}"
-        results = self.retriever.retrieve_by_lesson(query, lesson_number, top_k=20)
+        # Use more specific query to get main grammar sections, not just detection patterns
+        query = f"grammar point masculine feminine definite article lesson {lesson_number} rules examples"
+        results = self.retriever.retrieve_by_lesson(query, lesson_number, top_k=30)
 
         logger.info(f"Retrieved {len(results)} chunks for lesson {lesson_number} grammar")
 
