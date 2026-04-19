@@ -175,6 +175,32 @@ IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other lan
     input_variables=["batch_number", "score", "words_correct", "words_incorrect"],
 )
 
+VOCAB_PROGRESS_CHECK = PromptTemplate(
+    template="""Mode: teaching_vocab
+
+Lesson {lesson_number} - Progress Check
+
+Current Status:
+- Batch: {current_batch} of {total_batches}
+- Words quizzed in current batch: {words_quizzed}/{batch_size}
+- Total learned: {learned_count} items
+
+Show current progress and offer contextual options:
+- If mid-batch (words_quizzed < batch_size): Continue quiz or review current batch
+- If batch complete: Move to next batch or review
+- Always offer: See all words, skip to final test
+
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
+    input_variables=[
+        "lesson_number",
+        "current_batch",
+        "total_batches",
+        "words_quizzed",
+        "batch_size",
+        "learned_count",
+    ],
+)
+
 
 # -----------------------------------------------------------------------------
 # Grammar Teaching (4 prompts)
