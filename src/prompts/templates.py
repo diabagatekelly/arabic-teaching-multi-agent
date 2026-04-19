@@ -158,6 +158,24 @@ IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other lan
     input_variables=["batch_number", "score", "words_correct", "words_incorrect"],
 )
 
+VOCAB_FINAL_BATCH_SUMMARY = PromptTemplate(
+    template="""Mode: teaching_vocab
+
+Batch {batch_number} Quiz Results (Final Batch!)
+
+Score: {score}
+Correct: {words_correct}
+Missed: {words_incorrect}
+
+Congratulate on completing all vocabulary batches! Show words missed with translations. Offer options:
+1. Move to Grammar section
+2. Review these words
+3. Skip to final vocabulary test
+
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
+    input_variables=["batch_number", "score", "words_correct", "words_incorrect"],
+)
+
 
 # -----------------------------------------------------------------------------
 # Grammar Teaching (4 prompts)

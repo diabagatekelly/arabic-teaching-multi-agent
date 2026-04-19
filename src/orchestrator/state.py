@@ -75,6 +75,12 @@ class SystemState:
     cached_grammar_content: dict[str, Any] = field(default_factory=dict)
     lesson_initialized: bool = False
 
+    # Batch tracking for vocabulary teaching
+    current_vocab_batch: int = 1  # Which batch (1, 2, 3...) is currently active
+    batch_quizzed_words: list[str] = field(
+        default_factory=list
+    )  # Arabic words quizzed in current batch
+
     # Grading pre-loading (Agent 2)
     preloaded_grammar_rules: dict[str, Any] = field(default_factory=dict)
 
