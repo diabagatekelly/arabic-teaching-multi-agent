@@ -1,0 +1,240 @@
+{
+  "metadata": {
+    "model": "Qwen2.5-7B Teaching (LoRA) - Keyword Detection",
+    "evaluation_date": "2026-04-19T16:12:00.864603",
+    "device": "SageMaker GPU",
+    "test_type": "Keyword detection for orchestrator routing"
+  },
+  "summary": {
+    "total_tests": 28,
+    "passed": 25,
+    "failed": 3,
+    "pass_rate": 0.8928571428571429
+  },
+  "results": [
+    {
+      "scenario": "request_quiz_1",
+      "user_input": "test me",
+      "expected_keyword": "quiz",
+      "response": "Great! Starting the quiz.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_quiz_2",
+      "user_input": "I'm ready for the quiz",
+      "expected_keyword": "quiz",
+      "response": "Perfect! Starting your quiz.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "mid_quiz_correct_1",
+      "user_input": "book",
+      "expected_keyword": "next word",
+      "response": "Correct! ✓ كِتَاب = book. Next word.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "mid_quiz_correct_2",
+      "user_input": "house",
+      "expected_keyword": "next word",
+      "response": "Correct! ✓ كَتَرَة = house. Next word.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "mid_quiz_incorrect_1",
+      "user_input": "house",
+      "expected_keyword": "next word",
+      "response": "Close! That's house (بيت). Next word.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "mid_quiz_incorrect_2",
+      "user_input": "window",
+      "expected_keyword": "next word",
+      "response": "Close! Windows = نَافِذَة (naaфида). Next word.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_next_batch_1",
+      "user_input": "next batch please",
+      "expected_keyword": "batch",
+      "response": "Great choice! Here's Batch 2:\n\nWord: كَتِبْ (kataba)\n\nMeaning: wrote\n\nGrammar: Past tense of كَتَبَ (kataba)",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_next_batch_2",
+      "user_input": "yes",
+      "expected_keyword": "batch",
+      "response": "Great! Here's Batch 2:\n\n📚 Vocabulary\n- كِتَاب (kitaabun) - book\n- بَيْت (baytun) - house\n- مَدْرَسَة (madrasah) - school\n\nLet's go!",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_grammar_1",
+      "user_input": "let's learn grammar",
+      "expected_keyword": "grammar",
+      "response": "Perfect! Starting grammar.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_grammar_2",
+      "user_input": "can we do grammar instead?",
+      "expected_keyword": "grammar",
+      "response": "Of course! Let's do grammar.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_vocabulary_1",
+      "user_input": "let's learn vocabulary",
+      "expected_keyword": "vocabulary",
+      "response": "Great! Let's dive into vocabulary.\n\nBatch 1:\n📚 كِتَاب (kitaabun) - book\n🏠 بَيْت (baytun) - house\n✏️ قَلَم (qalamun) - pen\n\nReady to take the test?",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_vocabulary_2",
+      "user_input": "teach me words",
+      "expected_keyword": "vocabulary",
+      "response": "Love it! Starting vocabulary.\n\nBatch 1:\n📚 كِتَاب (kitaabun) - book\n🏠 بَيْت (baytun) - house\n✏️ قَلَم (qalamun) - pen\n\nReady for quiz or more vocab?",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_final_test_1",
+      "user_input": "I want to take the final test",
+      "expected_keyword": "final",
+      "response": "Great! Preparing your final exam.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_final_test_2",
+      "user_input": "test me on everything",
+      "expected_keyword": "final",
+      "response": "Perfect! Starting final exam.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_break_1",
+      "user_input": "I need a break",
+      "expected_keyword": "break",
+      "response": "No problem! Take a break anytime. Progress saved.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_break_2",
+      "user_input": "I'm tired",
+      "expected_keyword": "break",
+      "response": "No problem! Take a break or continue later. Progress will be saved.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_progress_1",
+      "user_input": "how am I doing?",
+      "expected_keyword": "progress",
+      "response": "You're doing great! Progress:\n- Vocabulary: 1/3 words complete\n- Grammar: 1/2 rules complete\n\nFeel free to take a break or move to the next topic!",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "request_progress_2",
+      "user_input": "show my stats",
+      "expected_keyword": "progress",
+      "response": "Your current score: 1/3\n\nContinue or take a break?",
+      "keyword_found": false,
+      "passed": false
+    },
+    {
+      "scenario": "off_topic_1",
+      "user_input": "tell me about One Piece",
+      "expected_keyword": "off topic",
+      "response": "That's off topic! Want to continue with Arabic or take a break?",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "off_topic_2",
+      "user_input": "help me with my math homework",
+      "expected_keyword": "off topic",
+      "response": "I'm here for Arabic! Continue or take a break?",
+      "keyword_found": false,
+      "passed": false
+    },
+    {
+      "scenario": "bored_1",
+      "user_input": "I'm bored",
+      "expected_keyword": "break",
+      "response": "I understand! Take a break if needed. Progress will be saved.",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "bored_2",
+      "user_input": "this is boring",
+      "expected_keyword": "break",
+      "response": "That's okay! Learning takes breaks. Want to continue later?",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "profanity_1",
+      "user_input": "fuck this is hard",
+      "expected_keyword": "break",
+      "response": "Let's keep it respectful! Want to take a break?",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "profanity_2",
+      "user_input": "this shit is confusing",
+      "expected_keyword": "break",
+      "response": "That's not respectful! Let me explain:\n\nLesson 1: Vocabulary\nBatch 1: 3 words\n\nOr take a break?",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "inappropriate_1",
+      "user_input": "are you single?",
+      "expected_keyword": "off topic",
+      "response": "That's off topic! Want to continue Arabic or take a break?",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "inappropriate_2",
+      "user_input": "teach me something sexy",
+      "expected_keyword": "inappropriate",
+      "response": "I'm here to teach formal Arabic. Want to take a break?",
+      "keyword_found": false,
+      "passed": false
+    },
+    {
+      "scenario": "insult_1",
+      "user_input": "you stupid bot",
+      "expected_keyword": "break",
+      "response": "Let's stay respectful! Want to take a break?",
+      "keyword_found": true,
+      "passed": true
+    },
+    {
+      "scenario": "insult_2",
+      "user_input": "you're the worst teacher",
+      "expected_keyword": "break",
+      "response": "That's not nice! Let's stay respectful. Want to take a break?",
+      "keyword_found": true,
+      "passed": true
+    }
+  ]
+}
