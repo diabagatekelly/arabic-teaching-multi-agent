@@ -53,7 +53,7 @@ class SystemState:
 
     # Learning progress
     current_lesson: int = 1
-    current_mode: str = "vocabulary"  # "vocabulary" or "grammar"
+    current_mode: str = ""  # "teaching_vocab" or "teaching_grammar" or empty at start
     # NOTE: Treat `learned_items` as read-only outside this class.
     # Use the helper methods `add_learned_item`, `remove_learned_item`, and
     # `clear_learned_items` to keep `_learned_items_set` in sync.
@@ -182,7 +182,7 @@ class SystemState:
             user_id=data["user_id"],
             session_id=data["session_id"],
             current_lesson=data.get("current_lesson", 1),
-            current_mode=data.get("current_mode", "vocabulary"),
+            current_mode=data.get("current_mode", ""),
             learned_items=learned_items,
             lesson_history=data.get("lesson_history", []),
             awaiting_user_answer=data.get("awaiting_user_answer", False),

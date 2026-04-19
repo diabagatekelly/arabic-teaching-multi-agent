@@ -273,12 +273,19 @@ class TeachingNode:
         }
         agent_mode = mode_map.get(state.current_mode, state.current_mode)
 
+        # Pass all metadata from grading (includes exercise metadata like word_arabic)
         input_data = {
             "is_correct": is_correct,
             "user_answer": grading_msg.metadata.get("user_answer", ""),
             "correct_answer": grading_msg.metadata.get("correct_answer", ""),
             "mode": agent_mode,
         }
+
+        # Add all other metadata fields (word_arabic, word_transliteration, etc.)
+        for key, value in grading_msg.metadata.items():
+            if key not in input_data:
+                input_data[key] = value
+
         return self.agent.provide_feedback(input_data)
 
 
