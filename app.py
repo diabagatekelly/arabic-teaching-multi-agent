@@ -92,14 +92,22 @@ def gradio_chat(message, history, session_id):
         return f"Error: {e}"
 
 
-# Build Gradio interface
+# Build Gradio interface with 3-column layout
 with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
-    gr.Markdown("# 🌍 Arabic Teacher - FastAPI Proof of Concept")
-    gr.Markdown("Demonstrating FastAPI backend with Gradio frontend")
+    gr.Markdown("# 🌍 Arabic Teacher")
 
     with gr.Row():
-        with gr.Column():
-            chatbot = gr.Chatbot(height=400)
+        # Left panel - Flashcards (1/4 width)
+        with gr.Column(scale=1):
+            gr.Markdown("### 📚 Flashcards")
+            flashcard_display = gr.Markdown("Click 'Next Card' to start")
+            flashcard_progress = gr.Textbox(label="Progress", value="0/6", interactive=False)
+            next_card_btn = gr.Button("Next Card")
+
+        # Center panel - Chat (1/2 width)
+        with gr.Column(scale=2):
+            gr.Markdown("### 💬 Chat")
+            chatbot = gr.Chatbot(height=500, type="messages")
             msg = gr.Textbox(
                 label="Your message",
                 placeholder="Try: hello, vocab, grammar...",
@@ -108,12 +116,20 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
                 submit = gr.Button("Send", variant="primary")
                 clear = gr.Button("Clear")
 
+        # Right panel - Info/Controls (1/4 width)
+        with gr.Column(scale=1):
+            gr.Markdown("### ℹ️ Lesson Info")
+            lesson_info = gr.Markdown("**Lesson:** Not started\n\n**Mode:** None")
+            start_lesson_btn = gr.Button("Start Lesson 1", variant="primary")
+
     session_id = gr.State("")
 
     def respond(message, chat_history, sess_id):
         # Get response from agent
         bot_message = gradio_chat(message, chat_history, sess_id)
-        chat_history.append((message, bot_message))
+        # Use messages format: list of dicts with 'role' and 'content'
+        chat_history.append({"role": "user", "content": message})
+        chat_history.append({"role": "assistant", "content": bot_message})
         return "", chat_history
 
     msg.submit(respond, [msg, chatbot, session_id], [msg, chatbot])
