@@ -346,15 +346,24 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
         ],
     )
 
-    def check_auto_continue(trigger, current_state):
+    def check_auto_continue(trigger, current_state, current_chat):
         """Helper to auto-trigger next quiz after 2-second delay."""
         import time
 
         if trigger == "true":
             time.sleep(2)
             # Trigger send_message with empty user message to get next quiz
-            return send_message("", [], current_state)
-        return gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), "false"
+            return send_message("", current_chat, current_state)
+        return (
+            gr.skip(),
+            gr.skip(),
+            gr.skip(),
+            gr.skip(),
+            gr.skip(),
+            gr.skip(),
+            gr.skip(),
+            "false",
+        )
 
     send_event = send_btn.click(
         fn=send_message,
@@ -374,7 +383,7 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
     # Auto-continue: if trigger is "true", wait 2s then auto-submit
     send_event.then(
         fn=check_auto_continue,
-        inputs=[auto_continue_trigger, session_state],
+        inputs=[auto_continue_trigger, session_state, chatbot],
         outputs=[
             session_state,
             chatbot,
@@ -405,7 +414,7 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
     # Auto-continue for submit as well
     submit_event.then(
         fn=check_auto_continue,
-        inputs=[auto_continue_trigger, session_state],
+        inputs=[auto_continue_trigger, session_state, chatbot],
         outputs=[
             session_state,
             chatbot,
