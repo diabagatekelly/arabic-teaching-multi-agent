@@ -48,7 +48,6 @@ Greet the student warmly. Present the complete lesson structure by showing:
 Then offer numbered navigation:
 1. Start with vocabulary
 2. Start with grammar
-3. See lesson progress
 
 Format with numbered options and mention they can request something else.
 
@@ -93,15 +92,11 @@ Lesson {lesson_number}, Batch {batch_number} of {total_batches}
 Words to teach:
 {words}
 
-INSTRUCTIONS:
-1. Say "Here are the words for Batch {batch_number} of {total_batches}"
-2. Show ALL the words above with their Arabic, transliteration, and English meanings
-3. Encourage them to review with flashcards before taking the quiz
-4. Then offer these TWO options:
-   1. Take quiz on this batch
-   2. Go to next batch
+Present all words above with their Arabic, transliteration, and English. Then offer these TWO options:
+1. Take quiz on this batch
+2. Go to next batch
 
-IMPORTANT: Actually show the words, don't just say "here are the words". Use ONLY English and Arabic text.""",
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["lesson_number", "batch_number", "total_batches", "words"],
 )
 
@@ -117,7 +112,7 @@ Show all vocabulary words with Arabic, transliteration, and English. Mention cur
 1. Go back to current batch (Batch {current_batch})
 2. Skip to final test
 
-Or tell me what you'd like to do.""",
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["lesson_number", "all_words", "current_batch"],
 )
 
@@ -159,7 +154,7 @@ Summarize performance encouragingly. Show words missed with translations. Offer 
 2. Review these words
 3. Skip to final test
 
-Or tell me what you'd like to do.""",
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["batch_number", "score", "words_correct", "words_incorrect"],
 )
 
@@ -176,11 +171,9 @@ Lesson {lesson_number} - Grammar Section
 Topics ({topics_count}):
 {topics_list}
 
-Present grammar section overview. Explain each topic has a quiz. Offer options:
-1. Start first topic
-2. See lesson progress
+Present grammar section overview. Explain each topic has a quiz. Ask if they want to start with the first topic or request something else.
 
-Or tell me what you'd like to do.""",
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["lesson_number", "topics_count", "topics_list"],
 )
 
@@ -229,12 +222,12 @@ Pass Threshold: {pass_threshold}
 
 {weak_areas}
 
-Summarize performance. If score < threshold, suggest reviewing weak areas and offer retry. If passed, congratulate. Offer options:
-1. Continue to next topic (if available)
-2. Review and retry (if failed)
-3. See lesson progress
+Summarize performance. If score < threshold, suggest reviewing weak areas and offer retry. If passed, congratulate. Offer:
+- Continue to next topic (if available)
+- Review and retry (if failed)
+- Or tell me what you'd like to do
 
-Or tell me what you'd like to do.""",
+IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["topic_name", "score", "pass_threshold", "weak_areas"],
 )
 
