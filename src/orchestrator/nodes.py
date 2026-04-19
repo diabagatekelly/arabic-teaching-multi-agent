@@ -67,10 +67,14 @@ class TeachingNode:
                 # Handle user message
                 response = self._handle_user_message(state)
 
-            # Strip [GENERATE_EXERCISE] marker BEFORE adding to messages
+            # Strip markers BEFORE adding to messages
             has_exercise_marker = "[GENERATE_EXERCISE]" in response
+            has_queue_marker = "[QUEUE_NEXT_QUIZ]" in response
+
             if has_exercise_marker:
                 response = response.replace("[GENERATE_EXERCISE]", "").strip()
+            if has_queue_marker:
+                response = response.replace("[QUEUE_NEXT_QUIZ]", "").strip()
 
             # Update state
             state.add_message("agent1", response)
@@ -83,14 +87,19 @@ class TeachingNode:
             if state.pending_exercise and state.awaiting_user_answer:
                 logger.info("Exercise presented, waiting for user answer")
                 state.next_agent = "user"
-            # Check if agent requested exercise generation
+            # Check if agent requested immediate exercise generation
             elif has_exercise_marker:
                 logger.info("Agent requested exercise generation via [GENERATE_EXERCISE] marker")
                 state.next_agent = "agent3"
+            # Check if agent requested queued quiz (show feedback, then auto-continue)
+            elif has_queue_marker:
+                logger.info(
+                    "Agent requested queued quiz via [QUEUE_NEXT_QUIZ] marker - UI will auto-continue"
+                )
+                state.next_agent = "user"  # Return to UI, let it handle timer
+                state.pending_auto_continue = True  # Flag for UI to auto-trigger
             else:
                 # Wait for user response
-                # Note: Removed keyword detection ("exercise"/"quiz") - too prone to false positives
-                # (e.g., lesson welcome mentioning "practice exercises" shouldn't trigger generation)
                 state.next_agent = "user"
 
             return state

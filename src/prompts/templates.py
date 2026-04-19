@@ -263,10 +263,10 @@ Result: Correct
 Batch Progress: {words_quizzed}/{total_batch_words} words
 
 Provide brief, encouraging feedback. Then check batch progress:
-- If words_quizzed < total_batch_words: Add "[GENERATE_EXERCISE]" to trigger next word
+- If words_quizzed < total_batch_words: Add "[QUEUE_NEXT_QUIZ]" to auto-trigger next word after 2 seconds
 - If words_quizzed == total_batch_words: Offer batch options (flashcards, retry, next batch)
 
-The marker [GENERATE_EXERCISE] will be hidden from the student.
+The marker [QUEUE_NEXT_QUIZ] will be hidden from the student and triggers automatic continuation.
 
 Your response:""",
     input_variables=[
@@ -288,10 +288,10 @@ Result: Incorrect
 Batch Progress: {words_quizzed}/{total_batch_words} words
 
 Provide supportive feedback with the correction. Then check batch progress:
-- If words_quizzed < total_batch_words: Add "[GENERATE_EXERCISE]" to trigger next word
+- If words_quizzed < total_batch_words: Add "[QUEUE_NEXT_QUIZ]" to auto-trigger next word after 2 seconds
 - If words_quizzed == total_batch_words: Offer batch options (flashcards, retry, next batch)
 
-The marker [GENERATE_EXERCISE] will be hidden from the student.
+The marker [QUEUE_NEXT_QUIZ] will be hidden from the student and triggers automatic continuation.
 
 Your response:""",
     input_variables=[

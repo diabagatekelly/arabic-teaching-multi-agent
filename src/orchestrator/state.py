@@ -69,6 +69,7 @@ class SystemState:
     # Agent routing
     last_agent: str = ""  # "agent1", "agent2", "agent3"
     next_agent: str = "agent1"  # Default: start with teaching agent
+    pending_auto_continue: bool = False  # Flag for UI to auto-trigger next action after delay
 
     # Content caching (Agent 3)
     cached_vocab_words: list[dict[str, Any]] = field(default_factory=list)

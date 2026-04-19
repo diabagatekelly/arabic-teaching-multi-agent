@@ -250,12 +250,27 @@ def send_message(user_message: str, chat_history: list, state_dict: dict):
 
         exercises, correct, accuracy, learned = _format_progress_stats(result)
 
-        return state_dict, chat_history, exercises, correct, accuracy, learned, ""
+        # Check if auto-continue is pending (for queued quiz)
+        auto_continue_flag = "true" if result.get("pending_auto_continue", False) else "false"
+        # Reset the flag after reading
+        if result.get("pending_auto_continue"):
+            result["pending_auto_continue"] = False
+
+        return (
+            state_dict,
+            chat_history,
+            exercises,
+            correct,
+            accuracy,
+            learned,
+            "",
+            auto_continue_flag,
+        )
 
     except Exception as e:
         logger.error(f"Error processing message: {e}")
         chat_history.append([user_message, f"❌ Error: {e}"])
-        return state_dict, chat_history, 0, 0, "0%", "", ""
+        return state_dict, chat_history, 0, 0, "0%", "", "", "false"
 
 
 # Build Gradio interface
@@ -265,6 +280,9 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
 
     # State to persist orchestrator state between GPU calls
     session_state = gr.State(value={})
+
+    # Hidden component for auto-continue trigger (2-second timer after feedback)
+    auto_continue_trigger = gr.Textbox(value="false", visible=False)
 
     with gr.Row():
         # Left column: Chat
@@ -328,7 +346,17 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
         ],
     )
 
-    send_btn.click(
+    def check_auto_continue(trigger, current_state):
+        """Helper to auto-trigger next quiz after 2-second delay."""
+        import time
+
+        if trigger == "true":
+            time.sleep(2)
+            # Trigger send_message with empty user message to get next quiz
+            return send_message("", [], current_state)
+        return gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), "false"
+
+    send_event = send_btn.click(
         fn=send_message,
         inputs=[msg, chatbot, session_state],
         outputs=[
@@ -339,10 +367,27 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
             accuracy_display,
             learned_items,
             msg,
+            auto_continue_trigger,
         ],
     )
 
-    msg.submit(
+    # Auto-continue: if trigger is "true", wait 2s then auto-submit
+    send_event.then(
+        fn=check_auto_continue,
+        inputs=[auto_continue_trigger, session_state],
+        outputs=[
+            session_state,
+            chatbot,
+            exercises_count,
+            correct_count,
+            accuracy_display,
+            learned_items,
+            msg,
+            auto_continue_trigger,
+        ],
+    )
+
+    submit_event = msg.submit(
         fn=send_message,
         inputs=[msg, chatbot, session_state],
         outputs=[
@@ -353,6 +398,23 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
             accuracy_display,
             learned_items,
             msg,
+            auto_continue_trigger,
+        ],
+    )
+
+    # Auto-continue for submit as well
+    submit_event.then(
+        fn=check_auto_continue,
+        inputs=[auto_continue_trigger, session_state],
+        outputs=[
+            session_state,
+            chatbot,
+            exercises_count,
+            correct_count,
+            accuracy_display,
+            learned_items,
+            msg,
+            auto_continue_trigger,
         ],
     )
 
