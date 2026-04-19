@@ -4,11 +4,13 @@ Demonstrates:
 - FastAPI backend with agent endpoint
 - Gradio UI mounted in FastAPI
 - Works with HuggingFace Spaces @spaces.GPU
+- GPU function isolated in engine.py for reliable ZeroGPU detection
 """
 
 import gradio as gr
-import spaces
 from fastapi import FastAPI
+
+from engine import process_message  # GPU function in separate module
 
 # Initialize FastAPI
 app = FastAPI(title="Arabic Teaching API")
@@ -66,39 +68,7 @@ def get_session(session_id: str):
     return sessions[session_id]
 
 
-# GPU-accelerated agent function (must be at module level for Spaces detection)
-@spaces.GPU(duration=60)
-def process_message(message, chat_history, session_id):
-    """Process user message with agent (GPU-accelerated).
-
-    Currently: Simple logic placeholder
-    Future: Will load Qwen 7B models for teaching/grading
-    """
-    import uuid
-
-    import torch
-
-    # Verify GPU access (placeholder for future model inference)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-
-    # Generate session ID if not provided
-    if not session_id:
-        session_id = str(uuid.uuid4())[:8]
-
-    # Simple agent logic (will be replaced with model inference)
-    if "hello" in message.lower():
-        response = f"مرحباً! Hello! (Running on {device})"
-    elif "vocab" in message.lower():
-        response = "📚 Vocabulary mode activated!"
-    elif "grammar" in message.lower():
-        response = "📖 Grammar mode activated!"
-    else:
-        response = f"Echo: {message}"
-
-    # Use messages format
-    chat_history.append({"role": "user", "content": message})
-    chat_history.append({"role": "assistant", "content": response})
-    return "", chat_history
+# GPU function imported from engine.py for ZeroGPU detection
 
 
 # Build Gradio interface with 3-column layout
@@ -139,12 +109,5 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
     clear.click(lambda: [], None, chatbot)
 
 
-# Mount Gradio in FastAPI and expose at module level for Spaces
-# IMPORTANT: Spaces needs 'app' at module level to detect @spaces.GPU functions
+# Mount Gradio in FastAPI
 app = gr.mount_gradio_app(app, demo, path="/")
-
-# Local development entry point only
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=7860)
