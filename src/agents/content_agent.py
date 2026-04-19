@@ -235,6 +235,8 @@ class ContentAgent:
                 - learned_items: List of vocab/grammar items to use
                 - count: Number of exercises to generate (default: 1)
                 - lesson_number: Optional lesson number for context
+                - batch_quizzed_words: List of Arabic words already quizzed (exclude these)
+                - current_batch: Current batch number
 
         Returns:
             JSON string with exercise data including required metadata fields
@@ -244,6 +246,7 @@ class ContentAgent:
         learned_items = input_data.get("learned_items", [])
         lesson_number = input_data.get("lesson_number")
         question_type = input_data.get("question_type", "arabic_to_english")  # Hard-coded for demo
+        batch_quizzed_words = input_data.get("batch_quizzed_words", [])
 
         # Get RAG examples for this exercise type and difficulty
         template = self.exercise_templates.get(exercise_type)
@@ -263,18 +266,30 @@ class ContentAgent:
             for i, example in enumerate(examples, 1):
                 examples_text += f"Example {i}:\n{example}\n\n"
 
+        # Filter out already quizzed words from learned items
+        available_items = [
+            item
+            for item in learned_items
+            if not any(quizzed in item for quizzed in batch_quizzed_words)
+        ]
+
+        if not available_items and learned_items:
+            logger.warning(f"All words already quizzed: {batch_quizzed_words}. Using full list.")
+            available_items = learned_items
+
         # Build prompt
         prompt = f"""You are an Arabic language exercise generator. Generate a single exercise following the exact format shown in the examples.
 
 Exercise Type: {exercise_type}
 Difficulty: {difficulty}
 Question Type: {question_type} (ALWAYS ask student to translate from Arabic to English)
-Learned Items: {", ".join(learned_items[:5])}
+Available Items (NOT already quizzed): {", ".join(available_items[:5])}
+Words Already Quizzed (DO NOT USE): {", ".join(batch_quizzed_words)}
 Lesson Vocabulary: {", ".join(lesson_vocab[:10])}
 {examples_text}
 CRITICAL REQUIREMENTS:
 1. Output ONLY valid JSON matching the example format EXACTLY
-2. Use the learned items provided above in your question
+2. Use ONLY words from "Available Items" - NEVER use words from "Words Already Quizzed"
 3. Question format: "What does [Arabic word] mean?" (always ask for English translation)
 4. Include ALL fields shown in the examples: "question", "answer", "correct", "type", "difficulty"
 5. REQUIRED: Add metadata fields: "word_arabic", "word_transliteration", "english" (the word being tested)
