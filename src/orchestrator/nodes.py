@@ -218,7 +218,9 @@ class TeachingNode:
         # If no mode set, "1" means "start with vocabulary"
 
         # Detect mode changes from user input (only when NOT already in a mode)
-        if user_input in ["1", "vocab", "vocabulary"] and not state.current_mode:
+        if (
+            user_input == "1" or any(kw in user_input for kw in ["vocab", "vocabulary", "batch"])
+        ) and not state.current_mode:
             state.current_mode = "teaching_vocab"
             logger.info("Mode changed to teaching_vocab - initiating vocabulary teaching")
 
