@@ -97,18 +97,19 @@ def initialize_models():
 
 
 @spaces.GPU(duration=120)  # Reserve GPU for 120 seconds per call
-def start_lesson(lesson_number: int, chat_history: list) -> tuple:
+def start_lesson(lesson_number: int, chat_history: list, state_dict: dict) -> tuple:
     """
     Start a new lesson (GPU-accelerated).
 
     Args:
         lesson_number: Lesson to start (1-10)
         chat_history: Current chat history
+        state_dict: Gradio State for persisting orchestrator state
 
     Returns:
-        Tuple of (updated_chat, exercises, correct, accuracy, learned_items, status)
+        Tuple of (state_dict, updated_chat, exercises, correct, accuracy, learned_items, status)
     """
-    global current_state, teaching_model, grading_model, embedder_model
+    global teaching_model, grading_model, embedder_model
 
     # Move models to device (GPU on Spaces, CPU locally)
     logger.info(f"Moving models to {DEVICE}...")
@@ -132,8 +133,8 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
         # Run orchestrator (GPU-accelerated model inference)
         result = orchestrator.invoke(initial_state)
 
-        # Update global state
-        current_state = result
+        # Update state dict (persists in Gradio State)
+        state_dict = result
 
         conversation_history = result.get("conversation_history", [])
         if conversation_history:
@@ -155,11 +156,11 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
 
         status = f"✓ Lesson {lesson_number} started!"
 
-        return chat_history, exercises, correct, accuracy, learned, status
+        return state_dict, chat_history, exercises, correct, accuracy, learned, status
 
     except Exception as e:
         logger.error(f"Failed to start lesson: {e}")
-        return chat_history, 0, 0, "0%", "", f"❌ Error: {e}"
+        return state_dict, chat_history, 0, 0, "0%", "", f"❌ Error: {e}"
 
 
 def _extract_agent_response(conversation_history: list) -> str:
@@ -184,37 +185,38 @@ def _format_progress_stats(result: dict) -> tuple:
 
 
 @spaces.GPU(duration=120)
-def send_message(user_message: str, chat_history: list):
+def send_message(user_message: str, chat_history: list, state_dict: dict):
     """
     Process user message (GPU-accelerated).
 
     Args:
         user_message: User's input
         chat_history: Current chat history
+        state_dict: Gradio State for persisting orchestrator state
 
     Returns:
-        Tuple of (updated_chat, exercises, correct, accuracy, learned_items, cleared_input)
+        Tuple of (state_dict, updated_chat, exercises, correct, accuracy, learned_items, cleared_input)
     """
-    global current_state, teaching_model, grading_model, embedder_model
+    global teaching_model, grading_model, embedder_model
 
     # Move models to device (GPU on Spaces, CPU locally)
     teaching_model.to(DEVICE)
     grading_model.to(DEVICE)
     embedder_model.model.to(DEVICE)
 
-    if not current_state:
+    if not state_dict:
         chat_history.append([user_message, "⚠️ Please start a lesson first!"])
-        return chat_history, 0, 0, "0%", "", ""
+        return state_dict, chat_history, 0, 0, "0%", "", ""
 
     if not user_message.strip():
-        return chat_history, 0, 0, "0%", "", ""
+        return state_dict, chat_history, 0, 0, "0%", "", ""
 
     logger.info(f"Processing user message: {user_message[:50]}...")
 
     try:
         user_msg = Message(role="user", content=user_message)
         # Convert to dict for LangGraph compatibility
-        current_state["conversation_history"].append(
+        state_dict["conversation_history"].append(
             {
                 "role": user_msg.role,
                 "content": user_msg.content,
@@ -223,13 +225,13 @@ def send_message(user_message: str, chat_history: list):
             }
         )
 
-        if current_state.get("pending_exercise") and current_state.get("awaiting_user_answer"):
-            current_state["next_agent"] = "agent2"  # Route to grading agent
+        if state_dict.get("pending_exercise") and state_dict.get("awaiting_user_answer"):
+            state_dict["next_agent"] = "agent2"  # Route to grading agent
         else:
-            current_state["next_agent"] = "agent1"  # Route to teaching agent
+            state_dict["next_agent"] = "agent1"  # Route to teaching agent
 
-        result = orchestrator.invoke(current_state)
-        current_state = result
+        result = orchestrator.invoke(state_dict)
+        state_dict = result
 
         conversation_history = result.get("conversation_history", [])
         agent_response = _extract_agent_response(conversation_history)
@@ -238,18 +240,21 @@ def send_message(user_message: str, chat_history: list):
 
         exercises, correct, accuracy, learned = _format_progress_stats(result)
 
-        return chat_history, exercises, correct, accuracy, learned, ""
+        return state_dict, chat_history, exercises, correct, accuracy, learned, ""
 
     except Exception as e:
         logger.error(f"Error processing message: {e}")
         chat_history.append([user_message, f"❌ Error: {e}"])
-        return chat_history, 0, 0, "0%", "", ""
+        return state_dict, chat_history, 0, 0, "0%", "", ""
 
 
 # Build Gradio interface
 with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
     gr.Markdown("# 🇸🇦 Arabic Teaching System")
     gr.Markdown("Learn Arabic through interactive lessons powered by fine-tuned AI agents")
+
+    # State to persist orchestrator state between GPU calls
+    session_state = gr.State(value={})
 
     with gr.Row():
         # Left column: Chat
@@ -301,8 +306,9 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
     # Event handlers
     start_btn.click(
         fn=start_lesson,
-        inputs=[lesson_dropdown, chatbot],
+        inputs=[lesson_dropdown, chatbot, session_state],
         outputs=[
+            session_state,
             chatbot,
             exercises_count,
             correct_count,
@@ -314,14 +320,30 @@ with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
 
     send_btn.click(
         fn=send_message,
-        inputs=[msg, chatbot],
-        outputs=[chatbot, exercises_count, correct_count, accuracy_display, learned_items, msg],
+        inputs=[msg, chatbot, session_state],
+        outputs=[
+            session_state,
+            chatbot,
+            exercises_count,
+            correct_count,
+            accuracy_display,
+            learned_items,
+            msg,
+        ],
     )
 
     msg.submit(
         fn=send_message,
-        inputs=[msg, chatbot],
-        outputs=[chatbot, exercises_count, correct_count, accuracy_display, learned_items, msg],
+        inputs=[msg, chatbot, session_state],
+        outputs=[
+            session_state,
+            chatbot,
+            exercises_count,
+            correct_count,
+            accuracy_display,
+            learned_items,
+            msg,
+        ],
     )
 
     # Initialize on load
