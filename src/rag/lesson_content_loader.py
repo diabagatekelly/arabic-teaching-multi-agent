@@ -85,16 +85,25 @@ class LessonContentLoader:
         query = f"grammar rules lesson {lesson_number}"
         results = self.retriever.retrieve_by_lesson(query, lesson_number, top_k=20)
 
+        logger.info(f"Retrieved {len(results)} chunks for lesson {lesson_number} grammar")
+
         grammar_content = {}
 
-        for result in results:
+        for i, result in enumerate(results):
             text = result["text"]
             metadata = result.get("metadata", {})
             section_title = metadata.get("section_title", "")
 
+            # Log each chunk to debug what's being retrieved
+            logger.info(
+                f"Grammar chunk {i+1}: section_title='{section_title}', "
+                f"has_grammar_point={'grammar point' in section_title.lower()}"
+            )
+
             # Check if this is a grammar section (exclude detection rules for grading)
             if "grammar point" in section_title.lower():
                 topic_name = self._extract_topic_name(section_title, text)
+                logger.info(f"Grammar chunk {i+1}: extracted topic_name='{topic_name}'")
                 if topic_name and "detection" not in topic_name.lower():
                     grammar_content[topic_name] = {
                         "rule": self._extract_rule(text),
@@ -102,7 +111,13 @@ class LessonContentLoader:
                         "detection_pattern": self._extract_detection_pattern(text),
                         "full_text": text,
                     }
+                    logger.info(
+                        f"Grammar chunk {i+1}: added topic '{topic_name}' to grammar_content"
+                    )
 
+        logger.info(
+            f"Total grammar topics loaded for lesson {lesson_number}: {len(grammar_content)}"
+        )
         return grammar_content
 
     def _extract_vocabulary_from_text(self, text: str) -> list[dict[str, str]]:
