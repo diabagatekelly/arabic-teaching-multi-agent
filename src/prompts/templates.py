@@ -42,7 +42,7 @@ Grammar: {topics_count} topics
 Topics: {grammar_topics}
 
 REQUIRED OUTPUT FORMAT:
-1. Start with: "مَرْحَبًا! Welcome to Lesson {lesson_number}!"
+1. Start with a warm greeting Welcome to Lesson {lesson_number}!"
 2. Show ALL {total_words} vocabulary words from the preview (copy the complete list - do not skip any words)
 3. List the {topics_count} grammar topics
 4. End with: "Choose an option:\n1. Start with vocabulary\n2. Start with grammar"
@@ -258,9 +258,22 @@ Question: What does "{word_arabic}" mean?
 Student Answer: {student_answer}
 Correct Answer: {english}
 Result: Correct
+Batch Progress: {words_quizzed}/{total_batch_words} words
 
-Provide brief, encouraging feedback:""",
-    input_variables=["word_arabic", "student_answer", "english"],
+Provide brief, encouraging feedback. Then check batch progress:
+- If words_quizzed < total_batch_words: Add "[GENERATE_EXERCISE]" to trigger next word
+- If words_quizzed == total_batch_words: Offer batch options (flashcards, retry, next batch)
+
+The marker [GENERATE_EXERCISE] will be hidden from the student.
+
+Your response:""",
+    input_variables=[
+        "word_arabic",
+        "student_answer",
+        "english",
+        "words_quizzed",
+        "total_batch_words",
+    ],
 )
 
 FEEDBACK_VOCAB_INCORRECT = PromptTemplate(
@@ -270,9 +283,22 @@ Question: What does "{word_arabic}" mean?
 Student Answer: {student_answer}
 Correct Answer: {english}
 Result: Incorrect
+Batch Progress: {words_quizzed}/{total_batch_words} words
 
-Provide supportive feedback with the correction:""",
-    input_variables=["word_arabic", "student_answer", "english"],
+Provide supportive feedback with the correction. Then check batch progress:
+- If words_quizzed < total_batch_words: Add "[GENERATE_EXERCISE]" to trigger next word
+- If words_quizzed == total_batch_words: Offer batch options (flashcards, retry, next batch)
+
+The marker [GENERATE_EXERCISE] will be hidden from the student.
+
+Your response:""",
+    input_variables=[
+        "word_arabic",
+        "student_answer",
+        "english",
+        "words_quizzed",
+        "total_batch_words",
+    ],
 )
 
 FEEDBACK_GRAMMAR_CORRECT = PromptTemplate(

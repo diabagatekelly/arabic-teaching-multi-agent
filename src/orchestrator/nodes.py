@@ -67,6 +67,11 @@ class TeachingNode:
                 # Handle user message
                 response = self._handle_user_message(state)
 
+            # Strip [GENERATE_EXERCISE] marker BEFORE adding to messages
+            has_exercise_marker = "[GENERATE_EXERCISE]" in response
+            if has_exercise_marker:
+                response = response.replace("[GENERATE_EXERCISE]", "").strip()
+
             # Update state
             state.add_message("agent1", response)
             state.last_agent = "agent1"
@@ -78,10 +83,9 @@ class TeachingNode:
             if state.pending_exercise and state.awaiting_user_answer:
                 logger.info("Exercise presented, waiting for user answer")
                 state.next_agent = "user"
-            # Look for explicit exercise generation markers
-            elif "[GENERATE_EXERCISE]" in response:
-                # Agent wants to generate exercise - strip marker from response
-                response = response.replace("[GENERATE_EXERCISE]", "").strip()
+            # Check if agent requested exercise generation
+            elif has_exercise_marker:
+                logger.info("Agent requested exercise generation via [GENERATE_EXERCISE] marker")
                 state.next_agent = "agent3"
             else:
                 # Wait for user response
@@ -350,61 +354,24 @@ class TeachingNode:
             if key not in input_data:
                 input_data[key] = value
 
-        # Clear pending exercise - this quiz is complete
-        state.clear_pending_exercise()
-
-        # Generate feedback
-        feedback = self.agent.provide_feedback(input_data)
-
-        # Check if batch is complete (all words quizzed)
-        import re
-
-        def normalize_arabic(text):
-            """Remove Arabic diacritics for comparison."""
-            return re.sub(r"[\u064B-\u0652\u0670]", "", text)
-
+        # Add batch progress for feedback prompt
         batch_size = 3
         start_idx = (state.current_vocab_batch - 1) * batch_size
         end_idx = start_idx + batch_size
         current_batch_words = (
             state.cached_vocab_words[start_idx:end_idx] if state.cached_vocab_words else []
         )
-        batch_words_arabic = [w["arabic"] for w in current_batch_words]
+        input_data["words_quizzed"] = len(state.batch_quizzed_words)
+        input_data["total_batch_words"] = len(current_batch_words)
 
-        # Use normalized comparison for harakaat-insensitive matching
-        all_quizzed = all(
-            any(
-                normalize_arabic(quizzed) == normalize_arabic(w)
-                for quizzed in state.batch_quizzed_words
-            )
-            for w in batch_words_arabic
-        )
+        # Clear pending exercise - this quiz is complete
+        state.clear_pending_exercise()
 
-        if all_quizzed and state.current_mode == "teaching_vocab":
-            # Batch complete - offer options and WAIT for user
-            total_batches = (len(state.cached_vocab_words) + 2) // 3
-            if state.current_vocab_batch < total_batches:
-                feedback += "\n\n✅ Great work! You've completed this batch. Would you like to:\n1. Review flashcards\n2. Take the quiz again\n3. Move to next batch"
-            else:
-                feedback += "\n\n✅ Excellent! You've completed all vocabulary batches. Would you like to:\n1. Review flashcards for all words\n2. Move to grammar"
-        else:
-            # More words to quiz in this batch - calculate remaining with normalization
-            remaining = len(
-                [
-                    w
-                    for w in batch_words_arabic
-                    if not any(
-                        normalize_arabic(quizzed) == normalize_arabic(w)
-                        for quizzed in state.batch_quizzed_words
-                    )
-                ]
-            )
-            if remaining > 0:
-                feedback += (
-                    f"\n\nGreat! Next word coming up... ({remaining} remaining in this batch)"
-                )
-                # Trigger automatic quiz generation for next word
-                state.next_agent = "agent3"
+        # Generate feedback (model will add [GENERATE_EXERCISE] if more words remain)
+        # The teaching agent will check words_quizzed vs total_batch_words and either:
+        # - Add [GENERATE_EXERCISE] to continue to next word
+        # - Offer batch completion options (flashcards, retry, next batch)
+        feedback = self.agent.provide_feedback(input_data)
 
         return feedback
 
