@@ -120,14 +120,28 @@ Or tell me what you'd like to do.""",
     input_variables=["lesson_number", "all_words", "current_batch"],
 )
 
-VOCAB_QUIZ_QUESTION = PromptTemplate(
+VOCAB_QUIZ_QUESTION_ARABIC_TO_ENGLISH = PromptTemplate(
     template="""Mode: teaching_vocab
 
-Question Type: {question_type}
-Word: {word_arabic} ({word_transliteration})
+Quiz Question
 
-Ask the translation question clearly. If arabic_to_english, ask "What does {word_arabic} mean?" If english_to_arabic, provide the English word and ask for Arabic translation.""",
-    input_variables=["question_type", "word_arabic", "word_transliteration"],
+Word: {word_arabic} ({word_transliteration})
+Question type: Translate from Arabic to English
+
+Ask the student what this word means:""",
+    input_variables=["word_arabic", "word_transliteration"],
+)
+
+VOCAB_QUIZ_QUESTION_ENGLISH_TO_ARABIC = PromptTemplate(
+    template="""Mode: teaching_vocab
+
+Quiz Question
+
+English word: {english}
+Question type: Translate from English to Arabic
+
+Ask the student to provide the Arabic word:""",
+    input_variables=["english"],
 )
 
 VOCAB_BATCH_SUMMARY = PromptTemplate(
@@ -229,51 +243,40 @@ Or tell me what you'd like to do.""",
 # -----------------------------------------------------------------------------
 
 FEEDBACK_VOCAB_CORRECT = PromptTemplate(
-    template="""Mode: Feedback - Vocabulary
-Phase: Quiz Feedback - Correct
-Objective: Provide brief, encouraging feedback for correct answer.
+    template="""Mode: feedback_vocab
 
-Word tested: {word_arabic} ({word_transliteration})
-Translation: {english}
-Student answered: correct
+Question: What does "{word_arabic}" mean?
+Student Answer: {student_answer}
+Correct Answer: {english}
+Result: Correct
 
-Student Context: Answered correctly
-
-After giving feedback, you can offer another quiz question by including [GENERATE_EXERCISE] in your response, or let the student decide what to do next.
-
-IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
-    input_variables=["word_arabic", "word_transliteration", "english"],
+Provide brief, encouraging feedback:""",
+    input_variables=["word_arabic", "student_answer", "english"],
 )
 
 FEEDBACK_VOCAB_INCORRECT = PromptTemplate(
-    template="""Mode: Feedback - Vocabulary
-Phase: Quiz Feedback - Incorrect
-Objective: Provide supportive correction, direct to flashcard practice.
+    template="""Mode: feedback_vocab
 
-Word tested: {word_arabic} ({word_transliteration})
-Correct translation: {english}
-Student answered: {student_answer} (incorrect)
+Question: What does "{word_arabic}" mean?
+Student Answer: {student_answer}
+Correct Answer: {english}
+Result: Incorrect
 
-Student Context: First mistake, needs gentle correction
-
-IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
-    input_variables=["word_arabic", "word_transliteration", "english", "student_answer"],
+Provide supportive feedback with the correction:""",
+    input_variables=["word_arabic", "student_answer", "english"],
 )
 
 FEEDBACK_GRAMMAR_CORRECT = PromptTemplate(
-    template="""Mode: Feedback - Grammar
-Phase: Quiz Feedback - Correct
-Objective: Provide brief, encouraging feedback with explanation.
+    template="""Mode: feedback_grammar
 
 Question: {question}
-Student answered: {student_answer} (correct)
-Correct answer: {correct_answer}
+Student Answer: {student_answer}
+Correct Answer: {correct_answer}
 Explanation: {explanation}
+Result: Correct
 Current score: {current_score}
 
-Student Context: Answered correctly
-
-IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
+Provide brief, encouraging feedback with the explanation:""",
     input_variables=[
         "question",
         "student_answer",
@@ -284,19 +287,16 @@ IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other lan
 )
 
 FEEDBACK_GRAMMAR_INCORRECT = PromptTemplate(
-    template="""Mode: Feedback - Grammar
-Phase: Quiz Feedback - Incorrect
-Objective: Provide supportive correction with explanation.
+    template="""Mode: feedback_grammar
 
 Question: {question}
-Student answered: {student_answer} (incorrect)
-Correct answer: {correct_answer}
+Student Answer: {student_answer}
+Correct Answer: {correct_answer}
 Explanation: {explanation}
+Result: Incorrect
 Current score: {current_score}
 
-Student Context: Needs gentle correction with grammar rule reference
-
-IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
+Provide supportive feedback with the explanation:""",
     input_variables=[
         "question",
         "student_answer",
@@ -317,18 +317,26 @@ IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other lan
 GRADING_VOCAB = PromptTemplate(
     template="""Mode: grading_vocab
 
-Compare the two answers:
-Student: "{student_answer}"
-Correct: "{correct_answer}"
+Question: What does "{word}" mean?
+Student Answer: "{student_answer}"
+Correct Answer: "{correct_answer}"
 
-Are they:
-- Exact match? [Check if identical]
-- Synonyms? [Check if same meaning - e.g., automobile = car, instructor = teacher]
-- 1-char typo? [Check if only 1 character different - e.g., scool = school]
-- Article difference only? [Check if only "a"/"the" differ - e.g., "a pen" = "pen"]
-- Related but different? [Check if different concepts - e.g., pencil ≠ pen]
+Evaluate if the student's answer is correct. Be flexible:
+- Accept minor typos (e.g., "scool" for "school")
+- Accept synonyms (e.g., "instructor" for "teacher")
+- Accept alternate phrasings that convey the same meaning
 
-Return ONLY JSON: {{"correct": true}} or {{"correct": false}}
+IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
+
+Correct output examples:
+{{"correct": true}}
+{{"correct": false}}
+
+Incorrect output examples (DO NOT DO THIS):
+{{"correct": true}} because the answer matches
+The answer is correct: {{"correct": true}}
+
+Your response must be ONLY the JSON object with no additional text.
 
 Response:""",
     input_variables=["word", "student_answer", "correct_answer"],
@@ -338,18 +346,26 @@ GRADING_GRAMMAR_QUIZ = PromptTemplate(
     template="""Mode: grading_grammar
 
 Question: {question}
-Compare answers:
-Student: "{student_answer}"
-Correct: "{correct_answer}"
+Student Answer: "{student_answer}"
+Correct Answer: "{correct_answer}"
 
-Check:
-- Exact match? [Compare directly]
-- Abbreviations? [Accept m=masculine, f=feminine, nom=nominative, acc=accusative, gen=genitive]
-- Question asks for case? [Check if nominative/accusative/genitive mentioned]
-- Internal harakaat (َ ِ ُ in middle)? [OPTIONAL - can differ, e.g., كبيرٌ = كَبِيرٌ]
-- Case ending (final َ ِ ُ ً ٌ ٍ)? [REQUIRED - must match if question asks for case]
+Evaluate if the student's answer is correct. Be flexible:
+- Accept minor typos
+- Accept synonyms or alternate phrasings that convey the same meaning
+- For identification questions (masculine/feminine), accept abbreviated forms (m/f, masc/fem)
+- For Arabic text answers: Internal harakaat (vowel marks) are OPTIONAL, but case endings (final harakaat like ُ َ ِ ٌ ً ٍ) are REQUIRED and must match exactly
 
-Return ONLY JSON: {{"correct": true}} or {{"correct": false}}
+IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
+
+Correct output examples:
+{{"correct": true}}
+{{"correct": false}}
+
+Incorrect output examples (DO NOT DO THIS):
+{{"correct": true}} The student correctly identified the gender
+Explanation: {{"correct": false}}
+
+Your response must be ONLY the JSON object with no additional text.
 
 Response:""",
     input_variables=["question", "student_answer", "correct_answer"],
@@ -364,12 +380,9 @@ Grade the following answers:
 
 {answers_formatted}
 
-For each question, compare student vs correct answer using these checks:
-- Exact match? [Compare directly]
-- Abbreviations? [Accept m=masculine, f=feminine, nom=nominative, acc=accusative, gen=genitive]
-- Question asks for case? [Check if nominative/accusative/genitive mentioned]
-- Internal harakaat (َ ِ ُ in middle)? [OPTIONAL - can differ, e.g., كبيرٌ = كَبِيرٌ]
-- Case ending (final َ ِ ُ ً ٌ ٍ)? [REQUIRED - must match if question asks for case]
+For each answer, evaluate correctness with flexibility:
+- Accept minor typos, synonyms, abbreviations
+- For Arabic text answers: Internal harakaat (vowel marks) are OPTIONAL, but case endings (final harakaat like ُ َ ِ ٌ ً ٍ) are REQUIRED and must match exactly
 
 IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
 
@@ -402,33 +415,17 @@ EXERCISE_GENERATION = PromptTemplate(
 
 Lesson {lesson_number}
 Type: {exercise_type}
-Difficulty: {difficulty}
+Content: vocabulary
 Count: {count}
 
 Learned items:
 {learned_items_formatted}
 
-Generate {count} practice exercises using the learned items above.
-
-CRITICAL REQUIREMENTS:
-1. ALL Arabic text MUST include harakaat (diacritical marks), especially final case endings (ُ َ ِ ٌ ً ٍ)
-2. NEVER use transliteration alone (e.g., "kabiir") - always include Arabic script: "كَبِيرٌ"
-3. Each question must be clear: "Translate:", "What does X mean?", "Fill in:", "Complete:", etc.
-4. Use the learned vocabulary in your exercises
-
-Correct Arabic examples:
-- "كِتَابٌ" (with harakaat ٌ)
-- "الكِتَابُ" (with case ending ُ)
-- "المَدْرَسَةَ" (with case ending َ)
-
-IMPORTANT: Output ONLY valid JSON. Do NOT add explanations, commentary, or text before/after the JSON.
-
-Required JSON format:
+Generate {count} practice exercises. Return JSON list:
 [
   {{
-    "question": "...",
-    "answer": "...",
-    "difficulty": "{difficulty}"
+    "question": "question text here",
+    "answer": "correct answer here"
   }},
   ...
 ]
@@ -437,7 +434,6 @@ Response:""",
     input_variables=[
         "lesson_number",
         "exercise_type",
-        "difficulty",
         "count",
         "learned_items_formatted",
     ],
@@ -453,11 +449,7 @@ Grammar Rule: {grammar_rule}
 Examples:
 {examples_formatted}
 
-Generate {count} quiz questions to test understanding of this rule.
-
-IMPORTANT: For questions expecting Arabic answers, always include case endings (final harakaat like ُ َ ِ ٌ ً ٍ) in both the question text and the correct answer. Case endings are grammatically significant and must be tested.
-
-Return JSON list:
+Generate {count} quiz questions to test understanding of this rule. Return JSON list:
 [
   {{
     "question": "question text",
