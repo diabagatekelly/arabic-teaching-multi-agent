@@ -534,6 +534,15 @@ class ContentNode:
             # Parse exercise from response
             exercise = self._parse_exercise_response(response, exercise_request, state)
 
+            # Track quizzed word to prevent repeats in batch
+            if exercise.metadata and "word_arabic" in exercise.metadata:
+                word_arabic = exercise.metadata["word_arabic"]
+                if word_arabic not in state.batch_quizzed_words:
+                    state.batch_quizzed_words.append(word_arabic)
+                    logger.info(
+                        f"Tracked quizzed word: {word_arabic} ({len(state.batch_quizzed_words)} total)"
+                    )
+
             # Update state
             state.set_pending_exercise(exercise)
             state.add_message("agent3", response)
@@ -649,6 +658,8 @@ class ContentNode:
             "lesson_number": state.current_lesson,
             "mode": "exercise_generation",
             "question_type": "arabic_to_english",  # Hard-coded for demo: always ask for English
+            "batch_quizzed_words": state.batch_quizzed_words,  # Avoid repeating words
+            "current_batch": state.current_vocab_batch,
         }
 
     def _parse_exercise_response(
