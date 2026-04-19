@@ -184,8 +184,12 @@ class TeachingNode:
         last_msg = state.conversation_history[-1]
         user_input = last_msg.content.lower().strip()
 
-        # Detect mode changes from user input and initiate teaching
-        if user_input in ["1", "vocab", "vocabulary"]:
+        # Context-aware parsing: "1" means different things depending on current mode
+        # If already in a mode, "1" is option 1 within that mode
+        # If no mode set, "1" means "start with vocabulary"
+
+        # Detect mode changes from user input (only when NOT already in a mode)
+        if user_input in ["1", "vocab", "vocabulary"] and not state.current_mode:
             state.current_mode = "teaching_vocab"
             logger.info("Mode changed to teaching_vocab - initiating vocabulary teaching")
 
@@ -211,7 +215,7 @@ class TeachingNode:
             }
             return self.agent.handle_teaching_vocab(input_data)
 
-        elif user_input in ["2", "grammar"]:
+        elif user_input in ["2", "grammar"] and not state.current_mode:
             state.current_mode = "teaching_grammar"
             logger.info("Mode changed to teaching_grammar - initiating grammar teaching")
 
@@ -231,7 +235,32 @@ class TeachingNode:
             }
             return self.agent.handle_teaching_grammar(input_data)
 
-        # General user message (not mode change)
+        # Context-aware option parsing within teaching modes
+        user_input_lower = last_msg.content.lower().strip()
+
+        # In vocab mode: "1" = take quiz, "2" = next batch
+        if state.current_mode == "teaching_vocab":
+            if user_input_lower == "1" or any(
+                kw in user_input_lower for kw in ["quiz", "test", "practice"]
+            ):
+                logger.info("User chose option 1 (take quiz) - triggering exercise generation")
+                state.next_agent = "agent3"
+                return "Great! Let me prepare a quiz for you. [GENERATE_EXERCISE]"
+            elif user_input_lower == "2" or "next" in user_input_lower:
+                logger.info("User chose option 2 (next batch)")
+                # TODO: Implement batch progression
+                return "Moving to next batch... (not yet implemented)"
+
+        # In grammar mode: similar logic
+        if state.current_mode == "teaching_grammar":
+            if user_input_lower == "1" or any(
+                kw in user_input_lower for kw in ["quiz", "test", "practice"]
+            ):
+                logger.info("User chose option 1 (grammar quiz)")
+                state.next_agent = "agent3"
+                return "Perfect! I'll create a grammar exercise for you. [GENERATE_EXERCISE]"
+
+        # General fallback for unrecognized input
         input_data = {
             "user_input": last_msg.content,
             "learned_items": state.learned_items,

@@ -96,9 +96,8 @@ Words to teach:
 Present these words encouragingly. Remind them flashcards are available for practice. Then offer:
 1. Take quiz on this batch
 2. Go to next batch
-3. See all words
 
-Format with numbered options and mention they can request something else (like going to final test).
+Format with numbered options.
 
 IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["lesson_number", "batch_number", "total_batches", "words"],
