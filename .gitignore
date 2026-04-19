@@ -221,7 +221,7 @@ docs/data/
 docs/status/
 
 # Project-specific: Large files
-models/*
+models/
 !models/README.md
 data/vectorstore/
 data/raw/*.txt
