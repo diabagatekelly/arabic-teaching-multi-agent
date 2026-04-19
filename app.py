@@ -14,10 +14,9 @@ from fastapi import FastAPI
 from engine import process_message  # GPU function in separate module
 
 
-# Dummy function to trigger ZeroGPU detection when using FastAPI mounting
 @spaces.GPU
-def detector_trigger():
-    """Dummy function to ensure ZeroGPU detects @spaces.GPU usage."""
+def pack_gpu_trigger():
+    # This exists only to satisfy the HF ZeroGPU detector
     return None
 
 

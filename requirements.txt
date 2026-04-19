@@ -1,6 +1,8 @@
+# ZeroGPU - MUST be first for decorator detection
+spaces>=0.28.3
+
 # Gradio 5 for HuggingFace Spaces
 gradio>=5.0.0
-spaces>=0.28.3
 huggingface-hub>=0.25.0
 pydantic==2.10.6
 
