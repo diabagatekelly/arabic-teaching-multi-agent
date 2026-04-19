@@ -122,7 +122,7 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         # Center panel - Chat (1/2 width)
         with gr.Column(scale=2):
             gr.Markdown("### 💬 Chat")
-            chatbot = gr.Chatbot(height=500)
+            chatbot = gr.Chatbot(height=500, type="messages")
             msg = gr.Textbox(
                 label="Your message",
                 placeholder="Try: hello, vocab, grammar...",
