@@ -208,7 +208,15 @@ def send_message(user_message: str, chat_history: list):
 
     try:
         user_msg = Message(role="user", content=user_message)
-        current_state["conversation_history"].append(user_msg)
+        # Convert to dict for LangGraph compatibility
+        current_state["conversation_history"].append(
+            {
+                "role": user_msg.role,
+                "content": user_msg.content,
+                "timestamp": user_msg.timestamp.isoformat(),
+                "metadata": user_msg.metadata,
+            }
+        )
 
         if current_state.get("pending_exercise") and current_state.get("awaiting_user_answer"):
             current_state["next_agent"] = "agent2"  # Route to grading agent
