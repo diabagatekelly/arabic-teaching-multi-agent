@@ -41,14 +41,18 @@ Preview: {topics_preview}
 Grammar: {topics_count} topics
 Topics: {grammar_topics}
 
-Greet the student warmly and present the lesson structure. Offer navigation:
+Greet the student warmly. Present the complete lesson structure by showing:
+1. The full vocabulary word list above (all {total_words} words with Arabic, transliteration, English)
+2. The {topics_count} grammar topics listed above
+
+Then offer numbered navigation:
 1. Start with vocabulary
 2. Start with grammar
 3. See lesson progress
 
 Format with numbered options and mention they can request something else.
 
-IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
+IMPORTANT: Include the COMPLETE word list from the preview above. Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=[
         "lesson_number",
         "total_words",
