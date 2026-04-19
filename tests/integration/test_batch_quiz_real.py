@@ -17,7 +17,7 @@ from src.orchestrator.nodes import ContentNode
 from src.orchestrator.state import create_initial_state
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")  # Create fresh agent for each test
 def real_content_agent():
     """Create ContentAgent with mocked model but real logic."""
     mock_model = MagicMock()
@@ -28,18 +28,21 @@ def real_content_agent():
 
     # Override generate_response to simulate model output
     def mock_generate(prompt: str) -> str:
-        """Generate exercise based on prompt - simulates real model behavior."""
+        """Generate exercise based on prompt - simulates real model behavior.
+
+        This mock parses the actual prompt to extract Available Items,
+        simulating how a real model would follow the prompt instructions.
+        """
         # Extract available words from prompt
-        if "Available Items" in prompt:
-            # Parse available items from prompt
-            lines = prompt.split("\n")
-            for line in lines:
-                if "Available Items" in line:
-                    # Extract words - should be "كِتَاب (kitaabun) - book, ..." format
-                    items_str = line.split("Available Items (NOT already quizzed):")[1].strip()
-                    if items_str and items_str != "":
-                        # Pick first available word
-                        first_item = items_str.split(",")[0].strip()
+        for line in prompt.split("\n"):
+            if "Available Items (NOT already quizzed):" in line:
+                items_str = line.split("Available Items (NOT already quizzed):")[1].strip()
+                if items_str and items_str != "":
+                    # Pick first available word (after filtering)
+                    first_item = items_str.split(",")[0].strip()
+
+                    # Parse components: "بَيْت (baytun) - house"
+                    try:
                         arabic = first_item.split("(")[0].strip()
                         transliteration = first_item.split("(")[1].split(")")[0].strip()
                         english = first_item.split("-")[1].strip()
@@ -60,8 +63,15 @@ def real_content_agent():
     }}
 }}
 ```"""
+                    except (IndexError, ValueError) as e:
+                        # Parsing failed - print debug and use fallback
+                        print(f"⚠ ERROR parsing first item: '{first_item}'")
+                        print(f"  Exception: {e}")
+                        break
 
-        # Fallback: return first word from lesson vocab if available
+        # Fallback: return first word from lesson vocab if parsing fails
+        # NOTE: This should rarely happen if ContentAgent is working correctly
+        print("⚠ WARNING: Using fallback word (parsing failed)")
         return """```json
 {
     "exercise_id": "ex_001",
@@ -182,12 +192,18 @@ class TestBatchQuizRealBehavior:
         state = content_node(state)
 
         exercise = state.pending_exercise
-        word_arabic = exercise.metadata.get("word_arabic", "")
+
+        # Get word_arabic from nested metadata (that's where ContentAgent puts it)
+        word_arabic = exercise.metadata.get("metadata", {}).get("word_arabic", "")
+
+        # Debug: print what we got
+        print(f"\n🔍 Generated word from nested metadata: {repr(word_arabic)}")
+        print(f"🔍 Exercise question: {exercise.question[:100]}")
 
         # Should NOT be the already-quizzed word
         assert word_arabic != "كِتَاب", (
-            "ERROR: Generated quiz for 'كِتَاب' (book) even though it's in batch_quizzed_words! "
-            "The filtering logic is broken."
+            f"ERROR: Generated quiz for '{word_arabic}' (book) even though it's in batch_quizzed_words! "
+            f"The filtering logic is broken. Exercise: {exercise.question[:100]}"
         )
 
         # Should be one of the remaining words
