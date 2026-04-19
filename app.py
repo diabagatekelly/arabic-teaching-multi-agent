@@ -211,9 +211,9 @@ def send_message(user_message: str, chat_history: list) -> tuple:
         current_state["conversation_history"].append(user_msg)
 
         if current_state.get("pending_exercise") and current_state.get("awaiting_user_answer"):
-            current_state["next_agent"] = "grading"
+            current_state["next_agent"] = "agent2"  # Route to grading agent
         else:
-            current_state["next_agent"] = "teaching"
+            current_state["next_agent"] = "agent1"  # Route to teaching agent
 
         result = orchestrator.invoke(current_state)
         current_state = result
