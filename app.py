@@ -229,6 +229,17 @@ def send_message(user_message: str, chat_history: list, state_dict: dict):
         # Invoke orchestrator with SystemState object
         result = orchestrator.invoke(current_system_state)
 
+        # Auto-continue if next_agent is not "user" (e.g., agent wants to chain to content/grading)
+        max_iterations = 10  # Safety limit to prevent infinite loops
+        iterations = 0
+        while result.get("next_agent") not in ["user", "end", None] and iterations < max_iterations:
+            logger.info(f"Auto-continuing to next_agent: {result.get('next_agent')}")
+            result = orchestrator.invoke(result)
+            iterations += 1
+
+        if iterations >= max_iterations:
+            logger.warning(f"Hit max iterations ({max_iterations}) in auto-continue loop")
+
         # Update state dict for Gradio State persistence
         state_dict = result
 
