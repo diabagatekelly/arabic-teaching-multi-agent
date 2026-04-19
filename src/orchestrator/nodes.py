@@ -248,8 +248,41 @@ class TeachingNode:
                 return "Great! Let me prepare a quiz for you. [GENERATE_EXERCISE]"
             elif user_input_lower == "2" or "next" in user_input_lower:
                 logger.info("User chose option 2 (next batch)")
-                # TODO: Implement batch progression
-                return "Moving to next batch... (not yet implemented)"
+
+                # Move to next batch
+                total_batches = (len(state.cached_vocab_words) + 2) // 3  # Ceiling division
+                if state.current_vocab_batch < total_batches:
+                    state.current_vocab_batch += 1
+                    state.batch_quizzed_words = []  # Reset for new batch
+
+                    # Get words for new batch
+                    batch_size = 3
+                    start_idx = (state.current_vocab_batch - 1) * batch_size
+                    end_idx = start_idx + batch_size
+                    vocab_words = (
+                        state.cached_vocab_words[start_idx:end_idx]
+                        if state.cached_vocab_words
+                        else []
+                    )
+
+                    words_formatted = "\n".join(
+                        [
+                            f"{i + 1}. {w['arabic']} ({w['transliteration']}) - {w['english']}"
+                            for i, w in enumerate(vocab_words)
+                        ]
+                    )
+
+                    input_data = {
+                        "lesson_number": state.current_lesson,
+                        "batch_number": state.current_vocab_batch,
+                        "total_batches": total_batches,
+                        "words": words_formatted,
+                        "mode": "teaching_vocab",
+                    }
+                    return self.agent.handle_teaching_vocab(input_data)
+                else:
+                    # Last batch complete - offer to move to grammar
+                    return "🎉 Excellent work! You've completed all vocabulary batches. Ready to move to grammar? (Type '2' or 'grammar')"
 
         # In grammar mode: similar logic
         if state.current_mode == "teaching_grammar":
@@ -317,7 +350,41 @@ class TeachingNode:
             if key not in input_data:
                 input_data[key] = value
 
-        return self.agent.provide_feedback(input_data)
+        # Clear pending exercise - this quiz is complete
+        state.clear_pending_exercise()
+
+        # Generate feedback
+        feedback = self.agent.provide_feedback(input_data)
+
+        # Check if batch is complete (all words quizzed)
+        batch_size = 3
+        start_idx = (state.current_vocab_batch - 1) * batch_size
+        end_idx = start_idx + batch_size
+        current_batch_words = (
+            state.cached_vocab_words[start_idx:end_idx] if state.cached_vocab_words else []
+        )
+        batch_words_arabic = [w["arabic"] for w in current_batch_words]
+
+        all_quizzed = all(word in state.batch_quizzed_words for word in batch_words_arabic)
+
+        if all_quizzed and state.current_mode == "teaching_vocab":
+            # Batch complete - offer options and WAIT for user
+            total_batches = (len(state.cached_vocab_words) + 2) // 3
+            if state.current_vocab_batch < total_batches:
+                feedback += "\n\n✅ Great work! You've completed this batch. Would you like to:\n1. Take the quiz again\n2. Move to next batch"
+            else:
+                feedback += "\n\n✅ Excellent! You've completed all vocabulary batches. Ready to move to grammar?"
+        else:
+            # More words to quiz in this batch - auto-continue after brief message
+            remaining = len([w for w in batch_words_arabic if w not in state.batch_quizzed_words])
+            if remaining > 0:
+                feedback += (
+                    f"\n\nGreat! Next word coming up... ({remaining} remaining in this batch)"
+                )
+                # Trigger automatic quiz generation for next word
+                state.next_agent = "agent3"
+
+        return feedback
 
 
 class GradingNode:
@@ -535,13 +602,30 @@ class ContentNode:
             exercise = self._parse_exercise_response(response, exercise_request, state)
 
             # Track quizzed word to prevent repeats in batch
-            if exercise.metadata and "word_arabic" in exercise.metadata:
-                word_arabic = exercise.metadata["word_arabic"]
-                if word_arabic not in state.batch_quizzed_words:
-                    state.batch_quizzed_words.append(word_arabic)
-                    logger.info(
-                        f"Tracked quizzed word: {word_arabic} ({len(state.batch_quizzed_words)} total)"
-                    )
+            # Try top-level metadata first, then nested metadata, then extract from question
+            word_arabic = None
+            if exercise.metadata:
+                if "word_arabic" in exercise.metadata:
+                    word_arabic = exercise.metadata["word_arabic"]
+                elif (
+                    "metadata" in exercise.metadata
+                    and "word_arabic" in exercise.metadata["metadata"]
+                ):
+                    word_arabic = exercise.metadata["metadata"]["word_arabic"]
+
+            # Fallback: extract Arabic word from question text
+            if not word_arabic and exercise.question:
+                import re
+
+                arabic_match = re.search(r"[\u0600-\u06FF]+", exercise.question)
+                if arabic_match:
+                    word_arabic = arabic_match.group(0)
+
+            if word_arabic and word_arabic not in state.batch_quizzed_words:
+                state.batch_quizzed_words.append(word_arabic)
+                logger.info(
+                    f"Tracked quizzed word: {word_arabic} ({len(state.batch_quizzed_words)} total)"
+                )
 
             # Update state
             state.set_pending_exercise(exercise)
