@@ -41,17 +41,14 @@ Preview: {topics_preview}
 Grammar: {topics_count} topics
 Topics: {grammar_topics}
 
-Greet the student warmly. Present the complete lesson structure by showing:
-1. The full vocabulary word list above (all {total_words} words with Arabic, transliteration, English)
-2. The {topics_count} grammar topics listed above
+REQUIRED OUTPUT FORMAT:
+1. Start with: "مَرْحَبًا! Welcome to Lesson {lesson_number}!"
+2. Show ALL {total_words} vocabulary words from the preview (copy the complete list - do not skip any words)
+3. List the {topics_count} grammar topics
+4. End with: "Choose an option:\n1. Start with vocabulary\n2. Start with grammar"
 
-Then offer numbered navigation:
-1. Start with vocabulary
-2. Start with grammar
-
-Format with numbered options and mention they can request something else.
-
-IMPORTANT: Include the COMPLETE word list from the preview above. Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
+CRITICAL: You MUST include the COMPLETE word list. Do not summarize or skip words.
+Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=[
         "lesson_number",
         "total_words",

@@ -384,9 +384,9 @@ class TeachingNode:
             # Batch complete - offer options and WAIT for user
             total_batches = (len(state.cached_vocab_words) + 2) // 3
             if state.current_vocab_batch < total_batches:
-                feedback += "\n\n✅ Great work! You've completed this batch. Would you like to:\n1. Take the quiz again\n2. Move to next batch"
+                feedback += "\n\n✅ Great work! You've completed this batch. Would you like to:\n1. Review flashcards\n2. Take the quiz again\n3. Move to next batch"
             else:
-                feedback += "\n\n✅ Excellent! You've completed all vocabulary batches. Ready to move to grammar?"
+                feedback += "\n\n✅ Excellent! You've completed all vocabulary batches. Would you like to:\n1. Review flashcards for all words\n2. Move to grammar"
         else:
             # More words to quiz in this batch - calculate remaining with normalization
             remaining = len(
