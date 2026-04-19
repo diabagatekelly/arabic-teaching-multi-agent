@@ -167,3 +167,9 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 # Note: Gradio must be mounted AFTER FastAPI routes are defined
 # Routes defined after mounting will override Gradio paths
 app = gr.mount_gradio_app(app, demo, path="/")
+
+if __name__ == "__main__":
+    import uvicorn
+
+    # Port 7860 is required for HuggingFace Spaces
+    uvicorn.run(app, host="0.0.0.0", port=7860)
