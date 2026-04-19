@@ -206,10 +206,10 @@ def send_message(user_message: str, chat_history: list, state_dict: dict):
 
     if not state_dict:
         chat_history.append([user_message, "⚠️ Please start a lesson first!"])
-        return state_dict, chat_history, 0, 0, "0%", "", ""
+        return state_dict, chat_history, 0, 0, "0%", "", "", "false"
 
     if not user_message.strip():
-        return state_dict, chat_history, 0, 0, "0%", "", ""
+        return state_dict, chat_history, 0, 0, "0%", "", "", "false"
 
     logger.info(f"Processing user message: {user_message[:50]}...")
 
