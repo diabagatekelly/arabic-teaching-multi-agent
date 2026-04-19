@@ -19,7 +19,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from src.agents import ContentAgent, GradingAgent, TeachingAgent  # noqa: E402
 from src.models.hf_model_loader import load_grading_model, load_teaching_model  # noqa: E402
 from src.orchestrator.graph import create_teaching_graph  # noqa: E402
-from src.orchestrator.state import Message, SystemState  # noqa: E402
+from src.orchestrator.state import SystemState  # noqa: E402
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -214,23 +214,22 @@ def send_message(user_message: str, chat_history: list, state_dict: dict):
     logger.info(f"Processing user message: {user_message[:50]}...")
 
     try:
-        user_msg = Message(role="user", content=user_message)
-        # Convert to dict for LangGraph compatibility
-        state_dict["conversation_history"].append(
-            {
-                "role": user_msg.role,
-                "content": user_msg.content,
-                "timestamp": user_msg.timestamp.isoformat(),
-                "metadata": user_msg.metadata,
-            }
-        )
+        # Convert state_dict to SystemState for orchestrator
+        current_system_state = SystemState.from_dict(state_dict)
 
-        if state_dict.get("pending_exercise") and state_dict.get("awaiting_user_answer"):
-            state_dict["next_agent"] = "agent2"  # Route to grading agent
+        # Add user message
+        current_system_state.add_message("user", user_message)
+
+        # Route to appropriate agent
+        if current_system_state.pending_exercise and current_system_state.awaiting_user_answer:
+            current_system_state.next_agent = "agent2"  # Route to grading agent
         else:
-            state_dict["next_agent"] = "agent1"  # Route to teaching agent
+            current_system_state.next_agent = "agent1"  # Route to teaching agent
 
-        result = orchestrator.invoke(state_dict)
+        # Invoke orchestrator with SystemState object
+        result = orchestrator.invoke(current_system_state)
+
+        # Update state dict for Gradio State persistence
         state_dict = result
 
         conversation_history = result.get("conversation_history", [])
