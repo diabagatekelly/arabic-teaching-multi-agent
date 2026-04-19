@@ -38,17 +38,18 @@ Lesson {lesson_number} Overview
 Vocabulary: {total_words} words
 Preview: {topics_preview}
 
-Grammar: {topics_count} topics
-Topics: {grammar_topics}
+Grammar: {grammar_topics}
 
 REQUIRED OUTPUT FORMAT:
-1. Start with a warm greeting Welcome to Lesson {lesson_number}!"
+1. Start with a warm greeting "Welcome to Lesson {lesson_number}!"
 2. Show ALL {total_words} vocabulary words from the preview (copy the complete list - do not skip any words)
-3. List the {topics_count} grammar topics
-4. End with: "Choose an option:\n1. Start with vocabulary\n2. Start with grammar"
+3. Show grammar status: "{grammar_topics}"
+4. End with: "Choose an option:\n1. Start with vocabulary" (only show option 2 for grammar if topics_count > 0)
 
-CRITICAL: You MUST include the COMPLETE word list. Do not summarize or skip words.
-Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
+CRITICAL:
+- You MUST include the COMPLETE word list. Do not summarize or skip words.
+- If topics_count is 0, only offer vocabulary option (don't mention grammar as an option)
+- Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=[
         "lesson_number",
         "total_words",
@@ -314,7 +315,7 @@ Result: Incorrect
 Batch Progress: {words_quizzed}/{total_batch_words} words
 
 Provide supportive feedback with the correction. Then check batch progress:
-- If words_quizzed < total_batch_words: Add "[QUEUE_NEXT_QUIZ]" to auto-trigger next word after 2 seconds
+- If words_quizzed < total_batch_words: Add "[QUEUE_NEXT_QUIZ]" to auto-trigger next word after 2 seconds and tell the user the next quiz word is coming up
 - If words_quizzed == total_batch_words: Offer batch options (flashcards, retry, next batch)
 
 The marker [QUEUE_NEXT_QUIZ] will be hidden from the student and triggers automatic continuation.

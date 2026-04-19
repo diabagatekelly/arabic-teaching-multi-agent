@@ -182,17 +182,22 @@ class TeachingNode:
             )
         topics_preview = "\n\n".join(vocab_preview_list)
 
-        # Format grammar topics
-        grammar_topics_formatted = ", ".join(
-            [topic.replace("_", " ").title() for topic in grammar_topics]
-        )
+        # Format grammar topics - use "Coming soon!" if empty
+        if grammar_topics:
+            grammar_topics_formatted = ", ".join(
+                [topic.replace("_", " ").title() for topic in grammar_topics]
+            )
+            topics_count = len(grammar_topics)
+        else:
+            grammar_topics_formatted = "Grammar content coming soon!"
+            topics_count = 0
 
         input_data = {
             "lesson_number": state.current_lesson,
             "mode": "lesson_start",
             "total_words": len(vocab_words),
             "topics_preview": topics_preview,
-            "topics_count": len(grammar_topics),
+            "topics_count": topics_count,
             "grammar_topics": grammar_topics_formatted,
         }
         # Call the actual fine-tuned model
