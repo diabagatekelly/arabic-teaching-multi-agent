@@ -273,6 +273,10 @@ class ContentAgent:
             """Remove Arabic diacritics (harakaat, tanween, shadda) for comparison."""
             return re.sub(r"[\u064B-\u0652\u0670]", "", text)
 
+        logger.info(
+            f"ContentAgent filtering: learned_items={learned_items}, batch_quizzed_words={batch_quizzed_words}"
+        )
+
         available_items = [
             item
             for item in learned_items
@@ -281,6 +285,8 @@ class ContentAgent:
                 for quizzed in batch_quizzed_words
             )
         ]
+
+        logger.info(f"ContentAgent available after filtering: {available_items}")
 
         if not available_items and learned_items:
             logger.warning(f"All words already quizzed: {batch_quizzed_words}. Using full list.")

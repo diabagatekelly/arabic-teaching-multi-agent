@@ -354,7 +354,26 @@ class TeachingNode:
             if key not in input_data:
                 input_data[key] = value
 
-        # Add batch progress for feedback prompt
+        # Track the word BEFORE calculating batch progress (prevents off-by-one)
+        word_arabic = grading_msg.metadata.get("word_arabic")
+        if word_arabic:
+            import re
+
+            def normalize_arabic(text):
+                """Remove Arabic diacritics for comparison."""
+                return re.sub(r"[\u064B-\u0652\u0670]", "", text)
+
+            normalized = normalize_arabic(word_arabic)
+            already_tracked = any(
+                normalize_arabic(w) == normalized for w in state.batch_quizzed_words
+            )
+            if not already_tracked:
+                state.batch_quizzed_words.append(word_arabic)
+                logger.info(
+                    f"Tracked word in feedback: {word_arabic} ({len(state.batch_quizzed_words)} total)"
+                )
+
+        # Add batch progress for feedback prompt (AFTER tracking current word)
         batch_size = 3
         start_idx = (state.current_vocab_batch - 1) * batch_size
         end_idx = start_idx + batch_size

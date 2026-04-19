@@ -92,7 +92,6 @@ Words to teach:
 Present all words above with their Arabic, transliteration, and English. Remind them flashcards are available for learning. Then offer these options:
 1. Take quiz on this batch
 2. Go to next batch
-3. See all words
 
 Format with numbered options and mention they can request something else (like going to final test).
 
