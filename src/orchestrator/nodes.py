@@ -307,7 +307,7 @@ class TeachingNode:
         # Pass all metadata from grading (includes exercise metadata like word_arabic)
         input_data = {
             "is_correct": is_correct,
-            "user_answer": grading_msg.metadata.get("user_answer", ""),
+            "student_answer": grading_msg.metadata.get("user_answer", ""),
             "correct_answer": grading_msg.metadata.get("correct_answer", ""),
             "mode": agent_mode,
         }
@@ -648,6 +648,7 @@ class ContentNode:
             "learned_items": state.learned_items[-3:] if state.learned_items else [],
             "lesson_number": state.current_lesson,
             "mode": "exercise_generation",
+            "question_type": "arabic_to_english",  # Hard-coded for demo: always ask for English
         }
 
     def _parse_exercise_response(

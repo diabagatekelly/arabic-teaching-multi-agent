@@ -243,6 +243,7 @@ class ContentAgent:
         difficulty = input_data.get("difficulty", "beginner")
         learned_items = input_data.get("learned_items", [])
         lesson_number = input_data.get("lesson_number")
+        question_type = input_data.get("question_type", "arabic_to_english")  # Hard-coded for demo
 
         # Get RAG examples for this exercise type and difficulty
         template = self.exercise_templates.get(exercise_type)
@@ -267,18 +268,20 @@ class ContentAgent:
 
 Exercise Type: {exercise_type}
 Difficulty: {difficulty}
+Question Type: {question_type} (ALWAYS ask student to translate from Arabic to English)
 Learned Items: {", ".join(learned_items[:5])}
 Lesson Vocabulary: {", ".join(lesson_vocab[:10])}
 {examples_text}
 CRITICAL REQUIREMENTS:
 1. Output ONLY valid JSON matching the example format EXACTLY
 2. Use the learned items provided above in your question
-3. Include ALL fields shown in the examples: "question", "answer", "correct", "type", "difficulty"
-4. REQUIRED: Add metadata fields: "word_arabic", "word_transliteration", "english" (the word being tested)
-5. The "correct" field must contain the expected answer
-6. Use proper Arabic with harakaat (vowel marks) where shown in examples
-7. Make the question clear and self-contained
-8. NO explanations, NO markdown, NO commentary - ONLY the JSON object
+3. Question format: "What does [Arabic word] mean?" (always ask for English translation)
+4. Include ALL fields shown in the examples: "question", "answer", "correct", "type", "difficulty"
+5. REQUIRED: Add metadata fields: "word_arabic", "word_transliteration", "english" (the word being tested)
+6. The "correct" field must contain the expected answer
+7. Use proper Arabic with harakaat (vowel marks) where shown in examples
+8. Make the question clear and self-contained
+9. NO explanations, NO markdown, NO commentary - ONLY the JSON object
 
 Generate ONE exercise now:
 """

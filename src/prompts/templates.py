@@ -94,7 +94,7 @@ Words to teach:
 {words}
 
 INSTRUCTIONS:
-1. First, greet the student warmly and introduce this batch
+1. Say "Here are the words for Batch {batch_number} of {total_batches}"
 2. Show ALL the words above with their Arabic, transliteration, and English meanings
 3. Encourage them to review with flashcards before taking the quiz
 4. Then offer these TWO options:
