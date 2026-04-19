@@ -198,12 +198,14 @@ class TeachingNode:
                 ]
             )
 
+            # Calculate batches: 3-4 words per batch (ceil division)
+            total_words = len(state.cached_vocab_words) if state.cached_vocab_words else 0
+            total_batches = (total_words + 3 - 1) // 3  # Ceiling division by 3
+
             input_data = {
                 "lesson_number": state.current_lesson,
                 "batch_number": 1,
-                "total_batches": (len(state.cached_vocab_words) + 2) // 3
-                if state.cached_vocab_words
-                else 1,
+                "total_batches": total_batches if total_batches > 0 else 1,
                 "words": words_formatted,
                 "mode": "teaching_vocab",
             }

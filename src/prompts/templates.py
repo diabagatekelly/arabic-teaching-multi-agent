@@ -86,19 +86,19 @@ Format with numbered options and mention they can request something else.""",
 )
 
 VOCAB_BATCH_INTRO = PromptTemplate(
-    template="""Mode: Teaching Vocabulary
-Lesson: {lesson_number}
-Phase: Batch Introduction
-Objective: Present batch, offer navigation choices.
+    template="""Mode: teaching_vocab
 
-Available Content:
-- Batch: {batch_number} of {total_batches}
-- Words in this batch:
+Lesson {lesson_number}, Batch {batch_number} of {total_batches}
+
+Words to teach:
 {words}
 
-Student Context: Learning vocabulary in batches
+Present these words encouragingly. Remind them flashcards are available for practice. Then offer:
+1. Take quiz on this batch
+2. Go to next batch
+3. See all words
 
-After presenting the words, if you want to generate a quiz, include [GENERATE_EXERCISE] in your response.
+Format with numbered options and mention they can request something else (like going to final test).
 
 IMPORTANT: Use ONLY English and Arabic text. Do not use Chinese or any other language.""",
     input_variables=["lesson_number", "batch_number", "total_batches", "words"],
