@@ -10,6 +10,7 @@ from pathlib import Path
 
 import gradio as gr
 import spaces
+import torch
 
 # Add project root to path for src imports
 PROJECT_ROOT = Path(__file__).parent
@@ -30,6 +31,10 @@ current_state = None
 teaching_model = None
 grading_model = None
 embedder_model = None
+
+# Device detection
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+logger.info(f"Using device: {DEVICE}")
 
 
 def initialize_models():
@@ -105,11 +110,11 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
     """
     global current_state, teaching_model, grading_model, embedder_model
 
-    # Move models to GPU (ZeroGPU requirement)
-    logger.info("Moving models to GPU...")
-    teaching_model.to("cuda")
-    grading_model.to("cuda")
-    embedder_model.model.to("cuda")
+    # Move models to device (GPU on Spaces, CPU locally)
+    logger.info(f"Moving models to {DEVICE}...")
+    teaching_model.to(DEVICE)
+    grading_model.to(DEVICE)
+    embedder_model.model.to(DEVICE)
 
     logger.info(f"Starting lesson {lesson_number}...")
 
@@ -192,10 +197,10 @@ def send_message(user_message: str, chat_history: list) -> tuple:
     """
     global current_state, teaching_model, grading_model, embedder_model
 
-    # Move models to GPU (ZeroGPU requirement)
-    teaching_model.to("cuda")
-    grading_model.to("cuda")
-    embedder_model.model.to("cuda")
+    # Move models to device (GPU on Spaces, CPU locally)
+    teaching_model.to(DEVICE)
+    grading_model.to(DEVICE)
+    embedder_model.model.to(DEVICE)
 
     if not current_state:
         chat_history.append([user_message, "⚠️ Please start a lesson first!"])
@@ -208,12 +213,20 @@ def send_message(user_message: str, chat_history: list) -> tuple:
 
     try:
         user_msg = Message(role="user", content=user_message)
-        current_state["conversation_history"].append(user_msg)
+        # Convert to dict for LangGraph compatibility
+        current_state["conversation_history"].append(
+            {
+                "role": user_msg.role,
+                "content": user_msg.content,
+                "timestamp": user_msg.timestamp.isoformat(),
+                "metadata": user_msg.metadata,
+            }
+        )
 
         if current_state.get("pending_exercise") and current_state.get("awaiting_user_answer"):
-            current_state["next_agent"] = "grading"
+            current_state["next_agent"] = "agent2"  # Route to grading agent
         else:
-            current_state["next_agent"] = "teaching"
+            current_state["next_agent"] = "agent1"  # Route to teaching agent
 
         result = orchestrator.invoke(current_state)
         current_state = result
