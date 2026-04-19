@@ -69,16 +69,25 @@ def get_session(session_id: str):
 # GPU-accelerated agent function (must be at module level for Spaces detection)
 @spaces.GPU(duration=60)
 def process_message(message, chat_history, session_id):
-    """Process user message with agent (GPU-accelerated)."""
+    """Process user message with agent (GPU-accelerated).
+
+    Currently: Simple logic placeholder
+    Future: Will load Qwen 7B models for teaching/grading
+    """
     import uuid
+
+    import torch
+
+    # Verify GPU access (placeholder for future model inference)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # Generate session ID if not provided
     if not session_id:
         session_id = str(uuid.uuid4())[:8]
 
-    # Simple agent logic
+    # Simple agent logic (will be replaced with model inference)
     if "hello" in message.lower():
-        response = "مرحباً! Hello!"
+        response = f"مرحباً! Hello! (Running on {device})"
     elif "vocab" in message.lower():
         response = "📚 Vocabulary mode activated!"
     elif "grammar" in message.lower():
@@ -130,9 +139,11 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
     clear.click(lambda: [], None, chatbot)
 
 
-# Mount Gradio in FastAPI
+# Mount Gradio in FastAPI and expose at module level for Spaces
+# IMPORTANT: Spaces needs 'app' at module level to detect @spaces.GPU functions
 app = gr.mount_gradio_app(app, demo, path="/")
 
+# Local development entry point only
 if __name__ == "__main__":
     import uvicorn
 
