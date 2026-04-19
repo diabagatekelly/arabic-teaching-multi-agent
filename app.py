@@ -39,7 +39,7 @@ logger.info(f"Using device: {DEVICE}")
 
 def initialize_models():
     """Initialize models and orchestrator (runs once at startup)."""
-    global orchestrator, teaching_model, grading_model, embedder_model
+    global orchestrator, teaching_model, grading_model, embedder_model, current_state
 
     logger.info("Loading fine-tuned models...")
 
@@ -119,13 +119,13 @@ def start_lesson(lesson_number: int, chat_history: list) -> tuple:
     logger.info(f"Starting lesson {lesson_number}...")
 
     try:
-        # Create initial state
+        # Create initial state - content will be loaded by TeachingNode
         initial_state = SystemState(
             user_id="user_1",
             session_id=f"session_{lesson_number}_{int(datetime.now().timestamp())}",
             current_lesson=lesson_number,
             conversation_history=[],
-            next_agent="teaching",
+            next_agent="agent1",
             last_agent="",
         )
 
@@ -184,7 +184,7 @@ def _format_progress_stats(result: dict) -> tuple:
 
 
 @spaces.GPU(duration=120)
-def send_message(user_message: str, chat_history: list) -> tuple:
+def send_message(user_message: str, chat_history: list):
     """
     Process user message (GPU-accelerated).
 
