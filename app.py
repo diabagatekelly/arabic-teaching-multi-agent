@@ -11,13 +11,15 @@ import gradio as gr
 import spaces  # Import at module level for ZeroGPU detection
 from fastapi import FastAPI
 
-from engine import process_message  # GPU function in separate module
+from engine import process_message as engine_process_message
 
 
-@spaces.GPU
-def pack_gpu_trigger():
-    # This exists only to satisfy the HF ZeroGPU detector
-    return None
+# THE CRITICAL FIX: The decorator MUST stay in this file
+# so the Hugging Face scanner sees it immediately.
+@spaces.GPU(duration=60)
+def process_message(message, chat_history, session_id):
+    """GPU wrapper that calls engine logic."""
+    return engine_process_message(message, chat_history, session_id)
 
 
 # Initialize FastAPI
