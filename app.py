@@ -8,18 +8,18 @@ Demonstrates:
 """
 
 import gradio as gr
-import spaces  # Import at module level for ZeroGPU detection
+import spaces
 from fastapi import FastAPI
+from gradio import mount_gradio_app
 
 from content_loader import load_lesson
 from engine import process_message as engine_process_message
 
 
-# THE CRITICAL FIX: The decorator MUST stay in this file
-# so the Hugging Face scanner sees it immediately.
+# Define your GPU-enabled function with @spaces.GPU decorator
 @spaces.GPU(duration=60)
 def process_message(message, chat_history, session_id):
-    """GPU wrapper that calls engine logic."""
+    """GPU-enabled message processing."""
     return engine_process_message(message, chat_history, session_id)
 
 
@@ -196,10 +196,8 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
     start_lesson_btn.click(start_lesson_ui, [session_id], [lesson_info, session_id])
 
 
-# Mount Gradio in FastAPI
-# Note: Gradio must be mounted AFTER FastAPI routes are defined
-# Routes defined after mounting will override Gradio paths
-app = gr.mount_gradio_app(app, demo, path="/")
+# Mount Gradio app inside FastAPI
+mount_gradio_app(app, demo, path="/")
 
 if __name__ == "__main__":
     import uvicorn
