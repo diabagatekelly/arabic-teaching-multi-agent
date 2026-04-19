@@ -53,11 +53,11 @@ class LessonContentLoader:
             section_title = metadata.get("section_title", "unknown")
 
             # Log each chunk
-            has_vocab_keyword = "vocabulary" in text.lower() or "vocab" in section_title.lower()
-            logger.info(f"Chunk {i+1}: '{section_title}' - has_vocab_keyword={has_vocab_keyword}")
+            is_vocab_section = "vocabulary" in section_title.lower()
+            logger.info(f"Chunk {i+1}: '{section_title}' - is_vocab_section={is_vocab_section}")
 
-            # Check if this chunk contains vocabulary
-            if has_vocab_keyword:
+            # Check if this chunk contains vocabulary (only from Vocabulary section)
+            if is_vocab_section:
                 # Extract words from tables or frontmatter
                 words = self._extract_vocabulary_from_text(text)
                 logger.info(f"Chunk {i+1}: Extracted {len(words)} words from '{section_title}'")

@@ -12,8 +12,11 @@ from src.agents import GradingAgent
 def mock_model():
     """Create mock model for grading agent."""
     model = MagicMock()
-    model.device = "cpu"
+    model.device = MagicMock()
+    model.device.type = "cpu"
     model.generate.return_value = torch.tensor([[1, 2, 3, 4, 5]])
+    # Ensure model doesn't have generate_response (for API adapters)
+    del model.generate_response
     return model
 
 
@@ -87,7 +90,8 @@ class TestGenerateResponse:
         # Verify model.generate was called with correct parameters
         mock_model.generate.assert_called_once()
         call_kwargs = mock_model.generate.call_args[1]
-        assert call_kwargs["do_sample"] is False
+        assert call_kwargs["do_sample"] is True
+        assert call_kwargs["temperature"] == 0.3
         assert call_kwargs["max_new_tokens"] == 50
 
         # Verify response has prompt stripped
@@ -97,44 +101,51 @@ class TestGenerateResponse:
 class TestGradeVocab:
     """Tests for grade_vocab method."""
 
-    @pytest.mark.parametrize(
-        "word,student_answer,correct_answer,expected_result",
-        [
-            ("كِتَاب", "book", "book", '{"correct": true}'),
-            ("مَدْرَسَة", "house", "school", '{"correct": false}'),
-        ],
-    )
-    @patch("src.agents.grading_agent.GRADING_VOCAB")
-    def test_grade_vocab(
-        self,
-        mock_prompt,
-        grading_agent,
-        mock_tokenizer,
-        word,
-        student_answer,
-        correct_answer,
-        expected_result,
-    ):
-        """Test vocab grading accepts exact matches and rejects wrong answers."""
-        mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = f"formatted prompt{expected_result}"
-
+    def test_grade_vocab_exact_match(self, grading_agent):
+        """Test vocab grading returns true for exact matches (rule-based)."""
         input_data = {
-            "word": word,
-            "student_answer": student_answer,
-            "correct_answer": correct_answer,
+            "word": "كِتَاب",
+            "student_answer": "book",
+            "correct_answer": "book",
         }
 
         response = grading_agent.grade_vocab(input_data)
 
-        # Verify prompt was formatted with input data
-        mock_prompt.format.assert_called_once_with(
-            word=word, student_answer=student_answer, correct_answer=correct_answer
-        )
+        # Exact match handled by rule-based logic
+        assert response == '{"correct": true}'
 
-        # Verify response is JSON string with expected result
-        assert isinstance(response, str)
-        assert expected_result in response
+    def test_grade_vocab_typo(self, grading_agent):
+        """Test vocab grading accepts minor typos (rule-based)."""
+        input_data = {
+            "word": "كِتَاب",
+            "student_answer": "bok",  # 1-char edit distance
+            "correct_answer": "book",
+        }
+
+        response = grading_agent.grade_vocab(input_data)
+
+        # Minor typo handled by rule-based logic
+        assert response == '{"correct": true}'
+
+    @patch("src.agents.grading_agent.GRADING_VOCAB")
+    def test_grade_vocab_ai_grading(self, mock_prompt, grading_agent, mock_tokenizer):
+        """Test vocab grading uses AI for non-exact matches."""
+        mock_prompt.format.return_value = "formatted prompt"
+        mock_tokenizer.decode.return_value = 'formatted prompt{"correct": true}'
+
+        input_data = {
+            "word": "مَدْرَسَة",
+            "student_answer": "academy",  # Synonym, requires AI
+            "correct_answer": "school",
+        }
+
+        response = grading_agent.grade_vocab(input_data)
+
+        # Verify AI grading was called
+        mock_prompt.format.assert_called_once_with(
+            word="مَدْرَسَة", student_answer="academy", correct_answer="school"
+        )
+        assert '{"correct": true}' in response
 
 
 class TestGradeGrammarQuiz:

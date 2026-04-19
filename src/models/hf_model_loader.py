@@ -15,10 +15,10 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-FINETUNED_7B_TEACHING_PATH_LOCAL = "models/qwen-7b-arabic-teaching"
+FINETUNED_7B_TEACHING_PATH_LOCAL = "models/qwen-7b-arabic-teaching-v2"
 FINETUNED_7B_GRADING_PATH_LOCAL = "models/qwen-7b-arabic-grading"
 
-FINETUNED_7B_TEACHING_PATH_HF = "kdiabagate/qwen-7b-arabic-teaching"
+FINETUNED_7B_TEACHING_PATH_HF = "kdiabagate/qwen-7b-arabic-teaching-v2"
 FINETUNED_7B_GRADING_PATH_HF = "kdiabagate/qwen-7b-arabic-grading"
 
 BASE_7B_MODEL = "Qwen/Qwen2.5-7B-Instruct"
@@ -108,7 +108,7 @@ def _load_finetuned_model(
 def load_teaching_model(use_hub: bool = True) -> tuple[AutoModelForCausalLM, AutoTokenizer]:
     """Load fine-tuned Qwen2.5-7B teaching model.
 
-    Fine-tuned on 153 multi-turn conversations for warm teaching tone.
+    Fine-tuned on 114 multi-turn conversations with keyword-based routing for orchestrator.
     """
     return _load_finetuned_model(
         model_type="teaching",
