@@ -1,0 +1,51 @@
+{
+  "1": {
+    "lesson_number": 1,
+    "lesson_name": "Masculine and Feminine Nouns",
+    "vocabulary": [
+      {
+        "arabic": "كِتَابٌ",
+        "transliteration": "kitaabun",
+        "english": "book"
+      },
+      {
+        "arabic": "بَيْتٌ",
+        "transliteration": "baytun",
+        "english": "house"
+      },
+      {
+        "arabic": "قَلَمٌ",
+        "transliteration": "qalamun",
+        "english": "pen"
+      },
+      {
+        "arabic": "طَاوِلَةٌ",
+        "transliteration": "taawilatun",
+        "english": "table"
+      },
+      {
+        "arabic": "مَدْرَسَةٌ",
+        "transliteration": "madrasatun",
+        "english": "school"
+      },
+      {
+        "arabic": "نَافِذَةٌ",
+        "transliteration": "naafidhatun",
+        "english": "window"
+      }
+    ],
+    "grammar_points": [
+      "masculine_feminine_nouns"
+    ],
+    "grammar_sections": {},
+    "difficulty": "beginner"
+  },
+  "2": {
+    "lesson_number": 2,
+    "lesson_name": "Lesson 2",
+    "vocabulary": [],
+    "grammar_points": [],
+    "grammar_sections": {},
+    "difficulty": "all"
+  }
+}

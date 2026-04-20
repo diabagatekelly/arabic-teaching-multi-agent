@@ -1,6 +1,5 @@
-"""Multi-agent orchestration layer using LangGraph."""
+"""Orchestrator module for managing lesson flow and agent interactions."""
 
-from .graph import create_teaching_graph
-from .state import SystemState
+from .orchestrator import Orchestrator
 
-__all__ = ["create_teaching_graph", "SystemState"]
+__all__ = ["Orchestrator"]

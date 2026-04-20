@@ -22,13 +22,22 @@ def mock_tokenizer():
     """Create mock tokenizer for grading agent."""
     tokenizer = MagicMock()
     tokenizer.eos_token_id = 2
+    tokenizer.pad_token_id = 0
+
+    # Mock apply_chat_template to return formatted text
+    tokenizer.apply_chat_template.return_value = "formatted_text"
 
     # Create a mock that behaves like tokenizer output with .to() method
     mock_tokens = MagicMock()
     mock_tokens.to.return_value = mock_tokens  # .to() returns itself
+    mock_tokens.input_ids = torch.tensor([[1, 2, 3, 4, 5]])
     mock_tokens.__getitem__ = lambda self, key: torch.tensor([[1, 2, 3, 4, 5]])
 
     tokenizer.return_value = mock_tokens
+
+    # Mock batch_decode for output
+    tokenizer.batch_decode.return_value = ['{"correct": true}']
+
     return tokenizer
 
 
@@ -67,23 +76,27 @@ class TestGenerateResponse:
 
     def test_generate_response_basic(self, grading_agent, mock_tokenizer, mock_model):
         """Test response generation with deterministic sampling, prompt stripping, and max tokens."""
-        # Mock tokenizer decode to return prompt + response
+        # Mock tokenizer to return expected response
         prompt = "Test prompt"
         expected_response = '{"correct": true}'
-        mock_tokenizer.decode.return_value = f"{prompt}{expected_response}"
+        mock_tokenizer.batch_decode.return_value = [expected_response]
 
         response = grading_agent.generate_response(prompt)
 
-        # Verify tokenizer was called with prompt
-        mock_tokenizer.assert_called_with(prompt, return_tensors="pt")
+        # Verify apply_chat_template was called with messages
+        mock_tokenizer.apply_chat_template.assert_called_once()
+        call_args = mock_tokenizer.apply_chat_template.call_args[0][0]
+        assert call_args[0]["role"] == "user"
+        assert call_args[0]["content"] == prompt
 
         # Verify model.generate was called with correct parameters
         mock_model.generate.assert_called_once()
         call_kwargs = mock_model.generate.call_args[1]
-        assert call_kwargs["do_sample"] is False
+        assert call_kwargs["do_sample"] is True
+        assert call_kwargs["temperature"] == 0.1
         assert call_kwargs["max_new_tokens"] == 50
 
-        # Verify response has prompt stripped
+        # Verify response
         assert response == expected_response
 
 
@@ -109,8 +122,11 @@ class TestGradeVocab:
         expected_result,
     ):
         """Test vocab grading accepts exact matches and rejects wrong answers."""
+        # Mock prompt template format
         mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = f"formatted prompt{expected_result}"
+
+        # Mock batch_decode to return expected result
+        mock_tokenizer.batch_decode.return_value = [expected_result]
 
         input_data = {
             "word": word,
@@ -152,8 +168,11 @@ class TestGradeGrammarQuiz:
         expected_result,
     ):
         """Test grammar quiz grading validates gender answers correctly."""
+        # Mock prompt template format
         mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = f"formatted prompt{expected_result}"
+
+        # Mock batch_decode to return expected result
+        mock_tokenizer.batch_decode.return_value = [expected_result]
 
         input_data = {
             "question": question,
@@ -181,8 +200,15 @@ class TestGradeGrammarTest:
     @patch("src.agents.grading_agent.GRADING_GRAMMAR_TEST")
     def test_grade_grammar_test_single_question(self, mock_prompt, grading_agent, mock_tokenizer):
         """Test grading grammar test with single question."""
+        expected_response = (
+            '{"total_score": "1/1", "results": [{"question_id": "q1", "correct": true}]}'
+        )
+
+        # Mock prompt template format
         mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = 'formatted prompt{"total_score": "1/1", "results": [{"question_id": "q1", "correct": true}]}'
+
+        # Mock batch_decode to return expected result
+        mock_tokenizer.batch_decode.return_value = [expected_response]
 
         input_data = {
             "lesson_number": 3,
@@ -214,11 +240,16 @@ class TestGradeGrammarTest:
         self, mock_prompt, grading_agent, mock_tokenizer
     ):
         """Test grading grammar test with multiple questions."""
-        mock_prompt.format.return_value = "formatted prompt"
-        mock_tokenizer.decode.return_value = (
-            'formatted prompt{"total_score": "1/2", '
+        expected_response = (
+            '{"total_score": "1/2", '
             '"results": [{"question_id": "q1", "correct": true}, {"question_id": "q2", "correct": false}]}'
         )
+
+        # Mock prompt template format
+        mock_prompt.format.return_value = "formatted prompt"
+
+        # Mock batch_decode to return expected result
+        mock_tokenizer.batch_decode.return_value = [expected_response]
 
         input_data = {
             "lesson_number": 3,
@@ -320,8 +351,11 @@ class TestOrchestratorAdapter:
     ):
         """Test grade_answer adapter routes to vocab/grammar methods based on mode and defaults to vocab."""
         with patch(f"src.agents.grading_agent.{expected_mock}") as mock_prompt:
+            # Mock prompt template format
             mock_prompt.format.return_value = "formatted prompt"
-            mock_tokenizer.decode.return_value = f"formatted prompt{expected_json}"
+
+            # Mock batch_decode to return expected result
+            mock_tokenizer.batch_decode.return_value = [expected_json]
 
             response = grading_agent.grade_answer(input_data)
 

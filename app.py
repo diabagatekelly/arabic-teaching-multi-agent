@@ -1,291 +1,677 @@
-"""Gradio UI for Arabic Teaching Multi-Agent System with Zero-GPU support.
+"""FastAPI + Gradio proof of concept with simple agent.
 
-HuggingFace Space entry point with GPU acceleration.
+Demonstrates:
+- FastAPI backend with agent endpoint
+- Gradio UI mounted in FastAPI
+- Works with HuggingFace Spaces @spaces.GPU
+- GPU function isolated in engine.py for reliable ZeroGPU detection
 """
 
+import json
 import logging
-import sys
-from datetime import datetime
+import os
 from pathlib import Path
 
 import gradio as gr
 import spaces
+import torch
+from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
-# Add project root to path for src imports
-PROJECT_ROOT = Path(__file__).parent
-sys.path.insert(0, str(PROJECT_ROOT))
-
-from src.agents import ContentAgent, GradingAgent, TeachingAgent  # noqa: E402
-from src.models.hf_model_loader import load_grading_model, load_teaching_model  # noqa: E402
-from src.orchestrator.graph import create_teaching_graph  # noqa: E402
-from src.orchestrator.state import Message, SystemState  # noqa: E402
+from src.agents.content_agent import ContentAgent
+from src.orchestrator.orchestrator import Orchestrator
+from src.rag.pinecone_client import PineconeClient
+from src.rag.rag_retriever import RAGRetriever
+from src.rag.sentence_transformer_client import SentenceTransformerClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Global components (loaded once)
-orchestrator = None
-current_state = None
+# Environment detection
+
+ZEROGPU = os.getenv("SPACE_ID") is not None  # Running on HuggingFace Spaces
+LOCAL_DEV = not ZEROGPU  # Running locally
+
+# Model names
+teaching_model_name = "Qwen/Qwen2.5-7B-Instruct"
+teaching_adapter_name = "kdiabagate/qwen-7b-arabic-teaching"  # v1 model (natural conversation)
+content_model_name = "Qwen/Qwen2.5-7B-Instruct"  # 7B base for ContentAgent
+
+# Load tokenizers globally (CPU-safe)
+teaching_tokenizer = AutoTokenizer.from_pretrained(teaching_model_name)
+content_tokenizer = AutoTokenizer.from_pretrained(content_model_name)
+
+# Global model variables
+teaching_model = None
+content_model = None
+
+# Load models at startup (both local and ZeroGPU)
+print("===== Loading models at startup =====")
+
+# Teaching model (7B + LoRA)
+print(f"===== Loading TeachingAgent base: {teaching_model_name} =====")
+base_model = AutoModelForCausalLM.from_pretrained(
+    teaching_model_name,
+    torch_dtype=torch.float16,
+    device_map="cpu" if ZEROGPU else "auto",  # CPU for ZeroGPU, auto for local
+)
+print(f"===== Loading LoRA adapter: {teaching_adapter_name} =====")
+teaching_model = PeftModel.from_pretrained(base_model, teaching_adapter_name)
+print("===== Merging LoRA weights =====")
+teaching_model = teaching_model.merge_and_unload()
+print(f"===== TeachingAgent ready on device: {teaching_model.device} =====")
+
+# Content model (3B base)
+print(f"===== Loading ContentAgent model: {content_model_name} =====")
+content_model = AutoModelForCausalLM.from_pretrained(
+    content_model_name,
+    torch_dtype=torch.float16,
+    device_map="cpu" if ZEROGPU else "auto",  # CPU for ZeroGPU, auto for local
+)
+print(f"===== ContentAgent ready on device: {content_model.device} =====")
+
+if ZEROGPU:
+    print("===== ZEROGPU: Models loaded on CPU, will move to GPU inside @spaces.GPU calls =====")
+
+# Initialize RAG retriever (CPU-bound, safe for all environments)
+print("===== Initializing RAG retriever =====")
+embedder = SentenceTransformerClient()
+vector_db = PineconeClient()
+rag_retriever = RAGRetriever(embedder, vector_db)
+print("===== RAG retriever initialized =====")
 
 
-def initialize_models():
-    """Initialize models and orchestrator (runs once at startup)."""
-    global orchestrator
+# Define your GPU-enabled function with @spaces.GPU decorator
+@spaces.GPU(duration=60)
+def process_message(message, chat_history, session_id):
+    """GPU-enabled message processing through orchestrator."""
+    # Reload sessions from file (ZeroGPU isolation) - update in-place
+    sessions.clear()
+    sessions.update(load_sessions())
 
-    logger.info("Loading fine-tuned models...")
+    logger.info("=" * 80)
+    logger.info("[App] USER INPUT CAPTURED")
+    logger.info(f"  Message: {message}")
+    logger.info(f"  Session ID: {session_id}")
+    logger.info(f"  Session ID type: {type(session_id)}")
+    logger.info(f"  Chat history length: {len(chat_history)}")
+    logger.info(f"  Sessions dict keys: {list(sessions.keys())}")
+    logger.info(f"  Session exists: {session_id in sessions}")
 
-    try:
-        # Load teaching model (7B fine-tuned)
-        teaching_model, teaching_tokenizer = load_teaching_model()
+    if session_id in sessions:
+        logger.info(f"  Session status: {sessions[session_id].get('status')}")
+        logger.info(f"  Session data: {list(sessions[session_id].keys())}")
 
-        # Load grading model (7B fine-tuned)
-        grading_model, grading_tokenizer = load_grading_model()
-
-        # Create agents
-        teaching_agent = TeachingAgent(
-            model=teaching_model,
-            tokenizer=teaching_tokenizer,
-            max_new_tokens=256,
+    # Check if lesson is active
+    if session_id not in sessions or sessions[session_id].get("status") != "active":
+        logger.warning("[App] No active lesson - returning error message")
+        logger.warning(f"  Condition 1 - session_id not in sessions: {session_id not in sessions}")
+        if session_id in sessions:
+            logger.warning(
+                f"  Condition 2 - status not active: {sessions[session_id].get('status') != 'active'}"
+            )
+            logger.warning(f"  Actual status: {sessions[session_id].get('status')}")
+        error_msg = "Please start a lesson first using the 'Start Lesson' button."
+        chat_history.append({"role": "user", "content": message})
+        chat_history.append({"role": "assistant", "content": error_msg})
+        # Return all 4 expected outputs: msg, chatbot, flashcard_trigger, progress_display
+        return (
+            "",
+            chat_history,
+            "",
+            "**Vocabulary:**\n○ No progress yet\n\n**Grammar:**\n○ No progress yet",
         )
 
-        grading_agent = GradingAgent(
-            model=grading_model,
-            tokenizer=grading_tokenizer,
-            max_new_tokens=50,
-        )
+    logger.info("[App] Routing to orchestrator.handle_message()")
 
-        content_agent = ContentAgent(
-            model=teaching_model,  # Reuse teaching model
-            tokenizer=teaching_tokenizer,
-            max_new_tokens=512,
-        )
+    # Route through orchestrator
+    response = orchestrator.handle_message(session_id, message)
 
-        # Create orchestrator
-        orchestrator = create_teaching_graph(
-            teaching_agent=teaching_agent,
-            grading_agent=grading_agent,
-            content_agent=content_agent,
-        )
+    # Save sessions after orchestrator updates state
+    save_sessions(sessions)
 
-        logger.info("✓ All components initialized")
-        return "✓ Models loaded successfully!"
+    logger.info("[App] Received response from orchestrator")
+    logger.info(f"  Response length: {len(response)} chars")
+    logger.info(f"  Response preview: {response[:100]}...")
 
-    except Exception as e:
-        logger.error(f"Failed to initialize: {e}")
-        return f"❌ Initialization failed: {e}"
+    # Update chat history
+    chat_history.append({"role": "user", "content": message})
+    chat_history.append({"role": "assistant", "content": response})
+
+    logger.info(f"[App] Updated chat history, new length: {len(chat_history)}")
+    logger.info("=" * 80)
+
+    # Check if we need to update flashcards (user chose vocab)
+    session = sessions.get(session_id, {})
+    current_progress = session.get("current_progress", "")
+    flashcard_update = ""
+
+    if current_progress == "vocab_batch_intro":
+        # Trigger flashcard update by changing the trigger value
+        import time
+
+        flashcard_update = str(time.time())
+
+    # Update progress display
+    progress_text = _build_progress_display(session)
+
+    return "", chat_history, flashcard_update, progress_text
 
 
-@spaces.GPU(duration=120)  # Reserve GPU for 120 seconds per call
-def start_lesson(lesson_number: int, chat_history: list) -> tuple:
-    """
-    Start a new lesson (GPU-accelerated).
+def _build_progress_display(session):
+    """Build progress display from session state - matches orchestrator progress report."""
+    if not session:
+        return "**Vocabulary:**\n○ No progress yet\n\n**Grammar:**\n○ No progress yet"
 
-    Args:
-        lesson_number: Lesson to start (1-10)
-        chat_history: Current chat history
+    progress_lines = []
 
-    Returns:
-        Tuple of (updated_chat, exercises, correct, accuracy, learned_items, status)
-    """
-    global current_state
+    # Vocabulary progress
+    progress_lines.append("**Vocabulary:**")
+    vocab_state = session.get("vocabulary", {})
+    all_vocab = vocab_state.get("words", [])
+    current_batch = vocab_state.get("current_batch", 1)
+    total_batches = (len(all_vocab) + 2) // 3  # Ceiling division
 
-    logger.info(f"Starting lesson {lesson_number}...")
+    for batch_num in range(1, total_batches + 1):
+        batch_start = (batch_num - 1) * 3
+        batch_end = min(batch_start + 3, len(all_vocab))
+        batch_words = all_vocab[batch_start:batch_end]
 
-    try:
-        # Create initial state
-        initial_state = SystemState(
-            user_id="user_1",
-            session_id=f"session_{lesson_number}_{int(datetime.now().timestamp())}",
-            current_lesson=lesson_number,
-            conversation_history=[],
-            next_agent="teaching",
-            last_agent="",
-        )
+        # Skip empty batches (shouldn't happen but safeguard)
+        if not batch_words:
+            continue
 
-        # Run orchestrator (GPU-accelerated model inference)
-        result = orchestrator.invoke(initial_state)
+        if batch_num < current_batch:
+            # Completed batch
+            progress_lines.append(f"- ✓ Batch {batch_num}: {len(batch_words)} words")
+        elif batch_num == current_batch:
+            # Current batch
+            progress_lines.append(f"- → Batch {batch_num}: {len(batch_words)} words")
+        else:
+            # Not started
+            progress_lines.append(f"- ○ Batch {batch_num}: {len(batch_words)} words")
 
-        # Update global state
-        current_state = result
+    # Grammar progress
+    progress_lines.append("\n**Grammar:**")
+    grammar_topics = session.get("grammar", {}).get("topics", {})
+    lesson_number = session.get("lesson_number")
 
-        conversation_history = result.get("conversation_history", [])
-        if conversation_history:
-            last_message = conversation_history[-1]
-            if hasattr(last_message, "role") and last_message.role == "agent1":
-                welcome_msg = last_message.content
-            elif isinstance(last_message, dict) and last_message.get("role") == "agent1":
-                welcome_msg = last_message.get("content", "")
+    if lesson_number and lesson_number in lesson_cache:
+        lesson_data = lesson_cache[lesson_number]
+        for topic_name in lesson_data.get("grammar_points", []):
+            # Convert underscore keys to display names
+            topic_display = topic_name.replace("_", " ").title()
+            topic_state = grammar_topics.get(topic_name, {})
+            if topic_state.get("taught", False):
+                score = topic_state.get("quiz_score", "N/A")
+                progress_lines.append(f"- ✓ {topic_display}: {score}")
             else:
-                welcome_msg = "Welcome to the lesson!"
-        else:
-            welcome_msg = "Welcome to the lesson!"
+                progress_lines.append(f"- ○ {topic_display}")
+    else:
+        progress_lines.append("- ○ No topics available")
 
-        chat_history.append((None, welcome_msg))
-
-        exercises, correct, accuracy, learned = _format_progress_stats(result)
-
-        status = f"✓ Lesson {lesson_number} started!"
-
-        return chat_history, exercises, correct, accuracy, learned, status
-
-    except Exception as e:
-        logger.error(f"Failed to start lesson: {e}")
-        return chat_history, 0, 0, "0%", "", f"❌ Error: {e}"
+    return "\n".join(progress_lines)
 
 
-def _extract_agent_response(conversation_history: list) -> str:
-    """Extract last agent response, skipping agent3 messages."""
-    for msg in reversed(conversation_history):
-        msg_role = msg.role if hasattr(msg, "role") else msg.get("role")
-        if msg_role in ["agent1", "agent2", "assistant"]:
-            content = msg.content if hasattr(msg, "content") else msg.get("content", "")
-            # Preserve fallback for empty/None content
-            if content:
-                return content
-    return "I'm here to help!"
+# Global lesson cache (loaded from JSON file)
+lesson_cache = {}
+
+# Per-user session store (file-based for ZeroGPU persistence)
+SESSION_FILE = Path(__file__).parent / "sessions.json"
 
 
-def _format_progress_stats(result: dict) -> tuple:
-    """Format progress statistics for UI display."""
-    exercises = result.get("total_exercises_completed", 0)
-    correct = result.get("total_correct_answers", 0)
-    accuracy = f"{(correct / exercises * 100):.1f}%" if exercises > 0 else "0%"
-    learned = ", ".join(list(result.get("learned_items", [])))[:100]
-    return exercises, correct, accuracy, learned
+def load_sessions():
+    """Load sessions from file."""
+    if SESSION_FILE.exists():
+        with open(SESSION_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    return {}
 
 
-@spaces.GPU(duration=120)
-def send_message(user_message: str, chat_history: list) -> tuple:
-    """
-    Process user message (GPU-accelerated).
-
-    Args:
-        user_message: User's input
-        chat_history: Current chat history
-
-    Returns:
-        Tuple of (updated_chat, exercises, correct, accuracy, learned_items, cleared_input)
-    """
-    global current_state
-
-    if not current_state:
-        chat_history.append((user_message, "⚠️ Please start a lesson first!"))
-        return chat_history, 0, 0, "0%", "", ""
-
-    if not user_message.strip():
-        return chat_history, 0, 0, "0%", "", ""
-
-    logger.info(f"Processing user message: {user_message[:50]}...")
-
-    try:
-        user_msg = Message(role="user", content=user_message)
-        current_state["conversation_history"].append(user_msg)
-
-        if current_state.get("pending_exercise") and current_state.get("awaiting_user_answer"):
-            current_state["next_agent"] = "grading"
-        else:
-            current_state["next_agent"] = "teaching"
-
-        result = orchestrator.invoke(current_state)
-        current_state = result
-
-        conversation_history = result.get("conversation_history", [])
-        agent_response = _extract_agent_response(conversation_history)
-
-        chat_history.append((user_message, agent_response))
-
-        exercises, correct, accuracy, learned = _format_progress_stats(result)
-
-        return chat_history, exercises, correct, accuracy, learned, ""
-
-    except Exception as e:
-        logger.error(f"Error processing message: {e}")
-        chat_history.append((user_message, f"❌ Error: {e}"))
-        return chat_history, 0, 0, "0%", "", ""
+def save_sessions(sessions_dict):
+    """Save sessions to file."""
+    with open(SESSION_FILE, "w", encoding="utf-8") as f:
+        json.dump(sessions_dict, f, ensure_ascii=False, indent=2)
 
 
-# Build Gradio interface
-with gr.Blocks(title="Arabic Teaching System", theme=gr.themes.Soft()) as app:
-    gr.Markdown("# 🇸🇦 Arabic Teaching System")
-    gr.Markdown("Learn Arabic through interactive lessons powered by fine-tuned AI agents")
+sessions = load_sessions()
+logger.info(f"===== Loaded {len(sessions)} sessions from file =====")
+
+# Load lesson cache from pre-built JSON file
+print("===== Loading lesson cache =====")
+cache_file = Path(__file__).parent / "lesson_cache.json"
+if cache_file.exists():
+    with open(cache_file, encoding="utf-8") as f:
+        cache_data = json.load(f)
+        # Convert string keys back to integers
+        lesson_cache = {int(k): v for k, v in cache_data.items()}
+    print(f"===== Loaded {len(lesson_cache)} lessons from cache =====")
+else:
+    print("===== WARNING: lesson_cache.json not found, using empty cache =====")
+    print("===== Run scripts/build_lesson_cache.py to generate it =====")
+
+
+# Helper functions to get models (move to GPU if on ZeroGPU)
+def get_teaching_model():
+    """Get the teaching model, moving to GPU if necessary."""
+    global teaching_model
+    if ZEROGPU and str(teaching_model.device) == "cpu":
+        print("===== Moving TeachingAgent to GPU =====")
+        teaching_model = teaching_model.to("cuda")
+    return teaching_model
+
+
+def get_content_model():
+    """Get the content model, moving to GPU if necessary."""
+    global content_model
+    if ZEROGPU and str(content_model.device) == "cpu":
+        print("===== Moving ContentAgent to GPU =====")
+        content_model = content_model.to("cuda")
+    return content_model
+
+
+# Initialize ContentAgent with RAG
+print("===== Initializing ContentAgent =====")
+content_agent = ContentAgent(
+    model=content_model,  # Model already loaded at startup
+    tokenizer=content_tokenizer,
+    max_new_tokens=512,
+)
+content_agent.rag_retriever = rag_retriever  # Wire up RAG
+print("===== ContentAgent initialized =====")
+
+# Initialize orchestrator with all agents
+orchestrator = Orchestrator(
+    lesson_cache=lesson_cache,
+    sessions=sessions,
+    teaching_model_getter=get_teaching_model,
+    teaching_tokenizer=teaching_tokenizer,
+    content_agent=content_agent,
+)
+print("===== Orchestrator initialized =====")
+
+
+# Build Gradio interface with 3-column layout
+with gr.Blocks(
+    title="Arabic Learning Companion",
+    theme=gr.themes.Soft(),
+    css="""
+    .flashcard {
+        padding: 95px 20px;
+        min-height: 250px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #f9f9f9;
+        font-size: 2.5em;
+        font-weight: 500;
+        margin-top: 0;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+    }
+    /* Flashcard container border */
+    .flashcard-container {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        align-self: stretch !important;
+    }
+    /* Right panel container border */
+    .controls-container {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        align-self: stretch !important;
+    }
+    .main-title {
+        text-align: center;
+        font-size: 2em;
+        margin: 0 0 0.5em 0 !important;
+        padding-top: 0 !important;
+    }
+    /* Fix double scrollbar in chatbot */
+    .chatbot {
+        overflow: hidden !important;
+    }
+    /* Remove top margin/padding from all headers to align tops */
+    h1, h3 {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    /* Align all columns to top */
+    .gradio-column {
+        align-self: flex-start !important;
+    }
+    /* Align side panels to stretch to bottom */
+    .gradio-row > .gradio-column:first-child,
+    .gradio-row > .gradio-column:last-child {
+        align-self: stretch !important;
+    }
+    /* Custom loading spinner */
+    .gradio-spinner {
+        border-width: 3px !important;
+    }
+    """,
+) as demo:
+    # Add loading message that shows during startup
+    gr.HTML("""
+        <div id="startup-loading" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+             background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; text-align: center;">
+            <div style="font-size: 1.5em; margin-bottom: 20px;">🧞‍♂️ Waking up the Arabic tutor...</div>
+            <div style="font-size: 1em; color: #666;">Loading language models, this takes ~10 seconds</div>
+        </div>
+        <script>
+            // Show loading on first visit
+            if (sessionStorage.getItem('loaded') !== 'true') {
+                document.getElementById('startup-loading').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('startup-loading').style.display = 'none';
+                    sessionStorage.setItem('loaded', 'true');
+                }, 8000);
+            }
+        </script>
+    """)
+    # Title row - spans full width
+    gr.Markdown("# 🌟 Arabic Learning Companion", elem_classes=["main-title"])
 
     with gr.Row():
-        # Left column: Chat
-        with gr.Column(scale=3):
-            chatbot = gr.Chatbot(
-                label="Chat with your Arabic teacher",
-                height=500,
-                show_label=True,
+        # Left panel - Flashcards (1/4 width)
+        with gr.Column(scale=1, elem_classes=["flashcard-container"]):
+            gr.Markdown("### 📚 Flashcards")
+            flashcard_display = gr.Markdown(
+                "*Start a lesson to see flashcards*", visible=True, elem_classes=["flashcard"]
             )
-
+            flashcard_progress = gr.Textbox(
+                label="Progress", value="0/0", interactive=False, visible=True
+            )
             with gr.Row():
-                msg = gr.Textbox(
-                    label="Your response",
-                    placeholder="Type your answer here...",
-                    scale=4,
-                )
-                send_btn = gr.Button("Send", variant="primary", scale=1)
+                flip_card_btn = gr.Button("Flip Card", size="sm", visible=True)
+                next_card_btn = gr.Button("Next Card", size="sm", visible=True)
 
-        # Right column: Controls & Progress
-        with gr.Column(scale=1):
-            gr.Markdown("### 📚 Lesson Selection")
-            lesson_dropdown = gr.Dropdown(
-                choices=list(range(1, 11)),
-                value=1,
-                label="Choose a lesson",
+        # Center panel - Chat (1/2 width)
+        with gr.Column(scale=2):
+            # type="messages" only works in Gradio 5.x (Spaces), not local 6.12
+            try:
+                chatbot = gr.Chatbot(height=450, type="messages", elem_classes=["chatbot"])
+            except TypeError:
+                chatbot = gr.Chatbot(height=450, elem_classes=["chatbot"])
+            msg = gr.Textbox(
+                label="Your message",
+                placeholder="Try: hello, vocab, grammar...",
             )
-            start_btn = gr.Button("Start New Lesson", variant="primary", size="lg")
-            status_box = gr.Textbox(label="Status", interactive=False)
+            with gr.Row():
+                submit = gr.Button("Send", variant="primary")
+                stop = gr.Button("Stop", variant="stop")
+                clear = gr.Button("Clear")
 
-            gr.Markdown("---")
+        # Right panel - Controls & Progress (1/4 width)
+        with gr.Column(scale=1, elem_classes=["controls-container"]):
+            gr.Markdown("### 🎮 Lesson Controls")
+            start_lesson_btn = gr.Button("Start Lesson", variant="primary")
+            with gr.Row():
+                end_lesson_btn = gr.Button("⏹️ End Lesson", variant="secondary", scale=1)
+                reset_lesson_btn = gr.Button("🔄 Reset", variant="stop", scale=1)
+
+            gr.Markdown("### 📖 About")
+            lesson_info = gr.Markdown("**Status:** Not started")
+
             gr.Markdown("### 📊 Progress")
-
-            exercises_count = gr.Number(label="Exercises Completed", value=0, interactive=False)
-            correct_count = gr.Number(label="Correct Answers", value=0, interactive=False)
-            accuracy_display = gr.Textbox(label="Accuracy", value="0%", interactive=False)
-            learned_items = gr.Textbox(
-                label="Learned Items",
-                value="",
-                interactive=False,
-                lines=3,
+            progress_display = gr.Markdown(
+                "**Vocabulary:**\n- ○ No progress yet\n\n**Grammar:**\n- ○ No progress yet"
             )
 
-            gr.Markdown("---")
-            gr.Markdown("### ℹ️ System Info")
-            gr.Markdown("**Teaching:** Fine-tuned Qwen2.5-7B")
-            gr.Markdown("**Grading:** Fine-tuned Qwen2.5-7B")
-            gr.Markdown("**GPU:** Zero-GPU (HuggingFace)")
+    session_id = gr.State("")  # String type for session ID
+    flashcard_state = gr.State(
+        {"current_index": 0, "flipped": False, "cards": [], "visible": False}
+    )
+    flashcard_trigger = gr.Textbox(visible=False)  # Hidden trigger for flashcard updates
 
-    # Event handlers
-    start_btn.click(
-        fn=start_lesson,
-        inputs=[lesson_dropdown, chatbot],
-        outputs=[
-            chatbot,
-            exercises_count,
-            correct_count,
-            accuracy_display,
-            learned_items,
-            status_box,
+    def flip_flashcard(state):
+        """Flip the current flashcard."""
+        if not state["cards"]:
+            return state, "*No flashcards available*"
+
+        state["flipped"] = not state["flipped"]
+        card = state["cards"][state["current_index"]]
+
+        if state["flipped"]:
+            # Show Arabic + transliteration
+            display = f"### {card['arabic']}\n\n*{card['transliteration']}*"
+        else:
+            # Show English
+            display = f"### {card['english']}"
+
+        return state, display
+
+    def next_flashcard(state):
+        """Move to next flashcard."""
+        if not state["cards"]:
+            return state, "*No flashcards available*", "0/0"
+
+        state["current_index"] = (state["current_index"] + 1) % len(state["cards"])
+        state["flipped"] = False
+
+        card = state["cards"][state["current_index"]]
+        display = f"### {card['english']}"
+        progress = f"{state['current_index'] + 1}/{len(state['cards'])}"
+
+        return state, display, progress
+
+    def update_flashcards(sid, state):
+        """Update flashcards - shows all learned vocab except during quizzes/tests."""
+        sessions.clear()
+        sessions.update(load_sessions())
+
+        if sid not in sessions:
+            return (
+                state,
+                "*Start a lesson to see flashcards*",
+                "0/0",
+                gr.update(visible=False),
+                gr.update(visible=False),
+                gr.update(visible=False),
+            )
+
+        session = sessions[sid]
+        current_progress = session.get("current_progress", "")
+
+        # Hide flashcards only during quizzes and tests
+        hide_flashcards = current_progress in [
+            "vocab_quiz",
+            "grammar_quiz",
+            "final_exam",
+        ]
+
+        if hide_flashcards:
+            # Hide flashcards during assessment
+            return (
+                state,
+                "*Flashcards hidden during quiz*",
+                "0/0",
+                gr.update(visible=False),
+                gr.update(visible=False),
+                gr.update(visible=False),
+            )
+
+        # Show all vocabulary learned so far (all batches up to current)
+        current_batch = session.get("vocabulary", {}).get("current_batch", 1)
+        all_vocab = session.get("vocabulary", {}).get("words", [])
+
+        # Get all words from completed and current batches
+        batch_size = 3
+        total_words_learned = min(current_batch * batch_size, len(all_vocab))
+        learned_words = all_vocab[:total_words_learned]
+
+        if not learned_words:
+            return (
+                state,
+                "*No vocabulary learned yet*",
+                "0/0",
+                gr.update(visible=True),
+                gr.update(visible=True),
+                gr.update(visible=True),
+            )
+
+        # Update flashcard state with all learned words
+        state["cards"] = learned_words
+        state["current_index"] = 0
+        state["flipped"] = False
+
+        # Show first card (English side)
+        display = f"### {learned_words[0]['english']}"
+        progress = f"1/{len(learned_words)}"
+
+        return (
+            state,
+            display,
+            progress,
+            gr.update(visible=True),
+            gr.update(visible=True),
+            gr.update(visible=True),
+        )
+
+    def show_loading():
+        """Show immediate loading message before GPU spins up."""
+        loading_chat = [
+            {
+                "role": "assistant",
+                "content": "🤖 Gathering my notes and grabbing some coffee... This will take about 5-10 seconds!",
+            }
+        ]
+        return "**Status:** Starting...", "○ Loading...", loading_chat
+
+    @spaces.GPU(duration=60)
+    def start_lesson_ui(sid):
+        """Start lesson and initialize session."""
+        import uuid
+
+        # Reload sessions from file (ZeroGPU isolation) - update in-place
+        sessions.clear()
+        sessions.update(load_sessions())
+
+        if not sid:
+            sid = str(uuid.uuid4())[:8]
+
+        logger.info("=" * 80)
+        logger.info("[App] START LESSON UI CALLED")
+        logger.info(f"  Session ID: {sid}")
+        logger.info(f"  Session ID type: {type(sid)}")
+        logger.info(f"  Sessions before: {list(sessions.keys())}")
+
+        # Get lesson from cache
+        lesson_number = 1
+        if lesson_number not in lesson_cache:
+            return "**Status:** Error - Lesson not found", "**Learned:** 0 words", [], sid
+
+        # Call orchestrator to start lesson (updates session, generates welcome)
+        welcome_message = orchestrator.start_lesson(sid, lesson_number)
+
+        # Save sessions to file for ZeroGPU persistence
+        save_sessions(sessions)
+
+        logger.info(f"  Sessions after: {list(sessions.keys())}")
+        logger.info(f"  Session created: {sid in sessions}")
+        if sid in sessions:
+            logger.info(f"  Session status: {sessions[sid].get('status')}")
+        logger.info("=" * 80)
+
+        lesson_data = lesson_cache[lesson_number]
+        # Convert grammar point keys to display names
+        grammar_display = [gp.replace("_", " ").title() for gp in lesson_data["grammar_points"]]
+
+        lesson_info = f"""**Status:** Active
+
+**Lesson {lesson_number}:** {lesson_data["lesson_name"]}
+
+**Total Vocab:** {len(lesson_data["vocabulary"])} words
+
+**Grammar:** {", ".join(grammar_display)}
+"""
+        progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
+
+        # Initialize chat with welcome message
+        chat_history = [{"role": "assistant", "content": welcome_message}]
+
+        return lesson_info, progress, chat_history, sid
+
+    def end_lesson_ui(sid):
+        """End lesson - session saved but marked inactive."""
+        if sid in sessions and "status" in sessions[sid]:
+            sessions[sid]["status"] = "ended"
+            learned = len(sessions[sid].get("learned_words", []))
+            quizzes = len(sessions[sid].get("quiz_scores", []))
+
+            lesson_info = f"""**Status:** Ended
+
+**Lesson:** {sessions[sid].get("lesson_name", "Unknown")}
+**Session saved** ✓
+"""
+            progress = f"**Learned:** {learned} words\n\n**Quizzes:** {quizzes} completed"
+        else:
+            lesson_info = "**Status:** No active lesson"
+            progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
+
+        return lesson_info, progress
+
+    def reset_lesson_ui(sid):
+        """Reset lesson - wipes session cache and progress."""
+        if sid in sessions:
+            # Clear all lesson data from session
+            del sessions[sid]
+
+        lesson_info = "**Status:** Reset complete\n\n*Session data cleared*"
+        progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
+        return lesson_info, progress
+
+    # Wire up flashcard functions
+    flip_card_btn.click(flip_flashcard, [flashcard_state], [flashcard_state, flashcard_display])
+    next_card_btn.click(
+        next_flashcard, [flashcard_state], [flashcard_state, flashcard_display, flashcard_progress]
+    )
+
+    # Auto-update flashcards when trigger changes (includes visibility)
+    flashcard_trigger.change(
+        update_flashcards,
+        [session_id, flashcard_state],
+        [
+            flashcard_state,
+            flashcard_display,
+            flashcard_progress,
+            flashcard_display,
+            flip_card_btn,
+            next_card_btn,
         ],
     )
 
-    send_btn.click(
-        fn=send_message,
-        inputs=[msg, chatbot],
-        outputs=[chatbot, exercises_count, correct_count, accuracy_display, learned_items, msg],
+    # Wire up chat functions
+    submit_event = msg.submit(
+        process_message,
+        [msg, chatbot, session_id],
+        [msg, chatbot, flashcard_trigger, progress_display],
+    )
+    click_event = submit.click(
+        process_message,
+        [msg, chatbot, session_id],
+        [msg, chatbot, flashcard_trigger, progress_display],
     )
 
-    msg.submit(
-        fn=send_message,
-        inputs=[msg, chatbot],
-        outputs=[chatbot, exercises_count, correct_count, accuracy_display, learned_items, msg],
+    # Stop button cancels ongoing inference
+    stop.click(None, None, None, cancels=[submit_event, click_event])
+
+    clear.click(lambda: [], None, chatbot)
+
+    # Wire up lesson control functions
+    # Show loading message immediately, then start lesson
+    start_lesson_btn.click(show_loading, None, [lesson_info, progress_display, chatbot]).then(
+        start_lesson_ui, [session_id], [lesson_info, progress_display, chatbot, session_id]
     )
+    end_lesson_btn.click(end_lesson_ui, [session_id], [lesson_info, progress_display])
+    reset_lesson_btn.click(reset_lesson_ui, [session_id], [lesson_info, progress_display])
 
-    # Initialize on load
-    app.load(fn=initialize_models, outputs=[status_box])
 
-
-if __name__ == "__main__":
-    app.launch(server_name="0.0.0.0", server_port=7860)
+# Launch Gradio (standard for Spaces)
+demo.launch()

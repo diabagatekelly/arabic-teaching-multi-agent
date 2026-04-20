@@ -1,0 +1,50 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: feedback_vocab\n\nWord: كِتَابٌ (kitaabun)\nTranslation: book\nStudent was correct.\nCurrent Score: 1/3\n\nIMPORTANT: The student got this RIGHT. Start with a positive affirmation like \"Correct!\", \"Yes!\", \"Perfect!\", or \"Exactly!\".\nNow provide brief, encouraging feedback in your own style. Confirm correctness and mention their score. Be warm and personable!"
+      },
+      {
+        "role": "assistant",
+        "content": "Correct! ✓ كِتَابٌ (kitaabun) means book. That's 1/3!"
+      }
+    ]
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: feedback_vocab\n\nWord: مَدْرَسَةٌ (madrasatun)\nCorrect Translation: school\nStudent Answer: house\nStudent was incorrect.\nCurrent Score: 1/2\n\nIMPORTANT: The student got this WRONG. Start with a gentle correction like \"Not quite!\", \"Almost!\", \"Close, but...\", or \"Actually,\".\nNow provide supportive correction in your own style. Show the correct answer clearly, optionally give a memory tip, and mention their score. Be encouraging and helpful!"
+      },
+      {
+        "role": "assistant",
+        "content": "Not quite! مَدْرَسَةٌ (madrasatun) means school, not house. You're at 1/2 - keep going!"
+      }
+    ]
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: feedback_vocab\n\nWord: قَلَمٌ (qalamun)\nTranslation: pen\nStudent was correct.\nCurrent Score: 3/3\n\nIMPORTANT: The student got this RIGHT. Start with a positive affirmation like \"Correct!\", \"Yes!\", \"Perfect!\", or \"Exactly!\".\nNow provide brief, encouraging feedback in your own style. Confirm correctness and mention their score. Be warm and personable!"
+      },
+      {
+        "role": "assistant",
+        "content": "Perfect! ✓ قَلَمٌ (qalamun) is pen. You got all 3 correct! 🎉"
+      }
+    ]
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: feedback_vocab\n\nWord: طَاوِلَةٌ (taawilatun)\nCorrect Translation: table\nStudent Answer: chair\nStudent was incorrect.\nCurrent Score: 0/1\n\nIMPORTANT: The student got this WRONG. Start with a gentle correction like \"Not quite!\", \"Almost!\", \"Close, but...\", or \"Actually,\".\nNow provide supportive correction in your own style. Show the correct answer clearly, optionally give a memory tip, and mention their score. Be encouraging and helpful!"
+      },
+      {
+        "role": "assistant",
+        "content": "Close, but طَاوِلَةٌ (taawilatun) means table, not chair. You're at 0/1 so far."
+      }
+    ]
+  }
+]

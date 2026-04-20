@@ -2,7 +2,7 @@
 LangChain Prompt Templates for Arabic Teaching Multi-Agent System
 
 All prompts follow the design specifications in docs/PROMPT_DESIGN.md
-Total: 21 prompts across 3 agents
+Total: 20 prompts across 3 agents
 """
 
 from langchain_core.prompts import PromptTemplate
@@ -22,7 +22,7 @@ MODE_EXERCISE_GENERATION = "exercise_generation"
 
 
 # =============================================================================
-# AGENT 1: TEACHING/PRESENTATION AGENT (14 prompts)
+# AGENT 1: TEACHING/PRESENTATION AGENT (13 prompts)
 # Model: Fine-tuned Qwen2.5-3B
 # =============================================================================
 
@@ -35,22 +35,41 @@ LESSON_WELCOME = PromptTemplate(
 
 Lesson {lesson_number} Overview
 
-Vocabulary: {total_words} words
-Preview: {topics_preview}
+Vocabulary ({total_words} words):
+{vocabulary_list}
 
-Grammar: {topics_count} topics
-Topics: {grammar_topics}
+Grammar ({topics_count} topics):
+{grammar_topics}
 
-Greet the student warmly and present the lesson structure. Offer navigation:
+Example response format:
+
+"Welcome to Lesson 1! 🌟 I'm excited to guide you through Arabic basics today.
+
+Here's what we'll cover:
+
+**Vocabulary:** 6 essential words
+- كِتَاب (kitāb) - book
+- مَدْرَسَة (madrasa) - school
+- قَلَم (qalam) - pen
+- بَيْت (bayt) - house
+- طَالِب (ṭālib) - student
+- مُعَلِّم (muʿallim) - teacher
+
+**Grammar:** Noun Gender - learning masculine and feminine nouns
+
+Which would you like to start with?
 1. Start with vocabulary
-2. Start with grammar
-3. See lesson progress
+2. Start with grammar"
 
-Or tell me what you'd like to do.""",
+Now welcome the student in your own warm, natural style. List all vocabulary words (Arabic + English) and grammar topics.
+
+End with EXACTLY these numbered options:
+1. Start with vocabulary
+2. Start with grammar""",
     input_variables=[
         "lesson_number",
         "total_words",
-        "topics_preview",
+        "vocabulary_list",
         "topics_count",
         "grammar_topics",
     ],
@@ -58,86 +77,167 @@ Or tell me what you'd like to do.""",
 
 
 # -----------------------------------------------------------------------------
-# Vocabulary Teaching (5 prompts)
+# Progress Report (1 prompt)
 # -----------------------------------------------------------------------------
 
-VOCAB_OVERVIEW = PromptTemplate(
-    template="""Mode: teaching_vocab
+PROGRESS_REPORT = PromptTemplate(
+    template="""Mode: lesson_start
 
-Lesson {lesson_number} - Vocabulary Overview
+Lesson {lesson_number} Progress Report
 
-Words you'll learn:
-{words_formatted}
+Vocabulary Progress:
+{vocab_progress}
 
-These are divided into {batches_count} batches for easier learning.
+Grammar Progress:
+{grammar_progress}
 
-Present all words and explain options:
-1. Learn in batches (I'll teach each batch, then quiz you)
-2. Skip to final test (test yourself on all {total_words} words now)
+Example response:
 
-Format with numbered options and mention they can request something else.""",
-    input_variables=["lesson_number", "words_formatted", "batches_count", "total_words"],
+"Here's where you are in Lesson 1! 📊
+
+**Vocabulary:**
+✓ Batch 1: 3/3 words mastered
+✓ Batch 2: 2/3 words learned
+○ Batch 3: Not started
+
+**Grammar:**
+✓ Masculine & Feminine Nouns: Passed (2/3)
+○ Not started
+
+What would you like to do?
+1. Review vocabulary
+2. Continue vocabulary
+3. Practice grammar
+4. Take the final exam
+5. Continue where I left off"
+
+Now show their progress in your own encouraging style. List what they've completed with scores and what's still available.
+
+End with numbered options that let them:
+- Review/retake any completed vocab batch
+- Continue or start vocab batches
+- Review/retake any grammar topic
+- Take the final exam (if ready)
+- Continue where they left off""",
+    input_variables=["lesson_number", "vocab_progress", "grammar_progress"],
 )
+
+
+# -----------------------------------------------------------------------------
+# Vocabulary Teaching (3 prompts)
+# -----------------------------------------------------------------------------
 
 VOCAB_BATCH_INTRO = PromptTemplate(
     template="""Mode: teaching_vocab
 
 Lesson {lesson_number}, Batch {batch_number} of {total_batches}
 
-Words:
+Words (3 per batch):
 {words}
 
-Present these words with Arabic, transliteration, and English translation. Remind them flashcards are available for learning. Offer options:
-1. Take quiz on these words
-2. Go to next batch
-3. See all words
+{previous_performance}
 
-Or tell me what you'd like to do.""",
-    input_variables=["lesson_number", "batch_number", "total_batches", "words"],
-)
+Example response format:
 
-VOCAB_LIST_VIEW = PromptTemplate(
-    template="""Mode: teaching_vocab
+"Great! Let's learn Batch 1 of 2. Here are your words:
 
-Lesson {lesson_number} - All Vocabulary Words
+1. كِتَاب (kitāb) - book
+2. مَدْرَسَة (madrasa) - school
+3. قَلَم (qalam) - pen
 
-All Words:
-{all_words}
+Use the flashcards in the left panel to practice these words!
 
-Show all vocabulary words with Arabic, transliteration, and English. Mention current batch ({current_batch}) and offer navigation:
-1. Go back to current batch (Batch {current_batch})
-2. Skip to final test
+What would you like to do?
+1. Take quick quiz on these words
+2. Move on to next batch"
 
-Or tell me what you'd like to do.""",
-    input_variables=["lesson_number", "all_words", "current_batch"],
+Now introduce this batch in your own warm, engaging style. Present the words clearly with Arabic, transliteration, and English. Remind students about the flashcards.
+
+End with EXACTLY these numbered options:
+1. Take quick quiz on these words
+2. Move on to next batch""",
+    input_variables=[
+        "lesson_number",
+        "batch_number",
+        "total_batches",
+        "words",
+        "previous_performance",
+    ],
 )
 
 VOCAB_QUIZ_QUESTION = PromptTemplate(
     template="""Mode: teaching_vocab
 
-Question Type: {question_type}
-Word: {word_arabic} ({word_transliteration})
+Question {question_number} of {total_questions}
 
-Ask the translation question clearly. If arabic_to_english, ask "What does {word_arabic} mean?" If english_to_arabic, provide the English word and ask for Arabic translation.""",
-    input_variables=["question_type", "word_arabic", "word_transliteration"],
+Example response format:
+
+"Question 1 of 3
+
+What does {word_arabic} mean?"
+
+Now ask your question simply and clearly. Use EXACTLY this format: "Question {question_number} of {total_questions}\n\nWhat does {word_arabic} mean?"
+
+IMPORTANT: DO NOT include the transliteration or English translation in your question. Keep it simple and wait for the student's answer.""",
+    input_variables=[
+        "question_type",
+        "word_arabic",
+        "word_english",
+        "question_number",
+        "total_questions",
+    ],
 )
 
 VOCAB_BATCH_SUMMARY = PromptTemplate(
     template="""Mode: teaching_vocab
 
-Batch {batch_number} Quiz Results
+Batch {batch_number} of {total_batches} - Quiz Results
 
 Score: {score}
 Correct: {words_correct}
 Missed: {words_incorrect}
 
-Summarize performance encouragingly. Show words missed with translations. Offer options:
-1. Continue to next batch
-2. Review these words
-3. Skip to final test
+Progress: You've completed {batches_completed} of {total_batches} batches.
 
-Or tell me what you'd like to do.""",
-    input_variables=["batch_number", "score", "words_correct", "words_incorrect"],
+IMPORTANT: Check if all batches are done ({batches_completed} == {total_batches}).
+
+Example responses:
+
+If batches remaining:
+"Excellent work! You scored 2/3 on Batch 1. 🎉
+
+✓ Got right: book, school
+✗ Missed: pen (قَلَم - qalam)
+
+You've completed 1 of 2 batches - great progress!
+
+What would you like to do?
+1. Continue to next batch
+2. Review these words"
+
+If all batches complete:
+"Amazing! You scored 2/3 on Batch 2 - that's the final vocabulary batch! 🎉
+
+✓ Got right: book, school
+✗ Missed: pen (قَلَم - qalam)
+
+You've completed all vocabulary! Time to move on to something else.
+1. Move on to grammar
+2. Review vocabulary"
+
+Now summarize their performance in your own warm, encouraging style. Show which words they got right and which they missed (with translations).
+
+End with EXACTLY these numbered options based on progress:
+- If batches remaining: "1. Continue to next batch" and "2. Review these words"
+- If all batches complete: "1. Move on to grammar" and "2. Review vocabulary" """,
+    input_variables=[
+        "batch_number",
+        "score",
+        "words_correct",
+        "words_incorrect",
+        "total_batches",
+        "batches_completed",
+    ],
 )
 
 
@@ -173,11 +273,27 @@ Rule: {grammar_rule}
 Examples:
 {examples_formatted}
 
-Explain this grammar topic to the student in an encouraging way.
+Example response format:
 
-IMPORTANT: When presenting Arabic text with examples, include case endings (final harakaat) as they are grammatically significant. When mentioning the quiz, remind students that case endings matter for correctness.
+"Let's learn about Noun Gender! 📚
 
-End by mentioning the quiz is next.""",
+In Arabic, every noun is either masculine or feminine. Here's the key rule:
+
+**Feminine nouns** usually end in ة (tā' marbūṭa), while **masculine nouns** don't.
+
+Examples:
+- كِتَابٌ (kitābun) - book [masculine]
+- مَدْرَسَةٌ (madrasatun) - school [feminine]
+
+What would you like to do next?
+1. Take quiz on this topic
+2. Review the lesson"
+
+Now teach this grammar topic in your own clear, engaging style. Explain the rule and provide the examples to help them understand.
+
+End with EXACTLY these numbered options:
+1. Take quiz on this topic
+2. Review the lesson""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
@@ -224,9 +340,15 @@ FEEDBACK_VOCAB_CORRECT = PromptTemplate(
 Word: {word_arabic} ({word_transliteration})
 Translation: {english}
 Student was correct.
+Current Score: {current_score}
 
-Provide brief, encouraging feedback. Confirm correctness with checkmark.""",
-    input_variables=["word_arabic", "word_transliteration", "english"],
+Example response:
+
+"✓ Correct! كِتَاب (kitāb) means book. You're doing great - that's 2/3 correct!"
+
+IMPORTANT: The student got this RIGHT. Start with a positive affirmation like "Correct!", "Yes!", "Perfect!", or "Exactly!".
+Now provide brief, encouraging feedback in your own style. Confirm correctness and mention their score. Be warm and personable!""",
+    input_variables=["word_arabic", "word_transliteration", "english", "current_score"],
 )
 
 FEEDBACK_VOCAB_INCORRECT = PromptTemplate(
@@ -236,9 +358,21 @@ Word: {word_arabic} ({word_transliteration})
 Correct Translation: {english}
 Student Answer: {student_answer}
 Student was incorrect.
+Current Score: {current_score}
 
-Provide supportive correction. Show correct answer with transliteration. Give memory tip.""",
-    input_variables=["word_arabic", "word_transliteration", "english", "student_answer"],
+Example response:
+
+"Not quite! كِتَاب (kitāb) means book, not pen. Think of 'kitāb' like 'book' - they both have that 'k' sound! You're at 1/2 so far - keep going!"
+
+IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Close, but...", or "Actually,".
+Now provide supportive correction in your own style. Show the correct answer clearly, optionally give a memory tip, and mention their score. Be encouraging and helpful!""",
+    input_variables=[
+        "word_arabic",
+        "word_transliteration",
+        "english",
+        "student_answer",
+        "current_score",
+    ],
 )
 
 FEEDBACK_GRAMMAR_CORRECT = PromptTemplate(
@@ -251,7 +385,8 @@ Explanation: {explanation}
 Current Score: {current_score}
 Student was correct.
 
-Provide brief, encouraging feedback. Mention current score.""",
+IMPORTANT: The student got this RIGHT. Start with a positive affirmation like "Correct!", "Yes!", "Exactly!", or "Perfect!".
+Provide brief, encouraging feedback in your own style. Mention current score. Be warm and personable!""",
     input_variables=[
         "question",
         "student_answer",
@@ -271,7 +406,8 @@ Explanation: {explanation}
 Current Score: {current_score}
 Student was incorrect.
 
-Provide supportive correction. Explain why with reference to grammar rule. Mention current score.""",
+IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Actually,", or "Close, but...".
+Provide supportive correction in your own style. Explain why with reference to grammar rule. Mention current score. Be encouraging and helpful!""",
     input_variables=[
         "question",
         "student_answer",
@@ -296,10 +432,13 @@ Question: What does "{word}" mean?
 Student Answer: "{student_answer}"
 Correct Answer: "{correct_answer}"
 
-Evaluate if the student's answer is correct. Be flexible:
-- Accept minor typos (e.g., "scool" for "school")
+Evaluate if the student's answer is correct. Be VERY flexible and lenient:
+- Ignore case differences (PEN = pen = Pen)
+- Ignore extra/missing spaces or punctuation
+- Accept minor typos (e.g., "scool" for "school", "pen" for "pen")
 - Accept synonyms (e.g., "instructor" for "teacher")
 - Accept alternate phrasings that convey the same meaning
+- If the core meaning matches, mark it correct
 
 IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
 

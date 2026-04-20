@@ -16,7 +16,8 @@ class SentenceTransformerClient:
         """Initialize SentenceTransformer client."""
         self.model_name = model_name
         self.dimension = dimension
-        self.model = SentenceTransformer(model_name)
+        # Force CPU to avoid CUDA init before ZeroGPU is ready
+        self.model = SentenceTransformer(model_name, device="cpu")
 
     def embed(self, text: str) -> list[float]:
         """Generate embedding for a single text."""
