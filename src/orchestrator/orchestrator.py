@@ -222,29 +222,8 @@ Teacher:"""
         logger.info(response)
         logger.info("=" * 80)
 
-        # Detect if student chose vocabulary or grammar section
-        # Pre-generate quizzes to avoid latency
-        user_lower = user_message.lower()
-        response_lower = response.lower()
-
-        if any(
-            trigger in user_lower or trigger in response_lower
-            for trigger in ["start with vocabulary", "vocabulary", "option 1", "1"]
-        ):
-            if "vocabulary" not in session or "current_batch_quiz" not in session["vocabulary"]:
-                # Pre-generate quiz for first vocabulary batch
-                self._generate_vocab_batch_quiz(session_id, batch_number=1)
-                logger.info("[Orchestrator] Pre-generated vocabulary batch 1 quiz")
-
-        if any(
-            trigger in user_lower or trigger in response_lower
-            for trigger in ["start with grammar", "grammar", "option 2", "2"]
-        ):
-            if "grammar" not in session or "quiz_questions" not in session["grammar"]:
-                # Pre-generate grammar quizzes for all topics
-                self._generate_grammar_quizzes(session_id)
-                logger.info("[Orchestrator] Pre-generated grammar quizzes")
-
+        # TODO: Pre-generate quizzes when student chooses section
+        # For now, generate on-demand when quiz is requested
         return response
 
     def _generate_vocab_batch_quiz(self, session_id, batch_number):
