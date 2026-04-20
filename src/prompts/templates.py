@@ -33,9 +33,6 @@ MODE_EXERCISE_GENERATION = "exercise_generation"
 LESSON_WELCOME = PromptTemplate(
     template="""Mode: lesson_start
 
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them back to the lesson. Say something like: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's totally fine - just let me know." Then continue with the lesson content.
-
 Lesson {lesson_number} Overview
 
 Vocabulary ({total_words} words):
@@ -68,10 +65,7 @@ Now welcome the student in your own warm, natural style. List all vocabulary wor
 
 End with EXACTLY these numbered options:
 1. Start with vocabulary
-2. Start with grammar
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
+2. Start with grammar""",
     input_variables=[
         "lesson_number",
         "total_words",
@@ -88,9 +82,6 @@ If the student goes off-topic (asks unrelated questions, uses inappropriate lang
 
 PROGRESS_REPORT = PromptTemplate(
     template="""Mode: lesson_start
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Lesson {lesson_number} Progress Report
 
@@ -127,7 +118,10 @@ End with numbered options that let them:
 - Continue or start vocab batches
 - Review/retake any grammar topic
 - Take the final exam (if ready)
-- Continue where they left off""",
+- Continue where they left off
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic or uses inappropriate language, gently redirect them back to the lesson. Suggest they can take a break if needed.""",
     input_variables=["lesson_number", "vocab_progress", "grammar_progress"],
 )
 
@@ -138,9 +132,6 @@ End with numbered options that let them:
 
 VOCAB_BATCH_INTRO = PromptTemplate(
     template="""Mode: teaching_vocab
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Lesson {lesson_number}, Batch {batch_number} of {total_batches}
 
@@ -167,7 +158,10 @@ Now introduce this batch in your own warm, engaging style. Present the words cle
 
 End with EXACTLY these numbered options:
 1. Take quick quiz on these words
-2. Move on to next batch""",
+2. Move on to next batch
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic or uses inappropriate language, gently redirect them back to the lesson. Suggest they can take a break if needed.""",
     input_variables=[
         "lesson_number",
         "batch_number",
@@ -202,9 +196,6 @@ IMPORTANT: DO NOT include the transliteration or English translation in your que
 
 VOCAB_BATCH_SUMMARY = PromptTemplate(
     template="""Mode: teaching_vocab
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Batch {batch_number} of {total_batches} - Quiz Results
 
@@ -263,9 +254,6 @@ End with EXACTLY these numbered options based on progress:
 GRAMMAR_OVERVIEW = PromptTemplate(
     template="""Mode: teaching_grammar
 
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
-
 Lesson {lesson_number} - Grammar Section
 
 Topics ({topics_count}):
@@ -281,9 +269,6 @@ Or tell me what you'd like to do.""",
 
 GRAMMAR_EXPLANATION = PromptTemplate(
     template="""Mode: teaching_grammar
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Lesson {lesson_number}
 
@@ -314,7 +299,10 @@ Now teach this grammar topic in your own clear, engaging style. Explain the rule
 
 End with EXACTLY these numbered options:
 1. Take quiz on this topic
-2. Review the lesson""",
+2. Review the lesson
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic or uses inappropriate language, gently redirect them back to the lesson. Suggest they can take a break if needed.""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
@@ -333,9 +321,6 @@ IMPORTANT: If the question expects an Arabic answer, make sure to include case e
 
 GRAMMAR_TOPIC_SUMMARY = PromptTemplate(
     template="""Mode: teaching_grammar
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 {topic_name} Quiz Results
 
@@ -361,9 +346,6 @@ Or tell me what you'd like to do.""",
 FEEDBACK_VOCAB_CORRECT = PromptTemplate(
     template="""Mode: feedback_vocab
 
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
-
 Word: {word_arabic} ({word_transliteration})
 Translation: {english}
 Student was correct.
@@ -381,9 +363,6 @@ Now provide brief, encouraging feedback in your own style. Confirm correctness a
 FEEDBACK_VOCAB_INCORRECT = PromptTemplate(
     template="""Mode: feedback_vocab
 
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
-
 Word: {word_arabic} ({word_transliteration})
 Correct Translation: {english}
 Student Answer: {student_answer}
@@ -397,13 +376,6 @@ Example response:
 IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Close, but...", or "Actually,".
 Now provide supportive correction in your own style. Show the correct answer clearly, optionally give a memory tip, and mention their score. Be encouraging and helpful!
 
-SPECIAL CASE - Off-topic or inappropriate answers:
-If the student's answer is completely off-topic (asking unrelated Arabic questions, bringing up topics outside the lesson), inappropriate, or using inappropriate language, gently redirect them:
-- Acknowledge they might be curious or need a break
-- Remind them to focus on the lesson words
-- Suggest they can take a break if needed
-- Example: "I see you're going off-topic! Let's stay focused on our lesson words. If you need a break, that's totally fine - just let me know. The correct answer for كِتَاب is 'book'."
-
 Stay patient and kind!""",
     input_variables=[
         "word_arabic",
@@ -416,9 +388,6 @@ Stay patient and kind!""",
 
 FEEDBACK_GRAMMAR_CORRECT = PromptTemplate(
     template="""Mode: feedback_grammar
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Question: {question}
 Student Answer: {student_answer}
@@ -441,9 +410,6 @@ Provide brief, encouraging feedback in your own style. Mention current score. Be
 FEEDBACK_GRAMMAR_INCORRECT = PromptTemplate(
     template="""Mode: feedback_grammar
 
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
-
 Question: {question}
 Student Answer: {student_answer}
 Correct Answer: {correct_answer}
@@ -453,13 +419,6 @@ Student was incorrect.
 
 IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Actually,", or "Close, but...".
 Provide supportive correction in your own style. Explain why with reference to grammar rule. Mention current score. Be encouraging and helpful!
-
-SPECIAL CASE - Off-topic or inappropriate responses:
-If the student's answer is completely off-topic (asking unrelated Arabic questions, bringing up topics outside the lesson), inappropriate, or using inappropriate language, gently redirect them:
-- Acknowledge they might be curious or need a break
-- Remind them to focus on the grammar lesson
-- Suggest they can take a break if needed
-- Example: "I see you're going off-topic! Let's stay focused on our grammar lesson. If you need a break, that's totally fine - just let me know. The correct answer is: {correct_answer}"
 
 Stay patient and supportive!""",
     input_variables=[
