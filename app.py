@@ -7,8 +7,10 @@ Demonstrates:
 - GPU function isolated in engine.py for reliable ZeroGPU detection
 """
 
+import json
 import logging
-import re
+import os
+from pathlib import Path
 
 import gradio as gr
 import spaces
@@ -17,13 +19,15 @@ from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from src.orchestrator.orchestrator import Orchestrator
-from src.rag.pinecone_client import PineconeClient
-from src.rag.rag_retriever import RAGRetriever
-from src.rag.sentence_transformer_client import SentenceTransformerClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Environment detection
+
+ZEROGPU = os.getenv("SPACE_ID") is not None  # Running on HuggingFace Spaces
+LOCAL_DEV = not ZEROGPU  # Running locally
 
 # Model names
 base_model_name = "Qwen/Qwen2.5-7B-Instruct"
@@ -32,15 +36,25 @@ adapter_model_name = "kdiabagate/qwen-7b-arabic-teaching-v2"
 # Load tokenizer globally (CPU-safe)
 tokenizer = AutoTokenizer.from_pretrained(base_model_name)
 
-# Global model variable - lazy loaded inside GPU decorator
+# Global model variable
 teaching_model = None
 
-# Initialize RAG retriever
-print("===== Initializing RAG retriever =====")
-embedder = SentenceTransformerClient()
-vector_db = PineconeClient()
-rag_retriever = RAGRetriever(embedder, vector_db)
-print("===== RAG retriever initialized =====")
+# Load model at startup for local dev (no ZeroGPU restrictions)
+if LOCAL_DEV:
+    print("===== LOCAL_DEV: Loading model at startup =====")
+    base_model = AutoModelForCausalLM.from_pretrained(
+        base_model_name,
+        torch_dtype=torch.float16,
+        device_map="auto",  # Uses MPS on Mac, CUDA on Linux
+    )
+    print("===== Base model loaded, loading LoRA adapter =====")
+    teaching_model = PeftModel.from_pretrained(base_model, adapter_model_name)
+    print("===== Model ready =====")
+else:
+    print("===== ZEROGPU: Model will be lazy-loaded on first use =====")
+
+# RAG is only needed for building the lesson cache offline
+# See scripts/build_lesson_cache.py
 
 
 # Define your GPU-enabled function with @spaces.GPU decorator
@@ -84,86 +98,24 @@ def process_message(message, chat_history, session_id):
     return "", chat_history
 
 
-# Global lesson cache (populated from RAG retrieval)
+# Global lesson cache (loaded from JSON file)
 lesson_cache = {}
 
 # Per-user session store
 sessions = {}
 
-# Build lesson cache by retrieving from Pinecone
-print("===== Building lesson cache from RAG =====")
-for lesson_num in range(1, 11):  # Lessons 1-10
-    try:
-        # Retrieve vocabulary section from Pinecone
-        vocab_results = rag_retriever.retrieve_by_lesson(
-            query="vocabulary words list table", lesson_number=lesson_num, top_k=10
-        )
-
-        # Retrieve grammar sections from Pinecone
-        grammar_results = rag_retriever.retrieve_by_lesson(
-            query="grammar rules points topics", lesson_number=lesson_num, top_k=10
-        )
-
-        if not vocab_results and not grammar_results:
-            print(f"✗ No results found in Pinecone for Lesson {lesson_num}")
-            continue
-
-        # Extract metadata from first result
-        metadata = (vocab_results[0] if vocab_results else grammar_results[0]).get("metadata", {})
-
-        # Parse vocabulary from retrieved markdown table
-        vocab_list = []
-        for result in vocab_results:
-            text = result.get("text", "")
-            # Extract vocabulary entries from markdown table
-            # Looking for lines like: | كِتَابٌ | kitaabun | book |
-            table_rows = re.findall(r"\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|", text)
-            for row in table_rows:
-                if (
-                    row[0].strip()
-                    and not row[0].strip().startswith("--")
-                    and row[0].strip() != "Arabic"
-                ):
-                    vocab_list.append(
-                        {
-                            "arabic": row[0].strip(),
-                            "transliteration": row[1].strip(),
-                            "english": row[2].strip(),
-                        }
-                    )
-
-        # Get grammar points from metadata
-        grammar_points = metadata.get("grammar_points", [])
-        if isinstance(grammar_points, str):
-            # Parse JSON string if needed
-            import json
-
-            try:
-                grammar_points = json.loads(grammar_points)
-            except (json.JSONDecodeError, TypeError):
-                grammar_points = [grammar_points]
-
-        lesson_data = {
-            "lesson_number": lesson_num,
-            "lesson_name": metadata.get("lesson_name", f"Lesson {lesson_num}"),
-            "vocabulary": vocab_list,
-            "grammar_points": grammar_points,
-            "grammar_sections": {},  # Could extract from grammar_results if needed
-            "difficulty": metadata.get("difficulty", "beginner"),
-        }
-
-        lesson_cache[lesson_num] = lesson_data
-        print(
-            f"✓ Cached Lesson {lesson_num}: {lesson_data['lesson_name']} ({len(vocab_list)} words)"
-        )
-
-    except Exception as e:
-        print(f"✗ Error caching lesson {lesson_num}: {e}")
-        import traceback
-
-        traceback.print_exc()
-
-print(f"===== {len(lesson_cache)} lessons cached =====")
+# Load lesson cache from pre-built JSON file
+print("===== Loading lesson cache =====")
+cache_file = Path(__file__).parent / "lesson_cache.json"
+if cache_file.exists():
+    with open(cache_file, encoding="utf-8") as f:
+        cache_data = json.load(f)
+        # Convert string keys back to integers
+        lesson_cache = {int(k): v for k, v in cache_data.items()}
+    print(f"===== Loaded {len(lesson_cache)} lessons from cache =====")
+else:
+    print("===== WARNING: lesson_cache.json not found, using empty cache =====")
+    print("===== Run scripts/build_lesson_cache.py to generate it =====")
 
 
 # Helper function to get model (lazy loaded)
