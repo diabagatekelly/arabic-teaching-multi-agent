@@ -258,7 +258,7 @@ class Orchestrator:
             logger.info("[Orchestrator] Detected intent: next_batch")
 
         # Fallback: check for numbered options
-        elif "1" in user_lower:
+        elif user_message.strip() == "1":
             # Option 1 is usually the primary action (quiz or first topic)
             if current_progress == "lesson_start":
                 detected_intent = "vocab"
@@ -266,7 +266,13 @@ class Orchestrator:
             elif current_progress in ["vocab_batch_intro", "grammar_explanation"]:
                 detected_intent = "quiz"
                 logger.info("[Orchestrator] Detected intent from '1': quiz")
-        elif "2" in user_lower:
+            elif current_progress == "vocab_quiz_complete":
+                detected_intent = "next_batch"
+                logger.info("[Orchestrator] Detected intent from '1': next_batch")
+            elif current_progress == "grammar_quiz_complete":
+                detected_intent = "vocab"
+                logger.info("[Orchestrator] Detected intent from '1': vocab")
+        elif user_message.strip() == "2":
             # Option 2 is usually the secondary action
             if current_progress == "lesson_start":
                 detected_intent = "grammar"
@@ -276,7 +282,27 @@ class Orchestrator:
                 logger.info("[Orchestrator] Detected intent from '2': next_batch")
             elif current_progress == "grammar_explanation":
                 detected_intent = "review"
-                logger.info("[Orchestrador] Detected intent from '2': review")
+                logger.info("[Orchestrator] Detected intent from '2': review")
+            elif current_progress == "vocab_quiz_complete":
+                detected_intent = "review"
+                logger.info("[Orchestrator] Detected intent from '2': review")
+            elif current_progress == "grammar_quiz_complete":
+                detected_intent = "grammar"
+                logger.info("[Orchestrator] Detected intent from '2': grammar")
+        elif user_message.strip() == "3":
+            # Option 3 where applicable
+            if current_progress == "vocab_quiz_complete":
+                # Template says "Skip to final test" but final_exam not in TRANSITIONS
+                # Map to grammar as best alternative
+                detected_intent = "grammar"
+                logger.info(
+                    "[Orchestrator] Detected intent from '3': grammar (skip to grammar section)"
+                )
+            elif current_progress == "grammar_quiz_complete":
+                # Template says "See lesson progress" - not a real transition
+                # No good mapping, just log warning
+                logger.warning("[Orchestrator] Option 3 'See lesson progress' not implemented")
+                detected_intent = None
 
         # Default intent based on current state
         else:
@@ -633,7 +659,10 @@ class Orchestrator:
         #         logger.info("[Orchestrator] User requested review, staying in grammar_explanation")
 
         # Build prompt based on current progress stage
-        prompt = self._build_stage_prompt(session_id, current_progress, user_message)
+        # Pass detected_intent to determine if user_message should be included
+        prompt = self._build_stage_prompt(
+            session_id, current_progress, user_message, detected_intent
+        )
 
         # Store prompt for debugging
         session["last_prompt"] = prompt
@@ -653,13 +682,14 @@ class Orchestrator:
 
         return response
 
-    def _build_stage_prompt(self, session_id, stage, user_message):
+    def _build_stage_prompt(self, session_id, stage, user_message, detected_intent=None):
         """Build prompt for current lesson stage using templates.
 
         Args:
             session_id: User session identifier
             stage: Current progress stage
             user_message: User's message
+            detected_intent: Detected user intent (vocab, grammar, quiz, answer, etc.)
 
         Returns:
             str: Formatted prompt for the stage
@@ -668,6 +698,11 @@ class Orchestrator:
         session = self.sessions[session_id]
         lesson_number = session["lesson_number"]
         lesson_data = self.lesson_cache[lesson_number]
+
+        # Determine if we should include user_message in prompt
+        # Omit for navigation intents, include for answers or conversational messages
+        navigation_intents = {"vocab", "grammar", "quiz", "next_batch", "review", "final_exam"}
+        include_user_message = detected_intent not in navigation_intents or detected_intent is None
 
         # Route to appropriate template based on stage
         if stage == "vocab_batch_intro":
@@ -711,7 +746,11 @@ class Orchestrator:
                     "previous_performance": previous_performance,
                 }
             ).text
-            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+            if include_user_message:
+                return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+            else:
+                return f"{prompt_text}\n\nTeacher:"
 
         elif stage == "vocab_quiz":
             logger.info("[Orchestrator] Using template: VOCAB_QUIZ_QUESTION or FEEDBACK")
@@ -866,7 +905,10 @@ class Orchestrator:
             if "quiz_state" in session["vocabulary"]:
                 del session["vocabulary"]["quiz_state"]
 
-            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+            if include_user_message:
+                return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+            else:
+                return f"{prompt_text}\n\nTeacher:"
 
         elif stage == "grammar_quiz_complete":
             logger.info("[Orchestrator] Using template: GRAMMAR_TOPIC_SUMMARY")
@@ -908,7 +950,10 @@ class Orchestrator:
             if "grammar_quiz_state" in session["grammar"]:
                 del session["grammar"]["grammar_quiz_state"]
 
-            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+            if include_user_message:
+                return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+            else:
+                return f"{prompt_text}\n\nTeacher:"
 
         elif stage == "grammar_overview":
             logger.info("[Orchestrator] Using template: GRAMMAR_OVERVIEW")
@@ -926,7 +971,11 @@ class Orchestrator:
                     "topics_list": topics_list,
                 }
             ).text
-            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+            if include_user_message:
+                return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+            else:
+                return f"{prompt_text}\n\nTeacher:"
 
         elif stage == "grammar_explanation":
             logger.info("[Orchestrator] Using template: GRAMMAR_EXPLANATION")
@@ -973,7 +1022,11 @@ class Orchestrator:
                     "examples_formatted": examples_formatted,
                 }
             ).text
-            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+            if include_user_message:
+                return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+            else:
+                return f"{prompt_text}\n\nTeacher:"
 
         elif stage == "grammar_quiz":
             logger.info("[Orchestrator] Using template: GRAMMAR_QUIZ (ContentAgent)")
