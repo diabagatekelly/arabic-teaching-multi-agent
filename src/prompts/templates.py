@@ -33,6 +33,9 @@ MODE_EXERCISE_GENERATION = "exercise_generation"
 LESSON_WELCOME = PromptTemplate(
     template="""Mode: lesson_start
 
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them back to the lesson. Say something like: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's totally fine - just let me know." Then continue with the lesson content.
+
 Lesson {lesson_number} Overview
 
 Vocabulary ({total_words} words):
@@ -86,6 +89,9 @@ If the student goes off-topic (asks unrelated questions, uses inappropriate lang
 PROGRESS_REPORT = PromptTemplate(
     template="""Mode: lesson_start
 
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
+
 Lesson {lesson_number} Progress Report
 
 Vocabulary Progress:
@@ -121,10 +127,7 @@ End with numbered options that let them:
 - Continue or start vocab batches
 - Review/retake any grammar topic
 - Take the final exam (if ready)
-- Continue where they left off
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
+- Continue where they left off""",
     input_variables=["lesson_number", "vocab_progress", "grammar_progress"],
 )
 
@@ -135,6 +138,9 @@ If the student goes off-topic (asks unrelated questions, uses inappropriate lang
 
 VOCAB_BATCH_INTRO = PromptTemplate(
     template="""Mode: teaching_vocab
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Lesson {lesson_number}, Batch {batch_number} of {total_batches}
 
@@ -161,10 +167,7 @@ Now introduce this batch in your own warm, engaging style. Present the words cle
 
 End with EXACTLY these numbered options:
 1. Take quick quiz on these words
-2. Move on to next batch
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
+2. Move on to next batch""",
     input_variables=[
         "lesson_number",
         "batch_number",
@@ -199,6 +202,9 @@ IMPORTANT: DO NOT include the transliteration or English translation in your que
 
 VOCAB_BATCH_SUMMARY = PromptTemplate(
     template="""Mode: teaching_vocab
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Batch {batch_number} of {total_batches} - Quiz Results
 
@@ -238,10 +244,7 @@ Now summarize their performance in your own warm, encouraging style. Show which 
 
 End with EXACTLY these numbered options based on progress:
 - If batches remaining: "1. Continue to next batch" and "2. Review these words"
-- If all batches complete: "1. Move on to grammar" and "2. Review vocabulary"
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
+- If all batches complete: "1. Move on to grammar" and "2. Review vocabulary\"""",
     input_variables=[
         "batch_number",
         "score",
@@ -260,6 +263,9 @@ If the student goes off-topic (asks unrelated questions, uses inappropriate lang
 GRAMMAR_OVERVIEW = PromptTemplate(
     template="""Mode: teaching_grammar
 
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
+
 Lesson {lesson_number} - Grammar Section
 
 Topics ({topics_count}):
@@ -269,15 +275,15 @@ Present grammar section overview. Explain each topic has a quiz. Offer options:
 1. Start first topic
 2. See lesson progress
 
-Or tell me what you'd like to do.
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
+Or tell me what you'd like to do.""",
     input_variables=["lesson_number", "topics_count", "topics_list"],
 )
 
 GRAMMAR_EXPLANATION = PromptTemplate(
     template="""Mode: teaching_grammar
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Lesson {lesson_number}
 
@@ -308,10 +314,7 @@ Now teach this grammar topic in your own clear, engaging style. Explain the rule
 
 End with EXACTLY these numbered options:
 1. Take quiz on this topic
-2. Review the lesson
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
+2. Review the lesson""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
@@ -331,6 +334,9 @@ IMPORTANT: If the question expects an Arabic answer, make sure to include case e
 GRAMMAR_TOPIC_SUMMARY = PromptTemplate(
     template="""Mode: teaching_grammar
 
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
+
 {topic_name} Quiz Results
 
 Score: {score}
@@ -343,10 +349,7 @@ Summarize performance. If score < threshold, suggest reviewing weak areas and of
 2. Review and retry (if failed)
 3. See lesson progress
 
-Or tell me what you'd like to do.
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
+Or tell me what you'd like to do.""",
     input_variables=["topic_name", "score", "pass_threshold", "weak_areas"],
 )
 
@@ -358,6 +361,9 @@ If the student goes off-topic (asks unrelated questions, uses inappropriate lang
 FEEDBACK_VOCAB_CORRECT = PromptTemplate(
     template="""Mode: feedback_vocab
 
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
+
 Word: {word_arabic} ({word_transliteration})
 Translation: {english}
 Student was correct.
@@ -368,15 +374,15 @@ Example response:
 "✓ Correct! كِتَاب (kitāb) means book. You're doing great - that's 2/3 correct!"
 
 IMPORTANT: The student got this RIGHT. Start with a positive affirmation like "Correct!", "Yes!", "Perfect!", or "Exactly!".
-Now provide brief, encouraging feedback in your own style. Confirm correctness and mention their score. Be warm and personable!
-
-IMPORTANT - Off-topic handling:
-If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
+Now provide brief, encouraging feedback in your own style. Confirm correctness and mention their score. Be warm and personable!""",
     input_variables=["word_arabic", "word_transliteration", "english", "current_score"],
 )
 
 FEEDBACK_VOCAB_INCORRECT = PromptTemplate(
     template="""Mode: feedback_vocab
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Word: {word_arabic} ({word_transliteration})
 Correct Translation: {english}
@@ -411,6 +417,9 @@ Stay patient and kind!""",
 FEEDBACK_GRAMMAR_CORRECT = PromptTemplate(
     template="""Mode: feedback_grammar
 
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
+
 Question: {question}
 Student Answer: {student_answer}
 Correct Answer: {correct_answer}
@@ -431,6 +440,9 @@ Provide brief, encouraging feedback in your own style. Mention current score. Be
 
 FEEDBACK_GRAMMAR_INCORRECT = PromptTemplate(
     template="""Mode: feedback_grammar
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), STOP and gently redirect them. Say: "I see you're going off-topic! Let's stay focused on our lesson. If you need a break, that's fine - just let me know." Then continue with the lesson content.
 
 Question: {question}
 Student Answer: {student_answer}
@@ -474,13 +486,17 @@ Question: What does "{word}" mean?
 Student Answer: "{student_answer}"
 Correct Answer: "{correct_answer}"
 
-Evaluate if the student's answer is correct. Be VERY flexible and lenient:
+Evaluate if the student's answer is correct. Be flexible but accurate:
 - Ignore case differences (PEN = pen = Pen)
 - Ignore extra/missing spaces or punctuation
-- Accept minor typos (e.g., "scool" for "school", "pen" for "pen")
-- Accept synonyms (e.g., "instructor" for "teacher")
-- Accept alternate phrasings that convey the same meaning
-- If the core meaning matches, mark it correct
+- Accept minor typos within 1-2 characters (e.g., "scool" for "school", "techer" for "teacher")
+- Accept close synonyms that mean the same thing (e.g., "instructor" for "teacher", "home" for "house")
+- The core meaning must match - "tall" is NOT the same as "table", "cat" is NOT the same as "window"
+
+Mark as INCORRECT if the meaning is different:
+- Wrong object/concept entirely (cat ≠ book, tall ≠ table)
+- Unrelated words (pen ≠ school)
+- Completely off-topic or nonsense answers
 
 IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
 
