@@ -1,6 +1,5 @@
 """Orchestrator for managing lesson flow and agent interactions."""
 
-import json
 import logging
 import threading
 
@@ -1556,39 +1555,60 @@ Teacher:"""
             if "quizzes" not in session["grammar"]:
                 session["grammar"]["quizzes"] = {}
 
-            # Prepare learned vocabulary items
-            learned_items = [f"{v['arabic']} ({v['english']})" for v in lesson_data["vocabulary"]]
-
             # Generate quiz for each grammar topic
             for topic in lesson_data["grammar_points"]:
                 try:
                     logger.info(f"[Orchestrator] [Background] Generating quiz for topic: {topic}")
 
-                    quiz_json = self.content_agent.generate_quiz(
-                        {
-                            "quiz_type": "grammar",
-                            "count": 3,
-                            "difficulty": "beginner",
-                            "learned_items": learned_items,
-                            "lesson_number": lesson_number,
-                        }
-                    )
+                    # Use hardcoded gender identification questions for masculine_feminine_nouns
+                    if topic == "masculine_feminine_nouns":
+                        import random
 
-                    # Parse and store
-                    questions_raw = json.loads(quiz_json)
-                    questions = []
-                    for q in questions_raw[:3]:
-                        questions.append(
-                            {
-                                "question": q.get("question", ""),
-                                "answer": q.get("answer", q.get("correct", "")),
-                                "explanation": f"Grammar topic: {topic}",
-                            }
+                        # Separate vocab by gender (ة ending = feminine)
+                        masculine_words = [
+                            v for v in lesson_data["vocabulary"] if not v["arabic"].endswith("ة")
+                        ]
+                        feminine_words = [
+                            v for v in lesson_data["vocabulary"] if v["arabic"].endswith("ة")
+                        ]
+
+                        questions = []
+
+                        # Generate 3 gender identification questions
+                        for _ in range(3):
+                            # Randomly pick masculine or feminine
+                            if random.choice([True, False]) and masculine_words:
+                                word = random.choice(masculine_words)
+                                questions.append(
+                                    {
+                                        "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                        "answer": "masculine",
+                                        "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
+                                    }
+                                )
+                            elif feminine_words:
+                                word = random.choice(feminine_words)
+                                questions.append(
+                                    {
+                                        "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                        "answer": "feminine",
+                                        "explanation": "It ends with ة (taa marbuta), so it's feminine",
+                                    }
+                                )
+
+                        logger.info(
+                            f"[Orchestrator] [Background] Generated {len(questions)} grammar-specific questions"
                         )
+                    else:
+                        # For other topics: try RAG-based generation (future enhancement)
+                        logger.warning(
+                            f"[Orchestrator] [Background] No quiz generator for topic: {topic}, skipping"
+                        )
+                        continue
 
                     session["grammar"]["quizzes"][topic] = questions
                     logger.info(
-                        f"[Orchestrator] [Background] Generated {len(questions)} questions for {topic}"
+                        f"[Orchestrator] [Background] Stored {len(questions)} questions for {topic}"
                     )
 
                     # Save sessions after each quiz generation (for ZeroGPU persistence)
