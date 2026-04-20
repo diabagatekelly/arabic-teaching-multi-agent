@@ -65,7 +65,10 @@ Now welcome the student in your own warm, natural style. List all vocabulary wor
 
 End with EXACTLY these numbered options:
 1. Start with vocabulary
-2. Start with grammar""",
+2. Start with grammar
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
     input_variables=[
         "lesson_number",
         "total_words",
@@ -118,7 +121,10 @@ End with numbered options that let them:
 - Continue or start vocab batches
 - Review/retake any grammar topic
 - Take the final exam (if ready)
-- Continue where they left off""",
+- Continue where they left off
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
     input_variables=["lesson_number", "vocab_progress", "grammar_progress"],
 )
 
@@ -155,7 +161,10 @@ Now introduce this batch in your own warm, engaging style. Present the words cle
 
 End with EXACTLY these numbered options:
 1. Take quick quiz on these words
-2. Move on to next batch""",
+2. Move on to next batch
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
     input_variables=[
         "lesson_number",
         "batch_number",
@@ -229,7 +238,10 @@ Now summarize their performance in your own warm, encouraging style. Show which 
 
 End with EXACTLY these numbered options based on progress:
 - If batches remaining: "1. Continue to next batch" and "2. Review these words"
-- If all batches complete: "1. Move on to grammar" and "2. Review vocabulary" """,
+- If all batches complete: "1. Move on to grammar" and "2. Review vocabulary"
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
     input_variables=[
         "batch_number",
         "score",
@@ -257,7 +269,10 @@ Present grammar section overview. Explain each topic has a quiz. Offer options:
 1. Start first topic
 2. See lesson progress
 
-Or tell me what you'd like to do.""",
+Or tell me what you'd like to do.
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
     input_variables=["lesson_number", "topics_count", "topics_list"],
 )
 
@@ -293,7 +308,10 @@ Now teach this grammar topic in your own clear, engaging style. Explain the rule
 
 End with EXACTLY these numbered options:
 1. Take quiz on this topic
-2. Review the lesson""",
+2. Review the lesson
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
@@ -325,7 +343,10 @@ Summarize performance. If score < threshold, suggest reviewing weak areas and of
 2. Review and retry (if failed)
 3. See lesson progress
 
-Or tell me what you'd like to do.""",
+Or tell me what you'd like to do.
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
     input_variables=["topic_name", "score", "pass_threshold", "weak_areas"],
 )
 
@@ -347,7 +368,10 @@ Example response:
 "✓ Correct! كِتَاب (kitāb) means book. You're doing great - that's 2/3 correct!"
 
 IMPORTANT: The student got this RIGHT. Start with a positive affirmation like "Correct!", "Yes!", "Perfect!", or "Exactly!".
-Now provide brief, encouraging feedback in your own style. Confirm correctness and mention their score. Be warm and personable!""",
+Now provide brief, encouraging feedback in your own style. Confirm correctness and mention their score. Be warm and personable!
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic (asks unrelated questions, uses inappropriate language, or brings up topics outside the lesson), gently redirect them back to the lesson. Acknowledge their curiosity but remind them to stay focused. Suggest they can take a break if needed.""",
     input_variables=["word_arabic", "word_transliteration", "english", "current_score"],
 )
 
