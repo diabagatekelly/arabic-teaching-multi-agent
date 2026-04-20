@@ -45,11 +45,13 @@ Greet the student warmly and present the lesson structure.
    - list all of the vocabulary words in a formatted numbered list (Arabic, transliteration, English)
    - list all of the grammar topics in a formatted numbered list
 
-Offer navigation:
+Offer numbered navigation at the end:
 1. Start with vocabulary
 2. Start with grammar
 
-Or tell me what you'd like to do.""",
+After the student chooses 1 (or indicates vocablary in some other way), or they chose 2 (or indicate grammar in some other way),
+acknowledge their choice and inform them that you are fetching their chosen content. If the user tries to go off topic or
+is inappropriate, gently guide them back to the options or offer them to take a break if they need it.""",
     input_variables=[
         "lesson_number",
         "total_words",
