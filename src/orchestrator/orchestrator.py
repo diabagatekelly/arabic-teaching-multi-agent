@@ -111,3 +111,62 @@ class Orchestrator:
         logger.debug(f"[Orchestrator] Response:\n{response}")
 
         return response
+
+    def handle_message(self, session_id, user_message):
+        """Handle user message during active lesson.
+
+        Args:
+            session_id: User session identifier
+            user_message: User's message text
+
+        Returns:
+            str: Response from appropriate agent
+        """
+        # Get session state
+        session = self.sessions.get(session_id)
+        if not session or session.get("status") != "active":
+            return "No active lesson. Please start a lesson first."
+
+        # Get lesson data
+        lesson_number = session.get("lesson_number")
+        if lesson_number not in self.lesson_cache:
+            return f"Error: Lesson {lesson_number} not found."
+
+        lesson_data = self.lesson_cache[lesson_number]
+
+        # Build context from session state
+        learned_words = session.get("vocabulary", {}).get("words", [])[:6]  # Current batch
+        vocab_list = "\n".join(
+            [
+                f"{i+1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
+                for i, v in enumerate(learned_words)
+            ]
+        )
+
+        grammar_topics = ", ".join(lesson_data.get("grammar_points", []))
+
+        # Build prompt with lesson context
+        prompt = f"""You are teaching Lesson {lesson_number}: {lesson_data['lesson_name']}.
+
+Current vocabulary being taught:
+{vocab_list}
+
+Grammar topics: {grammar_topics}
+
+Student message: {user_message}
+
+Respond as their Arabic teacher. Keep responses focused on the current lesson content."""
+
+        # Store prompt for debugging
+        self.sessions[session_id]["last_prompt"] = prompt
+
+        logger.info(f"[Orchestrator] Handling message for lesson {lesson_number}")
+        logger.debug(f"[Orchestrator] Prompt:\n{prompt}")
+
+        # Generate response using teaching agent
+        teaching_agent = TeachingAgent(self.teaching_model_getter(), self.teaching_tokenizer)
+        response = teaching_agent.respond(prompt, max_new_tokens=256, temperature=0.7)
+
+        logger.info(f"[Orchestrator] Response length: {len(response)} chars")
+
+        return response

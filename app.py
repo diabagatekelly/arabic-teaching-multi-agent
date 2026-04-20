@@ -85,38 +85,16 @@ print("===== RAG retriever initialized =====")
 # Define your GPU-enabled function with @spaces.GPU decorator
 @spaces.GPU(duration=60)
 def process_message(message, chat_history, session_id):
-    """GPU-enabled message processing with Qwen model."""
-    # Get model (lazy loads if needed)
-    model = get_teaching_model()
+    """GPU-enabled message processing through orchestrator."""
+    # Check if lesson is active
+    if session_id not in sessions or sessions[session_id].get("status") != "active":
+        error_msg = "Please start a lesson first using the 'Start Lesson' button."
+        chat_history.append({"role": "user", "content": message})
+        chat_history.append({"role": "assistant", "content": error_msg})
+        return "", chat_history
 
-    # Build chat history for model
-    messages = []
-    for msg in chat_history:
-        if msg["role"] == "user":
-            messages.append({"role": "user", "content": msg["content"]})
-        elif msg["role"] == "assistant":
-            messages.append({"role": "assistant", "content": msg["content"]})
-
-    # Add current message
-    messages.append({"role": "user", "content": message})
-
-    # Generate response using Qwen model
-    text = teaching_tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
-    )
-    model_inputs = teaching_tokenizer([text], return_tensors="pt").to(model.device)
-
-    generated_ids = model.generate(
-        **model_inputs,
-        max_new_tokens=512,
-        temperature=0.7,
-    )
-    generated_ids = [
-        output_ids[len(input_ids) :]
-        for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids, strict=False)
-    ]
-
-    response = teaching_tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    # Route through orchestrator
+    response = orchestrator.handle_message(session_id, message)
 
     # Update chat history
     chat_history.append({"role": "user", "content": message})
