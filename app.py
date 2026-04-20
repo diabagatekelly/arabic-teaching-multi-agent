@@ -86,6 +86,10 @@ print("===== RAG retriever initialized =====")
 @spaces.GPU(duration=60)
 def process_message(message, chat_history, session_id):
     """GPU-enabled message processing through orchestrator."""
+    # Reload sessions from file (ZeroGPU isolation)
+    global sessions
+    sessions = load_sessions()
+
     logger.info("=" * 80)
     logger.info("[App] USER INPUT CAPTURED")
     logger.info(f"  Message: {message}")
@@ -135,8 +139,26 @@ def process_message(message, chat_history, session_id):
 # Global lesson cache (loaded from JSON file)
 lesson_cache = {}
 
-# Per-user session store
-sessions = {}
+# Per-user session store (file-based for ZeroGPU persistence)
+SESSION_FILE = Path(__file__).parent / "sessions.json"
+
+
+def load_sessions():
+    """Load sessions from file."""
+    if SESSION_FILE.exists():
+        with open(SESSION_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+
+def save_sessions(sessions_dict):
+    """Save sessions to file."""
+    with open(SESSION_FILE, "w", encoding="utf-8") as f:
+        json.dump(sessions_dict, f, ensure_ascii=False, indent=2)
+
+
+sessions = load_sessions()
+logger.info(f"===== Loaded {len(sessions)} sessions from file =====")
 
 # Load lesson cache from pre-built JSON file
 print("===== Loading lesson cache =====")
@@ -232,12 +254,16 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
             lesson_info = gr.Markdown("**Status:** Not started")
             progress_display = gr.Markdown("**Learned:** 0 words\n\n**Quizzes:** 0/0")
 
-    session_id = gr.State("")
+    session_id = gr.State("")  # String type for session ID
 
     @spaces.GPU(duration=60)
     def start_lesson_ui(sid):
         """Start lesson and initialize session."""
         import uuid
+
+        # Reload sessions from file (ZeroGPU isolation)
+        global sessions
+        sessions = load_sessions()
 
         if not sid:
             sid = str(uuid.uuid4())[:8]
@@ -255,6 +281,9 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 
         # Call orchestrator to start lesson (updates session, generates welcome)
         welcome_message = orchestrator.start_lesson(sid, lesson_number)
+
+        # Save sessions to file for ZeroGPU persistence
+        save_sessions(sessions)
 
         logger.info(f"  Sessions after: {list(sessions.keys())}")
         logger.info(f"  Session created: {sid in sessions}")
