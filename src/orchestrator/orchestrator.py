@@ -273,6 +273,7 @@ class Orchestrator:
                     "let's",
                     "go",
                     "start",
+                    "ready",
                 ]
                 is_affirmative = any(keyword in user_lower for keyword in affirmative_keywords)
                 if is_affirmative:
@@ -412,6 +413,70 @@ class Orchestrator:
                 f"[Orchestrator] No valid transition - state: {current_progress}, intent: {detected_intent}"
             )
 
+            # Handle off-topic/unrecognized input gracefully
+            if detected_intent is None or (
+                current_progress in TRANSITIONS
+                and detected_intent not in TRANSITIONS[current_progress]
+            ):
+                logger.info("[Orchestrator] Handling off-topic/unrecognized input with fallback")
+
+                # Build a helpful fallback response based on current state
+                if current_progress == "vocab_quiz_complete":
+                    # Just finished quiz - offer next steps without crashing
+                    current_batch = session.get("vocabulary", {}).get("current_batch", 1)
+                    total_batches = len(session.get("vocabulary", {}).get("words", [])) // 3
+
+                    if current_batch < total_batches:
+                        fallback_msg = (
+                            "I noticed you might want to take a break! That's totally fine - learning is hard work. 🌟\n\n"
+                            f"So far you've completed Batch {current_batch}. "
+                            "When you're ready, we can:\n"
+                            "1. Continue to next batch\n"
+                            "2. Review these words\n"
+                            "3. Take a longer break and come back later\n\n"
+                            "What would you like to do?"
+                        )
+                    else:
+                        fallback_msg = (
+                            "Great work on completing the vocabulary! 🎉\n\n"
+                            "Would you like to:\n"
+                            "1. Move on to grammar\n"
+                            "2. Review vocabulary\n"
+                            "3. Take a break\n\n"
+                            "What sounds good?"
+                        )
+                    return fallback_msg
+
+                elif current_progress in ["vocab_batch_intro", "vocab_quiz"]:
+                    # In the middle of vocabulary learning
+                    return (
+                        "I want to make sure you're getting the most out of this lesson! 📚\n\n"
+                        "Right now we're working on vocabulary. You can:\n"
+                        "1. Continue with the current batch\n"
+                        "2. Take a quiz on these words\n"
+                        "3. See all vocabulary words\n\n"
+                        "Or if you need a break, just let me know and we can pause here. What would you like?"
+                    )
+
+                elif current_progress == "lesson_start":
+                    # At the beginning
+                    return (
+                        "Let's get started! Which would you like to begin with?\n"
+                        "1. Start with vocabulary\n"
+                        "2. Start with grammar\n\n"
+                        "Just let me know your choice!"
+                    )
+
+                else:
+                    # Generic fallback for any other state
+                    return (
+                        "I want to make sure we're on the same page! Could you let me know:\n"
+                        "- Do you want to continue with the lesson?\n"
+                        "- Would you like to review what we've covered?\n"
+                        "- Do you need a break?\n\n"
+                        "I'm here to help however works best for you! 🌟"
+                    )
+
         logger.info("[Orchestrator] ===== END STATE MACHINE =====")
 
         # =====================================================================
@@ -522,12 +587,22 @@ class Orchestrator:
                 ]
             )
 
+            # Build previous performance context
+            previous_performance = ""
+            if current_batch > 1:
+                # Check if previous batch has quiz results
+                vocab_state = session.get("vocabulary", {})
+                if "previous_quiz_score" in vocab_state:
+                    prev_score = vocab_state["previous_quiz_score"]
+                    previous_performance = f"Previous Batch Score: {prev_score}"
+
             prompt_text = VOCAB_BATCH_INTRO.invoke(
                 {
                     "lesson_number": lesson_number,
                     "batch_number": current_batch,
                     "total_batches": total_batches,
                     "words": words_formatted,
+                    "previous_performance": previous_performance,
                 }
             ).text
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
@@ -566,12 +641,16 @@ class Orchestrator:
 
                 logger.info(f"[Orchestrator] Showing feedback - correct: {is_correct}")
 
+                # Calculate current score for feedback
+                current_score = f"{quiz_state['score']}/{current_q}"
+
                 if is_correct:
                     prompt_text = FEEDBACK_VOCAB_CORRECT.invoke(
                         {
                             "word_arabic": word["arabic"],
                             "word_transliteration": word["transliteration"],
                             "english": word["english"],
+                            "current_score": current_score,
                         }
                     ).text
                 else:
@@ -581,6 +660,7 @@ class Orchestrator:
                             "word_transliteration": word["transliteration"],
                             "english": word["english"],
                             "student_answer": last_answer["student_answer"],
+                            "current_score": current_score,
                         }
                     ).text
 
@@ -597,6 +677,8 @@ class Orchestrator:
                             "question_type": question_type,
                             "word_arabic": next_word["arabic"],
                             "word_english": next_word["english"],
+                            "question_number": current_q + 1,
+                            "total_questions": quiz_state["total_questions"],
                         }
                     ).text
 
@@ -618,6 +700,8 @@ class Orchestrator:
                     "question_type": question_type,
                     "word_arabic": word["arabic"],
                     "word_english": word["english"],
+                    "question_number": current_q + 1,
+                    "total_questions": quiz_state["total_questions"],
                 }
             ).text
 
@@ -626,6 +710,13 @@ class Orchestrator:
 
         elif stage == "vocab_quiz_complete":
             logger.info("[Orchestrator] Using template: VOCAB_BATCH_SUMMARY")
+
+            # Check if quiz_state still exists (may have been deleted already)
+            if "quiz_state" not in session.get("vocabulary", {}):
+                logger.warning("[Orchestrator] quiz_state not found - quiz already completed")
+                # Return a simple acknowledgment instead of crashing
+                return "Great job on completing the quiz! What would you like to do next?"
+
             quiz_state = session["vocabulary"]["quiz_state"]
 
             # Calculate words correct and incorrect
@@ -644,12 +735,24 @@ class Orchestrator:
             words_correct_str = ", ".join(words_correct) if words_correct else "None"
             words_incorrect_str = "\n".join(words_incorrect) if words_incorrect else "None"
 
+            # Calculate progress
+            lesson_number = session.get("lesson_number", 1)
+            lesson_data = self.lesson_cache.get(lesson_number, {})
+            all_vocab = lesson_data.get("vocabulary", [])
+            total_batches = (len(all_vocab) + 2) // 3  # Ceiling division
+            batches_completed = batch_number  # Current batch just finished
+
+            # Store quiz score for next batch
+            session["vocabulary"]["previous_quiz_score"] = score
+
             prompt_text = VOCAB_BATCH_SUMMARY.invoke(
                 {
                     "batch_number": batch_number,
                     "score": score,
                     "words_correct": words_correct_str,
                     "words_incorrect": words_incorrect_str,
+                    "total_batches": total_batches,
+                    "batches_completed": batches_completed,
                 }
             ).text
 

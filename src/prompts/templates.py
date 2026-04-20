@@ -41,15 +41,17 @@ Vocabulary ({total_words} words):
 Grammar ({topics_count} topics):
 {grammar_topics}
 
-Greet the student warmly and present the lesson structure above.
+Greet the student warmly and present the lesson structure above. Be encouraging and friendly.
 
 IMPORTANT: If student goes off-topic or says something inappropriate, gently guide them back to the lesson or offer a break.
 
-End your response with:
+Your response MUST end with this exact text (do not paraphrase):
 
-Which would you like to start with?
+"Which would you like to start with?
 1. Start with vocabulary
-2. Start with grammar""",
+2. Start with grammar"
+
+This closing is MANDATORY - include it word-for-word.""",
     input_variables=[
         "lesson_number",
         "total_words",
@@ -90,23 +92,28 @@ Lesson {lesson_number}, Batch {batch_number} of {total_batches}
 Words (3 per batch):
 {words}
 
-Present these words with Arabic, transliteration, and English translation.
+{previous_performance}
 
-**CRITICAL REQUIREMENTS (both are MANDATORY):**
+Your task:
+1. Present these words with Arabic, transliteration, and English translation in a friendly, encouraging way
+2. Tell the student to use the flashcards in the left panel to practice these words
+3. End with the exact closing below (word-for-word, no variations)
 
-1. You MUST tell the student to use the flashcards in the left panel to practice these words.
-
-2. You MUST end your response with these EXACT numbered options:
+Required closing (MANDATORY - copy exactly):
 
 "What would you like to do?
 1. Take quick quiz on these words
 2. Move on to next batch"
 
-DO NOT end your response without mentioning flashcards AND showing these numbered options.
-
-After the student chooses an option, acknowledge their choice by saying something like "Great choice!" or "Let's dive into that topic."
+Do NOT paraphrase the closing. After the student chooses, acknowledge their choice warmly.
 If they go off topic, gently guide them back or offer a break.""",
-    input_variables=["lesson_number", "batch_number", "total_batches", "words"],
+    input_variables=[
+        "lesson_number",
+        "batch_number",
+        "total_batches",
+        "words",
+        "previous_performance",
+    ],
 )
 
 VOCAB_LIST_VIEW = PromptTemplate(
@@ -128,23 +135,32 @@ Or tell me what you'd like to do.""",
 VOCAB_QUIZ_QUESTION = PromptTemplate(
     template="""Mode: teaching_vocab
 
+Question {question_number} of {total_questions}
 Question Type: {question_type}
 
 If arabic_to_english: Ask "What does {word_arabic} mean?" (DO NOT include transliteration or English translation)
 If english_to_arabic: Ask "How do you say '{word_english}' in Arabic?" (DO NOT provide the Arabic answer)
 
 Ask the question clearly and wait for student's answer. Do not give hints or show the answer.""",
-    input_variables=["question_type", "word_arabic", "word_english"],
+    input_variables=[
+        "question_type",
+        "word_arabic",
+        "word_english",
+        "question_number",
+        "total_questions",
+    ],
 )
 
 VOCAB_BATCH_SUMMARY = PromptTemplate(
     template="""Mode: teaching_vocab
 
-Batch {batch_number} Quiz Results
+Batch {batch_number} of {total_batches} - Quiz Results
 
 Score: {score}
 Correct: {words_correct}
 Missed: {words_incorrect}
+
+Progress: You've completed {batches_completed} of {total_batches} batches.
 
 Summarize performance encouragingly. Show words missed with translations. Offer options:
 1. Continue to next batch
@@ -152,7 +168,14 @@ Summarize performance encouragingly. Show words missed with translations. Offer 
 3. Skip to final test
 
 Or tell me what you'd like to do.""",
-    input_variables=["batch_number", "score", "words_correct", "words_incorrect"],
+    input_variables=[
+        "batch_number",
+        "score",
+        "words_correct",
+        "words_incorrect",
+        "total_batches",
+        "batches_completed",
+    ],
 )
 
 
@@ -188,18 +211,18 @@ Rule: {grammar_rule}
 Examples:
 {examples_formatted}
 
-Explain this grammar topic to the student in an encouraging way.
+Your task:
+1. Explain this grammar topic to the student in an encouraging, clear way
+2. When presenting Arabic text with examples, include case endings (final harakaat) as they are grammatically significant
+3. End with the exact closing below (word-for-word, no variations)
 
-IMPORTANT: When presenting Arabic text with examples, include case endings (final harakaat) as they are grammatically significant.
-
-**CRITICAL REQUIREMENT:**
-You MUST end your response with these EXACT numbered options:
+Required closing (MANDATORY - copy exactly):
 
 "What would you like to do next?
 1. Take quiz on this topic
 2. Review the lesson"
 
-DO NOT end your response without these numbered options. They are MANDATORY.""",
+Do NOT paraphrase or skip this closing.""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
@@ -246,9 +269,10 @@ FEEDBACK_VOCAB_CORRECT = PromptTemplate(
 Word: {word_arabic} ({word_transliteration})
 Translation: {english}
 Student was correct.
+Current Score: {current_score}
 
-Provide brief, encouraging feedback. Confirm correctness with checkmark.""",
-    input_variables=["word_arabic", "word_transliteration", "english"],
+Provide brief, encouraging feedback. Confirm correctness with checkmark. Mention their score progress.""",
+    input_variables=["word_arabic", "word_transliteration", "english", "current_score"],
 )
 
 FEEDBACK_VOCAB_INCORRECT = PromptTemplate(
@@ -258,9 +282,16 @@ Word: {word_arabic} ({word_transliteration})
 Correct Translation: {english}
 Student Answer: {student_answer}
 Student was incorrect.
+Current Score: {current_score}
 
-Provide supportive correction. Show correct answer with transliteration. Give memory tip.""",
-    input_variables=["word_arabic", "word_transliteration", "english", "student_answer"],
+Provide supportive correction. Show correct answer with transliteration. Give memory tip. Mention their score progress.""",
+    input_variables=[
+        "word_arabic",
+        "word_transliteration",
+        "english",
+        "student_answer",
+        "current_score",
+    ],
 )
 
 FEEDBACK_GRAMMAR_CORRECT = PromptTemplate(
