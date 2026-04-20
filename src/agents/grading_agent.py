@@ -305,19 +305,39 @@ class GradingAgent:
         Returns:
             Generated response text (with prompt stripped)
         """
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        # Build messages for model (use chat template like teaching agent)
+        messages = [{"role": "user", "content": prompt}]
 
-        outputs = self.model.generate(
-            **inputs,
-            max_new_tokens=self.max_new_tokens,
-            do_sample=False,  # Deterministic for grading
-            pad_token_id=self.tokenizer.eos_token_id,
+        # Apply chat template
+        text = self.tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
         )
 
-        response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        # Tokenize
+        model_inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
 
-        if response.startswith(prompt):
-            response = response[len(prompt) :].strip()
+        # Generate with tight constraints for JSON output
+        generated_ids = self.model.generate(
+            **model_inputs,
+            max_new_tokens=self.max_new_tokens,
+            do_sample=True,
+            temperature=0.1,  # Very low for focused, deterministic JSON
+            top_p=0.95,
+            top_k=40,
+            repetition_penalty=1.0,  # No penalty - JSON has repeated structure
+            num_beams=1,
+            use_cache=True,
+            pad_token_id=self.tokenizer.pad_token_id,
+        )
+
+        # Strip input tokens from output
+        generated_ids = [
+            output_ids[len(input_ids) :]
+            for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids, strict=False)
+        ]
+
+        # Decode
+        response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
         return response
 

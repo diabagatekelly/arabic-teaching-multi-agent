@@ -341,10 +341,23 @@ class Orchestrator:
 
                     logger.info(f"[Orchestrator] Grading result (raw): {grading_result}")
 
-                    # Parse JSON response
+                    # Parse JSON response - extract just the JSON part (model may add extra text)
+                    import re
+
                     try:
-                        result_dict = json.loads(grading_result)
-                        is_correct = result_dict.get("correct", False)
+                        # Try to find JSON object in response
+                        json_match = re.search(
+                            r'\{[^}]*"correct"\s*:\s*(true|false)[^}]*\}', grading_result
+                        )
+                        if json_match:
+                            json_str = json_match.group(0)
+                            result_dict = json.loads(json_str)
+                            is_correct = result_dict.get("correct", False)
+                        else:
+                            logger.error(
+                                f"[Orchestrator] No JSON found in grading result: {grading_result}"
+                            )
+                            is_correct = False
                     except json.JSONDecodeError:
                         logger.error(
                             f"[Orchestrator] Failed to parse grading result: {grading_result}"
