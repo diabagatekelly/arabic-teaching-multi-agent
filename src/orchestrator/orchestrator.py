@@ -822,14 +822,29 @@ class Orchestrator:
                         }
                     ).text
 
-                # Mark that we showed feedback so next turn will ask the question
+                # Mark that we showed feedback
                 quiz_state["feedback_shown"] = True
 
-                # Just show feedback, next question will be asked on next turn
+                # Show feedback, then immediately show next question (don't wait for user)
                 if current_q < quiz_state["total_questions"]:
-                    return f"{prompt_text}\n\nTeacher:"
+                    # Ask next question immediately after feedback
+                    next_word = quiz_state["words"][current_q]
+                    question_type = "arabic_to_english"
+
+                    next_question_text = VOCAB_QUIZ_QUESTION.invoke(
+                        {
+                            "question_type": question_type,
+                            "word_arabic": next_word["arabic"],
+                            "word_english": next_word["english"],
+                            "question_number": current_q + 1,
+                            "total_questions": quiz_state["total_questions"],
+                        }
+                    ).text
+
+                    # Combine feedback + next question in one response
+                    return f"{prompt_text}\n\n{next_question_text}\n\nTeacher:"
                 else:
-                    # No more questions, just show feedback (will transition to quiz_complete)
+                    # No more questions, just show feedback (will transition to quiz_complete on next turn)
                     return f"{prompt_text}\n\nTeacher:"
 
             # Ask the current question (first question or continuing after feedback)
@@ -1221,14 +1236,27 @@ class Orchestrator:
                         }
                     ).text
 
-                # Mark that we showed feedback so next turn will ask the question
+                # Mark that we showed feedback
                 quiz_state["feedback_shown"] = True
 
-                # Just show feedback, next question will be asked on next turn
+                # Show feedback, then immediately show next question (don't wait for user)
                 if current_q < quiz_state["total_questions"]:
-                    return f"{prompt_text}\n\nTeacher:"
+                    # Ask next question immediately after feedback
+                    next_question = quiz_state["questions"][current_q]
+
+                    next_question_text = GRAMMAR_QUIZ_QUESTION.invoke(
+                        {
+                            "topic_name": quiz_state["topic"],
+                            "question_number": current_q + 1,
+                            "total_questions": quiz_state["total_questions"],
+                            "question": next_question["question"],
+                        }
+                    ).text
+
+                    # Combine feedback + next question in one response
+                    return f"{prompt_text}\n\n{next_question_text}\n\nTeacher:"
                 else:
-                    # No more questions, just show feedback (will transition to quiz_complete)
+                    # No more questions, just show feedback (will transition to quiz_complete on next turn)
                     return f"{prompt_text}\n\nTeacher:"
 
             # Ask the current question (first question or continuing after feedback)
