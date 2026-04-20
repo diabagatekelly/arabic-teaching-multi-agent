@@ -591,7 +591,7 @@ class Orchestrator:
                         {
                             "question_type": question_type,
                             "word_arabic": next_word["arabic"],
-                            "word_transliteration": next_word["transliteration"],
+                            "word_english": next_word["english"],
                         }
                     ).text
 
@@ -612,7 +612,7 @@ class Orchestrator:
                 {
                     "question_type": question_type,
                     "word_arabic": word["arabic"],
-                    "word_transliteration": word["transliteration"],
+                    "word_english": word["english"],
                 }
             ).text
 

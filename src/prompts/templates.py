@@ -129,10 +129,12 @@ VOCAB_QUIZ_QUESTION = PromptTemplate(
     template="""Mode: teaching_vocab
 
 Question Type: {question_type}
-Word: {word_arabic} ({word_transliteration})
 
-Ask the translation question clearly. If arabic_to_english, ask "What does {word_arabic} mean?" If english_to_arabic, provide the English word and ask for Arabic translation.""",
-    input_variables=["question_type", "word_arabic", "word_transliteration"],
+If arabic_to_english: Ask "What does {word_arabic} mean?" (DO NOT include transliteration or English translation)
+If english_to_arabic: Ask "How do you say '{word_english}' in Arabic?" (DO NOT provide the Arabic answer)
+
+Ask the question clearly and wait for student's answer. Do not give hints or show the answer.""",
+    input_variables=["question_type", "word_arabic", "word_english"],
 )
 
 VOCAB_BATCH_SUMMARY = PromptTemplate(
