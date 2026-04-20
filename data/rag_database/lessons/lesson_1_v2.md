@@ -1,9 +1,8 @@
 ---
 lesson_number: 1
-lesson_name: "Gender and Definite Article"
+lesson_name: "Masculine and Feminine Nouns"
 grammar_points:
   - masculine_feminine_nouns
-  - definite_article_al
 prerequisites: []
 difficulty: beginner
 vocabulary:

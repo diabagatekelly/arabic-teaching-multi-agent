@@ -1,7 +1,7 @@
 {
   "1": {
     "lesson_number": 1,
-    "lesson_name": "Gender and Definite Article",
+    "lesson_name": "Masculine and Feminine Nouns",
     "vocabulary": [
       {
         "arabic": "كِتَابٌ",
@@ -35,10 +35,17 @@
       }
     ],
     "grammar_points": [
-      "masculine_feminine_nouns",
-      "definite_article_al"
+      "masculine_feminine_nouns"
     ],
     "grammar_sections": {},
     "difficulty": "beginner"
+  },
+  "2": {
+    "lesson_number": 2,
+    "lesson_name": "Lesson 2",
+    "vocabulary": [],
+    "grammar_points": [],
+    "grammar_sections": {},
+    "difficulty": "all"
   }
 }
