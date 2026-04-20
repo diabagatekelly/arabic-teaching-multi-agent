@@ -20,8 +20,8 @@ from src.rag.rag_retriever import RAGRetriever
 from src.rag.sentence_transformer_client import SentenceTransformerClient
 
 # Load teaching model at module level (required for ZeroGPU)
-print("===== Loading Qwen 7B Teaching Model =====")
-model_name = "Qwen/Qwen2.5-7B-Instruct"
+print("===== Loading Fine-tuned Qwen 7B Teaching Model =====")
+model_name = "kdiabagate/qwen-7b-arabic-teaching-v2"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 teaching_model = AutoModelForCausalLM.from_pretrained(
     model_name,
@@ -31,7 +31,7 @@ teaching_model = AutoModelForCausalLM.from_pretrained(
 # Only move to cuda if available (for HuggingFace Spaces)
 if torch.cuda.is_available():
     teaching_model.to("cuda")
-print("===== Model loaded =====")
+print("===== Fine-tuned model loaded =====")
 
 # TODO: Load LoRA adapter for teaching model when available
 # from peft import PeftModel
