@@ -296,6 +296,7 @@ with gr.Blocks(
     .flashcard {
         padding: 60px 20px;
         min-height: 250px;
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -306,6 +307,7 @@ with gr.Blocks(
         margin-top: 0;
         border: 2px solid #ddd;
         border-radius: 8px;
+        box-sizing: border-box;
     }
     /* Flashcard container border */
     .flashcard-container {

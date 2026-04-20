@@ -544,6 +544,9 @@ class Orchestrator:
                     if is_correct:
                         quiz_state["score"] += 1
 
+                    # Reset feedback_shown so feedback will be displayed
+                    quiz_state["feedback_shown"] = False
+
                     # Move to next question or complete quiz
                     quiz_state["current_question"] += 1
 
@@ -822,6 +825,7 @@ class Orchestrator:
                     "answers": [],
                     "score": 0,
                     "feedback_shown": False,
+                    "batch_number": current_batch,  # Store which batch this quiz is for
                 }
                 logger.info(f"[Orchestrator] Initialized quiz_state with {len(batch_words)} words")
 
@@ -957,7 +961,10 @@ class Orchestrator:
                 if not ans["correct"]
             ]
 
-            batch_number = session.get("vocabulary", {}).get("current_batch", 1)
+            # Get the batch number that was just quizzed (stored in quiz_state)
+            batch_number = quiz_state.get(
+                "batch_number", session.get("vocabulary", {}).get("current_batch", 1)
+            )
             score = f"{quiz_state['score']}/{quiz_state['total_questions']}"
 
             words_correct_str = ", ".join(words_correct) if words_correct else "None"
@@ -968,7 +975,7 @@ class Orchestrator:
             lesson_data = self.lesson_cache.get(lesson_number, {})
             all_vocab = lesson_data.get("vocabulary", [])
             total_batches = (len(all_vocab) + 2) // 3  # Ceiling division
-            batches_completed = batch_number  # Current batch just finished
+            batches_completed = batch_number  # This batch just finished
 
             # Store quiz score for next batch
             session["vocabulary"]["previous_quiz_score"] = score
@@ -1193,59 +1200,41 @@ class Orchestrator:
                         v for v in lesson_data["vocabulary"] if v["arabic"].endswith("ة")
                     ]
 
-                    # Build 3 questions with randomization
+                    # Build 3 unique questions with randomization
                     fallback_questions = []
+                    used_words = set()
 
-                    # Question 1: Random masculine word
-                    if masculine_words:
-                        word = random.choice(masculine_words)
-                        fallback_questions.append(
-                            {
-                                "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
-                                "answer": "masculine",
-                                "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
-                            }
-                        )
-
-                    # Question 2: Random feminine word
-                    if feminine_words:
-                        word = random.choice(feminine_words)
-                        fallback_questions.append(
-                            {
-                                "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
-                                "answer": "feminine",
-                                "explanation": "It ends with ة (taa marbuta), so it's feminine",
-                            }
-                        )
-
-                    # Question 3: Another random masculine word (if available)
-                    if len(masculine_words) > 1:
-                        word = random.choice(
-                            [w for w in masculine_words if w not in [fallback_questions[0]]]
-                        )
-                        fallback_questions.append(
-                            {
-                                "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
-                                "answer": "masculine",
-                                "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
-                            }
-                        )
-                    elif feminine_words:  # Fallback to another feminine if not enough masculine
-                        word = random.choice(
-                            [
-                                w
-                                for w in feminine_words
-                                if len(fallback_questions) < 2
-                                or w != fallback_questions[1]["question"].split()[1]
+                    # Generate 3 unique questions
+                    attempts = 0
+                    while len(fallback_questions) < 3 and attempts < 20:
+                        attempts += 1
+                        # Randomly pick masculine or feminine
+                        if random.choice([True, False]) and masculine_words:
+                            available = [
+                                w for w in masculine_words if w["arabic"] not in used_words
                             ]
-                        )
-                        fallback_questions.append(
-                            {
-                                "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
-                                "answer": "feminine",
-                                "explanation": "It ends with ة (taa marbuta), so it's feminine",
-                            }
-                        )
+                            if available:
+                                word = random.choice(available)
+                                used_words.add(word["arabic"])
+                                fallback_questions.append(
+                                    {
+                                        "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                        "answer": "masculine",
+                                        "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
+                                    }
+                                )
+                        else:
+                            available = [w for w in feminine_words if w["arabic"] not in used_words]
+                            if available:
+                                word = random.choice(available)
+                                used_words.add(word["arabic"])
+                                fallback_questions.append(
+                                    {
+                                        "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                        "answer": "feminine",
+                                        "explanation": "It ends with ة (taa marbuta), so it's feminine",
+                                    }
+                                )
 
                     questions = fallback_questions[:3]  # Ensure exactly 3 questions
                     logger.info(
@@ -1591,28 +1580,41 @@ Teacher:"""
                         ]
 
                         questions = []
+                        used_words = set()  # Track used words to avoid duplicates
 
-                        # Generate 3 gender identification questions
-                        for _ in range(3):
+                        # Generate 3 unique gender identification questions
+                        attempts = 0
+                        while len(questions) < 3 and attempts < 20:
+                            attempts += 1
                             # Randomly pick masculine or feminine
                             if random.choice([True, False]) and masculine_words:
-                                word = random.choice(masculine_words)
-                                questions.append(
-                                    {
-                                        "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
-                                        "answer": "masculine",
-                                        "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
-                                    }
-                                )
-                            elif feminine_words:
-                                word = random.choice(feminine_words)
-                                questions.append(
-                                    {
-                                        "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
-                                        "answer": "feminine",
-                                        "explanation": "It ends with ة (taa marbuta), so it's feminine",
-                                    }
-                                )
+                                available = [
+                                    w for w in masculine_words if w["arabic"] not in used_words
+                                ]
+                                if available:
+                                    word = random.choice(available)
+                                    used_words.add(word["arabic"])
+                                    questions.append(
+                                        {
+                                            "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                            "answer": "masculine",
+                                            "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
+                                        }
+                                    )
+                            else:
+                                available = [
+                                    w for w in feminine_words if w["arabic"] not in used_words
+                                ]
+                                if available:
+                                    word = random.choice(available)
+                                    used_words.add(word["arabic"])
+                                    questions.append(
+                                        {
+                                            "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                            "answer": "feminine",
+                                            "explanation": "It ends with ة (taa marbuta), so it's feminine",
+                                        }
+                                    )
 
                         logger.info(
                             f"[Orchestrator] [Background] Generated {len(questions)} grammar-specific questions"

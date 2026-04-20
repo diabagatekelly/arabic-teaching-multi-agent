@@ -220,7 +220,7 @@ If all batches complete:
 ✓ Got right: book, school
 ✗ Missed: pen (قَلَم - qalam)
 
-You've completed all vocabulary! Ready for grammar?
+You've completed all vocabulary! Time to move on to something else.
 1. Move on to grammar
 2. Review vocabulary"
 
