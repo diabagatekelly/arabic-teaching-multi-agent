@@ -96,7 +96,7 @@ class Orchestrator:
         # Build full vocabulary list for prompt
         vocab_list = "\n".join(
             [
-                f"{i+1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
+                f"{i + 1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
                 for i, v in enumerate(lesson_data["vocabulary"])
             ]
         )
@@ -854,7 +854,7 @@ class Orchestrator:
             # Format words for this batch
             words_formatted = "\n".join(
                 [
-                    f"{i+1}. {w['arabic']} ({w['transliteration']}) - {w['english']}"
+                    f"{i + 1}. {w['arabic']} ({w['transliteration']}) - {w['english']}"
                     for i, w in enumerate(batch_words)
                 ]
             )
@@ -1134,7 +1134,7 @@ class Orchestrator:
             # Build grammar overview prompt
             topics_list = "\n".join(
                 [
-                    f"{i+1}. {topic.replace('_', ' ').title()}"
+                    f"{i + 1}. {topic.replace('_', ' ').title()}"
                     for i, topic in enumerate(lesson_data["grammar_points"])
                 ]
             )
@@ -1584,7 +1584,7 @@ Teacher:"""
             # Default: minimal context for free conversation
             vocab_list = "\n".join(
                 [
-                    f"{i+1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
+                    f"{i + 1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
                     for i, v in enumerate(lesson_data["vocabulary"])
                 ]
             )
@@ -1592,7 +1592,7 @@ Teacher:"""
                 [topic.replace("_", " ").title() for topic in lesson_data["grammar_points"]]
             )
 
-            return f"""Lesson {lesson_number}: {lesson_data['lesson_name']}
+            return f"""Lesson {lesson_number}: {lesson_data["lesson_name"]}
 
 Vocabulary:
 {vocab_list}

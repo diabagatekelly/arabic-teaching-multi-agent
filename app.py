@@ -585,11 +585,11 @@ with gr.Blocks(
 
         lesson_info = f"""**Status:** Active
 
-**Lesson {lesson_number}:** {lesson_data['lesson_name']}
+**Lesson {lesson_number}:** {lesson_data["lesson_name"]}
 
-**Total Vocab:** {len(lesson_data['vocabulary'])} words
+**Total Vocab:** {len(lesson_data["vocabulary"])} words
 
-**Grammar:** {', '.join(grammar_display)}
+**Grammar:** {", ".join(grammar_display)}
 """
         progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
 
@@ -607,7 +607,7 @@ with gr.Blocks(
 
             lesson_info = f"""**Status:** Ended
 
-**Lesson:** {sessions[sid].get('lesson_name', 'Unknown')}
+**Lesson:** {sessions[sid].get("lesson_name", "Unknown")}
 **Session saved** ✓
 """
             progress = f"**Learned:** {learned} words\n\n**Quizzes:** {quizzes} completed"
