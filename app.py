@@ -528,6 +528,16 @@ with gr.Blocks(
             gr.update(visible=True),
         )
 
+    def show_loading():
+        """Show immediate loading message before GPU spins up."""
+        loading_chat = [
+            {
+                "role": "assistant",
+                "content": "🤖 Gathering my notes and grabbing some coffee... This will take about 5-10 seconds!",
+            }
+        ]
+        return "**Status:** Starting...", "○ Loading...", loading_chat
+
     @spaces.GPU(duration=60)
     def start_lesson_ui(sid):
         """Start lesson and initialize session."""
@@ -649,7 +659,8 @@ with gr.Blocks(
     clear.click(lambda: [], None, chatbot)
 
     # Wire up lesson control functions
-    start_lesson_btn.click(
+    # Show loading message immediately, then start lesson
+    start_lesson_btn.click(show_loading, None, [lesson_info, progress_display, chatbot]).then(
         start_lesson_ui, [session_id], [lesson_info, progress_display, chatbot, session_id]
     )
     end_lesson_btn.click(end_lesson_ui, [session_id], [lesson_info, progress_display])
