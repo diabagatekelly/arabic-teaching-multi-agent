@@ -115,7 +115,13 @@ def process_message(message, chat_history, session_id):
         error_msg = "Please start a lesson first using the 'Start Lesson' button."
         chat_history.append({"role": "user", "content": message})
         chat_history.append({"role": "assistant", "content": error_msg})
-        return "", chat_history
+        # Return all 4 expected outputs: msg, chatbot, flashcard_trigger, progress_display
+        return (
+            "",
+            chat_history,
+            "",
+            "**Vocabulary:**\n○ No progress yet\n\n**Grammar:**\n○ No progress yet",
+        )
 
     logger.info("[App] Routing to orchestrator.handle_message()")
 
