@@ -2,7 +2,7 @@
 LangChain Prompt Templates for Arabic Teaching Multi-Agent System
 
 All prompts follow the design specifications in docs/PROMPT_DESIGN.md
-Total: 21 prompts across 3 agents
+Total: 20 prompts across 3 agents
 """
 
 from langchain_core.prompts import PromptTemplate
@@ -22,7 +22,7 @@ MODE_EXERCISE_GENERATION = "exercise_generation"
 
 
 # =============================================================================
-# AGENT 1: TEACHING/PRESENTATION AGENT (14 prompts)
+# AGENT 1: TEACHING/PRESENTATION AGENT (13 prompts)
 # Model: Fine-tuned Qwen2.5-3B
 # =============================================================================
 
@@ -61,7 +61,11 @@ Which would you like to start with?
 1. Start with vocabulary
 2. Start with grammar"
 
-Now generate your response following this format exactly. Greet warmly, list ALL vocabulary words with Arabic and English, present grammar topics, and end with those exact numbered options.""",
+Now welcome the student in your own warm, natural style. List all vocabulary words (Arabic + English) and grammar topics.
+
+End with EXACTLY these numbered options:
+1. Start with vocabulary
+2. Start with grammar""",
     input_variables=[
         "lesson_number",
         "total_words",
@@ -73,26 +77,54 @@ Now generate your response following this format exactly. Greet warmly, list ALL
 
 
 # -----------------------------------------------------------------------------
-# Vocabulary Teaching (5 prompts)
+# Progress Report (1 prompt)
 # -----------------------------------------------------------------------------
 
-VOCAB_OVERVIEW = PromptTemplate(
-    template="""Mode: teaching_vocab
+PROGRESS_REPORT = PromptTemplate(
+    template="""Mode: lesson_start
 
-Lesson {lesson_number} - Vocabulary Overview
+Lesson {lesson_number} Progress Report
 
-Words you'll learn:
-{words_formatted}
+Vocabulary Progress:
+{vocab_progress}
 
-These are divided into {batches_count} batches for easier learning.
+Grammar Progress:
+{grammar_progress}
 
-Present all words and explain options:
-1. Learn in batches (I'll teach each batch, then quiz you)
-2. Skip to final test (test yourself on all {total_words} words now)
+Example response:
 
-Format with numbered options and mention they can request something else.""",
-    input_variables=["lesson_number", "words_formatted", "batches_count", "total_words"],
+"Here's where you are in Lesson 1! 📊
+
+**Vocabulary:**
+✓ Batch 1: 3/3 words mastered
+✓ Batch 2: 2/3 words learned
+○ Batch 3: Not started
+
+**Grammar:**
+✓ Noun Gender: Passed (4/5)
+○ Definite Article: Not started
+
+What would you like to do?
+1. Review Batch 1 vocabulary
+2. Continue Batch 2 vocabulary
+3. Review Noun Gender
+4. Start Definite Article
+5. Continue where I left off"
+
+Now show their progress in your own encouraging style. List what they've completed with scores and what's still available.
+
+End with numbered options that let them:
+- Review/retake any completed vocab batch
+- Continue or start vocab batches
+- Review/retake any grammar topic
+- Continue where they left off""",
+    input_variables=["lesson_number", "vocab_progress", "grammar_progress"],
 )
+
+
+# -----------------------------------------------------------------------------
+# Vocabulary Teaching (3 prompts)
+# -----------------------------------------------------------------------------
 
 VOCAB_BATCH_INTRO = PromptTemplate(
     template="""Mode: teaching_vocab
@@ -118,7 +150,11 @@ What would you like to do?
 1. Take quick quiz on these words
 2. Move on to next batch"
 
-Now generate your response following this exact format. Present the words clearly, remind them about flashcards, and end with those exact numbered options.""",
+Now introduce this batch in your own warm, engaging style. Present the words clearly with Arabic, transliteration, and English. Remind students about the flashcards.
+
+End with EXACTLY these numbered options:
+1. Take quick quiz on these words
+2. Move on to next batch""",
     input_variables=[
         "lesson_number",
         "batch_number",
@@ -126,22 +162,6 @@ Now generate your response following this exact format. Present the words clearl
         "words",
         "previous_performance",
     ],
-)
-
-VOCAB_LIST_VIEW = PromptTemplate(
-    template="""Mode: teaching_vocab
-
-Lesson {lesson_number} - All Vocabulary Words
-
-All Words:
-{all_words}
-
-Show all vocabulary words with Arabic, transliteration, and English. Mention current batch ({current_batch}) and offer navigation:
-1. Go back to current batch (Batch {current_batch})
-2. Skip to final test
-
-Or tell me what you'd like to do.""",
-    input_variables=["lesson_number", "all_words", "current_batch"],
 )
 
 VOCAB_QUIZ_QUESTION = PromptTemplate(
@@ -155,7 +175,9 @@ Example response format:
 
 What does {word_arabic} mean?"
 
-Now generate your question following this exact format. Ask "What does {word_arabic} mean?" - DO NOT include the transliteration or English translation in your question. Keep it simple and wait for the student's answer.""",
+Now ask your question simply and clearly. Use EXACTLY this format: "Question {question_number} of {total_questions}\n\nWhat does {word_arabic} mean?"
+
+IMPORTANT: DO NOT include the transliteration or English translation in your question. Keep it simple and wait for the student's answer.""",
     input_variables=[
         "question_type",
         "word_arabic",
@@ -177,6 +199,8 @@ Missed: {words_incorrect}
 Progress: You've completed {batches_completed} of {total_batches} batches.
 
 IMPORTANT: Check if all batches are done ({batches_completed} == {total_batches}).
+
+Example responses:
 
 If batches remaining:
 "Excellent work! You scored 2/3 on Batch 1. 🎉
@@ -200,7 +224,11 @@ You've completed all vocabulary! Ready for grammar?
 1. Move on to grammar
 2. Review vocabulary"
 
-Generate your response in your own style. Summarize performance encouragingly, show missed words with translations, and offer appropriate next steps based on progress.""",
+Now summarize their performance in your own warm, encouraging style. Show which words they got right and which they missed (with translations).
+
+End with EXACTLY these numbered options based on progress:
+- If batches remaining: "1. Continue to next batch" and "2. Review these words"
+- If all batches complete: "1. Move on to grammar" and "2. Review vocabulary" """,
     input_variables=[
         "batch_number",
         "score",
@@ -260,7 +288,11 @@ What would you like to do next?
 1. Take quiz on this topic
 2. Review the lesson"
 
-Now generate your response following this exact format. Explain clearly with examples and end with those exact numbered options.""",
+Now teach this grammar topic in your own clear, engaging style. Explain the rule and provide the examples to help them understand.
+
+End with EXACTLY these numbered options:
+1. Take quiz on this topic
+2. Review the lesson""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 

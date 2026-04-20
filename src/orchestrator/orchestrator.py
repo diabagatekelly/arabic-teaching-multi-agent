@@ -15,6 +15,7 @@ from src.prompts.templates import (
     GRAMMAR_QUIZ_QUESTION,
     GRAMMAR_TOPIC_SUMMARY,
     LESSON_WELCOME,
+    PROGRESS_REPORT,
     VOCAB_BATCH_INTRO,
     VOCAB_BATCH_SUMMARY,
     VOCAB_QUIZ_QUESTION,
@@ -160,7 +161,9 @@ class Orchestrator:
         # Get session state
         session = self.sessions.get(session_id)
         if not session or session.get("status") != "active":
-            return "No active lesson. Please start a lesson first."
+            return (
+                "Oops, you haven't picked a lesson yet. Please start a lesson from the right panel."
+            )
 
         # Get lesson data
         lesson_number = session.get("lesson_number")
@@ -568,101 +571,81 @@ class Orchestrator:
                 f"[Orchestrator] No valid transition - state: {current_progress}, intent: {detected_intent}"
             )
 
-            # Handle off-topic/unrecognized input gracefully
+            # Handle off-topic/unrecognized input with progress report
             if detected_intent is None or (
                 current_progress in TRANSITIONS
                 and detected_intent not in TRANSITIONS[current_progress]
             ):
-                logger.info("[Orchestrator] Handling off-topic/unrecognized input with fallback")
+                logger.info(
+                    "[Orchestrator] No clear intent detected - showing progress report with all options"
+                )
 
-                # Build a helpful fallback response based on current state
-                # Let model generate in its own voice with appropriate context
+                # Build progress summary
+                vocab_progress_lines = []
+                grammar_progress_lines = []
+
+                # Vocabulary progress
+                vocab_state = session.get("vocabulary", {})
+                all_vocab = vocab_state.get("words", [])
+                current_batch = vocab_state.get("current_batch", 1)
+                total_batches = (len(all_vocab) + 2) // 3  # Ceiling division
+
+                for batch_num in range(1, total_batches + 1):
+                    batch_start = (batch_num - 1) * 3
+                    batch_end = min(batch_start + 3, len(all_vocab))
+                    batch_words = all_vocab[batch_start:batch_end]
+
+                    if batch_num < current_batch:
+                        # Completed batch
+                        vocab_progress_lines.append(
+                            f"✓ Batch {batch_num}: {len(batch_words)} words completed"
+                        )
+                    elif batch_num == current_batch:
+                        # Current batch
+                        vocab_progress_lines.append(
+                            f"→ Batch {batch_num}: {len(batch_words)} words (in progress)"
+                        )
+                    else:
+                        # Not started
+                        vocab_progress_lines.append(
+                            f"○ Batch {batch_num}: {len(batch_words)} words (not started)"
+                        )
+
+                vocab_progress = "\n".join(vocab_progress_lines)
+
+                # Grammar progress
+                grammar_topics = session.get("grammar", {}).get("topics", {})
+                lesson_data = self.lesson_cache.get(session.get("lesson_number"))
+                if lesson_data:
+                    for topic_name in lesson_data.get("grammar_points", []):
+                        topic_state = grammar_topics.get(topic_name, {})
+                        if topic_state.get("taught", False):
+                            score = topic_state.get("quiz_score", "N/A")
+                            grammar_progress_lines.append(
+                                f"✓ {topic_name}: Completed (Score: {score})"
+                            )
+                        else:
+                            grammar_progress_lines.append(f"○ {topic_name}: Not started")
+
+                grammar_progress = (
+                    "\n".join(grammar_progress_lines)
+                    if grammar_progress_lines
+                    else "No grammar topics available"
+                )
+
+                # Generate progress report using template
+                prompt_text = PROGRESS_REPORT.invoke(
+                    {
+                        "lesson_number": session.get("lesson_number", 1),
+                        "vocab_progress": vocab_progress,
+                        "grammar_progress": grammar_progress,
+                    }
+                ).text
+
                 teaching_agent = TeachingAgent(
                     self.teaching_model_getter(), self.teaching_tokenizer
                 )
-
-                if current_progress == "vocab_quiz_complete":
-                    # Just finished quiz - offer next steps
-                    current_batch = session.get("vocabulary", {}).get("current_batch", 1)
-                    total_batches = len(session.get("vocabulary", {}).get("words", [])) // 3
-
-                    if current_batch < total_batches:
-                        context = f"completed Batch {current_batch} of {total_batches}"
-                        options = "continue to next batch, review these words, or take a break"
-                    else:
-                        context = "completed all vocabulary batches"
-                        options = "move on to grammar, review vocabulary, or take a break"
-
-                    fallback_prompt = f"""Mode: clarification
-
-Student just {context}.
-Student's unclear message: {user_message}
-
-Your task: Acknowledge their message warmly and offer next steps. Mention they can {options}.
-Keep it conversational and brief (2-3 sentences). Ask what they'd like to do.
-
-Teacher:"""
-                    return teaching_agent.respond(
-                        fallback_prompt, max_new_tokens=150, temperature=0.85
-                    )
-
-                elif current_progress in ["vocab_batch_intro", "vocab_quiz"]:
-                    # In the middle of vocabulary learning
-                    fallback_prompt = f"""Mode: clarification
-
-Currently working on: vocabulary section
-Student's unclear message: {user_message}
-
-Your task: Gently redirect them back to vocabulary work. Mention they can continue with the batch, take a quiz, or see all words. Or take a break if needed.
-Keep it warm and conversational (2-3 sentences).
-
-Teacher:"""
-                    return teaching_agent.respond(
-                        fallback_prompt, max_new_tokens=150, temperature=0.85
-                    )
-
-                elif current_progress == "lesson_start":
-                    # At the beginning
-                    fallback_prompt = f"""Mode: clarification
-
-Currently at: lesson start (haven't chosen vocab or grammar yet)
-Student's unclear message: {user_message}
-
-Your task: Warmly ask them whether they'd like to start with vocabulary or grammar.
-Keep it friendly and brief (1-2 sentences).
-
-Teacher:"""
-                    return teaching_agent.respond(
-                        fallback_prompt, max_new_tokens=100, temperature=0.85
-                    )
-
-                else:
-                    # Generic fallback: let model handle in its own voice
-                    # Build context about current state and boundaries
-                    fallback_prompt = f"""Mode: clarification
-
-Current lesson stage: {current_progress}
-Student message: {user_message}
-
-Context: The student's message doesn't clearly indicate what they want to do next. You need to gently redirect them back to the lesson structure while being warm and supportive.
-
-Your task: Respond in your own natural teaching voice to:
-1. Acknowledge their message kindly
-2. Explain that you can help them with the lesson (continue, review, or take a break)
-3. Remind them what stage they're at (e.g., vocabulary section, grammar topic, etc.)
-4. Ask them what they'd like to do: continue, review, or pause
-
-Be conversational and encouraging, not robotic. Keep it brief (2-3 sentences max).
-
-Teacher:"""
-
-                    # Generate response through teaching agent
-                    teaching_agent = TeachingAgent(
-                        self.teaching_model_getter(), self.teaching_tokenizer
-                    )
-                    return teaching_agent.respond(
-                        fallback_prompt, max_new_tokens=150, temperature=0.85
-                    )
+                return teaching_agent.respond(prompt_text, max_new_tokens=300, temperature=0.75)
 
         logger.info("[Orchestrator] ===== END STATE MACHINE =====")
 

@@ -154,31 +154,52 @@ def process_message(message, chat_history, session_id):
 
 
 def _build_progress_display(session):
-    """Build progress display from session state."""
+    """Build progress display from session state - matches orchestrator progress report."""
     if not session:
-        return "**Learned:** 0 words\n\n**Quizzes:** 0/0"
+        return "**Vocabulary:**\n○ No progress yet\n\n**Grammar:**\n○ No progress yet"
 
-    # Count completed quiz questions
-    vocab_quiz_state = session.get("vocabulary", {}).get("quiz_state", {})
-    quiz_answers = len(vocab_quiz_state.get("answers", []))
-    quiz_score = vocab_quiz_state.get("score", 0)
+    progress_lines = []
 
-    # Count words learned (batches taught)
-    batch_1_taught = session.get("vocabulary", {}).get("current_batch", 1) >= 1
-    batch_2_taught = session.get("vocabulary", {}).get("current_batch", 1) >= 2
-    words_learned = (3 if batch_1_taught else 0) + (3 if batch_2_taught else 0)
+    # Vocabulary progress
+    progress_lines.append("**Vocabulary:**")
+    vocab_state = session.get("vocabulary", {})
+    all_vocab = vocab_state.get("words", [])
+    current_batch = vocab_state.get("current_batch", 1)
+    total_batches = (len(all_vocab) + 2) // 3  # Ceiling division
+
+    for batch_num in range(1, total_batches + 1):
+        batch_start = (batch_num - 1) * 3
+        batch_end = min(batch_start + 3, len(all_vocab))
+        batch_words = all_vocab[batch_start:batch_end]
+
+        if batch_num < current_batch:
+            # Completed batch
+            progress_lines.append(f"✓ Batch {batch_num}: {len(batch_words)} words")
+        elif batch_num == current_batch:
+            # Current batch
+            progress_lines.append(f"→ Batch {batch_num}: {len(batch_words)} words")
+        else:
+            # Not started
+            progress_lines.append(f"○ Batch {batch_num}: {len(batch_words)} words")
 
     # Grammar progress
-    grammar_taught = session.get("grammar", {}).get("topics", {})
-    grammar_completed = sum(1 for topic in grammar_taught.values() if topic.get("taught", False))
+    progress_lines.append("\n**Grammar:**")
+    grammar_topics = session.get("grammar", {}).get("topics", {})
+    lesson_number = session.get("lesson_number")
 
-    progress_text = f"""**Learned:** {words_learned} words
+    if lesson_number and lesson_number in lesson_cache:
+        lesson_data = lesson_cache[lesson_number]
+        for topic_name in lesson_data.get("grammar_points", []):
+            topic_state = grammar_topics.get(topic_name, {})
+            if topic_state.get("taught", False):
+                score = topic_state.get("quiz_score", "N/A")
+                progress_lines.append(f"✓ {topic_name} ({score})")
+            else:
+                progress_lines.append(f"○ {topic_name}")
+    else:
+        progress_lines.append("○ No topics available")
 
-**Quiz Progress:** {quiz_score}/{quiz_answers} correct
-
-**Grammar:** {grammar_completed}/1 topics"""
-
-    return progress_text
+    return "\n".join(progress_lines)
 
 
 # Global lesson cache (loaded from JSON file)
@@ -260,14 +281,39 @@ print("===== Orchestrator initialized =====")
 
 
 # Build Gradio interface with 3-column layout
-with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
-    gr.Markdown("# 🌍 Arabic Teacher")
-
+with gr.Blocks(
+    title="Arabic Learning Companion",
+    css="""
+    .flashcard {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 40px 20px;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #f9f9f9;
+        font-size: 1.2em;
+    }
+    .main-title {
+        text-align: center;
+        font-size: 2em;
+        margin-bottom: 0.5em;
+    }
+    /* Fix double scrollbar in chatbot */
+    .chatbot {
+        overflow: hidden !important;
+    }
+    """,
+) as demo:
     with gr.Row():
         # Left panel - Flashcards (1/4 width)
         with gr.Column(scale=1):
             gr.Markdown("### 📚 Flashcards")
-            flashcard_display = gr.Markdown("*Start a lesson to see flashcards*", visible=True)
+            flashcard_display = gr.Markdown(
+                "*Start a lesson to see flashcards*", visible=True, elem_classes=["flashcard"]
+            )
             flashcard_progress = gr.Textbox(
                 label="Progress", value="0/0", interactive=False, visible=True
             )
@@ -277,12 +323,12 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 
         # Center panel - Chat (1/2 width)
         with gr.Column(scale=2):
-            gr.Markdown("### 💬 Chat")
+            gr.Markdown("# 🌟 Arabic Learning Companion", elem_classes=["main-title"])
             # type="messages" only works in Gradio 5.x (Spaces), not local 6.12
             try:
-                chatbot = gr.Chatbot(height=500, type="messages")
+                chatbot = gr.Chatbot(height=600, type="messages", elem_classes=["chatbot"])
             except TypeError:
-                chatbot = gr.Chatbot(height=500)
+                chatbot = gr.Chatbot(height=600, elem_classes=["chatbot"])
             msg = gr.Textbox(
                 label="Your message",
                 placeholder="Try: hello, vocab, grammar...",
@@ -342,7 +388,7 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         return state, display, progress
 
     def update_flashcards(sid, state):
-        """Update flashcards based on current session vocabulary batch and visibility rules."""
+        """Update flashcards - shows all learned vocab except during quizzes/tests."""
         sessions.clear()
         sessions.update(load_sessions())
 
@@ -359,17 +405,15 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         session = sessions[sid]
         current_progress = session.get("current_progress", "")
 
-        # Determine visibility based on current progress
-        # Show: vocab_batch_intro, grammar_overview, grammar_explanation
-        # Hide: vocab_quiz, grammar_quiz, final_test
-        show_flashcards = current_progress in [
-            "vocab_batch_intro",
-            "grammar_overview",
-            "grammar_explanation",
+        # Hide flashcards only during quizzes and tests
+        hide_flashcards = current_progress in [
+            "vocab_quiz",
+            "grammar_quiz",
+            "final_test",
         ]
 
-        if not show_flashcards:
-            # Hide flashcards
+        if hide_flashcards:
+            # Hide flashcards during assessment
             return (
                 state,
                 "*Flashcards hidden during quiz*",
@@ -379,34 +423,33 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
                 gr.update(visible=False),
             )
 
-        # Show flashcards and update content
+        # Show all vocabulary learned so far (all batches up to current)
         current_batch = session.get("vocabulary", {}).get("current_batch", 1)
         all_vocab = session.get("vocabulary", {}).get("words", [])
 
-        # Get words for current batch (3 per batch)
+        # Get all words from completed and current batches
         batch_size = 3
-        start_idx = (current_batch - 1) * batch_size
-        end_idx = min(start_idx + batch_size, len(all_vocab))
-        batch_words = all_vocab[start_idx:end_idx]
+        total_words_learned = min(current_batch * batch_size, len(all_vocab))
+        learned_words = all_vocab[:total_words_learned]
 
-        if not batch_words:
+        if not learned_words:
             return (
                 state,
-                "*No vocabulary in current batch*",
+                "*No vocabulary learned yet*",
                 "0/0",
                 gr.update(visible=True),
                 gr.update(visible=True),
                 gr.update(visible=True),
             )
 
-        # Update flashcard state
-        state["cards"] = batch_words
+        # Update flashcard state with all learned words
+        state["cards"] = learned_words
         state["current_index"] = 0
         state["flipped"] = False
 
         # Show first card (English side)
-        display = f"### {batch_words[0]['english']}"
-        progress = f"1/{len(batch_words)}"
+        display = f"### {learned_words[0]['english']}"
+        progress = f"1/{len(learned_words)}"
 
         return (
             state,
@@ -453,12 +496,16 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         logger.info("=" * 80)
 
         lesson_data = lesson_cache[lesson_number]
+        # Convert grammar point keys to display names
+        grammar_display = [gp.replace("_", " ").title() for gp in lesson_data["grammar_points"]]
+
         lesson_info = f"""**Status:** Active
 
 **Lesson {lesson_number}:** {lesson_data['lesson_name']}
 
 **Total Vocab:** {len(lesson_data['vocabulary'])} words
-**Grammar:** {', '.join(lesson_data['grammar_points'])}
+
+**Grammar:** {', '.join(grammar_display)}
 """
         progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
 
