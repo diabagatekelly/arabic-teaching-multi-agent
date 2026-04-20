@@ -164,6 +164,35 @@ class Orchestrator:
 
         grammar_topics = ", ".join(lesson_data.get("grammar_points", []))
 
+        # Check if student is requesting a quiz
+        user_lower = user_message.lower()
+        quiz_context = ""
+
+        if "quiz" in user_lower or "test" in user_lower or "take quiz" in user_lower:
+            # Determine if vocab or grammar quiz
+            if "vocab" in user_lower or "word" in user_lower:
+                # Get current batch number
+                current_batch = session.get("vocabulary", {}).get("current_batch", 1)
+                quiz_json = self.get_vocab_batch_quiz(session_id, current_batch)
+                if quiz_json:
+                    quiz_context = f"\n\nVocabulary Quiz (Batch {current_batch}):\n{quiz_json}"
+                    logger.info(
+                        f"[Orchestrator] Injected vocab batch {current_batch} quiz into context"
+                    )
+            elif "grammar" in user_lower:
+                # Determine which grammar topic (for now, use first topic)
+                topics = lesson_data["grammar_points"]
+                if topics:
+                    topic = topics[0]  # TODO: track which topic student is on
+                    quiz_json = self.get_grammar_quiz(session_id, topic)
+                    if quiz_json:
+                        quiz_context = (
+                            f"\n\nGrammar Quiz ({topic.replace('_', ' ').title()}):\n{quiz_json}"
+                        )
+                        logger.info(
+                            f"[Orchestrator] Injected grammar quiz for {topic} into context"
+                        )
+
         # Minimal prompt - let model handle naturally
         prompt = f"""Lesson {lesson_number}: {lesson_data['lesson_name']}
 
@@ -171,6 +200,7 @@ Vocabulary:
 {vocab_list}
 
 Grammar: {grammar_topics}
+{quiz_context}
 
 Student: {user_message}
 
@@ -192,8 +222,168 @@ Teacher:"""
         logger.info(response)
         logger.info("=" * 80)
 
-        # Detect if model needs other agents
-        # For now, just return response - model handles everything
-        # Future: detect [CONTENT:...] or [GRADE:...] signals
+        # Detect if student chose vocabulary or grammar section
+        # Pre-generate quizzes to avoid latency
+        user_lower = user_message.lower()
+        response_lower = response.lower()
+
+        if any(
+            trigger in user_lower or trigger in response_lower
+            for trigger in ["start with vocabulary", "vocabulary", "option 1", "1"]
+        ):
+            if "vocabulary" not in session or "current_batch_quiz" not in session["vocabulary"]:
+                # Pre-generate quiz for first vocabulary batch
+                self._generate_vocab_batch_quiz(session_id, batch_number=1)
+                logger.info("[Orchestrator] Pre-generated vocabulary batch 1 quiz")
+
+        if any(
+            trigger in user_lower or trigger in response_lower
+            for trigger in ["start with grammar", "grammar", "option 2", "2"]
+        ):
+            if "grammar" not in session or "quiz_questions" not in session["grammar"]:
+                # Pre-generate grammar quizzes for all topics
+                self._generate_grammar_quizzes(session_id)
+                logger.info("[Orchestrator] Pre-generated grammar quizzes")
 
         return response
+
+    def _generate_vocab_batch_quiz(self, session_id, batch_number):
+        """Pre-generate quiz for a vocabulary batch.
+
+        Args:
+            session_id: User session identifier
+            batch_number: Batch number (1-indexed)
+        """
+        session = self.sessions[session_id]
+        lesson_number = session["lesson_number"]
+
+        # Get words for this batch (batches of 6)
+        all_vocab = session["vocabulary"]["words"]
+        batch_size = 6
+        start_idx = (batch_number - 1) * batch_size
+        end_idx = min(start_idx + batch_size, len(all_vocab))
+        batch_words = all_vocab[start_idx:end_idx]
+
+        if not batch_words:
+            return
+
+        # Prepare learned items for ContentAgent
+        learned_items = [
+            f"{v['arabic']} ({v['transliteration']}) - {v['english']}" for v in batch_words
+        ]
+
+        # Generate quiz via ContentAgent
+        quiz_input = {
+            "quiz_type": "vocabulary",
+            "count": len(batch_words),  # One question per word
+            "difficulty": "beginner",
+            "learned_items": learned_items,
+            "lesson_number": lesson_number,
+        }
+
+        logger.info(
+            f"[Orchestrator] Generating vocab quiz for batch {batch_number} with {len(batch_words)} words"
+        )
+        quiz_json = self.content_agent.generate_quiz(quiz_input)
+
+        # Store in session
+        if "quizzes" not in session["vocabulary"]:
+            session["vocabulary"]["quizzes"] = {}
+        session["vocabulary"]["quizzes"][f"batch_{batch_number}"] = quiz_json
+
+        logger.info(f"[Orchestrator] Stored vocab batch {batch_number} quiz in session")
+
+    def _generate_grammar_quizzes(self, session_id):
+        """Pre-generate quizzes for all grammar topics.
+
+        Args:
+            session_id: User session identifier
+        """
+        session = self.sessions[session_id]
+        lesson_number = session["lesson_number"]
+        lesson_data = self.lesson_cache[lesson_number]
+
+        # Get all grammar topics
+        grammar_topics = lesson_data["grammar_points"]
+
+        for topic in grammar_topics:
+            # Generate quiz for this topic
+            quiz_input = {
+                "quiz_type": "grammar",
+                "count": 5,  # 5 questions per topic
+                "difficulty": "beginner",
+                "learned_items": [topic.replace("_", " ")],
+                "lesson_number": lesson_number,
+            }
+
+            logger.info(f"[Orchestrator] Generating grammar quiz for topic: {topic}")
+            quiz_json = self.content_agent.generate_quiz(quiz_input)
+
+            # Store in session
+            if "quizzes" not in session["grammar"]:
+                session["grammar"]["quizzes"] = {}
+            session["grammar"]["quizzes"][topic] = quiz_json
+
+            logger.info(f"[Orchestrator] Stored grammar quiz for {topic} in session")
+
+    def get_vocab_batch_quiz(self, session_id, batch_number):
+        """Get pre-generated vocabulary batch quiz.
+
+        Args:
+            session_id: User session identifier
+            batch_number: Batch number (1-indexed)
+
+        Returns:
+            str: Quiz JSON or None if not found
+        """
+        session = self.sessions.get(session_id)
+        if not session:
+            return None
+
+        quizzes = session.get("vocabulary", {}).get("quizzes", {})
+        quiz = quizzes.get(f"batch_{batch_number}")
+
+        if not quiz:
+            # Generate on demand if not pre-generated
+            logger.info(
+                f"[Orchestrator] Quiz not pre-generated, generating now for batch {batch_number}"
+            )
+            self._generate_vocab_batch_quiz(session_id, batch_number)
+            quiz = session.get("vocabulary", {}).get("quizzes", {}).get(f"batch_{batch_number}")
+
+        return quiz
+
+    def get_grammar_quiz(self, session_id, topic):
+        """Get pre-generated grammar topic quiz.
+
+        Args:
+            session_id: User session identifier
+            topic: Grammar topic name
+
+        Returns:
+            str: Quiz JSON or None if not found
+        """
+        session = self.sessions.get(session_id)
+        if not session:
+            return None
+
+        quizzes = session.get("grammar", {}).get("quizzes", {})
+        quiz = quizzes.get(topic)
+
+        if not quiz:
+            # Generate on demand if not pre-generated
+            logger.info(f"[Orchestrator] Quiz not pre-generated, generating now for topic {topic}")
+            lesson_number = session["lesson_number"]
+            quiz_input = {
+                "quiz_type": "grammar",
+                "count": 5,
+                "difficulty": "beginner",
+                "learned_items": [topic.replace("_", " ")],
+                "lesson_number": lesson_number,
+            }
+            quiz = self.content_agent.generate_quiz(quiz_input)
+            if "quizzes" not in session["grammar"]:
+                session["grammar"]["quizzes"] = {}
+            session["grammar"]["quizzes"][topic] = quiz
+
+        return quiz
