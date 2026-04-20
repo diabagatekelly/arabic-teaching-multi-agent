@@ -56,8 +56,8 @@ Or reference the data path in the notebook if running from the repo directory.
 Trained models are saved to EFS and can be uploaded to HuggingFace Hub directly from the notebooks.
 
 **Current models on Hub:**
-- `kdiabagate/qwen-7b-arabic-teaching` (Teaching Agent)
-- `kdiabagate/qwen-7b-arabic-grading` (Grading Agent)
+- `kdiabagate/qwen-7b-arabic-teaching` (Teaching Agent) - **PRODUCTION MODEL**
+- `kdiabagate/qwen-7b-arabic-grading` (Grading Agent) - Trained but not deployed (see models/README.md)
 
 ---
 

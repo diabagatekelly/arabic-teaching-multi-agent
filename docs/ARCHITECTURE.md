@@ -1,1107 +1,153 @@
 # Arabic Teaching Multi-Agent System - Architecture v2
 
-**Design Philosophy:** Separate content from style. Fine-tune for teaching behavior, use RAG for scalable grammar content.
+**Design Philosophy:** Separate content from style. Fine-tune for teaching behavior, use lesson cache for scalable content.
+
+## Core Problem
+
+**v1 approach:** Fine-tune model on specific grammar rules
+- Adding new grammar = retrain entire model
+- Doesn't scale past 5-10 grammar points
+
+**v2 approach:** Fine-tune for style, cache content from JSON
+- Adding new grammar = update lesson_cache.json
+- Scales to 100+ grammar points
+
+## Why Multi-Agent?
+
+Original plan had separate models for conflicting objectives (encouraging tone vs. accurate correction). Current implementation uses shared 7B teaching model for both presentation and grading, with orchestrator managing behavioral differences through prompts.
+
+**Agent 1 (Teaching):** Qwen2.5-7B + LoRA - Pedagogical style, user-facing
+**Agent 2 (Grading):** Same Qwen2.5-7B + LoRA - Evaluation with flexible matching
+**Agent 3 (Content):** lesson_cache.json - Pre-built content (RAG deprecated)
+
+**Trade-offs:** Single model simplifies deployment; orchestrator handles role-switching via prompts.
 
 ---
 
-## Core Problem We're Solving
+## Agent 1: Teaching Agent
 
-**Old approach (v1):** Fine-tune model on specific grammar rules
-- ❌ Adding new grammar = retrain entire model
-- ❌ Doesn't scale past 5-10 grammar points
-- ❌ Model memorizes examples, doesn't generalize
+**Model:** Qwen2.5-7B-Instruct + LoRA (kdiabagate/qwen-7b-arabic-teaching)
 
-**New approach (v2):** Fine-tune for style, RAG for content
-- ✅ Adding new grammar = upload markdown file (no retrain)
-- ✅ Scales to 100+ grammar points
-- ✅ Model learns teaching patterns, not specific rules
+**Responsibility:** Present content with encouraging pedagogical style
 
----
+**Input:** Structured variables (words, rules, scores) from lesson cache/orchestrator
 
-## Why This Approach?
-
-### Evolution: From Single Model to Multi-Agent
-
-**Initial approach:** Single Qwen2.5-3B fine-tuned to do everything
-- Teaching with encouraging tone
-- Grading student answers
-- Managing grammar facts
-
-**Problems encountered:**
-1. **Conflicting objectives:** Model struggled to balance encouraging tone while correcting errors properly
-2. **Catastrophic forgetting:** As grammar rules expanded, model couldn't retain earlier lessons without massive retraining
-3. **Content vs. style:** Model was memorizing specific grammar facts instead of learning teaching patterns
-
-**Solution:** Separate models with dedicated responsibilities + RAG for facts
-
-### Why Multi-Agent Architecture?
-
-The three-agent split maps directly to the three problems the single model couldn't solve:
-
-**Agent 1 (Teaching):** Handles tone and user interaction
-- Fine-tuned purely for pedagogical style
-- No grammar facts in training data (comes via variables from Agent 3)
-- Single focus: be encouraging and structured
-
-**Agent 2 (Grading):** Handles error identification and correctness
-- Factual, no tone requirements (Agent 1 wraps the output)
-- Can focus entirely on semantic accuracy
-- Uses larger model (7B) for better reasoning
-
-**Agent 3 (Content Retrieval):** Handles grammar facts via RAG
-- No fine-tuning needed (facts are data, not weights)
-- Expandable without retraining (add markdown files)
-- Eliminates catastrophic forgetting risk
-
-**Trade-offs:**
-- ✅ Solves all three core problems
-- ⚠️ More complex architecture to orchestrate
-- ⚠️ May have higher latency (multiple model calls)
-- ⚠️ Higher total cost (two models running)
-
-### Why Dual-Model Strategy (3B + 7B)?
-
-**Why not 3B for everything?**
-- Grading is the most critical component of the system
-- Incorrect grading breaks trust and learning effectiveness
-- Flexible grading (typos, synonyms, semantic matching) requires stronger reasoning
-- Testing showed 3B struggled with semantic comparison tasks
-
-**Why not 7B for everything?**
-- Memory conscious: 7GB total (3B + 7B) vs. 8GB for two 7B models
-- Teaching and generation are simpler tasks - 3B is sufficient
-- 3B inference is faster and cheaper for user-facing interactions
-
-**Result:** Use the right model for each task's complexity
-
-### Why Eval-First Development?
-
-**Background:** Test-Driven Development (TDD) practitioner in traditional software engineering
-
-**Reasoning:** If TDD works for deterministic code, evaluation-driven should work for non-deterministic LLM outputs
-- Define success criteria before building
-- Catch regressions immediately when changing prompts or models
-- Quantify improvement claims with numbers
-
-**Validation:** Later learned this is emerging industry best practice (DeepEval, LangSmith, etc.)
-
-**Experience:** Initial single-model attempt failed specifically because there were no clear success metrics - just "seems encouraging" or "mostly correct". Eval-first approach would have caught the conflicting objectives earlier.
-
-### What Makes This Different?
-
-**vs. Duolingo and similar apps:**
-1. **Explicit grammar teaching:** Focuses on understanding rules, not just learning phrases through conversation
-2. **Targeted practice:** Users can focus on specific vocabulary or grammar points they're struggling with
-3. **Arabic language support:** Built specifically for Arabic with transliteration, not adapted from Romance languages
-4. **Immediate, intelligent feedback:** Accepts typos, synonyms, and alternate phrasings (semantic grading vs. exact string matching)
-5. **Blended approach:** Can do guided full course (vocab + grammar from lesson 1) or targeted practice
-
-**Engineering approach:** This is good engineering with industry-standard patterns (multi-agent, RAG, eval-driven), not claiming novel research. The value is in thoughtful application of modern best practices to solve a real pedagogical problem.
-
----
-
-## Agent Architecture
-
-### 🎭 Agent 1: Teaching/Presentation Agent (The "Face")
-
-**Role:** Format content into pedagogical style
-
-**Single Job:** Take structured variables and present them in an encouraging, learner-friendly way
-
-**Responsibilities:**
-- Format lessons in structured, learner-friendly way
-- Maintain encouraging, supportive tone
-- Ask comprehension questions
-- Provide progress feedback
-
-**Does NOT:**
-- ❌ Access RAG directly
-- ❌ Retrieve content
-- ❌ Assemble prompts from scratch
-
-**Input Variables** (passed from Agent 3 or orchestrator):
-
-*Vocabulary modes:*
-```python
-# Mode: vocab_batch_introduction
-{
-    "lesson_number": 3,
-    "batch_number": 1,
-    "words": [
-        {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"},
-        {"arabic": "مَدْرَسَة", "transliteration": "madrasa", "english": "school"},
-        {"arabic": "قَلَم", "transliteration": "qalam", "english": "pen"}
-    ]
-}
-
-# Mode: vocab_batch_quiz (per word)
-{
-    "word": {"arabic": "كِتَاب", "transliteration": "kitaab"},
-    "question_type": "arabic_to_english"  # or "english_to_arabic"
-}
-
-# Mode: vocab_final_test (per word)
-{
-    "word": {"arabic": "مَدْرَسَة", "transliteration": "madrasa"},
-    "question_number": 3,
-    "total_questions": 10
-}
-```
-
-*Grammar modes:*
-```python
-# Mode: grammar_explanation
-{
-    "lesson_number": 3,
-    "topic_name": "Feminine Nouns",
-    "grammar_rule": "Feminine nouns usually end in ة (taa marbuuta)",
-    "examples": ["مَدْرَسَة (school) ✓", "كِتَاب (book - masculine) ✗"],
-    "topics_remaining": 1  # "After this, 1 more topic"
-}
-
-# Mode: grammar_quiz (per question)
-{
-    "lesson_number": 3,
-    "topic_name": "Feminine Nouns",
-    "question_number": 2,
-    "total_questions": 5,
-    "question": "Is بَيْت masculine or feminine?",
-    "correct_answer": "masculine"
-}
-```
-
-**Tools:**
-1. **LangChain PromptTemplate** - Formats variables into structured prompt
-2. **Fine-tuned LLM** (Qwen2.5-3B - teaching style) - Adds pedagogical style
-
-**Process:**
-```python
-from langchain.prompts import PromptTemplate
-
-# 1. LangChain template formats the structure
-template = PromptTemplate(
-    template="""You are teaching Lesson {lesson_number}.
-
-Grammar Rule: {grammar_rule}
-
-Examples:
-{examples}
-
-Vocabulary: {vocabulary}
-
-Present this in an encouraging, structured way with a comprehension question.""",
-    input_variables=["lesson_number", "grammar_rule", "examples", "vocabulary"]
-)
-
-# 2. Format with input variables
-prompt = template.format(**input_variables)
-
-# 3. Fine-tuned model adds pedagogical style
-response = teaching_llm.generate(prompt)
-```
-
-**Output Examples:**
-
-*Vocabulary Batch Introduction:*
-```
-"Let's learn Batch 1! Here are your first 3 words:
-
-📝 كِتَاب (kitaab) - book
-📝 مَدْرَسَة (madrasa) - school  
-📝 قَلَم (qalam) - pen
-
-Take your time reviewing these. When you're ready, let's test your knowledge!"
-```
-
-*Vocabulary Batch Quiz Feedback (correct):*
-```
-"Correct! ✓ كِتَاب = book. Great job!"
-```
-
-*Vocabulary Batch Quiz Feedback (incorrect):*
-```
-"Not quite! The word مَدْرَسَة (madrasa) means 'school', not 'house'. Try to remember: madrasa = school."
-```
-
-*Grammar Explanation:*
-```
-"Let's learn about Feminine Nouns! 🌟
-
-**The Rule:** In Arabic, most feminine nouns end with ة (taa marbuuta).
+**Output:** User-facing text with supportive tone
 
 **Examples:**
-- مَدْرَسَة (madrasa) - school ✓ (ends in ة)
-- كِتَاب (kitaab) - book (masculine, no ة)
+- Batch intro: "Let's learn Batch 1! Here are your first 3 words..."
+- Feedback (correct): "Correct! ✓ كِتَاب = book. Great job!"
+- Feedback (incorrect): "Not quite! مَدْرَسَة (madrasa) means 'school', not 'house'."
 
-**Quick Check:** Look at the word بِنْت (bint - girl). Does it end in ة?"
-```
+**Training:** 153 multi-turn conversations on teaching patterns (not specific content)
 
-*Grammar Quiz Question:*
-```
-"Question 2 of 5: Is the word بَيْت (bayt - house) masculine or feminine?"
-```
-
-*Grammar Quiz Feedback (correct):*
-```
-"Correct! ✓ بَيْت is masculine (no ة ending). You're doing great! (2/2 so far)"
-```
-
-*Grammar Quiz Feedback (incorrect):*
-```
-"Not quite. مَدْرَسَة is feminine because it ends in ة (taa marbuuta). The ة is the key indicator! (1/2 so far)"
-```
-
-**Fine-tuned On:**
-- Vocabulary teaching patterns (~15 conversations)
-  - Batch introductions with Arabic + transliteration + English
-  - Per-word quiz feedback (correct/incorrect)
-  - Final test feedback
-- Grammar teaching patterns (~25 conversations)
-  - Structured explanations with rule + examples
-  - Comprehension questions
-  - Quiz feedback with running score
-  - Review suggestions
-- Encouraging, supportive tone throughout
-- **NOT** specific vocabulary words or grammar rules (content comes via variables)
+**Deployment:** HuggingFace model hub, loaded with LoRA adapter merged at startup
 
 ---
 
-### ✅ Agent 2: Grading Agent (The "Grader")
+## Agent 2: Grading Agent
 
-**Role:** Flexible, accurate grading - receives structured input, returns JSON
+**Model:** Same as Agent 1 - Qwen2.5-7B-Instruct + LoRA (kdiabagate/qwen-7b-arabic-teaching)
 
-**Single Job:** Evaluate student answers with semantic understanding and flexible matching
+**Responsibility:** Evaluate answers with flexible matching, return JSON
 
-**Implementation Status:** ✅ **IMPLEMENTED** (baseline evaluated, fine-tuning planned)
+**Edge Cases:** Accepts synonyms, typos, capitalization; for Arabic: internal harakaat optional, case endings required
 
-**Model:** Qwen2.5-7B-Instruct
-- **Baseline Results:** Strong reasoning (83% correct on edge cases), poor JSON compliance (0-6%)
-- **Status:** Needs fine-tuning for format compliance and harakaat rules
-- **Next Step:** Fine-tune on 270+ examples for JSON-only output and flexible grading
-
-**Responsibilities:**
-- Grade vocabulary translations (English ↔ Arabic)
-- Grade grammar quiz answers (single questions)
-- Grade grammar tests (multiple questions)
-- Handle edge cases: synonyms, typos, capitalization, articles, harakaat variations
-
-**Does NOT:**
-- ❌ Access RAG (answers and rules passed via prompt)
-- ❌ Be encouraging (just factual correctness)
-- ❌ Format for user (Agent 1 wraps output in friendly tone)
-
-**Grading Modes:**
-
-**1. Vocabulary Grading (mode: grading_vocab)**
+**Input/Output:**
 ```python
-# Input
-{
-    "word": "كِتَاب",
-    "student_answer": "book",
-    "correct_answer": "book"
-}
-
-# Output
-{"correct": true}  # or {"correct": false}
+{"word": "كِتَاب", "student_answer": "book", "correct_answer": "book"}
+→ {"correct": true}
 ```
 
-**2. Grammar Quiz (mode: grading_grammar, single question)**
-```python
-# Input
-{
-    "question": "Is the word مَدْرَسَة masculine or feminine?",
-    "student_answer": "feminine",
-    "correct_answer": "feminine"
-}
+**Implementation:** Lazy-loaded on first grading call via orchestrator. Uses same teaching model but with different prompts (GRADING_VOCAB, GRADING_GRAMMAR_QUIZ templates) and lower temperature (0.1) for deterministic JSON output.
 
-# Output
-{"correct": true}  # or {"correct": false}
-```
-
-**3. Grammar Test (mode: grading_grammar, multiple questions)**
-```python
-# Input
-{
-    "lesson_number": 3,
-    "answers": [
-        {
-            "question_id": "q1",
-            "question": "Is مَدْرَسَة masculine or feminine?",
-            "student_answer": "feminine",
-            "correct_answer": "feminine"
-        },
-        {
-            "question_id": "q2",
-            "question": "Is كِتَاب masculine or feminine?",
-            "student_answer": "feminine",
-            "correct_answer": "masculine"
-        }
-    ]
-}
-
-# Output
-{
-    "total_score": "1/2",
-    "results": [
-        {"question_id": "q1", "correct": true},
-        {"question_id": "q2", "correct": false}
-    ]
-}
-```
-
-**Edge Cases Handled:**
-
-The grading agent must handle real-world student variations:
-
-| Edge Case | Example | Expected Behavior |
-|-----------|---------|-------------------|
-| **Synonyms** | "instructor" vs "teacher" | ✅ Accept both |
-| **Minor typos** | "scool" vs "school" | ✅ Accept with 1-2 char errors |
-| **Capitalization** | "Book" vs "book" | ✅ Ignore case differences |
-| **Articles** | "a pen" vs "pen" | ✅ Ignore articles |
-| **Harakaat (Arabic)** | Internal vowels | ✅ Optional (الكتابُ = الكِتَابُ) |
-| **Case endings (Arabic)** | Final harakaat | ❌ **Required** (الكتاب ≠ الكِتَابُ) |
-
-**Baseline Evaluation Results (7B - 2026-04-13):**
-
-| Category | 7B Performance | Notes |
-|----------|----------------|-------|
-| **JSON Compliance** | 0-6% ✗ | Adds explanations after JSON |
-| **Synonyms** | 100% ✓ | Correctly accepted "instructor"→"teacher" |
-| **Typos** | 100% ✓ | Correctly accepted "scool"→"school" |
-| **Capitalization** | 100% ✓ | Correctly accepted "Book"→"book" |
-| **Wrong answers** | 100% ✓ | Correctly rejected "pen"→"book" |
-| **Case endings** | 100% ✓ | Correctly enforced nominative/accusative |
-| **Internal harakaat** | 0% ✗ | Too strict - didn't follow "optional" rule |
-| **Overall reasoning** | 83% (5/6) | Strong reasoning, format issues |
-
-**Why Fine-Tuning is Needed:**
-
-1. **Format compliance**: Model outputs `{"correct": true} Here's why...` instead of just JSON
-2. **Harakaat flexibility**: Model doesn't follow the "internal optional, case endings required" rule
-3. **Strong reasoning baseline**: The 7B model makes correct grading decisions, just needs format training
-
-**Fine-Tuning Plan:** 270+ examples covering JSON-only format, harakaat rules, and edge case handling.
+**Status:** Active and deployed (uses teaching model, differentiated by inference config)
 
 ---
 
-### 📚 Agent 3: Content Retrieval Agent (The "Librarian")
+## Agent 3: Content Agent
 
-**Role:** Retrieve content from RAG and prepare data for other agents
+**Model:** None (deprecated in production)
 
-**Single Job:** Fetch lesson content and assemble it into formats that Agent 1 and Agent 2 can use
+**Responsibility:** Serve pre-built lesson content from lesson_cache.json
 
-**When Lesson Starts:**
-```
-Backend: "User starting Lesson 3"
-  ↓ (provides structure)
-Backend → Orchestrator: {
-    lesson: 3,
-    vocab: {total: 10, batches: [3,3,3,1]},
-    grammar: {topics: ["feminine_nouns", "definite_article"]}
-}
-  ↓
-Orchestrator → Agent 3: "Prepare lesson 3"
-  ↓
-Agent 3:
-  1. Retrieves ALL Lesson 3 content from RAG (vocabulary + grammar)
-  2. Splits vocabulary into batches per backend structure
-  3. Holds everything in memory (no more RAG queries during lesson)
-  4. Sends grammar rules to Agent 2 for pre-loading
-  ↓
-Agent 3 → Orchestrator: "Ready. Content cached."
-```
+**Flow:**
+1. Lesson starts → load ALL vocab + grammar from lesson_cache.json
+2. Cache content in orchestrator session state
+3. Serve content on-demand to Agents 1 & 2
+4. No dynamic exercise generation (uses fixed quizzes from cache)
 
-**Responsibilities:**
-- **At lesson start:** Retrieve ALL content (vocabulary + grammar) and hold in memory
-- Split vocabulary into batches per backend-provided structure
-- Serve vocabulary words on-demand (from memory, not RAG)
-- Serve grammar content on-demand (from memory, not RAG)
-- Assemble prompt variables for Agent 1
-- Pre-load grammar rules for Agent 2
-- Generate exercises using lightweight LLM + cached content
+**Data Structure:** lesson_cache.json with pre-built lessons (vocabulary, grammar sections, difficulty)
 
-**Does NOT:**
-- ❌ Generate student-facing content (Agent 1 does that)
-- ❌ Grade answers (Agent 2 does that)
+**RAG Status:** RAG infrastructure exists (Pinecone, embeddings) but not used in production. Content is pre-built via `scripts/build_lesson_cache.py` instead.
 
-**Inputs:**
-
-*From Backend (lesson structure):*
-- Lesson number
-- Vocabulary batch structure (e.g., [3, 3, 3, 1])
-- Grammar topics list (e.g., ["feminine_nouns", "definite_article"])
-
-*Retrieval queries (to RAG):*
-- Lesson number → retrieve all vocabulary and grammar content
-- Grammar point name (optional - for specific queries)
-- Exercise type (fill-in-blank, translation, etc.)
-
-**Note on Content Flow:**
-- Backend provides STRUCTURE (how many batches, which topics)
-- Agent 3 retrieves CONTENT (actual words, rules, examples) from RAG
-- Agent 3 holds content in memory throughout lesson (no repeated RAG queries)
-
-**Outputs:**
-
-*For Agent 1 (vocabulary teaching):*
-```python
-# Batch introduction
-{
-    "lesson_number": 3,
-    "batch_number": 1,
-    "words": [
-        {"arabic": "كِتَاب", "transliteration": "kitaab", "english": "book"},
-        {"arabic": "مَدْرَسَة", "transliteration": "madrasa", "english": "school"},
-        {"arabic": "قَلَم", "transliteration": "qalam", "english": "pen"}
-    ]
-}
-
-# Batch quiz (per word)
-{
-    "word": {"arabic": "كِتَاب", "transliteration": "kitaab"},
-    "question_type": "arabic_to_english"
-}
-```
-
-*For Agent 1 (grammar teaching):*
-```python
-# Topic explanation
-{
-    "lesson_number": 3,
-    "topic_name": "Feminine Nouns",
-    "grammar_rule": "Feminine nouns usually end in ة (taa marbuuta)",
-    "examples": ["مَدْرَسَة (school) ✓", "كِتَاب (book - masculine) ✗"],
-    "topics_remaining": 1
-}
-
-# Topic quiz (per question)
-{
-    "lesson_number": 3,
-    "topic_name": "Feminine Nouns",
-    "question_number": 2,
-    "total_questions": 5,
-    "question": "Is بَيْت masculine or feminine?"
-}
-```
-
-For Agent 2 (grading):
-```python
-{
-    "lesson": 3,
-    "grammar_rules": {
-        "gender_agreement": {
-            "rule": "Adjectives must match noun gender",
-            "detection_pattern": "If noun.gender ≠ adj.gender → error",
-            "error_types": ["gender_mismatch"]
-        },
-        "definiteness_agreement": {
-            "rule": "Adjectives must match noun definiteness",
-            "detection_pattern": "If noun has ال but adj doesn't → error",
-            "error_types": ["definiteness_mismatch"]
-        }
-    }
-}
-```
-
-**Tools:**
-1. **Vector Database** (ChromaDB/Pinecone) - Stores lesson content and exercise templates
-2. **Semantic Search** - Finds relevant content by meaning
-3. **Metadata Filtering** - Filters by lesson number, grammar point, difficulty
-4. **Lightweight LLM** - Generates exercises from templates + vocabulary
-5. **LangChain PromptTemplate** - Assembles prompts for Agent 1 and Agent 2
-
-**RAG Database Structure:**
-```
-data/rag_database/
-├── lessons/
-│   ├── lesson_01_gender_definiteness.md
-│   ├── lesson_02_pronouns_nominal.md
-│   ├── lesson_03_adjective_agreement.md
-│   ├── lesson_04_present_tense.md
-│   ├── lesson_05_past_tense.md
-│   ├── lesson_06_negation.md
-│   ├── lesson_07_questions.md
-│   ├── lesson_08_possessive_idaafah.md
-│   └── ... (expand to 25+ lessons)
-│
-└── exercises/
-    ├── gender_agreement_fill_blank.md
-    ├── definiteness_translation.md
-    ├── verb_conjugation_practice.md
-    └── ...
-```
-
-**Example Lesson File Metadata:**
-```markdown
----
-lesson_number: 3
-grammar_points: 
-  - noun_adjective_agreement
-  - gender_agreement
-  - definiteness_agreement
-prerequisites: [1, 2]
-difficulty: intermediate
-vocabulary: [كبير, صغير, جميل, جديد, قديم]
----
-
-# Lesson 3: Noun-Adjective Agreement
-
-## Grammar Rules
-...
-```
-
-**Process Flow:**
-
-**Lesson Initialization (happens once):**
-```python
-# 1. Receive lesson structure from backend
-lesson_structure = backend.get_lesson_structure(3)
-# {
-#     "lesson": 3,
-#     "vocab": {"total": 10, "batches": [3, 3, 3, 1]},
-#     "grammar": {"topics": ["feminine_nouns", "definite_article"]}
-# }
-
-# 2. Retrieve ALL content from RAG (one-time query)
-vocab_content = vectorstore.query(
-    filter={"lesson_number": 3, "content_type": "vocabulary"}
-)
-# Returns all 10 words with metadata
-
-grammar_content = vectorstore.query(
-    filter={"lesson_number": 3, "content_type": "grammar"}
-)
-# Returns all grammar rules, examples, patterns
-
-# 3. Cache everything in memory
-self.cached_vocab = vocab_content.words  # All 10 words
-self.vocab_batches = split_into_batches(
-    self.cached_vocab, 
-    lesson_structure["vocab"]["batches"]
-)  # [[3 words], [3 words], [3 words], [1 word]]
-
-self.cached_grammar = {
-    topic: grammar_content[topic]
-    for topic in lesson_structure["grammar"]["topics"]
-}
-
-# 4. Pre-load Agent 2 with grammar rules
-agent2.preload_rules(grammar_content.rules)
-
-# → Ready! No more RAG queries during this lesson
-```
-
-**Serving Content (from memory):**
-```python
-# Vocabulary batch introduction
-def get_batch_content(batch_number):
-    # No RAG query - serve from memory
-    return self.vocab_batches[batch_number - 1]
-
-# Grammar topic explanation
-def get_topic_content(topic_name):
-    # No RAG query - serve from memory
-    return self.cached_grammar[topic_name]
-
-# Format for Agent 1
-agent1_variables = {
-    "lesson_number": 3,
-    "batch_number": 1,
-    "words": self.vocab_batches[0]
-}
-# → Agent 1 uses these with LangChain template
-```
-
-**For Agent 2 Pre-loading (happens at lesson start):**
-```python
-# Format rules for Agent 2's pre-loading
-agent2_rules = {
-    "lesson": 3,
-    "grammar_rules": {
-        rule.name: {
-            "rule": rule.description,
-            "detection_pattern": rule.pattern,
-            "error_types": rule.error_types
-        }
-        for rule in self.cached_grammar.values()
-    }
-}
-# → Agent 2 pre-loads these rules and keeps them ready for grading
-```
-
-**For Exercise Generation:**
-```python
-# 1. Retrieve template (could also be cached at lesson start)
-template = vectorstore.query(
-    filter={"type": "exercise", "grammar_point": "gender_agreement"}
-)
-
-# 2. Use cached vocabulary (already in memory from lesson initialization)
-primary_vocab = self.cached_vocab[:3]  # Current batch words
-all_vocab = self.cached_vocab  # All lesson vocabulary
-
-# 3. Generate new exercises using LLM + cached content
-generation_prompt = f"""Generate 5 fill-in-blank exercises.
-
-Template: {template.structure}
-Primary vocabulary (current batch): {primary_vocab}
-All lesson vocabulary: {all_vocab}
-Grammar focus: Gender agreement
-
-Focus on primary vocabulary, use others for variety.
-
-Output JSON array of exercises."""
-
-exercises = lightweight_llm.generate(generation_prompt)
-# Returns: [
-#   {"question": "Complete: كتاب ___", "answer": "كبير", "options": ["كبير", "كبيرة"]},
-#   ...
-# ]
-```
-
-**For Test Composition:**
-```python
-# 6. Generate mixed test with multiple grammar points
-test_content = {
-    "lesson": 3,
-    "num_questions": 10,
-    "grammar_points": ["gender_agreement", "definiteness_agreement"]
-}
-
-# Agent 3 generates variety of questions
-test = lightweight_llm.generate_test(test_content)
-```
-
-**LLM Choice for Agent 3:**
-- **Option A:** Fine-tuned Qwen2.5-3B (same as Agent 1, optimized for exercise generation patterns)
-- **Option B:** Base Qwen2.5-3B with prompting (no fine-tuning, simpler approach)
-- **Option C:** Base Qwen2.5-7B (same as Agent 2, better reasoning for complex generation)
-
-**Recommendation:** Start with Option B (base 3B with prompting). Fine-tune later if exercise quality needs improvement.
-
----
+**Trade-off:** Faster, more reliable (no vector DB latency), but less dynamic content generation.
 
 ## State Management
 
-### Lesson Structure Provided by Backend
+**Tracked by Orchestrator:**
+- Lesson progress (vocab/grammar modes, scores, quiz state, current batch)
+- Session state (lesson_number, lesson_name, vocabulary/grammar sections)
+- Lesson content cache (loaded from lesson_cache.json at lesson start)
+- File-based persistence (sessions.json for cross-request state in ZeroGPU)
 
-**Backend Responsibilities:**
-- Provide lesson structure (vocabulary batches, grammar topics list)
-- Track student progress (which batches/topics completed)
-- Determine when to move to next section
-
-**Agent 3 Responsibilities:**
-- Retrieve ALL content for lesson upfront (vocabulary + grammar)
-- Hold content in memory (no repeated RAG queries)
-- Serve content on-demand as lesson progresses
-
-**Example Lesson Structure from Backend:**
+**Session Schema:**
 ```python
 {
-    "lesson_number": 3,
+    "lesson_number": 1,
+    "lesson_name": "Gender and Definite Article",
     "vocabulary": {
-        "total_words": 10,
-        "batch_structure": [3, 3, 3, 1],  # 4 batches
-        "words": [...]  # Backend provides list
+        "words": [...],
+        "current_batch": 1,
+        "quizzed_words": [],
+        "quiz_state": {...}
     },
     "grammar": {
-        "topics": ["feminine_nouns", "definite_article"],
-        "quiz_per_topic": 5  # 5 questions each
-    }
-}
-```
-
-### Conversation State Schema
-
-**Tracked by Orchestrator:**
-```python
-class ConversationState(TypedDict):
-    lesson_number: int
-    
-    # Vocabulary progress
-    vocab_mode: str  # "batch_intro" | "batch_quiz" | "final_test" | "complete"
-    vocab_batches_completed: List[int]  # [1, 2]
-    current_vocab_batch: int  # 3
-    vocab_batch_scores: Dict[int, str]  # {1: "2/3", 2: "3/3"}
-    vocab_words_missed: List[str]  # ["مَدْرَسَة", "بَيْت"]
-    vocab_final_test_score: Optional[str]  # "8/10"
-    
-    # Grammar progress
-    grammar_mode: str  # "explanation" | "quiz" | "review" | "complete"
-    grammar_topics_completed: List[str]  # ["feminine_nouns"]
-    current_grammar_topic: str  # "definite_article"
-    topic_quiz_scores: Dict[str, str]  # {"feminine_nouns": "3/5"}
-    grammar_topics_needing_review: List[str]  # ["feminine_nouns"]
-    
-    # Agent 3 cache (loaded once per lesson)
-    cached_vocab_words: List[Dict]  # All 10 words
-    cached_grammar_content: Dict[str, Dict]  # All grammar rules + examples
-    
-    # Agent 2 pre-load (loaded once per lesson)
-    preloaded_grammar_rules: Dict  # All rules for grading
-    
-    conversation_history: List[dict]
-```
-
-**State Flow Example:**
-
-*Lesson Start:*
-```python
-state = {
-    "lesson_number": 3,
-    "vocab_mode": "batch_intro",
-    "current_vocab_batch": 1,
-    "vocab_batches_completed": [],
-    # Agent 3 retrieves everything upfront:
-    "cached_vocab_words": [...],  # All 10 words
-    "cached_grammar_content": {...},  # All topics
-    # Agent 2 pre-loads all rules:
-    "preloaded_grammar_rules": {...}
-}
-```
-
-*After Batch 1 Quiz:*
-```python
-state = {
-    ...
-    "vocab_batches_completed": [1],
-    "vocab_batch_scores": {1: "2/3"},
-    "vocab_words_missed": ["مَدْرَسَة"],
-    "current_vocab_batch": 2
-}
-```
-
-*Vocabulary Complete, Starting Grammar:*
-```python
-state = {
-    ...
-    "vocab_mode": "complete",
-    "vocab_final_test_score": "8/10",
-    "grammar_mode": "explanation",
-    "current_grammar_topic": "feminine_nouns",
-    "grammar_topics_completed": []
-}
-```
-
-*After Grammar Topic 1 Quiz (Score < 4/5):*
-```python
-state = {
-    ...
-    "grammar_topics_completed": ["feminine_nouns"],
-    "topic_quiz_scores": {"feminine_nouns": "3/5"},
-    "grammar_topics_needing_review": ["feminine_nouns"],
-    # Orchestrator asks: "Review or continue?"
-}
-```
-
----
-
-## Agent Interaction Flows
-
-**Note:** Detailed interaction flows with mermaid diagrams are documented in `INTERACTION_FLOWS.md`
-
----
-
-## Key Design Decisions
-
-### 1. Agent 1 is Always the "Face"
-
-**Why:** Consistency in tone and presentation
-- All user-facing text goes through Agent 1
-- Other agents provide structured data
-- Agent 1 wraps data in pedagogical style
-
-### 2. Agent 2 Outputs Structured Data (JSON)
-
-**Why:** Clear separation of evaluation vs. presentation
-- Agent 2 focuses purely on correctness
-- No need to be "nice" - just accurate
-- Agent 1 handles making it encouraging
-
-### 3. Agent 3 Retrieves + Generates Content
-
-**Why:** Scalability without memorization
-- Grammar rules stored in RAG (data, not model weights)
-- Exercise templates stored in RAG
-- Lightweight LLM generates exercise variations from templates
-- Add new lesson = upload markdown file (no retraining)
-- Add new exercise type = upload new template (no retraining)
-
-### 4. Fine-Tuning for Behavior, Not Facts
-
-**Why:** Efficient scaling
-- Train once on ~110 style examples
-- Model learns "how to teach" not "what to teach"
-- Content lives in RAG (easily updatable)
-
----
-
-## Training Data Strategy
-
-**Initial Approach:** Fine-tune only Agent 1 (Teaching). Use base models with prompting for Agent 2 (Grading) and Agent 3 (Generation).
-
-### Teaching Agent Training Dataset
-
-**Total Size:** ~40 conversations
-
-```
-teaching_training_data.jsonl
-├─ Vocabulary batch introduction (~10 conversations)
-├─ Vocabulary quiz feedback (~10 conversations)
-├─ Grammar explanation (~15 conversations)
-└─ Grammar quiz feedback (~5 conversations)
-```
-
-**Optional Future Fine-Tuning:**
-- Agent 2 (Grading): If baseline evaluation shows accuracy issues (~40 grading conversations)
-- Agent 3 (Generation): If exercise quality needs improvement (~30 generation conversations)
-
----
-
-### Mode 1: Teaching Style (~40 conversations)
-
-**Focus:** Encouraging pedagogy, structured presentations, comprehension questions
-
-**Sub-modes:**
-- Vocabulary batch introduction (~10 conversations)
-- Vocabulary quiz feedback (~10 conversations)
-- Grammar explanation (~15 conversations)
-- Grammar quiz feedback (~5 conversations)
-
-**System prompt patterns:**
-
-*Vocabulary batch introduction:*
-```
-Mode: vocab_batch_introduction
-Lesson: {lesson_number}
-Batch: {batch_number}
-Words: {word_list_with_transliteration}
-```
-
-**Example conversation:**
-```json
-{
-  "messages": [
-    {
-      "role": "system",
-      "content": "Mode: vocab_batch_introduction\nLesson: 3\nBatch: 1\nWords: [{\"arabic\": \"كِتَاب\", \"transliteration\": \"kitaab\", \"english\": \"book\"}, {\"arabic\": \"مَدْرَسَة\", \"transliteration\": \"madrasa\", \"english\": \"school\"}, {\"arabic\": \"قَلَم\", \"transliteration\": \"qalam\", \"english\": \"pen\"}]"
+        "topics": {...},
+        "sections": {...}
     },
-    {"role": "user", "content": "Show me batch 1"},
-    {
-      "role": "assistant",
-      "content": "Let's learn Batch 1! Here are your first 3 words:\n\n📝 كِتَاب (kitaab) - book\n📝 مَدْرَسَة (madrasa) - school\n📝 قَلَم (qalam) - pen\n\nTake your time reviewing these. When you're ready, let's test your knowledge!"
-    }
-  ]
+    "current_progress": "vocab_batch_intro",
+    "status": "active"
 }
 ```
 
-*Grammar explanation:*
-```
-Mode: grammar_explanation
-Lesson: {lesson_number}
-Topic: {topic_name}
-Grammar Rule: {rule_description}
-Examples: {examples}
-```
+See `orchestrator.py:start_lesson()` for full implementation.
 
-**Example conversation:**
-```json
-{
-  "messages": [
-    {
-      "role": "system", 
-      "content": "Mode: grammar_explanation\nLesson: 3\nTopic: Feminine Nouns\nGrammar Rule: Feminine nouns usually end in ة (taa marbuuta)\nExamples: مَدْرَسَة (school) ✓, كِتَاب (book - masculine) ✗"
-    },
-    {"role": "user", "content": "Teach me this topic"},
-    {
-      "role": "assistant", 
-      "content": "Let's learn about Feminine Nouns! 🌟\n\n**The Rule:**\nIn Arabic, most feminine nouns end with ة (taa marbuuta).\n\n**Examples:**\n- مَدْرَسَة (madrasa) - school ✓ (ends in ة)\n- كِتَاب (kitaab) - book (masculine, no ة)\n\n**Quick Check:** Look at the word بِنْت (bint - girl). Does it end in ة?"
-    }
-  ]
-}
-```
+## Training Data
 
-**Key:** Uses placeholders in system prompt - actual content inserted at inference from Agent 3's cache
+**Agent 1 (Teaching):** 153 multi-turn conversations on teaching patterns (vocab intro, feedback, grammar explanations)
+**Agent 2 (Grading):** Uses same teaching model as Agent 1, differentiated by prompts + inference config
+**Agent 3 (Content):** No model - uses pre-built lesson_cache.json generated from data/lessons/
 
----
+## Scalability
 
-### Agent 2 & 3: Base Models with Prompting (Not Fine-Tuned Initially)
-
-**Agent 2 (Grading) - Qwen2.5-7B Base:**
-- Uses detailed prompts with grammar rules and flexible matching instructions
-- Accepts typos, synonyms, abbreviations through prompt guidance
-- Returns JSON with grading results
-- Will fine-tune only if baseline evaluation shows accuracy issues
-
-**Agent 3 (Generation) - Qwen2.5-3B Base:**
-- Uses prompts with exercise templates and cached vocabulary
-- Generates varied exercises from templates
-- Returns JSON array of exercises
-- Will fine-tune only if exercise quality needs improvement
-
-**Note:** Both agents rely on good prompting initially. Fine-tuning is optional based on baseline evaluation results.
-
----
-
-## Scalability: Adding New Grammar
-
-**Old approach (v1):**
-1. Write 20-30 new training examples
-2. Retrain model (20-30 min)
-3. Test and validate
-4. Repeat for each new grammar point
-
-**New approach (v2):**
-1. Write `lesson_XX_new_grammar.md` (5 min):
-```markdown
----
-lesson: 5
-grammar_point: negation_particles
----
-
-# Negation in Arabic
-
-## Rule
-Use لا for present/future, ما for past
-
-## Examples
-- لا أكتب (I don't write) ✓
-- ما كتبت (I didn't write) ✓
-
-## Detection Pattern
-If negation particle doesn't match tense → ERROR
-```
-
-2. Upload to RAG database (1 min)
-3. Test immediately (no retrain needed!)
-4. **Total time: 6 minutes vs. 30+ minutes**
-
----
-
-## Model Strategy
-
-### Two-Model Architecture
-
-**Agent 1 (Teaching):** Qwen2.5-3B-Instruct (fine-tuned)
-- Fine-tuned on ~40 teaching conversations
-- Optimized for encouraging tone and pedagogical structure
-- Lightweight (2GB with 4-bit quantization)
-- Fast inference for real-time teaching interactions
-
-**Agent 2 (Grading):** Qwen2.5-7B-Instruct (fine-tuning required)
-- Better reasoning for semantic comparison
-- Strong Arabic comprehension
-- Handles flexible grading (typos, synonyms, abbreviations)
-- **Baseline evaluation (2026-04-13)**: 83% correct reasoning but poor JSON compliance (0-6%)
-- **Fine-tuning planned**: 270+ examples for JSON-only output and harakaat rules
-
-**Agent 3 (Generation):** Qwen2.5-3B-Instruct (base with prompting)
-- Uses base 3B model initially (no fine-tuning needed)
-- Can fine-tune later for exercise generation patterns if needed
-- Generates exercises from templates using cached vocabulary
-
-**Why Two Different Models:**
-- **Teaching needs fine-tuning:** Specific tone/style requirements for user-facing content
-- **Grading needs reasoning:** 7B provides better semantic understanding for flexible matching
-- **Separation of concerns:** Teaching optimized for friendliness, grading optimized for accuracy
-
-**Training Strategy (Agent 1 Only):**
-```
-Fine-tune Qwen2.5-3B on teaching conversations (~40 total):
-├─ Vocabulary batch introduction (~10 conversations)
-├─ Vocabulary quiz feedback (~10 conversations)
-├─ Grammar explanation (~15 conversations)
-└─ Grammar quiz feedback (~5 conversations)
-```
-
-**Memory Requirements:**
-- 3B Model (4-bit): ~2GB
-- 7B Model (4-bit): ~4GB
-- Context (1536 tokens): ~1GB per model
-- Total: ~7GB RAM (both models loaded)
-
-**Why 3B for Teaching:**
-- Sufficient for style learning (not memorizing content)
-- Fast inference for interactive teaching
-- Small training dataset (40 conversations)
-
-**Why 7B for Grading:**
-- Better reasoning for semantic comparison
-- Stronger Arabic language understanding
-- More reliable for critical grading decisions
-- Reduces false negatives/positives
-
----
+Adding new grammar: Update lesson_cache.json via build script (~2 min) vs. retrain model (30+ min)
 
 ## Technology Stack
 
-| Component | Tool | Why |
-|-----------|------|-----|
-| Orchestration | LangGraph | State management, agent routing |
-| **Agent 1 LLM** | **Qwen2.5-3B (fine-tuned)** | **Teaching style - encouraging, structured** |
-| **Agent 2 LLM** | **Qwen2.5-7B (base)** | **Grading - better reasoning, Arabic comprehension** |
-| **Agent 3 LLM** | **Qwen2.5-3B (base)** | **Exercise generation - prompting sufficient** |
-| Agent 3 RAG | Pinecone | Cloud vector database, scalable retrieval |
-| Prompt Assembly | LangChain PromptTemplate | Variable formatting for all agents |
-| Vector Embeddings | `all-MiniLM-L6-v2` (sentence-transformers) | Free, 384-dim embeddings, used in assignment 8 |
-| Evaluation | DeepEval + Qwen2.5-7B | Automated testing with LLM-as-a-Judge for alignment |
-
----
+- **Orchestration:** Custom state machine in `orchestrator.py` (LangGraph removed)
+- **Models:** Qwen2.5-7B-Instruct + LoRA (single model for both teaching and grading)
+- **UI:** Gradio (gr.Blocks) with chat interface and flashcards
+- **Deployment:** HuggingFace Spaces with ZeroGPU (@spaces.GPU decorator)
+- **Content:** Pre-built lesson_cache.json (RAG deprecated)
+- **Evaluation:** DeepEval with LLM-as-a-Judge
 
 ## Success Metrics
 
-### Agent 1 (Teaching)
-- ✅ Maintains encouraging tone (95%+ positive sentiment)
-- ✅ Structures explanations clearly
-- ✅ Asks comprehension questions proactively
-
-### Agent 2 (Error Detection)
-- ✅ 90%+ accuracy on correct/incorrect classification
-- ✅ Identifies error type correctly
-- ✅ Generalizes to unseen grammar points
-
-### Agent 3 (Content Retrieval)
-- ✅ Retrieves relevant rules (90%+ relevance score)
-- ✅ Fast retrieval (<500ms)
-- ✅ Handles 100+ grammar points without degradation
-
-### Overall System
-- ✅ Can add new grammar in <10 minutes
-- ✅ No retraining needed for content expansion
-- ✅ Student satisfaction: encouraging + accurate feedback
+- Agent 1 (Teaching): 95%+ positive sentiment, natural conversation flow
+- Agent 2 (Grading): 90%+ grading accuracy with flexible matching
+- Agent 3 (Content): <100ms cache lookup, 100% availability
+- System: Add grammar in <10 min without retraining
 
 ---
 
-## Next Steps
+**Status:** Production deployed on HuggingFace Spaces  
+**Created:** 2026-04-03  
+**Last Updated:** 2026-04-20 (aligned with actual implementation)  
+**See also:** `INFERENCE.md`, `DEPLOYMENT.md`, `PROMPTS_INVENTORY.md`
 
-Following modern **Eval-Driven Development** approach (2026 best practices):
-
-### Phase 1: Foundation (Define Success First)
-1. **Create evaluation dataset** - Test cases with expected outputs
-2. **Set up DeepEval pipeline** - Automated testing, baseline scores
-3. **Build RAG database** - Lessons 1-8 grammar rules and templates
-
-### Phase 2: Core Components (Build & Measure)
-4. **Create training data** - 40 teaching conversations for Agent 1
-5. **Fine-tune Qwen2.5-3B** - Agent 1 teaching style only
-6. **Build Agent 2** (Grading) - Use base Qwen2.5-7B with prompting, test against evals
-7. **Build Agent 3** (Content Retrieval + Generation) - Use base Qwen2.5-3B with prompting, test in isolation
-8. **Build Agent 1** (Teaching Presentation) - Use fine-tuned 3B, test in isolation
-9. **Evaluate grading accuracy** - If <90%, create grading training data and fine-tune 7B
-
-### Phase 3: Integration (Orchestrate)
-9. **Build simple orchestrator** - Basic routing between agents
-10. **Test end-to-end flows** - Full lesson and quiz flows
-11. **Add LangGraph** - State management, complex routing
-
-### Phase 4: Scale Testing (Validate Architecture)
-12. **Add Lessons 9-10** - Verify no retraining needed
-13. **Run full eval suite** - Confirm all metrics still pass
-
-**Detailed implementation plan with TDD approach:** See `IMPLEMENTATION_PLAN.md`
-
----
-
-**Status:** Architecture defined, ready for implementation
-**Created:** 2026-04-03
+**Note:** This architecture document now reflects the ACTUAL implementation, not the original design plan. Key changes from v2 design:
+- Single 7B model instead of separate 3B/7B models
+- lesson_cache.json instead of RAG
+- Gradio-only interface (no REST API)
+- Shared model for teaching and grading (different prompts/configs)

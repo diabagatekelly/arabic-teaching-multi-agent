@@ -22,16 +22,20 @@ See `docs/evaluation/teaching_agent/FINAL_EVALUATION.md` for detailed evaluation
 ---
 
 ### `qwen-7b-arabic-grading/`
-**Purpose:** Agent 2 (Grading Agent)
+**Purpose:** Agent 2 (Grading Agent) - DEPRECATED
 
-Fine-tuned Qwen2.5-7B model for validating student answers:
+**Status:** This model was developed but not deployed. Production system uses the same `qwen-7b-arabic-teaching` model for both teaching and grading, with role differentiation via prompts and inference configs.
+
+**Original Intent:** Separate fine-tuned Qwen2.5-7B model for validating student answers:
 - Vocabulary answer grading (handles typos, synonyms)
 - Grammar answer grading (validates rules and case endings)
-- Explanation generation for incorrect answers
+- JSON-only output enforcement
 - Hybrid validation (rule-based + semantic AI grading)
 
 **Training:** 346 grading examples  
 **Performance:** 97.5% accuracy (39/40 test cases)
+
+**Why Not Deployed:** Single-model architecture simplified deployment and reduced GPU memory requirements for ZeroGPU. The teaching model proved capable of grading when prompted correctly with low temperature (0.1).
 
 See `docs/evaluation/grading_agent/FINAL_EVALUATION.md` for detailed evaluation results.
 
