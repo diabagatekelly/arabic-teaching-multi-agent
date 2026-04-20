@@ -101,14 +101,14 @@ Example response:
 ○ Batch 3: Not started
 
 **Grammar:**
-✓ Noun Gender: Passed (4/5)
-○ Definite Article: Not started
+✓ Masculine & Feminine Nouns: Passed (2/3)
+○ Not started
 
 What would you like to do?
-1. Review Batch 1 vocabulary
-2. Continue Batch 2 vocabulary
-3. Review Noun Gender
-4. Start Definite Article
+1. Review vocabulary
+2. Continue vocabulary
+3. Practice grammar
+4. Take the final exam
 5. Continue where I left off"
 
 Now show their progress in your own encouraging style. List what they've completed with scores and what's still available.
@@ -117,6 +117,7 @@ End with numbered options that let them:
 - Review/retake any completed vocab batch
 - Continue or start vocab batches
 - Review/retake any grammar topic
+- Take the final exam (if ready)
 - Continue where they left off""",
     input_variables=["lesson_number", "vocab_progress", "grammar_progress"],
 )

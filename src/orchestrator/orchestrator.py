@@ -1036,6 +1036,12 @@ class Orchestrator:
                 }
             ).text
 
+            # Mark topic as completed and store score
+            topic_key = quiz_state.get("topic_key", topic_name.lower().replace(" ", "_"))
+            if topic_key in session["grammar"]["topics"]:
+                session["grammar"]["topics"][topic_key]["taught"] = True
+                session["grammar"]["topics"][topic_key]["quiz_score"] = score
+
             # Clear quiz state
             if "grammar_quiz_state" in session["grammar"]:
                 del session["grammar"]["grammar_quiz_state"]
@@ -1248,6 +1254,7 @@ class Orchestrator:
                     "answers": [],
                     "score": 0,
                     "topic": topic_name,
+                    "topic_key": grammar_topic,  # Store the key for updating later
                     "feedback_shown": False,
                 }
                 logger.info(f"[Orchestrator] Generated {len(questions)} grammar quiz questions")
