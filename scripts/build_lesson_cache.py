@@ -31,6 +31,19 @@ for lesson_num in range(1, 11):
         vocab_list = []
         for result in vocab_results:
             text = result.get("text", "")
+
+            # Try numbered list format: "1. كِتَابٌ (kitaabun) - book"
+            list_rows = re.findall(r"\d+\.\s+(\S+)\s+\(([^)]+)\)\s+-\s+(.+)", text)
+            for row in list_rows:
+                vocab_list.append(
+                    {
+                        "arabic": row[0].strip(),
+                        "transliteration": row[1].strip(),
+                        "english": row[2].strip(),
+                    }
+                )
+
+            # Try table format: "| Arabic | transliteration | english |"
             table_rows = re.findall(r"\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|", text)
             for row in table_rows:
                 if (
