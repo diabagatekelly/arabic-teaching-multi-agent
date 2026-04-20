@@ -7,11 +7,13 @@ Demonstrates:
 - GPU function isolated in engine.py for reliable ZeroGPU detection
 """
 
+import logging
 import re
 
 import gradio as gr
 import spaces
 import torch
+from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from src.orchestrator.orchestrator import Orchestrator
@@ -19,19 +21,31 @@ from src.rag.pinecone_client import PineconeClient
 from src.rag.rag_retriever import RAGRetriever
 from src.rag.sentence_transformer_client import SentenceTransformerClient
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Load teaching model at module level (required for ZeroGPU)
-print("===== Loading Fine-tuned Qwen 7B Teaching Model =====")
-model_name = "kdiabagate/qwen-7b-arabic-teaching-v2"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-teaching_model = AutoModelForCausalLM.from_pretrained(
-    model_name,
+print("===== Loading Base Qwen 7B Model =====")
+base_model_name = "Qwen/Qwen2.5-7B-Instruct"
+adapter_model_name = "kdiabagate/qwen-7b-arabic-teaching-v2"
+
+tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+base_model = AutoModelForCausalLM.from_pretrained(
+    base_model_name,
     torch_dtype=torch.float16,
     device_map="auto",
 )
+print("===== Base model loaded, loading LoRA adapter =====")
+
+# Load LoRA adapter
+teaching_model = PeftModel.from_pretrained(base_model, adapter_model_name)
+print("===== LoRA adapter merged =====")
+
 # Only move to cuda if available (for HuggingFace Spaces)
 if torch.cuda.is_available():
     teaching_model.to("cuda")
-print("===== Fine-tuned model loaded =====")
+print("===== Fine-tuned model ready =====")
 
 # TODO: Load LoRA adapter for teaching model when available
 # from peft import PeftModel

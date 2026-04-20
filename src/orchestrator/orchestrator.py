@@ -1,7 +1,11 @@
 """Orchestrator for managing lesson flow and agent interactions."""
 
+import logging
+
 from src.agents.teaching_agent import TeachingAgent
 from src.prompts.templates import LESSON_WELCOME
+
+logger = logging.getLogger(__name__)
 
 
 class Orchestrator:
@@ -80,7 +84,17 @@ class Orchestrator:
         # Store prompt for debugging
         self.sessions[session_id]["last_prompt"] = prompt_text
 
+        logger.info(
+            f"[Orchestrator] Sending prompt to teaching agent (length: {len(prompt_text)} chars)"
+        )
+        logger.debug(f"[Orchestrator] Prompt:\n{prompt_text}")
+
         # Generate welcome message using teaching agent
         response = self.teaching_agent.respond(prompt_text, max_new_tokens=256, temperature=0.7)
+
+        logger.info(
+            f"[Orchestrator] Received response from teaching agent (length: {len(response)} chars)"
+        )
+        logger.debug(f"[Orchestrator] Response:\n{response}")
 
         return response
