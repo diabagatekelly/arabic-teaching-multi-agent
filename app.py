@@ -42,14 +42,17 @@ teaching_model = None
 # Load model at startup for local dev (no ZeroGPU restrictions)
 if LOCAL_DEV:
     print("===== LOCAL_DEV: Loading model at startup =====")
+    print(f"===== Base model: {base_model_name} =====")
     base_model = AutoModelForCausalLM.from_pretrained(
         base_model_name,
         torch_dtype=torch.float16,
         device_map="auto",  # Uses MPS on Mac, CUDA on Linux
     )
-    print("===== Base model loaded, loading LoRA adapter =====")
+    print(f"===== Base model loaded, loading LoRA adapter: {adapter_model_name} =====")
     teaching_model = PeftModel.from_pretrained(base_model, adapter_model_name)
-    print("===== Model ready =====")
+    print("===== LoRA adapter loaded, merging weights =====")
+    teaching_model = teaching_model.merge_and_unload()
+    print(f"===== Fine-tuned model ready on device: {teaching_model.device} =====")
 else:
     print("===== ZEROGPU: Model will be lazy-loaded on first use =====")
 
@@ -123,15 +126,19 @@ def get_teaching_model():
     """Get the teaching model, loading it if necessary."""
     global teaching_model
     if teaching_model is None:
-        print("===== Loading Base Qwen 7B Model =====")
+        print(f"===== Loading Base Qwen 7B Model: {base_model_name} =====")
         base_model = AutoModelForCausalLM.from_pretrained(
             base_model_name,
             torch_dtype=torch.float16,
             device_map="cuda",
         )
-        print("===== Base model loaded, loading LoRA adapter =====")
+        print(f"===== Base model loaded, loading LoRA adapter: {adapter_model_name} =====")
         teaching_model = PeftModel.from_pretrained(base_model, adapter_model_name)
-        print("===== LoRA adapter merged =====")
+        print("===== Merging LoRA adapter weights =====")
+        teaching_model = teaching_model.merge_and_unload()
+        print(f"===== Fine-tuned model ready on device: {teaching_model.device} =====")
+    else:
+        print(f"===== Using cached fine-tuned model on device: {teaching_model.device} =====")
     return teaching_model
 
 

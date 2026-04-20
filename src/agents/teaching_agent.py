@@ -29,6 +29,9 @@ class TeachingAgent:
         Returns:
             str: The model's response
         """
+        logger.info("=" * 80)
+        logger.info(f"[TeachingAgent] USING FINE-TUNED MODEL: {type(self.model).__name__}")
+        logger.info(f"[TeachingAgent] Model device: {self.model.device}")
         logger.info(
             f"[TeachingAgent] Starting generation (max_tokens={max_new_tokens}, temp={temperature})"
         )
@@ -69,6 +72,9 @@ class TeachingAgent:
 
         response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
         logger.info(f"[TeachingAgent] Decoded response length: {len(response)} chars")
-        logger.debug(f"[TeachingAgent] Raw response:\n{response}")
+        logger.info("=" * 80)
+        logger.info("[TeachingAgent] MODEL OUTPUT:")
+        logger.info(response)
+        logger.info("=" * 80)
 
         return response
