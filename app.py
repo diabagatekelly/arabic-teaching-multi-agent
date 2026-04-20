@@ -36,7 +36,7 @@ LOCAL_DEV = not ZEROGPU  # Running locally
 # Model names
 teaching_model_name = "Qwen/Qwen2.5-7B-Instruct"
 teaching_adapter_name = "kdiabagate/qwen-7b-arabic-teaching-v2"
-content_model_name = "Qwen/Qwen2.5-3B-Instruct"  # 3B for ContentAgent
+content_model_name = "Qwen/Qwen2.5-7B-Instruct"  # 7B base for ContentAgent
 
 # Load tokenizers globally (CPU-safe)
 teaching_tokenizer = AutoTokenizer.from_pretrained(teaching_model_name)
