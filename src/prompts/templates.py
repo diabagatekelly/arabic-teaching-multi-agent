@@ -41,17 +41,20 @@ Vocabulary ({total_words} words):
 Grammar ({topics_count} topics):
 {grammar_topics}
 
-Greet the student warmly and present the lesson structure above. Be encouraging and friendly.
+Example response format:
 
-IMPORTANT: If student goes off-topic or says something inappropriate, gently guide them back to the lesson or offer a break.
+"Welcome to Lesson 1! 🌟 I'm excited to guide you through Arabic basics today.
 
-Your response MUST end with this exact text (do not paraphrase):
+Here's what we'll cover:
 
-"Which would you like to start with?
+**Vocabulary:** 6 essential words like book, school, pen, and more
+**Grammar:** Noun Gender - learning masculine and feminine nouns
+
+Which would you like to start with?
 1. Start with vocabulary
 2. Start with grammar"
 
-This closing is MANDATORY - include it word-for-word.""",
+Now generate your response following this format exactly. Greet warmly, present the lesson overview, and end with those exact numbered options.""",
     input_variables=[
         "lesson_number",
         "total_words",
@@ -94,19 +97,21 @@ Words (3 per batch):
 
 {previous_performance}
 
-Your task:
-1. Present these words with Arabic, transliteration, and English translation in a friendly, encouraging way
-2. Tell the student to use the flashcards in the left panel to practice these words
-3. End with the exact closing below (word-for-word, no variations)
+Example response format:
 
-Required closing (MANDATORY - copy exactly):
+"Great! Let's learn Batch 1 of 2. Here are your words:
 
-"What would you like to do?
+1. كِتَاب (kitāb) - book
+2. مَدْرَسَة (madrasa) - school
+3. قَلَم (qalam) - pen
+
+Use the flashcards in the left panel to practice these words!
+
+What would you like to do?
 1. Take quick quiz on these words
 2. Move on to next batch"
 
-Do NOT paraphrase the closing. After the student chooses, acknowledge their choice warmly.
-If they go off topic, gently guide them back or offer a break.""",
+Now generate your response following this exact format. Present the words clearly, remind them about flashcards, and end with those exact numbered options.""",
     input_variables=[
         "lesson_number",
         "batch_number",
@@ -138,10 +143,21 @@ VOCAB_QUIZ_QUESTION = PromptTemplate(
 Question {question_number} of {total_questions}
 Question Type: {question_type}
 
-If arabic_to_english: Ask "What does {word_arabic} mean?" (DO NOT include transliteration or English translation)
-If english_to_arabic: Ask "How do you say '{word_english}' in Arabic?" (DO NOT provide the Arabic answer)
+Example for arabic_to_english:
+"Question 1 of 3
 
-Ask the question clearly and wait for student's answer. Do not give hints or show the answer.""",
+What does كِتَاب mean?"
+
+Example for english_to_arabic:
+"Question 2 of 3
+
+How do you say 'school' in Arabic?"
+
+Now generate your question following this format:
+- If arabic_to_english: Ask "What does {word_arabic} mean?" (DO NOT include transliteration or English)
+- If english_to_arabic: Ask "How do you say '{word_english}' in Arabic?" (DO NOT include the Arabic answer)
+
+Keep it simple and clear. Wait for the student's answer.""",
     input_variables=[
         "question_type",
         "word_arabic",
@@ -162,12 +178,21 @@ Missed: {words_incorrect}
 
 Progress: You've completed {batches_completed} of {total_batches} batches.
 
-Summarize performance encouragingly. Show words missed with translations. Offer options:
+Example response:
+
+"Excellent work! You scored 2/3 on Batch 1. 🎉
+
+✓ Got right: book, school
+✗ Missed: pen (قَلَم - qalam)
+
+You've completed 1 of 2 batches - great progress!
+
+What would you like to do?
 1. Continue to next batch
 2. Review these words
-3. Skip to final test
+3. Skip to final test"
 
-Or tell me what you'd like to do.""",
+Now generate your response following this format. Summarize performance encouragingly, show missed words with translations, and end with those exact numbered options.""",
     input_variables=[
         "batch_number",
         "score",
@@ -211,18 +236,23 @@ Rule: {grammar_rule}
 Examples:
 {examples_formatted}
 
-Your task:
-1. Explain this grammar topic to the student in an encouraging, clear way
-2. When presenting Arabic text with examples, include case endings (final harakaat) as they are grammatically significant
-3. End with the exact closing below (word-for-word, no variations)
+Example response format:
 
-Required closing (MANDATORY - copy exactly):
+"Let's learn about Noun Gender! 📚
 
-"What would you like to do next?
+In Arabic, every noun is either masculine or feminine. Here's the key rule:
+
+**Feminine nouns** usually end in ة (tā' marbūṭa), while **masculine nouns** don't.
+
+Examples:
+- كِتَابٌ (kitābun) - book [masculine]
+- مَدْرَسَةٌ (madrasatun) - school [feminine]
+
+What would you like to do next?
 1. Take quiz on this topic
 2. Review the lesson"
 
-Do NOT paraphrase or skip this closing.""",
+Now generate your response following this exact format. Explain clearly with examples and end with those exact numbered options.""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
@@ -271,7 +301,11 @@ Translation: {english}
 Student was correct.
 Current Score: {current_score}
 
-Provide brief, encouraging feedback. Confirm correctness with checkmark. Mention their score progress.""",
+Example response:
+
+"✓ Correct! كِتَاب (kitāb) means book. You're doing great - that's 2/3 correct!"
+
+Now provide brief, encouraging feedback following this style. Confirm correctness and mention their score.""",
     input_variables=["word_arabic", "word_transliteration", "english", "current_score"],
 )
 
@@ -284,7 +318,11 @@ Student Answer: {student_answer}
 Student was incorrect.
 Current Score: {current_score}
 
-Provide supportive correction. Show correct answer with transliteration. Give memory tip. Mention their score progress.""",
+Example response:
+
+"Not quite! كِتَاب (kitāb) means book, not pen. Think of 'kitāb' like 'book' - they both have that 'k' sound! You're at 1/2 so far - keep going!"
+
+Now provide supportive correction following this style. Show the correct answer, give a memory tip, and mention their score.""",
     input_variables=[
         "word_arabic",
         "word_transliteration",
