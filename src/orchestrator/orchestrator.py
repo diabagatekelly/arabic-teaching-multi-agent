@@ -208,6 +208,14 @@ class Orchestrator:
                 "vocab": "vocab_batch_intro",
                 "grammar": "grammar_explanation",
                 "review": "grammar_explanation",
+                "final_exam": "final_exam",
+            },
+            "final_exam": {
+                "answer": "final_exam",  # stay in exam, process answer
+            },
+            "final_exam_complete": {
+                "vocab": "vocab_batch_intro",
+                "grammar": "grammar_explanation",
             },
         }
 
@@ -228,6 +236,11 @@ class Orchestrator:
         elif "grammar" in user_lower:
             detected_intent = "grammar"
             logger.info("[Orchestrator] Detected intent: grammar")
+
+        # Check for final exam intent
+        elif "final" in user_lower or "exam" in user_lower:
+            detected_intent = "final_exam"
+            logger.info("[Orchestrator] Detected intent: final_exam")
 
         # Check for quiz intent
         elif "quiz" in user_lower or "test" in user_lower:
@@ -267,8 +280,8 @@ class Orchestrator:
 
         # Default intent based on current state
         else:
-            # In quiz state, any message is an answer
-            if current_progress in ["vocab_quiz", "grammar_quiz"]:
+            # In quiz/exam state, any message is an answer
+            if current_progress in ["vocab_quiz", "grammar_quiz", "final_exam"]:
                 detected_intent = "answer"
                 logger.info(f"[Orchestrator] Default intent in {current_progress}: answer")
             # Check for affirmative (default to primary action)
@@ -965,25 +978,72 @@ class Orchestrator:
                 grammar_topic = lesson_data["grammar_points"][0]
                 topic_name = grammar_topic.replace("_", " ").title()
 
-                # For now, generate simple questions based on vocabulary
-                # Later this can call ContentAgent properly
-                questions = [
-                    {
-                        "question": f"Is {lesson_data['vocabulary'][0]['arabic']} ({lesson_data['vocabulary'][0]['english']}) masculine or feminine?",
-                        "answer": "masculine",
-                        "explanation": "It doesn't end with ة (taa marbuta), so it's masculine"
-                    },
-                    {
-                        "question": f"Is {lesson_data['vocabulary'][4]['arabic']} ({lesson_data['vocabulary'][4]['english']}) masculine or feminine?",
-                        "answer": "feminine",
-                        "explanation": "It ends with ة (taa marbuta), so it's feminine"
-                    },
-                    {
-                        "question": f"Is {lesson_data['vocabulary'][1]['arabic']} ({lesson_data['vocabulary'][1]['english']}) masculine or feminine?",
-                        "answer": "masculine",
-                        "explanation": "It doesn't end with ة (taa marbuta), so it's masculine"
-                    },
+                # Prepare learned vocabulary items for ContentAgent
+                learned_items = [
+                    f"{v['arabic']} ({v['english']})" for v in lesson_data["vocabulary"]
                 ]
+
+                # Try to generate quiz via ContentAgent
+                if self.content_agent:
+                    try:
+                        logger.info("[Orchestrator] Calling ContentAgent.generate_quiz()")
+                        quiz_json = self.content_agent.generate_quiz(
+                            {
+                                "quiz_type": "grammar",
+                                "count": 3,
+                                "difficulty": "beginner",
+                                "learned_items": learned_items,
+                                "lesson_number": lesson_number,
+                            }
+                        )
+
+                        # Parse the JSON response
+                        import json
+
+                        questions_raw = json.loads(quiz_json)
+
+                        # Convert to our format
+                        questions = []
+                        for q in questions_raw[:3]:  # Take first 3
+                            questions.append(
+                                {
+                                    "question": q.get("question", ""),
+                                    "answer": q.get("answer", q.get("correct", "")),
+                                    "explanation": f"Grammar topic: {topic_name}",
+                                }
+                            )
+
+                        logger.info(
+                            f"[Orchestrator] ContentAgent generated {len(questions)} questions"
+                        )
+
+                    except Exception as e:
+                        logger.error(f"[Orchestrator] ContentAgent failed: {e}, using fallback")
+                        questions = None
+                else:
+                    logger.warning("[Orchestrator] No ContentAgent available, using fallback")
+                    questions = None
+
+                # Fallback: simple hardcoded questions
+                if not questions or len(questions) < 3:
+                    logger.info("[Orchestrator] Using fallback grammar questions")
+                    questions = [
+                        {
+                            "question": f"Is {lesson_data['vocabulary'][0]['arabic']} ({lesson_data['vocabulary'][0]['english']}) masculine or feminine?",
+                            "answer": "masculine",
+                            "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
+                        },
+                        {
+                            "question": f"Is {lesson_data['vocabulary'][4]['arabic']} ({lesson_data['vocabulary'][4]['english']}) masculine or feminine?",
+                            "answer": "feminine",
+                            "explanation": "It ends with ة (taa marbuta), so it's feminine",
+                        },
+                        {
+                            "question": f"Is {lesson_data['vocabulary'][1]['arabic']} ({lesson_data['vocabulary'][1]['english']}) masculine or feminine?",
+                            "answer": "masculine",
+                            "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
+                        },
+                    ]
 
                 session["grammar"]["grammar_quiz_state"] = {
                     "current_question": 0,
