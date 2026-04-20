@@ -298,12 +298,22 @@ with gr.Blocks(
         font-size: 2.5em;
         font-weight: 500;
         margin-top: 0;
+        border: 2px solid #ddd;
+        border-radius: 8px;
     }
     /* Flashcard container border */
     .flashcard-container {
         border: 2px solid #ddd;
         border-radius: 8px;
+        padding: 10px;
+        align-self: stretch !important;
+    }
+    /* Right panel container border */
+    .controls-container {
+        border: 2px solid #ddd;
+        border-radius: 8px;
         padding: 15px;
+        align-self: stretch !important;
     }
     .main-title {
         text-align: center;
@@ -323,6 +333,11 @@ with gr.Blocks(
     /* Align all columns to top */
     .gradio-column {
         align-self: flex-start !important;
+    }
+    /* Align side panels to stretch to bottom */
+    .gradio-row > .gradio-column:first-child,
+    .gradio-row > .gradio-column:last-child {
+        align-self: stretch !important;
     }
     /* Custom loading spinner */
     .gradio-spinner {
@@ -382,7 +397,7 @@ with gr.Blocks(
                 clear = gr.Button("Clear")
 
         # Right panel - Controls & Progress (1/4 width)
-        with gr.Column(scale=1):
+        with gr.Column(scale=1, elem_classes=["controls-container"]):
             gr.Markdown("### 🎮 Lesson Controls")
             start_lesson_btn = gr.Button("Start Lesson", variant="primary")
             with gr.Row():
