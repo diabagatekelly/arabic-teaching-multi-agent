@@ -86,9 +86,9 @@ print("===== RAG retriever initialized =====")
 @spaces.GPU(duration=60)
 def process_message(message, chat_history, session_id):
     """GPU-enabled message processing through orchestrator."""
-    # Reload sessions from file (ZeroGPU isolation)
-    global sessions
-    sessions = load_sessions()
+    # Reload sessions from file (ZeroGPU isolation) - update in-place
+    sessions.clear()
+    sessions.update(load_sessions())
 
     logger.info("=" * 80)
     logger.info("[App] USER INPUT CAPTURED")
@@ -240,6 +240,7 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
             )
             with gr.Row():
                 submit = gr.Button("Send", variant="primary")
+                stop = gr.Button("Stop", variant="stop")
                 clear = gr.Button("Clear")
 
         # Right panel - Controls & Progress (1/4 width)
@@ -261,9 +262,9 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         """Start lesson and initialize session."""
         import uuid
 
-        # Reload sessions from file (ZeroGPU isolation)
-        global sessions
-        sessions = load_sessions()
+        # Reload sessions from file (ZeroGPU isolation) - update in-place
+        sessions.clear()
+        sessions.update(load_sessions())
 
         if not sid:
             sid = str(uuid.uuid4())[:8]
@@ -336,8 +337,12 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         return lesson_info, progress
 
     # Wire up chat functions
-    msg.submit(process_message, [msg, chatbot, session_id], [msg, chatbot])
-    submit.click(process_message, [msg, chatbot, session_id], [msg, chatbot])
+    submit_event = msg.submit(process_message, [msg, chatbot, session_id], [msg, chatbot])
+    click_event = submit.click(process_message, [msg, chatbot, session_id], [msg, chatbot])
+
+    # Stop button cancels ongoing inference
+    stop.click(None, None, None, cancels=[submit_event, click_event])
+
     clear.click(lambda: [], None, chatbot)
 
     # Wire up lesson control functions
