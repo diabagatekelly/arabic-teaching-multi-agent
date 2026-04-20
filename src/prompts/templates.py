@@ -432,10 +432,13 @@ Question: What does "{word}" mean?
 Student Answer: "{student_answer}"
 Correct Answer: "{correct_answer}"
 
-Evaluate if the student's answer is correct. Be flexible:
-- Accept minor typos (e.g., "scool" for "school")
+Evaluate if the student's answer is correct. Be VERY flexible and lenient:
+- Ignore case differences (PEN = pen = Pen)
+- Ignore extra/missing spaces or punctuation
+- Accept minor typos (e.g., "scool" for "school", "pen" for "pen")
 - Accept synonyms (e.g., "instructor" for "teacher")
 - Accept alternate phrasings that convey the same meaning
+- If the core meaning matches, mark it correct
 
 IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
 

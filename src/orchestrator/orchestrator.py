@@ -674,6 +674,10 @@ class Orchestrator:
                     batch_end = min(batch_start + 3, len(all_vocab))
                     batch_words = all_vocab[batch_start:batch_end]
 
+                    # Skip empty batches (shouldn't happen but safeguard)
+                    if not batch_words:
+                        continue
+
                     if batch_num < current_batch:
                         # Completed batch
                         vocab_progress_lines.append(

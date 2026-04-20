@@ -178,6 +178,10 @@ def _build_progress_display(session):
         batch_end = min(batch_start + 3, len(all_vocab))
         batch_words = all_vocab[batch_start:batch_end]
 
+        # Skip empty batches (shouldn't happen but safeguard)
+        if not batch_words:
+            continue
+
         if batch_num < current_batch:
             # Completed batch
             progress_lines.append(f"- ✓ Batch {batch_num}: {len(batch_words)} words")
@@ -479,7 +483,7 @@ with gr.Blocks(
         hide_flashcards = current_progress in [
             "vocab_quiz",
             "grammar_quiz",
-            "final_test",
+            "final_exam",
         ]
 
         if hide_flashcards:
