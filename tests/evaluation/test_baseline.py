@@ -98,9 +98,9 @@ class TestBaselineEvaluator:
         # Models should NOT be loaded yet (lazy loading)
         mock_tokenizer.from_pretrained.assert_not_called()
         mock_model.from_pretrained.assert_not_called()
-        # Baseline evaluator now creates 2 EvaluationPipeline instances:
-        # 1. teaching_agent_test_cases.json, 2. grading_agent_test_cases.json
-        assert mock_pipeline.call_count == 2
+        # Baseline evaluator now creates 3 EvaluationPipeline instances:
+        # 1. teaching_agent_test_cases.json, 2. grading_agent_test_cases.json, 3. content_agent_test_cases.json
+        assert mock_pipeline.call_count == 3
 
     @patch("src.evaluation.baseline.AutoModelForCausalLM")
     @patch("src.evaluation.baseline.AutoTokenizer")

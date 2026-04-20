@@ -24,14 +24,28 @@ def mock_tokenizer():
     """Mock tokenizer."""
 
     class MockTokenizer:
+        pad_token_id = 0
+
         def apply_chat_template(self, messages, tokenize=False, add_generation_prompt=True):
             return "mocked_prompt"
 
         def __call__(self, texts, return_tensors=None):
+            class MockTensor:
+                shape = (1, 3)  # batch size 1, sequence length 3
+
+                def __iter__(self):
+                    return iter([[1, 2, 3]])
+
+                def __len__(self):
+                    return 1
+
+                def __getitem__(self, index):
+                    return [1, 2, 3]
+
             class TokenizerOutput(dict):
                 def __init__(self):
-                    super().__init__(input_ids=[[1, 2, 3]])
-                    self.input_ids = [[1, 2, 3]]
+                    super().__init__(input_ids=MockTensor())
+                    self.input_ids = MockTensor()
 
                 def to(self, device):
                     return self
