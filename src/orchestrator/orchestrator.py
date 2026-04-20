@@ -3,7 +3,16 @@
 import logging
 
 from src.agents.teaching_agent import TeachingAgent
-from src.prompts.templates import LESSON_WELCOME
+from src.prompts.templates import (
+    FEEDBACK_VOCAB_CORRECT,
+    FEEDBACK_VOCAB_INCORRECT,
+    GRAMMAR_EXPLANATION,
+    GRAMMAR_OVERVIEW,
+    LESSON_WELCOME,
+    VOCAB_BATCH_INTRO,
+    VOCAB_BATCH_SUMMARY,
+    VOCAB_QUIZ_QUESTION,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -172,9 +181,14 @@ class Orchestrator:
                 "grammar": "grammar_explanation",
             },
             "vocab_quiz": {
+                "answer": "vocab_quiz",  # stay in quiz, process answer, show next question
+                # No escape routes - must complete quiz
+            },
+            "vocab_quiz_complete": {
                 "next_batch": "vocab_batch_intro",
                 "grammar": "grammar_explanation",
                 "vocab": "vocab_batch_intro",
+                "review": "vocab_batch_intro",
             },
             "grammar_explanation": {
                 "quiz": "grammar_quiz",
@@ -241,25 +255,31 @@ class Orchestrator:
                 detected_intent = "review"
                 logger.info("[Orchestrador] Detected intent from '2': review")
 
-        # Check for affirmative (default to primary action)
+        # Default intent based on current state
         else:
-            affirmative_keywords = [
-                "yes",
-                "yeah",
-                "yep",
-                "ok",
-                "okay",
-                "sure",
-                "let's",
-                "go",
-                "start",
-            ]
-            is_affirmative = any(keyword in user_lower for keyword in affirmative_keywords)
-            if is_affirmative:
-                # Default to primary action based on current state
-                if current_progress in ["vocab_batch_intro", "grammar_explanation"]:
-                    detected_intent = "quiz"
-                    logger.info("[Orchestrator] Detected intent from affirmative: quiz")
+            # In quiz state, any message is an answer
+            if current_progress == "vocab_quiz":
+                detected_intent = "answer"
+                logger.info("[Orchestrator] Default intent in vocab_quiz: answer")
+            # Check for affirmative (default to primary action)
+            else:
+                affirmative_keywords = [
+                    "yes",
+                    "yeah",
+                    "yep",
+                    "ok",
+                    "okay",
+                    "sure",
+                    "let's",
+                    "go",
+                    "start",
+                ]
+                is_affirmative = any(keyword in user_lower for keyword in affirmative_keywords)
+                if is_affirmative:
+                    # Default to primary action based on current state
+                    if current_progress in ["vocab_batch_intro", "grammar_explanation"]:
+                        detected_intent = "quiz"
+                        logger.info("[Orchestrator] Detected intent from affirmative: quiz")
 
         logger.info(f"[Orchestrator] Final detected intent: {detected_intent}")
 
@@ -279,6 +299,87 @@ class Orchestrator:
                     current_batch = session.get("vocabulary", {}).get("current_batch", 1)
                     session["vocabulary"]["current_batch"] = current_batch + 1
                     logger.info(f"[Orchestrator] Incremented batch to {current_batch + 1}")
+
+                # Handle answer intent in vocab_quiz
+                elif detected_intent == "answer" and current_progress == "vocab_quiz":
+                    import json
+
+                    from src.agents.grading_agent import GradingAgent
+
+                    logger.info("[Orchestrator] Processing quiz answer")
+                    quiz_state = session["vocabulary"]["quiz_state"]
+                    current_q = quiz_state["current_question"]
+                    current_word = quiz_state["words"][current_q]
+
+                    # Grade the answer using grading agent
+                    grading_agent = GradingAgent(
+                        model=self.teaching_model_getter(),
+                        tokenizer=self.teaching_tokenizer,
+                        max_new_tokens=50,
+                    )
+
+                    # Determine question type for this round
+                    question_type = (
+                        "arabic_to_english" if current_q % 2 == 0 else "english_to_arabic"
+                    )
+
+                    if question_type == "arabic_to_english":
+                        word_display = current_word["arabic"]
+                        correct_answer = current_word["english"]
+                    else:
+                        word_display = current_word["english"]
+                        correct_answer = current_word["arabic"]
+
+                    # Grade the answer (returns JSON string)
+                    grading_result = grading_agent.grade_vocab(
+                        {
+                            "word": word_display,
+                            "student_answer": user_message,
+                            "correct_answer": correct_answer,
+                        }
+                    )
+
+                    logger.info(f"[Orchestrator] Grading result (raw): {grading_result}")
+
+                    # Parse JSON response
+                    try:
+                        result_dict = json.loads(grading_result)
+                        is_correct = result_dict.get("correct", False)
+                    except json.JSONDecodeError:
+                        logger.error(
+                            f"[Orchestrator] Failed to parse grading result: {grading_result}"
+                        )
+                        is_correct = False
+
+                    logger.info(f"[Orchestrator] Grading result (parsed): {is_correct}")
+
+                    # Update quiz state
+                    quiz_state["answers"].append(
+                        {
+                            "word": current_word,
+                            "student_answer": user_message,
+                            "correct": is_correct,
+                        }
+                    )
+
+                    if is_correct:
+                        quiz_state["score"] += 1
+
+                    # Move to next question or complete quiz
+                    quiz_state["current_question"] += 1
+
+                    if quiz_state["current_question"] >= quiz_state["total_questions"]:
+                        # Quiz complete
+                        logger.info(
+                            "[Orchestrator] Quiz complete, transitioning to vocab_quiz_complete"
+                        )
+                        new_state = "vocab_quiz_complete"
+                    else:
+                        # Stay in quiz for next question
+                        logger.info(
+                            f"[Orchestrator] Moving to question {quiz_state['current_question'] + 1}"
+                        )
+                        new_state = "vocab_quiz"
 
                 # Update state
                 session["current_progress"] = new_state
@@ -374,12 +475,6 @@ class Orchestrator:
         Returns:
             str: Formatted prompt for the stage
         """
-        from src.prompts.templates import (
-            GRAMMAR_EXPLANATION,
-            GRAMMAR_OVERVIEW,
-            VOCAB_BATCH_INTRO,
-            VOCAB_QUIZ_QUESTION,
-        )
 
         session = self.sessions[session_id]
         lesson_number = session["lesson_number"]
@@ -420,7 +515,7 @@ class Orchestrator:
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
 
         elif stage == "vocab_quiz":
-            logger.info("[Orchestrator] Using template: VOCAB_QUIZ_QUESTION")
+            logger.info("[Orchestrator] Using template: VOCAB_QUIZ_QUESTION or FEEDBACK")
             # Initialize quiz state if not exists
             if "quiz_state" not in session["vocabulary"]:
                 current_batch = session.get("vocabulary", {}).get("current_batch", 1)
@@ -439,22 +534,66 @@ class Orchestrator:
                     "answers": [],
                     "score": 0,
                 }
+                logger.info(f"[Orchestrator] Initialized quiz_state with {len(batch_words)} words")
 
             quiz_state = session["vocabulary"]["quiz_state"]
             current_q = quiz_state["current_question"]
 
-            # Check if quiz is complete
-            if current_q >= quiz_state["total_questions"]:
-                # TODO: Show quiz summary
-                return (
-                    f"Quiz complete! Score: {quiz_state['score']}/{quiz_state['total_questions']}"
-                )
+            # Check if we just graded an answer (answers list has content)
+            if quiz_state["answers"] and len(quiz_state["answers"]) == current_q:
+                # Show feedback for the last answer
+                last_answer = quiz_state["answers"][-1]
+                word = last_answer["word"]
+                is_correct = last_answer["correct"]
 
-            # Get current word
+                logger.info(f"[Orchestrator] Showing feedback - correct: {is_correct}")
+
+                if is_correct:
+                    prompt_text = FEEDBACK_VOCAB_CORRECT.invoke(
+                        {
+                            "word_arabic": word["arabic"],
+                            "word_transliteration": word["transliteration"],
+                            "english": word["english"],
+                        }
+                    ).text
+                else:
+                    prompt_text = FEEDBACK_VOCAB_INCORRECT.invoke(
+                        {
+                            "word_arabic": word["arabic"],
+                            "word_transliteration": word["transliteration"],
+                            "english": word["english"],
+                            "student_answer": last_answer["student_answer"],
+                        }
+                    ).text
+
+                # Check if more questions remain
+                if current_q < quiz_state["total_questions"]:
+                    # Ask next question after feedback
+                    next_word = quiz_state["words"][current_q]
+                    question_type = (
+                        "arabic_to_english" if current_q % 2 == 0 else "english_to_arabic"
+                    )
+
+                    next_question_text = VOCAB_QUIZ_QUESTION.invoke(
+                        {
+                            "question_type": question_type,
+                            "word_arabic": next_word["arabic"],
+                            "word_transliteration": next_word["transliteration"],
+                        }
+                    ).text
+
+                    return f"{prompt_text}\n\n{next_question_text}\n\nStudent: {user_message}\n\nTeacher:"
+                else:
+                    # No more questions, just show feedback (will transition to quiz_complete)
+                    return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+            # Ask the current question (first question or continuing)
             word = quiz_state["words"][current_q]
-
-            # Alternate between arabic_to_english and english_to_arabic
             question_type = "arabic_to_english" if current_q % 2 == 0 else "english_to_arabic"
+
+            logger.info(
+                f"[Orchestrator] Asking question {current_q + 1}/{quiz_state['total_questions']}"
+            )
 
             prompt_text = VOCAB_QUIZ_QUESTION.invoke(
                 {
@@ -463,6 +602,41 @@ class Orchestrator:
                     "word_transliteration": word["transliteration"],
                 }
             ).text
+
+            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+        elif stage == "vocab_quiz_complete":
+            logger.info("[Orchestrator] Using template: VOCAB_BATCH_SUMMARY")
+            quiz_state = session["vocabulary"]["quiz_state"]
+
+            # Calculate words correct and incorrect
+            words_correct = [
+                ans["word"]["english"] for ans in quiz_state["answers"] if ans["correct"]
+            ]
+            words_incorrect = [
+                f"{ans['word']['english']} ({ans['word']['arabic']} - {ans['word']['transliteration']})"
+                for ans in quiz_state["answers"]
+                if not ans["correct"]
+            ]
+
+            batch_number = session.get("vocabulary", {}).get("current_batch", 1)
+            score = f"{quiz_state['score']}/{quiz_state['total_questions']}"
+
+            words_correct_str = ", ".join(words_correct) if words_correct else "None"
+            words_incorrect_str = "\n".join(words_incorrect) if words_incorrect else "None"
+
+            prompt_text = VOCAB_BATCH_SUMMARY.invoke(
+                {
+                    "batch_number": batch_number,
+                    "score": score,
+                    "words_correct": words_correct_str,
+                    "words_incorrect": words_incorrect_str,
+                }
+            ).text
+
+            # Clear quiz state for next batch
+            if "quiz_state" in session["vocabulary"]:
+                del session["vocabulary"]["quiz_state"]
 
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
 
