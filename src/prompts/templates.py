@@ -41,10 +41,13 @@ Preview: {topics_preview}
 Grammar: {topics_count} topics
 Topics: {grammar_topics}
 
-Greet the student warmly and present the lesson structure. Offer navigation:
+Greet the student warmly and present the lesson structure.
+   - list all of the vocabulary words in a formatted numbered list (Arabic, transliteration, English)
+   - list all of the grammar topics in a formatted numbered list
+
+Offer navigation:
 1. Start with vocabulary
 2. Start with grammar
-3. See lesson progress
 
 Or tell me what you'd like to do.""",
     input_variables=[

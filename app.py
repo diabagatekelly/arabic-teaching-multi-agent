@@ -7,13 +7,17 @@ Demonstrates:
 - GPU function isolated in engine.py for reliable ZeroGPU detection
 """
 
+import re
+
 import gradio as gr
 import spaces
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from content_loader import load_lesson
 from src.orchestrator.orchestrator import Orchestrator
+from src.rag.pinecone_client import PineconeClient
+from src.rag.rag_retriever import RAGRetriever
+from src.rag.sentence_transformer_client import SentenceTransformerClient
 
 # Load teaching model at module level (required for ZeroGPU)
 print("===== Loading Qwen 7B Teaching Model =====")
@@ -32,6 +36,13 @@ print("===== Model loaded =====")
 # TODO: Load LoRA adapter for teaching model when available
 # from peft import PeftModel
 # teaching_model = PeftModel.from_pretrained(teaching_model, "path/to/adapter")
+
+# Initialize RAG retriever
+print("===== Initializing RAG retriever =====")
+embedder = SentenceTransformerClient()
+vector_db = PineconeClient()
+rag_retriever = RAGRetriever(embedder, vector_db)
+print("===== RAG retriever initialized =====")
 
 
 # Define your GPU-enabled function with @spaces.GPU decorator
@@ -72,21 +83,85 @@ def process_message(message, chat_history, session_id):
     return "", chat_history
 
 
-# Global lesson cache (loaded at startup, shared across all users)
+# Global lesson cache (populated from RAG retrieval)
 lesson_cache = {}
 
 # Per-user session store
 sessions = {}
 
-# Load all lessons at module level
-print("===== Loading lessons into cache =====")
+# Build lesson cache by retrieving from Pinecone
+print("===== Building lesson cache from RAG =====")
 for lesson_num in range(1, 11):  # Lessons 1-10
     try:
-        lesson_data = load_lesson(lesson_num)
+        # Retrieve vocabulary section from Pinecone
+        vocab_results = rag_retriever.retrieve_by_lesson(
+            query="vocabulary words list table", lesson_number=lesson_num, top_k=10
+        )
+
+        # Retrieve grammar sections from Pinecone
+        grammar_results = rag_retriever.retrieve_by_lesson(
+            query="grammar rules points topics", lesson_number=lesson_num, top_k=10
+        )
+
+        if not vocab_results and not grammar_results:
+            print(f"✗ No results found in Pinecone for Lesson {lesson_num}")
+            continue
+
+        # Extract metadata from first result
+        metadata = (vocab_results[0] if vocab_results else grammar_results[0]).get("metadata", {})
+
+        # Parse vocabulary from retrieved markdown table
+        vocab_list = []
+        for result in vocab_results:
+            text = result.get("text", "")
+            # Extract vocabulary entries from markdown table
+            # Looking for lines like: | كِتَابٌ | kitaabun | book |
+            table_rows = re.findall(r"\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|", text)
+            for row in table_rows:
+                if (
+                    row[0].strip()
+                    and not row[0].strip().startswith("--")
+                    and row[0].strip() != "Arabic"
+                ):
+                    vocab_list.append(
+                        {
+                            "arabic": row[0].strip(),
+                            "transliteration": row[1].strip(),
+                            "english": row[2].strip(),
+                        }
+                    )
+
+        # Get grammar points from metadata
+        grammar_points = metadata.get("grammar_points", [])
+        if isinstance(grammar_points, str):
+            # Parse JSON string if needed
+            import json
+
+            try:
+                grammar_points = json.loads(grammar_points)
+            except (json.JSONDecodeError, TypeError):
+                grammar_points = [grammar_points]
+
+        lesson_data = {
+            "lesson_number": lesson_num,
+            "lesson_name": metadata.get("lesson_name", f"Lesson {lesson_num}"),
+            "vocabulary": vocab_list,
+            "grammar_points": grammar_points,
+            "grammar_sections": {},  # Could extract from grammar_results if needed
+            "difficulty": metadata.get("difficulty", "beginner"),
+        }
+
         lesson_cache[lesson_num] = lesson_data
-        print(f"✓ Loaded Lesson {lesson_num}: {lesson_data['lesson_name']}")
-    except FileNotFoundError:
-        print(f"✗ Lesson {lesson_num} not found, skipping")
+        print(
+            f"✓ Cached Lesson {lesson_num}: {lesson_data['lesson_name']} ({len(vocab_list)} words)"
+        )
+
+    except Exception as e:
+        print(f"✗ Error caching lesson {lesson_num}: {e}")
+        import traceback
+
+        traceback.print_exc()
+
 print(f"===== {len(lesson_cache)} lessons cached =====")
 
 # Initialize orchestrator
