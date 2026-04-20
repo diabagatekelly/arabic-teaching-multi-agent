@@ -355,12 +355,30 @@ class Orchestrator:
                         "arabic_to_english" if current_q % 2 == 0 else "english_to_arabic"
                     )
 
-                    if question_type == "arabic_to_english":
-                        word_display = current_word["arabic"]
-                        correct_answer = current_word["english"]
-                    else:
+                    # IMPORTANT: Grade based on the actual word being tested, not question_type
+                    # The fine-tuned model sometimes ignores the question_type instruction
+                    # So we always pass the word and both possible answers to the grading agent
+                    # For vocab grading, we need to check if student answered in English or Arabic
+
+                    # Try to detect what the student answered
+                    student_answer_is_arabic = any(
+                        ord(c) > 127 for c in user_message
+                    )  # Contains non-ASCII (likely Arabic)
+
+                    if student_answer_is_arabic:
+                        # Student gave Arabic answer, so question was english_to_arabic
                         word_display = current_word["english"]
                         correct_answer = current_word["arabic"]
+                        actual_question_type = "english_to_arabic"
+                    else:
+                        # Student gave English answer, so question was arabic_to_english
+                        word_display = current_word["arabic"]
+                        correct_answer = current_word["english"]
+                        actual_question_type = "arabic_to_english"
+
+                    logger.info(
+                        f"[Orchestrator] Detected actual question type: {actual_question_type} (planned: {question_type})"
+                    )
 
                     # Grade the answer (returns JSON string)
                     grading_result = grading_agent.grade_vocab(
@@ -1045,26 +1063,78 @@ class Orchestrator:
                     logger.warning("[Orchestrator] No ContentAgent available, using fallback")
                     questions = None
 
-                # Fallback: simple hardcoded questions
+                # Fallback: dynamic hardcoded questions using lesson vocabulary
                 if not questions or len(questions) < 3:
+                    import random
+
                     logger.info("[Orchestrator] Using fallback grammar questions")
-                    questions = [
-                        {
-                            "question": f"Is {lesson_data['vocabulary'][0]['arabic']} ({lesson_data['vocabulary'][0]['english']}) masculine or feminine?",
-                            "answer": "masculine",
-                            "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
-                        },
-                        {
-                            "question": f"Is {lesson_data['vocabulary'][4]['arabic']} ({lesson_data['vocabulary'][4]['english']}) masculine or feminine?",
-                            "answer": "feminine",
-                            "explanation": "It ends with ة (taa marbuta), so it's feminine",
-                        },
-                        {
-                            "question": f"Is {lesson_data['vocabulary'][1]['arabic']} ({lesson_data['vocabulary'][1]['english']}) masculine or feminine?",
-                            "answer": "masculine",
-                            "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
-                        },
+
+                    # Separate vocab into masculine and feminine
+                    masculine_words = [
+                        v for v in lesson_data["vocabulary"] if not v["arabic"].endswith("ة")
                     ]
+                    feminine_words = [
+                        v for v in lesson_data["vocabulary"] if v["arabic"].endswith("ة")
+                    ]
+
+                    # Build 3 questions with randomization
+                    fallback_questions = []
+
+                    # Question 1: Random masculine word
+                    if masculine_words:
+                        word = random.choice(masculine_words)
+                        fallback_questions.append(
+                            {
+                                "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                "answer": "masculine",
+                                "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
+                            }
+                        )
+
+                    # Question 2: Random feminine word
+                    if feminine_words:
+                        word = random.choice(feminine_words)
+                        fallback_questions.append(
+                            {
+                                "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                "answer": "feminine",
+                                "explanation": "It ends with ة (taa marbuta), so it's feminine",
+                            }
+                        )
+
+                    # Question 3: Another random masculine word (if available)
+                    if len(masculine_words) > 1:
+                        word = random.choice(
+                            [w for w in masculine_words if w not in [fallback_questions[0]]]
+                        )
+                        fallback_questions.append(
+                            {
+                                "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                "answer": "masculine",
+                                "explanation": "It doesn't end with ة (taa marbuta), so it's masculine",
+                            }
+                        )
+                    elif feminine_words:  # Fallback to another feminine if not enough masculine
+                        word = random.choice(
+                            [
+                                w
+                                for w in feminine_words
+                                if len(fallback_questions) < 2
+                                or w != fallback_questions[1]["question"].split()[1]
+                            ]
+                        )
+                        fallback_questions.append(
+                            {
+                                "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                "answer": "feminine",
+                                "explanation": "It ends with ة (taa marbuta), so it's feminine",
+                            }
+                        )
+
+                    questions = fallback_questions[:3]  # Ensure exactly 3 questions
+                    logger.info(
+                        f"[Orchestrator] Fallback generated {len(questions)} randomized questions"
+                    )
 
                 session["grammar"]["grammar_quiz_state"] = {
                     "current_question": 0,
