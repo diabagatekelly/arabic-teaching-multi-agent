@@ -43,7 +43,7 @@ class ContentAgent:
 
     def __init__(
         self,
-        model: PreTrainedModel,
+        model: PreTrainedModel | None,
         tokenizer: PreTrainedTokenizer,
         max_new_tokens: int = 512,
     ) -> None:
@@ -51,13 +51,14 @@ class ContentAgent:
         Initialize content agent.
 
         Args:
-            model: Fine-tuned content generation model (Qwen2.5-3B-Instruct)
+            model: Fine-tuned content generation model (Qwen2.5-3B-Instruct), optional for lazy loading
             tokenizer: Model tokenizer
             max_new_tokens: Maximum tokens to generate in response
         """
         self.model = model
         self.tokenizer = tokenizer
         self.max_new_tokens = max_new_tokens
+        self.rag_retriever = None  # Set externally after initialization
 
         # Load RAG database at initialization
         self.exercise_templates = self._load_exercise_templates()

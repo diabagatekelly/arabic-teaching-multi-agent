@@ -11,19 +11,28 @@ logger = logging.getLogger(__name__)
 class Orchestrator:
     """Manages lesson cache, session state, and agent interactions."""
 
-    def __init__(self, lesson_cache, sessions, model_getter, tokenizer):
+    def __init__(
+        self,
+        lesson_cache,
+        sessions,
+        teaching_model_getter,
+        teaching_tokenizer,
+        content_agent=None,
+    ):
         """Initialize orchestrator with shared resources.
 
         Args:
             lesson_cache: Dict of lesson_number -> lesson_data
             sessions: Dict of session_id -> session_state
-            model_getter: Callable that returns the teaching model (for lazy loading)
-            tokenizer: The tokenizer for the teaching model
+            teaching_model_getter: Callable that returns the teaching model (for lazy loading)
+            teaching_tokenizer: The tokenizer for the teaching model
+            content_agent: ContentAgent instance for RAG-based content retrieval
         """
         self.lesson_cache = lesson_cache
         self.sessions = sessions
-        self.model_getter = model_getter
-        self.tokenizer = tokenizer
+        self.teaching_model_getter = teaching_model_getter
+        self.teaching_tokenizer = teaching_tokenizer
+        self.content_agent = content_agent
 
     def start_lesson(self, session_id, lesson_number):
         """Start a lesson - get content from cache, build prompt, generate welcome.
@@ -93,7 +102,7 @@ class Orchestrator:
         logger.debug(f"[Orchestrator] Prompt:\n{prompt_text}")
 
         # Generate welcome message using teaching agent (lazy load model)
-        teaching_agent = TeachingAgent(self.model_getter(), self.tokenizer)
+        teaching_agent = TeachingAgent(self.teaching_model_getter(), self.teaching_tokenizer)
         response = teaching_agent.respond(prompt_text, max_new_tokens=256, temperature=0.7)
 
         logger.info(

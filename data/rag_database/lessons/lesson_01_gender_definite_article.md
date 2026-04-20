@@ -16,7 +16,7 @@ vocabulary:
   - كُرْسِيٌّ  # kursiyyun - chair (m)
   - نَافِذَةٌ  # naafidhatun - window (f)
   - غُرْفَةٌ  # ghurfatun - room (f)
-  - مَكْتَبٌ  # maktabun - office (m)
+  - مَكْتَبٌ  # maktabun - office (m)l
 ---
 
 # Lesson 1: Gender and Definite Article
