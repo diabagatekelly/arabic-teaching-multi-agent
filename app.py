@@ -174,16 +174,13 @@ def _build_progress_display(session):
 
         if batch_num < current_batch:
             # Completed batch
-            progress_lines.append(f"  ✓ Batch {batch_num}")
-            progress_lines.append(f"     {len(batch_words)} words")
+            progress_lines.append(f"- ✓ Batch {batch_num}: {len(batch_words)} words")
         elif batch_num == current_batch:
             # Current batch
-            progress_lines.append(f"  → Batch {batch_num}")
-            progress_lines.append(f"     {len(batch_words)} words")
+            progress_lines.append(f"- → Batch {batch_num}: {len(batch_words)} words")
         else:
             # Not started
-            progress_lines.append(f"  ○ Batch {batch_num}")
-            progress_lines.append(f"     {len(batch_words)} words")
+            progress_lines.append(f"- ○ Batch {batch_num}: {len(batch_words)} words")
 
     # Grammar progress
     progress_lines.append("\n**Grammar:**")
@@ -198,12 +195,11 @@ def _build_progress_display(session):
             topic_state = grammar_topics.get(topic_name, {})
             if topic_state.get("taught", False):
                 score = topic_state.get("quiz_score", "N/A")
-                progress_lines.append(f"  ✓ {topic_display}")
-                progress_lines.append(f"     Score: {score}")
+                progress_lines.append(f"- ✓ {topic_display}: {score}")
             else:
-                progress_lines.append(f"  ○ {topic_display}")
+                progress_lines.append(f"- ○ {topic_display}")
     else:
-        progress_lines.append("  ○ No topics available")
+        progress_lines.append("- ○ No topics available")
 
     return "\n".join(progress_lines)
 
@@ -305,16 +301,21 @@ with gr.Blocks(
     .main-title {
         text-align: center;
         font-size: 2em;
-        margin-bottom: 0.5em;
-        margin-top: 0;
+        margin: 0 0 0.5em 0 !important;
+        padding-top: 0 !important;
     }
     /* Fix double scrollbar in chatbot */
     .chatbot {
         overflow: hidden !important;
     }
-    /* Remove top margin from section headers */
-    h3 {
+    /* Remove top margin/padding from all headers to align tops */
+    h1, h3 {
         margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    /* Align all columns to top */
+    .gradio-column {
+        align-self: flex-start !important;
     }
     """,
 ) as demo:
