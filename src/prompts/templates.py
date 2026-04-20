@@ -118,7 +118,10 @@ End with numbered options that let them:
 - Continue or start vocab batches
 - Review/retake any grammar topic
 - Take the final exam (if ready)
-- Continue where they left off""",
+- Continue where they left off
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic or uses inappropriate language, gently redirect them back to the lesson. Suggest they can take a break if needed.""",
     input_variables=["lesson_number", "vocab_progress", "grammar_progress"],
 )
 
@@ -155,7 +158,10 @@ Now introduce this batch in your own warm, engaging style. Present the words cle
 
 End with EXACTLY these numbered options:
 1. Take quick quiz on these words
-2. Move on to next batch""",
+2. Move on to next batch
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic or uses inappropriate language, gently redirect them back to the lesson. Suggest they can take a break if needed.""",
     input_variables=[
         "lesson_number",
         "batch_number",
@@ -229,7 +235,7 @@ Now summarize their performance in your own warm, encouraging style. Show which 
 
 End with EXACTLY these numbered options based on progress:
 - If batches remaining: "1. Continue to next batch" and "2. Review these words"
-- If all batches complete: "1. Move on to grammar" and "2. Review vocabulary" """,
+- If all batches complete: "1. Move on to grammar" and "2. Review vocabulary\"""",
     input_variables=[
         "batch_number",
         "score",
@@ -293,7 +299,10 @@ Now teach this grammar topic in your own clear, engaging style. Explain the rule
 
 End with EXACTLY these numbered options:
 1. Take quiz on this topic
-2. Review the lesson""",
+2. Review the lesson
+
+IMPORTANT - Off-topic handling:
+If the student goes off-topic or uses inappropriate language, gently redirect them back to the lesson. Suggest they can take a break if needed.""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 
@@ -365,7 +374,9 @@ Example response:
 "Not quite! كِتَاب (kitāb) means book, not pen. Think of 'kitāb' like 'book' - they both have that 'k' sound! You're at 1/2 so far - keep going!"
 
 IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Close, but...", or "Actually,".
-Now provide supportive correction in your own style. Show the correct answer clearly, optionally give a memory tip, and mention their score. Be encouraging and helpful!""",
+Now provide supportive correction in your own style. Show the correct answer clearly, optionally give a memory tip, and mention their score. Be encouraging and helpful!
+
+Stay patient and kind!""",
     input_variables=[
         "word_arabic",
         "word_transliteration",
@@ -407,7 +418,9 @@ Current Score: {current_score}
 Student was incorrect.
 
 IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Actually,", or "Close, but...".
-Provide supportive correction in your own style. Explain why with reference to grammar rule. Mention current score. Be encouraging and helpful!""",
+Provide supportive correction in your own style. Explain why with reference to grammar rule. Mention current score. Be encouraging and helpful!
+
+Stay patient and supportive!""",
     input_variables=[
         "question",
         "student_answer",
@@ -432,13 +445,17 @@ Question: What does "{word}" mean?
 Student Answer: "{student_answer}"
 Correct Answer: "{correct_answer}"
 
-Evaluate if the student's answer is correct. Be VERY flexible and lenient:
+Evaluate if the student's answer is correct. Be flexible but accurate:
 - Ignore case differences (PEN = pen = Pen)
 - Ignore extra/missing spaces or punctuation
-- Accept minor typos (e.g., "scool" for "school", "pen" for "pen")
-- Accept synonyms (e.g., "instructor" for "teacher")
-- Accept alternate phrasings that convey the same meaning
-- If the core meaning matches, mark it correct
+- Accept minor typos within 1-2 characters (e.g., "scool" for "school", "techer" for "teacher")
+- Accept close synonyms that mean the same thing (e.g., "instructor" for "teacher", "home" for "house")
+- The core meaning must match - "tall" is NOT the same as "table", "cat" is NOT the same as "window"
+
+Mark as INCORRECT if the meaning is different:
+- Wrong object/concept entirely (cat ≠ book, tall ≠ table)
+- Unrelated words (pen ≠ school)
+- Completely off-topic or nonsense answers
 
 IMPORTANT: Output ONLY a JSON object. Do NOT add explanations, reasoning, or any text before or after the JSON.
 

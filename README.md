@@ -70,11 +70,19 @@ Built with:
 
 ## Documentation
 
+### System Documentation ([`docs/`](docs/))
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design and agent details
 - **[INFERENCE.md](docs/INFERENCE.md)** - Inference pipeline and generation configs
 - **[DEPLOYMENT.md](docs/DEPLOYMENT.md)** - HuggingFace Spaces deployment guide
 - **[API_CONTRACT.md](docs/API_CONTRACT.md)** - Gradio interface contract
 - **[PROMPTS_INVENTORY.md](docs/PROMPTS_INVENTORY.md)** - All 19 prompts documented
+
+### Model & Training ([`models/`](models/), [`training/`](training/))
+- **[models/README.md](models/README.md)** - Fine-tuned model details and LoRA adapters
+- **[training/README.md](training/README.md)** - Training notebooks and AWS SageMaker setup
+
+### Training Data ([`data/training/`](data/training/))
+- **[examples/README.md](data/training/examples/README.md)** - Training data format and examples
 
 ## Credits
 
