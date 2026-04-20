@@ -216,7 +216,7 @@ class Orchestrator:
         Returns:
             str: Formatted prompt for the stage
         """
-        from src.prompts.templates import GRAMMAR_OVERVIEW, VOCAB_BATCH_INTRO
+        from src.prompts.templates import GRAMMAR_OVERVIEW, VOCAB_BATCH_INTRO, VOCAB_QUIZ_QUESTION
 
         session = self.sessions[session_id]
         lesson_number = session["lesson_number"]
@@ -254,6 +254,53 @@ class Orchestrator:
                     "words": words_formatted,
                 }
             ).text
+            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+        elif stage == "vocab_quiz":
+            logger.info("[Orchestrator] Using template: VOCAB_QUIZ_QUESTION")
+            # Initialize quiz state if not exists
+            if "quiz_state" not in session["vocabulary"]:
+                current_batch = session.get("vocabulary", {}).get("current_batch", 1)
+                all_vocab = lesson_data["vocabulary"]
+
+                # Get words for current batch (3 per batch)
+                batch_size = 3
+                start_idx = (current_batch - 1) * batch_size
+                end_idx = min(start_idx + batch_size, len(all_vocab))
+                batch_words = all_vocab[start_idx:end_idx]
+
+                session["vocabulary"]["quiz_state"] = {
+                    "current_question": 0,
+                    "total_questions": len(batch_words),
+                    "words": batch_words,
+                    "answers": [],
+                    "score": 0,
+                }
+
+            quiz_state = session["vocabulary"]["quiz_state"]
+            current_q = quiz_state["current_question"]
+
+            # Check if quiz is complete
+            if current_q >= quiz_state["total_questions"]:
+                # TODO: Show quiz summary
+                return (
+                    f"Quiz complete! Score: {quiz_state['score']}/{quiz_state['total_questions']}"
+                )
+
+            # Get current word
+            word = quiz_state["words"][current_q]
+
+            # Alternate between arabic_to_english and english_to_arabic
+            question_type = "arabic_to_english" if current_q % 2 == 0 else "english_to_arabic"
+
+            prompt_text = VOCAB_QUIZ_QUESTION.invoke(
+                {
+                    "question_type": question_type,
+                    "word_arabic": word["arabic"],
+                    "word_transliteration": word["transliteration"],
+                }
+            ).text
+
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
 
         elif stage == "grammar_overview":
