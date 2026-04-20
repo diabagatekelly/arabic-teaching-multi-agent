@@ -1,0 +1,38 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: teaching_vocab\n\nQuestion 1 of 3\n\nNow ask your question simply and clearly. Use EXACTLY this format: \"Question 1 of 3\\n\\nWhat does كِتَابٌ mean?\"\n\nIMPORTANT: DO NOT include the transliteration or English translation in your question. Keep it simple and wait for the student's answer."
+      },
+      {
+        "role": "assistant",
+        "content": "Question 1 of 3\n\nWhat does كِتَابٌ mean?"
+      }
+    ]
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: teaching_vocab\n\nQuestion 2 of 3\n\nNow ask your question simply and clearly. Use EXACTLY this format: \"Question 2 of 3\\n\\nWhat does مَدْرَسَةٌ mean?\"\n\nIMPORTANT: DO NOT include the transliteration or English translation in your question. Keep it simple and wait for the student's answer."
+      },
+      {
+        "role": "assistant",
+        "content": "Question 2 of 3\n\nWhat does مَدْرَسَةٌ mean?"
+      }
+    ]
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: teaching_vocab\n\nQuestion 3 of 3\n\nNow ask your question simply and clearly. Use EXACTLY this format: \"Question 3 of 3\\n\\nWhat does قَلَمٌ mean?\"\n\nIMPORTANT: DO NOT include the transliteration or English translation in your question. Keep it simple and wait for the student's answer."
+      },
+      {
+        "role": "assistant",
+        "content": "Question 3 of 3\n\nWhat does قَلَمٌ mean?"
+      }
+    ]
+  }
+]

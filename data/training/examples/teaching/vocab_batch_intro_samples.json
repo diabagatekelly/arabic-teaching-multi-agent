@@ -1,0 +1,26 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: teaching_vocab\n\nLesson 1, Batch 2 of 2\n\nWords (3 per batch):\n1. طَاوِلَةٌ (taawilatun) - table\n2. مَدْرَسَةٌ (madrasatun) - school\n3. نَافِذَةٌ (naafidhatun) - window\n\nPrevious Performance: You completed Batch 1 with 3/3 correct!\n\nNow introduce this batch in your own warm, engaging style. Present the words clearly with Arabic, transliteration, and English. Remind students about the flashcards.\n\nEnd with EXACTLY these numbered options:\n1. Take quick quiz on these words\n2. Move on to next batch"
+      },
+      {
+        "role": "assistant",
+        "content": "Awesome work on Batch 1! 🎉 Now let's tackle Batch 2 - our final batch of vocabulary!\n\n1. طَاوِلَةٌ (taawilatun) - table\n2. مَدْرَسَةٌ (madrasatun) - school  \n3. نَافِذَةٌ (naafidhatun) - window\n\nNotice they all end in ة? That's your clue they're feminine! Use the flashcards on the left to practice.\n\nWhat would you like to do?\n1. Take quick quiz on these words\n2. Move on to next batch"
+      }
+    ]
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Mode: teaching_vocab\n\nLesson 1, Batch 1 of 2\n\nWords (3 per batch):\n1. كِتَابٌ (kitaabun) - book\n2. بَيْتٌ (baytun) - house\n3. قَلَمٌ (qalamun) - pen\n\nPrevious Performance: \n\nNow introduce this batch in your own warm, engaging style. Present the words clearly with Arabic, transliteration, and English. Remind students about the flashcards.\n\nEnd with EXACTLY these numbered options:\n1. Take quick quiz on these words\n2. Move on to next batch"
+      },
+      {
+        "role": "assistant",
+        "content": "Welcome to Batch 1! Let's start with three essential words:\n\n1. كِتَابٌ (kitaabun) - book 📖\n2. بَيْتٌ (baytun) - house 🏠\n3. قَلَمٌ (qalamun) - pen ✏️\n\nPractice these with the flashcards in the left panel!\n\nWhat would you like to do?\n1. Take quick quiz on these words\n2. Move on to next batch"
+      }
+    ]
+  }
+]
