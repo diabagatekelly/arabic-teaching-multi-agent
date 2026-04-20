@@ -176,8 +176,9 @@ Missed: {words_incorrect}
 
 Progress: You've completed {batches_completed} of {total_batches} batches.
 
-Example response:
+IMPORTANT: Check if all batches are done ({batches_completed} == {total_batches}).
 
+If batches remaining:
 "Excellent work! You scored 2/3 on Batch 1. 🎉
 
 ✓ Got right: book, school
@@ -187,10 +188,19 @@ You've completed 1 of 2 batches - great progress!
 
 What would you like to do?
 1. Continue to next batch
-2. Review these words
-3. Skip to final test"
+2. Review these words"
 
-Now generate your response following this format. Summarize performance encouragingly, show missed words with translations, and end with those exact numbered options.""",
+If all batches complete:
+"Amazing! You scored 2/3 on Batch 2 - that's the final vocabulary batch! 🎉
+
+✓ Got right: book, school
+✗ Missed: pen (قَلَم - qalam)
+
+You've completed all vocabulary! Ready for grammar?
+1. Move on to grammar
+2. Review vocabulary"
+
+Generate your response in your own style. Summarize performance encouragingly, show missed words with translations, and offer appropriate next steps based on progress.""",
     input_variables=[
         "batch_number",
         "score",
@@ -303,7 +313,8 @@ Example response:
 
 "✓ Correct! كِتَاب (kitāb) means book. You're doing great - that's 2/3 correct!"
 
-Now provide brief, encouraging feedback following this style. Confirm correctness and mention their score.""",
+IMPORTANT: The student got this RIGHT. Start with a positive affirmation like "Correct!", "Yes!", "Perfect!", or "Exactly!".
+Now provide brief, encouraging feedback in your own style. Confirm correctness and mention their score. Be warm and personable!""",
     input_variables=["word_arabic", "word_transliteration", "english", "current_score"],
 )
 
@@ -320,7 +331,8 @@ Example response:
 
 "Not quite! كِتَاب (kitāb) means book, not pen. Think of 'kitāb' like 'book' - they both have that 'k' sound! You're at 1/2 so far - keep going!"
 
-Now provide supportive correction following this style. Show the correct answer, give a memory tip, and mention their score.""",
+IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Close, but...", or "Actually,".
+Now provide supportive correction in your own style. Show the correct answer clearly, optionally give a memory tip, and mention their score. Be encouraging and helpful!""",
     input_variables=[
         "word_arabic",
         "word_transliteration",
@@ -340,7 +352,8 @@ Explanation: {explanation}
 Current Score: {current_score}
 Student was correct.
 
-Provide brief, encouraging feedback. Mention current score.""",
+IMPORTANT: The student got this RIGHT. Start with a positive affirmation like "Correct!", "Yes!", "Exactly!", or "Perfect!".
+Provide brief, encouraging feedback in your own style. Mention current score. Be warm and personable!""",
     input_variables=[
         "question",
         "student_answer",
@@ -360,7 +373,8 @@ Explanation: {explanation}
 Current Score: {current_score}
 Student was incorrect.
 
-Provide supportive correction. Explain why with reference to grammar rule. Mention current score.""",
+IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Actually,", or "Close, but...".
+Provide supportive correction in your own style. Explain why with reference to grammar rule. Mention current score. Be encouraging and helpful!""",
     input_variables=[
         "question",
         "student_answer",

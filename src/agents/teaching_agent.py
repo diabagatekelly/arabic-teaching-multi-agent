@@ -55,9 +55,9 @@ class TeachingAgent:
             max_new_tokens=max_new_tokens,
             do_sample=True,
             temperature=temperature,
-            top_p=0.9,
-            top_k=50,
-            repetition_penalty=1.1,
+            top_p=0.92,  # Slightly higher for more diverse vocabulary
+            top_k=60,  # Broader vocabulary selection
+            repetition_penalty=1.05,  # Lower penalty for more natural repetition
             num_beams=1,
             use_cache=True,
             pad_token_id=self.tokenizer.pad_token_id,

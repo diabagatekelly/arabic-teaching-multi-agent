@@ -127,7 +127,7 @@ class Orchestrator:
 
         # Generate welcome message using teaching agent (lazy load model)
         teaching_agent = TeachingAgent(self.teaching_model_getter(), self.teaching_tokenizer)
-        response = teaching_agent.respond(prompt_text, max_new_tokens=256, temperature=0.7)
+        response = teaching_agent.respond(prompt_text, max_new_tokens=256, temperature=0.85)
 
         logger.info(
             f"[Orchestrator] Received response from teaching agent (length: {len(response)} chars)"
@@ -564,60 +564,92 @@ class Orchestrator:
                 logger.info("[Orchestrator] Handling off-topic/unrecognized input with fallback")
 
                 # Build a helpful fallback response based on current state
+                # Let model generate in its own voice with appropriate context
+                teaching_agent = TeachingAgent(
+                    self.teaching_model_getter(), self.teaching_tokenizer
+                )
+
                 if current_progress == "vocab_quiz_complete":
-                    # Just finished quiz - offer next steps without crashing
+                    # Just finished quiz - offer next steps
                     current_batch = session.get("vocabulary", {}).get("current_batch", 1)
                     total_batches = len(session.get("vocabulary", {}).get("words", [])) // 3
 
                     if current_batch < total_batches:
-                        fallback_msg = (
-                            "I noticed you might want to take a break! That's totally fine - learning is hard work. 🌟\n\n"
-                            f"So far you've completed Batch {current_batch}. "
-                            "When you're ready, we can:\n"
-                            "1. Continue to next batch\n"
-                            "2. Review these words\n"
-                            "3. Take a longer break and come back later\n\n"
-                            "What would you like to do?"
-                        )
+                        context = f"completed Batch {current_batch} of {total_batches}"
+                        options = "continue to next batch, review these words, or take a break"
                     else:
-                        fallback_msg = (
-                            "Great work on completing the vocabulary! 🎉\n\n"
-                            "Would you like to:\n"
-                            "1. Move on to grammar\n"
-                            "2. Review vocabulary\n"
-                            "3. Take a break\n\n"
-                            "What sounds good?"
-                        )
-                    return fallback_msg
+                        context = "completed all vocabulary batches"
+                        options = "move on to grammar, review vocabulary, or take a break"
+
+                    fallback_prompt = f"""Mode: clarification
+
+Student just {context}.
+Student's unclear message: {user_message}
+
+Your task: Acknowledge their message warmly and offer next steps. Mention they can {options}.
+Keep it conversational and brief (2-3 sentences). Ask what they'd like to do.
+
+Teacher:"""
+                    return teaching_agent.respond(
+                        fallback_prompt, max_new_tokens=150, temperature=0.85
+                    )
 
                 elif current_progress in ["vocab_batch_intro", "vocab_quiz"]:
                     # In the middle of vocabulary learning
-                    return (
-                        "I want to make sure you're getting the most out of this lesson! 📚\n\n"
-                        "Right now we're working on vocabulary. You can:\n"
-                        "1. Continue with the current batch\n"
-                        "2. Take a quiz on these words\n"
-                        "3. See all vocabulary words\n\n"
-                        "Or if you need a break, just let me know and we can pause here. What would you like?"
+                    fallback_prompt = f"""Mode: clarification
+
+Currently working on: vocabulary section
+Student's unclear message: {user_message}
+
+Your task: Gently redirect them back to vocabulary work. Mention they can continue with the batch, take a quiz, or see all words. Or take a break if needed.
+Keep it warm and conversational (2-3 sentences).
+
+Teacher:"""
+                    return teaching_agent.respond(
+                        fallback_prompt, max_new_tokens=150, temperature=0.85
                     )
 
                 elif current_progress == "lesson_start":
                     # At the beginning
-                    return (
-                        "Let's get started! Which would you like to begin with?\n"
-                        "1. Start with vocabulary\n"
-                        "2. Start with grammar\n\n"
-                        "Just let me know your choice!"
+                    fallback_prompt = f"""Mode: clarification
+
+Currently at: lesson start (haven't chosen vocab or grammar yet)
+Student's unclear message: {user_message}
+
+Your task: Warmly ask them whether they'd like to start with vocabulary or grammar.
+Keep it friendly and brief (1-2 sentences).
+
+Teacher:"""
+                    return teaching_agent.respond(
+                        fallback_prompt, max_new_tokens=100, temperature=0.85
                     )
 
                 else:
-                    # Generic fallback for any other state
-                    return (
-                        "I want to make sure we're on the same page! Could you let me know:\n"
-                        "- Do you want to continue with the lesson?\n"
-                        "- Would you like to review what we've covered?\n"
-                        "- Do you need a break?\n\n"
-                        "I'm here to help however works best for you! 🌟"
+                    # Generic fallback: let model handle in its own voice
+                    # Build context about current state and boundaries
+                    fallback_prompt = f"""Mode: clarification
+
+Current lesson stage: {current_progress}
+Student message: {user_message}
+
+Context: The student's message doesn't clearly indicate what they want to do next. You need to gently redirect them back to the lesson structure while being warm and supportive.
+
+Your task: Respond in your own natural teaching voice to:
+1. Acknowledge their message kindly
+2. Explain that you can help them with the lesson (continue, review, or take a break)
+3. Remind them what stage they're at (e.g., vocabulary section, grammar topic, etc.)
+4. Ask them what they'd like to do: continue, review, or pause
+
+Be conversational and encouraging, not robotic. Keep it brief (2-3 sentences max).
+
+Teacher:"""
+
+                    # Generate response through teaching agent
+                    teaching_agent = TeachingAgent(
+                        self.teaching_model_getter(), self.teaching_tokenizer
+                    )
+                    return teaching_agent.respond(
+                        fallback_prompt, max_new_tokens=150, temperature=0.85
                     )
 
         logger.info("[Orchestrator] ===== END STATE MACHINE =====")
@@ -694,7 +726,7 @@ class Orchestrator:
 
             # Generate response using teaching agent
             teaching_agent = TeachingAgent(self.teaching_model_getter(), self.teaching_tokenizer)
-            response = teaching_agent.respond(prompt, max_new_tokens=512, temperature=0.7)
+            response = teaching_agent.respond(prompt, max_new_tokens=512, temperature=0.85)
 
         logger.info("=" * 80)
         logger.info("[Orchestrator] MODEL RESPONSE:")
@@ -851,7 +883,7 @@ class Orchestrator:
                     self.teaching_model_getter(), self.teaching_tokenizer
                 )
                 feedback_response = teaching_agent.respond(
-                    f"{prompt_text}\n\nTeacher:", max_new_tokens=200, temperature=0.7
+                    f"{prompt_text}\n\nTeacher:", max_new_tokens=200, temperature=0.85
                 )
 
                 # Show feedback, then immediately show next question (don't wait for user)
@@ -1083,61 +1115,72 @@ class Orchestrator:
                 return f"{prompt_text}\n\nTeacher:"
 
         elif stage == "grammar_quiz":
-            logger.info("[Orchestrator] Using template: GRAMMAR_QUIZ (ContentAgent)")
+            logger.info("[Orchestrator] Using template: GRAMMAR_QUIZ")
 
-            # Generate quiz questions using ContentAgent if not already generated
+            # Generate quiz questions using pre-generated or ContentAgent if not already in quiz state
             if "grammar_quiz_state" not in session.get("grammar", {}):
-                logger.info("[Orchestrator] Generating grammar quiz questions via ContentAgent")
-
                 # Get the first grammar topic
                 grammar_topic = lesson_data["grammar_points"][0]
                 topic_name = grammar_topic.replace("_", " ").title()
 
-                # Prepare learned vocabulary items for ContentAgent
-                learned_items = [
-                    f"{v['arabic']} ({v['english']})" for v in lesson_data["vocabulary"]
-                ]
+                # First try to get pre-generated quiz from background thread
+                pre_generated_quizzes = session.get("grammar", {}).get("quizzes", {})
+                if grammar_topic in pre_generated_quizzes:
+                    logger.info(
+                        f"[Orchestrator] Using pre-generated quiz for topic: {grammar_topic}"
+                    )
+                    questions = pre_generated_quizzes[grammar_topic]
+                else:
+                    # Fallback: generate on-demand if pre-generation hasn't finished yet
+                    logger.info(
+                        "[Orchestrator] Pre-generated quiz not ready, generating on-demand via ContentAgent"
+                    )
 
-                # Try to generate quiz via ContentAgent
-                if self.content_agent:
-                    try:
-                        logger.info("[Orchestrator] Calling ContentAgent.generate_quiz()")
-                        quiz_json = self.content_agent.generate_quiz(
-                            {
-                                "quiz_type": "grammar",
-                                "count": 3,
-                                "difficulty": "beginner",
-                                "learned_items": learned_items,
-                                "lesson_number": lesson_number,
-                            }
-                        )
+                    # Prepare learned vocabulary items for ContentAgent
+                    learned_items = [
+                        f"{v['arabic']} ({v['english']})" for v in lesson_data["vocabulary"]
+                    ]
 
-                        # Parse the JSON response
-                        import json
-
-                        questions_raw = json.loads(quiz_json)
-
-                        # Convert to our format
-                        questions = []
-                        for q in questions_raw[:3]:  # Take first 3
-                            questions.append(
+                    # Try to generate quiz via ContentAgent
+                    if self.content_agent:
+                        try:
+                            logger.info("[Orchestrator] Calling ContentAgent.generate_quiz()")
+                            quiz_json = self.content_agent.generate_quiz(
                                 {
-                                    "question": q.get("question", ""),
-                                    "answer": q.get("answer", q.get("correct", "")),
-                                    "explanation": f"Grammar topic: {topic_name}",
+                                    "quiz_type": "grammar",
+                                    "count": 3,
+                                    "difficulty": "beginner",
+                                    "learned_items": learned_items,
+                                    "lesson_number": lesson_number,
                                 }
                             )
 
-                        logger.info(
-                            f"[Orchestrator] ContentAgent generated {len(questions)} questions"
-                        )
+                            # Parse the JSON response
+                            import json
 
-                    except Exception as e:
-                        logger.error(f"[Orchestrator] ContentAgent failed: {e}, using fallback")
+                            questions_raw = json.loads(quiz_json)
+
+                            # Convert to our format
+                            questions = []
+                            for q in questions_raw[:3]:  # Take first 3
+                                questions.append(
+                                    {
+                                        "question": q.get("question", ""),
+                                        "answer": q.get("answer", q.get("correct", "")),
+                                        "explanation": f"Grammar topic: {topic_name}",
+                                    }
+                                )
+
+                            logger.info(
+                                f"[Orchestrator] ContentAgent generated {len(questions)} questions"
+                            )
+
+                        except Exception as e:
+                            logger.error(f"[Orchestrator] ContentAgent failed: {e}, using fallback")
+                            questions = None
+                    else:
+                        logger.warning("[Orchestrator] No ContentAgent available, using fallback")
                         questions = None
-                else:
-                    logger.warning("[Orchestrator] No ContentAgent available, using fallback")
-                    questions = None
 
                 # Fallback: dynamic hardcoded questions using lesson vocabulary
                 if not questions or len(questions) < 3:
@@ -1279,7 +1322,7 @@ class Orchestrator:
                     self.teaching_model_getter(), self.teaching_tokenizer
                 )
                 feedback_response = teaching_agent.respond(
-                    f"{prompt_text}\n\nTeacher:", max_new_tokens=200, temperature=0.7
+                    f"{prompt_text}\n\nTeacher:", max_new_tokens=200, temperature=0.85
                 )
 
                 # Show feedback, then immediately show next question (don't wait for user)
