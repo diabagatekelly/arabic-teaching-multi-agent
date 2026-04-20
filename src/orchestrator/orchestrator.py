@@ -563,6 +563,80 @@ class Orchestrator:
                         )
                         new_state = "grammar_quiz"
 
+                # Handle answer intent in final_exam
+                elif detected_intent == "answer" and current_progress == "final_exam":
+                    import json
+
+                    from src.agents.grading_agent import GradingAgent
+
+                    logger.info("[Orchestrator] Processing final exam answer")
+                    exam_state = session["final_exam_state"]
+                    current_q = exam_state["current_question"]
+                    current_question = exam_state["questions"][current_q]
+
+                    grading_agent = GradingAgent(
+                        model=self.teaching_model_getter(),
+                        tokenizer=self.teaching_tokenizer,
+                        max_new_tokens=50,
+                    )
+
+                    # Grade based on question type
+                    if current_question["type"] == "vocab":
+                        grading_result = grading_agent.grade_vocab(
+                            {
+                                "word": current_question["word"]["arabic"],
+                                "student_answer": user_message,
+                                "correct_answer": current_question["word"]["english"],
+                            }
+                        )
+                    else:  # grammar
+                        grading_result = grading_agent.grade_grammar_quiz(
+                            {
+                                "question": current_question["question"],
+                                "student_answer": user_message,
+                                "correct_answer": current_question["answer"],
+                            }
+                        )
+
+                    # Parse result
+                    import re
+
+                    try:
+                        json_match = re.search(
+                            r'\{[^}]*"correct"\s*:\s*(true|false)[^}]*\}', grading_result
+                        )
+                        if json_match:
+                            result_dict = json.loads(json_match.group(0))
+                            is_correct = result_dict.get("correct", False)
+                        else:
+                            is_correct = False
+                    except (json.JSONDecodeError, AttributeError):
+                        is_correct = False
+
+                    # Update exam state
+                    exam_state["answers"].append(
+                        {
+                            "question_type": current_question["type"],
+                            "word": current_question.get("word"),
+                            "correct_answer": current_question.get("answer")
+                            if current_question["type"] == "grammar"
+                            else current_question["word"]["english"],
+                            "student_answer": user_message,
+                            "correct": is_correct,
+                        }
+                    )
+
+                    if is_correct:
+                        exam_state["score"] += 1
+
+                    exam_state["feedback_shown"] = False
+                    exam_state["current_question"] += 1
+
+                    if exam_state["current_question"] >= exam_state["total_questions"]:
+                        new_state = "final_exam_complete"
+                    else:
+                        new_state = "final_exam"
+
                 # Update state
                 session["current_progress"] = new_state
                 current_progress = new_state
@@ -1367,19 +1441,141 @@ class Orchestrator:
             return f"{prompt_text}\n\nTeacher:"
 
         elif stage == "final_exam":
-            logger.info("[Orchestrator] Using template: FINAL_EXAM (not implemented)")
-            # TODO: Implement comprehensive final exam with mixed vocab + grammar questions
-            return {
-                "skip_model": True,
-                "response": "The final exam feature is coming soon! For now, you can practice with vocab quizzes and grammar quizzes separately.",
-            }
+            logger.info("[Orchestrator] Using template: FINAL_EXAM")
+
+            # Initialize final exam state if not exists
+            if "final_exam_state" not in session:
+                # Create mixed questions: 3 vocab + 2 grammar
+                import random
+
+                all_vocab = lesson_data["vocabulary"]
+                vocab_questions = random.sample(all_vocab, min(3, len(all_vocab)))
+
+                # Grammar questions (gender identification)
+                masculine_words = [v for v in all_vocab if not v["arabic"].endswith("ة")]
+                feminine_words = [v for v in all_vocab if v["arabic"].endswith("ة")]
+
+                grammar_questions = []
+                used_words = set()
+                for _ in range(2):  # 2 grammar questions
+                    if random.choice([True, False]) and masculine_words:
+                        available = [w for w in masculine_words if w["arabic"] not in used_words]
+                        if available:
+                            word = random.choice(available)
+                            used_words.add(word["arabic"])
+                            grammar_questions.append(
+                                {
+                                    "type": "grammar",
+                                    "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                    "answer": "masculine",
+                                    "word": word,
+                                }
+                            )
+                    elif feminine_words:
+                        available = [w for w in feminine_words if w["arabic"] not in used_words]
+                        if available:
+                            word = random.choice(available)
+                            used_words.add(word["arabic"])
+                            grammar_questions.append(
+                                {
+                                    "type": "grammar",
+                                    "question": f"Is {word['arabic']} ({word['english']}) masculine or feminine?",
+                                    "answer": "feminine",
+                                    "word": word,
+                                }
+                            )
+
+                # Combine and shuffle
+                all_questions = [
+                    {"type": "vocab", "word": w} for w in vocab_questions
+                ] + grammar_questions
+                random.shuffle(all_questions)
+
+                session["final_exam_state"] = {
+                    "current_question": 0,
+                    "total_questions": len(all_questions),
+                    "questions": all_questions,
+                    "answers": [],
+                    "score": 0,
+                    "feedback_shown": False,
+                }
+                logger.info(
+                    f"[Orchestrator] Initialized final exam with {len(all_questions)} questions"
+                )
+
+            exam_state = session["final_exam_state"]
+            current_q = exam_state["current_question"]
+
+            # Check if we just graded and need to show feedback
+            if (
+                exam_state["answers"]
+                and len(exam_state["answers"]) == current_q
+                and not exam_state.get("feedback_shown", False)
+            ):
+                # Show feedback for last answer
+                last_answer = exam_state["answers"][-1]
+                is_correct = last_answer["correct"]
+                current_score = f"{exam_state['score']}/{len(exam_state['answers'])}"
+
+                # Generate brief feedback
+                teaching_agent = TeachingAgent(
+                    self.teaching_model_getter(), self.teaching_tokenizer
+                )
+                if is_correct:
+                    feedback = f"✓ Correct! Score: {current_score}"
+                else:
+                    if last_answer["question_type"] == "vocab":
+                        feedback = f"✗ Not quite. {last_answer['word']['arabic']} means {last_answer['word']['english']}. Score: {current_score}"
+                    else:
+                        feedback = f"✗ Not quite. The answer was {last_answer['correct_answer']}. Score: {current_score}"
+
+                exam_state["feedback_shown"] = True
+
+                # Show next question if available
+                if current_q < exam_state["total_questions"]:
+                    next_q = exam_state["questions"][current_q]
+                    if next_q["type"] == "vocab":
+                        next_question = f"\n\nQuestion {current_q + 1}/{exam_state['total_questions']}\n\nWhat does {next_q['word']['arabic']} mean?"
+                    else:
+                        next_question = f"\n\nQuestion {current_q + 1}/{exam_state['total_questions']}\n\n{next_q['question']}"
+
+                    return {"skip_model": True, "response": feedback + next_question}
+                else:
+                    return {"skip_model": True, "response": feedback}
+
+            # Ask current question
+            question = exam_state["questions"][current_q]
+            if question["type"] == "vocab":
+                return f"Question {current_q + 1}/{exam_state['total_questions']}\n\nWhat does {question['word']['arabic']} mean?\n\nTeacher:"
+            else:
+                return f"Question {current_q + 1}/{exam_state['total_questions']}\n\n{question['question']}\n\nTeacher:"
 
         elif stage == "final_exam_complete":
-            logger.info("[Orchestrator] Final exam complete (not implemented)")
-            return {
-                "skip_model": True,
-                "response": "Great work on completing the lesson! You can review vocabulary, try more grammar practice, or start a new lesson.",
-            }
+            logger.info("[Orchestrator] Using template: FINAL_EXAM_COMPLETE")
+
+            exam_state = session.get("final_exam_state", {})
+            if not exam_state:
+                return "Great work on completing the final exam!"
+
+            score = f"{exam_state['score']}/{exam_state['total_questions']}"
+            percentage = int((exam_state["score"] / exam_state["total_questions"]) * 100)
+
+            # Clear exam state
+            if "final_exam_state" in session:
+                del session["final_exam_state"]
+
+            return f"""🎉 Final Exam Complete! 🎉
+
+Your score: {score} ({percentage}%)
+
+You've completed Lesson 1! {"🌟 Excellent work!" if percentage >= 80 else "Great effort!"}
+
+What would you like to do?
+1. Review vocabulary
+2. Practice grammar
+3. Retake the exam
+
+Teacher:"""
 
         else:
             logger.info(f"[Orchestrator] Using default minimal prompt for stage: {stage}")
