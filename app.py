@@ -90,11 +90,24 @@ def process_message(message, chat_history, session_id):
     logger.info("[App] USER INPUT CAPTURED")
     logger.info(f"  Message: {message}")
     logger.info(f"  Session ID: {session_id}")
+    logger.info(f"  Session ID type: {type(session_id)}")
     logger.info(f"  Chat history length: {len(chat_history)}")
+    logger.info(f"  Sessions dict keys: {list(sessions.keys())}")
+    logger.info(f"  Session exists: {session_id in sessions}")
+
+    if session_id in sessions:
+        logger.info(f"  Session status: {sessions[session_id].get('status')}")
+        logger.info(f"  Session data: {list(sessions[session_id].keys())}")
 
     # Check if lesson is active
     if session_id not in sessions or sessions[session_id].get("status") != "active":
         logger.warning("[App] No active lesson - returning error message")
+        logger.warning(f"  Condition 1 - session_id not in sessions: {session_id not in sessions}")
+        if session_id in sessions:
+            logger.warning(
+                f"  Condition 2 - status not active: {sessions[session_id].get('status') != 'active'}"
+            )
+            logger.warning(f"  Actual status: {sessions[session_id].get('status')}")
         error_msg = "Please start a lesson first using the 'Start Lesson' button."
         chat_history.append({"role": "user", "content": message})
         chat_history.append({"role": "assistant", "content": error_msg})
@@ -229,6 +242,12 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         if not sid:
             sid = str(uuid.uuid4())[:8]
 
+        logger.info("=" * 80)
+        logger.info("[App] START LESSON UI CALLED")
+        logger.info(f"  Session ID: {sid}")
+        logger.info(f"  Session ID type: {type(sid)}")
+        logger.info(f"  Sessions before: {list(sessions.keys())}")
+
         # Get lesson from cache
         lesson_number = 1
         if lesson_number not in lesson_cache:
@@ -236,6 +255,12 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 
         # Call orchestrator to start lesson (updates session, generates welcome)
         welcome_message = orchestrator.start_lesson(sid, lesson_number)
+
+        logger.info(f"  Sessions after: {list(sessions.keys())}")
+        logger.info(f"  Session created: {sid in sessions}")
+        if sid in sessions:
+            logger.info(f"  Session status: {sessions[sid].get('status')}")
+        logger.info("=" * 80)
 
         lesson_data = lesson_cache[lesson_number]
         lesson_info = f"""**Status:** Active
