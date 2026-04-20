@@ -277,7 +277,12 @@ class Orchestrator:
                 is_affirmative = any(keyword in user_lower for keyword in affirmative_keywords)
                 if is_affirmative:
                     # Default to primary action based on current state
-                    if current_progress in ["vocab_batch_intro", "grammar_explanation"]:
+                    if current_progress == "lesson_start":
+                        detected_intent = "vocab"
+                        logger.info(
+                            "[Orchestrator] Detected intent from affirmative: vocab (default)"
+                        )
+                    elif current_progress in ["vocab_batch_intro", "grammar_explanation"]:
                         detected_intent = "quiz"
                         logger.info("[Orchestrator] Detected intent from affirmative: quiz")
 
