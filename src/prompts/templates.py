@@ -189,9 +189,16 @@ Examples:
 
 Explain this grammar topic to the student in an encouraging way.
 
-IMPORTANT: When presenting Arabic text with examples, include case endings (final harakaat) as they are grammatically significant. When mentioning the quiz, remind students that case endings matter for correctness.
+IMPORTANT: When presenting Arabic text with examples, include case endings (final harakaat) as they are grammatically significant.
 
-End by mentioning the quiz is next.""",
+**CRITICAL REQUIREMENT:**
+You MUST end your response with these EXACT numbered options:
+
+"What would you like to do next?
+1. Take quiz on this topic
+2. Review the lesson"
+
+DO NOT end your response without these numbered options. They are MANDATORY.""",
     input_variables=["lesson_number", "topic_name", "grammar_rule", "examples_formatted"],
 )
 

@@ -166,9 +166,9 @@ class Orchestrator:
                 current_progress = "vocab_batch_intro"
                 logger.info("[Orchestrator] Transitioning to vocab_batch_intro")
             elif "grammar" in user_lower or "2" in user_lower:
-                session["current_progress"] = "grammar_overview"
-                current_progress = "grammar_overview"
-                logger.info("[Orchestrator] Transitioning to grammar_overview")
+                session["current_progress"] = "grammar_explanation"
+                current_progress = "grammar_explanation"
+                logger.info("[Orchestrator] Transitioning to grammar_explanation")
 
         # Check if starting vocab quiz (user chooses quiz from vocab_batch_intro)
         elif current_progress == "vocab_batch_intro":
@@ -216,7 +216,12 @@ class Orchestrator:
         Returns:
             str: Formatted prompt for the stage
         """
-        from src.prompts.templates import GRAMMAR_OVERVIEW, VOCAB_BATCH_INTRO, VOCAB_QUIZ_QUESTION
+        from src.prompts.templates import (
+            GRAMMAR_EXPLANATION,
+            GRAMMAR_OVERVIEW,
+            VOCAB_BATCH_INTRO,
+            VOCAB_QUIZ_QUESTION,
+        )
 
         session = self.sessions[session_id]
         lesson_number = session["lesson_number"]
@@ -317,6 +322,53 @@ class Orchestrator:
                     "lesson_number": lesson_number,
                     "topics_count": len(lesson_data["grammar_points"]),
                     "topics_list": topics_list,
+                }
+            ).text
+            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+        elif stage == "grammar_explanation":
+            logger.info("[Orchestrator] Using template: GRAMMAR_EXPLANATION")
+            # Get first grammar topic (we only have 1)
+            grammar_topic = lesson_data["grammar_points"][0]
+            topic_name = grammar_topic.replace("_", " ").title()
+
+            # Get grammar content from RAG
+            if self.content_agent and self.content_agent.rag_retriever:
+                rag_results = self.content_agent.rag_retriever.retrieve_by_lesson(
+                    query=f"grammar {topic_name} rule examples",
+                    lesson_number=lesson_number,
+                    top_k=3,
+                )
+
+                # Extract rule and examples from RAG results
+                grammar_rule = ""
+                examples = []
+
+                for result in rag_results:
+                    text = result.get("text", "")
+                    if "rule" in text.lower() or "Rule:" in text:
+                        grammar_rule = text
+                    if "example" in text.lower() or "Examples:" in text:
+                        examples.append(text)
+
+                # Fallback if RAG didn't return content
+                if not grammar_rule:
+                    grammar_rule = f"This lesson covers {topic_name}."
+                if not examples:
+                    examples = ["Check the lesson materials for examples."]
+
+                examples_formatted = "\n\n".join(examples)
+            else:
+                # No RAG available
+                grammar_rule = f"This lesson covers {topic_name}."
+                examples_formatted = "Check the lesson materials for examples."
+
+            prompt_text = GRAMMAR_EXPLANATION.invoke(
+                {
+                    "lesson_number": lesson_number,
+                    "topic_name": topic_name,
+                    "grammar_rule": grammar_rule,
+                    "examples_formatted": examples_formatted,
                 }
             ).text
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
