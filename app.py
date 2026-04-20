@@ -25,31 +25,15 @@ from src.rag.sentence_transformer_client import SentenceTransformerClient
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load teaching model at module level (required for ZeroGPU)
-print("===== Loading Base Qwen 7B Model =====")
+# Model names
 base_model_name = "Qwen/Qwen2.5-7B-Instruct"
 adapter_model_name = "kdiabagate/qwen-7b-arabic-teaching-v2"
 
+# Load tokenizer globally (CPU-safe)
 tokenizer = AutoTokenizer.from_pretrained(base_model_name)
-base_model = AutoModelForCausalLM.from_pretrained(
-    base_model_name,
-    torch_dtype=torch.float16,
-    device_map="auto",
-)
-print("===== Base model loaded, loading LoRA adapter =====")
 
-# Load LoRA adapter
-teaching_model = PeftModel.from_pretrained(base_model, adapter_model_name)
-print("===== LoRA adapter merged =====")
-
-# Only move to cuda if available (for HuggingFace Spaces)
-if torch.cuda.is_available():
-    teaching_model.to("cuda")
-print("===== Fine-tuned model ready =====")
-
-# TODO: Load LoRA adapter for teaching model when available
-# from peft import PeftModel
-# teaching_model = PeftModel.from_pretrained(teaching_model, "path/to/adapter")
+# Global model variable - lazy loaded inside GPU decorator
+teaching_model = None
 
 # Initialize RAG retriever
 print("===== Initializing RAG retriever =====")
@@ -63,6 +47,9 @@ print("===== RAG retriever initialized =====")
 @spaces.GPU(duration=60)
 def process_message(message, chat_history, session_id):
     """GPU-enabled message processing with Qwen model."""
+    # Get model (lazy loads if needed)
+    model = get_teaching_model()
+
     # Build chat history for model
     messages = []
     for msg in chat_history:
@@ -76,9 +63,9 @@ def process_message(message, chat_history, session_id):
 
     # Generate response using Qwen model
     text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    model_inputs = tokenizer([text], return_tensors="pt").to(teaching_model.device)
+    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
 
-    generated_ids = teaching_model.generate(
+    generated_ids = model.generate(
         **model_inputs,
         max_new_tokens=512,
         temperature=0.7,
@@ -178,8 +165,26 @@ for lesson_num in range(1, 11):  # Lessons 1-10
 
 print(f"===== {len(lesson_cache)} lessons cached =====")
 
-# Initialize orchestrator
-orchestrator = Orchestrator(lesson_cache, sessions, teaching_model, tokenizer)
+
+# Helper function to get model (lazy loaded)
+def get_teaching_model():
+    """Get the teaching model, loading it if necessary."""
+    global teaching_model
+    if teaching_model is None:
+        print("===== Loading Base Qwen 7B Model =====")
+        base_model = AutoModelForCausalLM.from_pretrained(
+            base_model_name,
+            torch_dtype=torch.float16,
+            device_map="cuda",
+        )
+        print("===== Base model loaded, loading LoRA adapter =====")
+        teaching_model = PeftModel.from_pretrained(base_model, adapter_model_name)
+        print("===== LoRA adapter merged =====")
+    return teaching_model
+
+
+# Initialize orchestrator with model getter
+orchestrator = Orchestrator(lesson_cache, sessions, get_teaching_model, tokenizer)
 print("===== Orchestrator initialized =====")
 
 
