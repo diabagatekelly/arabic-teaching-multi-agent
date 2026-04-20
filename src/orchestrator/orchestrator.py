@@ -456,6 +456,9 @@ class Orchestrator:
                     if is_correct:
                         quiz_state["score"] += 1
 
+                    # Reset feedback_shown so feedback will be displayed
+                    quiz_state["feedback_shown"] = False
+
                     # Move to next question or complete quiz
                     quiz_state["current_question"] += 1
 
@@ -1366,6 +1369,21 @@ class Orchestrator:
 
             # Don't include user_message in prompt for first question
             return f"{prompt_text}\n\nTeacher:"
+
+        elif stage == "final_exam":
+            logger.info("[Orchestrator] Using template: FINAL_EXAM (not implemented)")
+            # TODO: Implement comprehensive final exam with mixed vocab + grammar questions
+            return {
+                "skip_model": True,
+                "response": "The final exam feature is coming soon! For now, you can practice with vocab quizzes and grammar quizzes separately.",
+            }
+
+        elif stage == "final_exam_complete":
+            logger.info("[Orchestrator] Final exam complete (not implemented)")
+            return {
+                "skip_model": True,
+                "response": "Great work on completing the lesson! You can review vocabulary, try more grammar practice, or start a new lesson.",
+            }
 
         else:
             logger.info(f"[Orchestrator] Using default minimal prompt for stage: {stage}")

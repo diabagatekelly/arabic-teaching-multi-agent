@@ -291,7 +291,7 @@ Generate ONE exercise now:
 
     def generate_quiz(self, input_data: dict[str, Any]) -> str:
         """
-        Generate quiz (multiple exercises) using few-shot examples.
+        Generate quiz (multiple exercises) using RAG-retrieved exercise examples.
 
         Args:
             input_data: Input with keys:
@@ -310,35 +310,61 @@ Generate ONE exercise now:
         learned_items = input_data.get("learned_items", [])
         lesson_number = input_data.get("lesson_number")
 
-        # Get lesson vocabulary
-        lesson_vocab = []
-        if lesson_number and lesson_number in self.lessons:
-            lesson_vocab = self.lessons[lesson_number]["metadata"].get("vocabulary", [])
-
-        # Get examples from translation and multiple_choice templates
+        # Use RAG to retrieve relevant exercise examples based on quiz type and difficulty
         examples_text = ""
-        for ex_type in ["translation", "multiple_choice"]:
-            if ex_type in self.exercise_templates:
-                template = self.exercise_templates[ex_type]
-                if "examples" in template:
-                    type_examples = template["examples"].get(difficulty, [])[:1]
-                    if type_examples:
-                        examples_text += f"\n{ex_type} example:\n{type_examples[0]}\n"
+        if self.rag_retriever:
+            # Build query based on quiz type
+            if quiz_type == "vocabulary":
+                query = f"vocabulary {difficulty} translation exercise examples"
+            elif quiz_type == "grammar":
+                query = f"grammar {difficulty} exercise examples {' '.join(learned_items[:3])}"
+            else:
+                query = f"{difficulty} exercise examples for Arabic learning"
+
+            # Query RAG with metadata filter for lesson and difficulty
+            metadata_filter = {}
+            if lesson_number:
+                metadata_filter["lesson_number"] = lesson_number
+
+            # Retrieve top 5 exercise examples
+            retrieved_docs = self.rag_retriever.retrieve(
+                query=query,
+                top_k=5,
+                metadata_filter=metadata_filter if metadata_filter else None,
+            )
+
+            # Format retrieved examples for prompt
+            if retrieved_docs:
+                examples_text = "\n\nRetrieved Exercise Examples:\n"
+                for i, doc in enumerate(retrieved_docs[:3], 1):  # Use top 3
+                    examples_text += f"\nExample {i}:\n{doc['text'][:500]}\n"
+
+            logger.info(f"[ContentAgent] Retrieved {len(retrieved_docs)} exercise examples via RAG")
+        else:
+            # Fallback: Get examples from templates (old behavior)
+            logger.warning("[ContentAgent] RAG retriever not available, using template fallback")
+            for ex_type in ["translation", "multiple_choice"]:
+                if ex_type in self.exercise_templates:
+                    template = self.exercise_templates[ex_type]
+                    if "examples" in template:
+                        type_examples = template["examples"].get(difficulty, [])[:1]
+                        if type_examples:
+                            examples_text += f"\n{ex_type} example:\n{type_examples[0]}\n"
 
         prompt = f"""You are an Arabic language quiz generator. Generate {count} questions in a JSON array.
 
 Quiz Type: {quiz_type}
 Difficulty: {difficulty}
 Learned Items: {", ".join(learned_items[:10])}
-Lesson Vocabulary: {", ".join(lesson_vocab[:10])}
 {examples_text}
 
 REQUIREMENTS:
 1. Output ONLY a JSON array: [{{"question": "...", "answer": "...", "correct": "...", "type": "...", "difficulty": "..."}}]
 2. Include ALL fields in each question: "question", "answer", "correct", "type", "difficulty"
-3. Use variety (translation, multiple_choice, fill_in_blank)
-4. Each question uses learned items
-5. No duplicates
+3. Use VARIETY - mix different exercise types (translation, multiple_choice, fill_in_blank, error_correction, etc.)
+4. Each question MUST test the learned items provided
+5. NO duplicates - each question should be unique
+6. Make questions progressively harder within the same difficulty level
 
 Generate the JSON array now:
 """

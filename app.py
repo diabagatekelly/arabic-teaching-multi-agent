@@ -295,9 +295,15 @@ with gr.Blocks(
         justify-content: center;
         text-align: center;
         background-color: #f9f9f9;
-        font-size: 2em;
+        font-size: 2.5em;
         font-weight: 500;
         margin-top: 0;
+    }
+    /* Flashcard container border */
+    .flashcard-container {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
     }
     .main-title {
         text-align: center;
@@ -347,7 +353,7 @@ with gr.Blocks(
 
     with gr.Row():
         # Left panel - Flashcards (1/4 width)
-        with gr.Column(scale=1):
+        with gr.Column(scale=1, elem_classes=["flashcard-container"]):
             gr.Markdown("### 📚 Flashcards")
             flashcard_display = gr.Markdown(
                 "*Start a lesson to see flashcards*", visible=True, elem_classes=["flashcard"]
@@ -363,9 +369,9 @@ with gr.Blocks(
         with gr.Column(scale=2):
             # type="messages" only works in Gradio 5.x (Spaces), not local 6.12
             try:
-                chatbot = gr.Chatbot(height=600, type="messages", elem_classes=["chatbot"])
+                chatbot = gr.Chatbot(height=450, type="messages", elem_classes=["chatbot"])
             except TypeError:
-                chatbot = gr.Chatbot(height=600, elem_classes=["chatbot"])
+                chatbot = gr.Chatbot(height=450, elem_classes=["chatbot"])
             msg = gr.Textbox(
                 label="Your message",
                 placeholder="Try: hello, vocab, grammar...",
