@@ -123,6 +123,8 @@ class Orchestrator:
     def handle_message(self, session_id, user_message):
         """Handle user message during active lesson.
 
+        Routes to appropriate template based on session state.
+
         Args:
             session_id: User session identifier
             user_message: User's message text
@@ -141,73 +143,37 @@ class Orchestrator:
             return f"Error: Lesson {lesson_number} not found."
 
         lesson_data = self.lesson_cache[lesson_number]
+        current_progress = session.get("current_progress", "lesson_start")
 
         # Log session state
         logger.info("=" * 80)
         logger.info("[Orchestrator] SESSION STATE:")
         logger.info(f"  Lesson: {lesson_number} - {lesson_data['lesson_name']}")
-        learned_words = session.get("vocabulary", {}).get("words", [])[:6]
-        logger.info(f"  Learned words: {len(learned_words)}")
-        logger.info(f"  Current progress: {session.get('current_progress')}")
+        logger.info(f"  Current progress: {current_progress}")
         logger.info("=" * 80)
         logger.info("[Orchestrator] USER MESSAGE:")
         logger.info(f"  {user_message}")
         logger.info("=" * 80)
 
-        # Build minimal context
-        vocab_list = "\n".join(
-            [
-                f"{i+1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
-                for i, v in enumerate(learned_words)
-            ]
-        )
-
-        grammar_topics = ", ".join(lesson_data.get("grammar_points", []))
-
-        # Check if student is requesting a quiz
+        # Detect transitions from user message
         user_lower = user_message.lower()
-        quiz_context = ""
 
-        if "quiz" in user_lower or "test" in user_lower or "take quiz" in user_lower:
-            # Determine if vocab or grammar quiz
-            if "vocab" in user_lower or "word" in user_lower:
-                # Get current batch number
-                current_batch = session.get("vocabulary", {}).get("current_batch", 1)
-                quiz_json = self.get_vocab_batch_quiz(session_id, current_batch)
-                if quiz_json:
-                    quiz_context = f"\n\nVocabulary Quiz (Batch {current_batch}):\n{quiz_json}"
-                    logger.info(
-                        f"[Orchestrator] Injected vocab batch {current_batch} quiz into context"
-                    )
-            elif "grammar" in user_lower:
-                # Determine which grammar topic (for now, use first topic)
-                topics = lesson_data["grammar_points"]
-                if topics:
-                    topic = topics[0]  # TODO: track which topic student is on
-                    quiz_json = self.get_grammar_quiz(session_id, topic)
-                    if quiz_json:
-                        quiz_context = (
-                            f"\n\nGrammar Quiz ({topic.replace('_', ' ').title()}):\n{quiz_json}"
-                        )
-                        logger.info(
-                            f"[Orchestrator] Injected grammar quiz for {topic} into context"
-                        )
+        # Check if transitioning to vocab or grammar
+        if current_progress == "lesson_start":
+            if "vocab" in user_lower or "1" in user_lower:
+                session["current_progress"] = "vocab_overview"
+                current_progress = "vocab_overview"
+                logger.info("[Orchestrator] Transitioning to vocab_overview")
+            elif "grammar" in user_lower or "2" in user_lower:
+                session["current_progress"] = "grammar_overview"
+                current_progress = "grammar_overview"
+                logger.info("[Orchestrator] Transitioning to grammar_overview")
 
-        # Minimal prompt - let model handle naturally
-        prompt = f"""Lesson {lesson_number}: {lesson_data['lesson_name']}
-
-Vocabulary:
-{vocab_list}
-
-Grammar: {grammar_topics}
-{quiz_context}
-
-Student: {user_message}
-
-Teacher:"""
+        # Build prompt based on current progress stage
+        prompt = self._build_stage_prompt(session_id, current_progress, user_message)
 
         # Store prompt for debugging
-        self.sessions[session_id]["last_prompt"] = prompt
+        session["last_prompt"] = prompt
 
         logger.info("[Orchestrator] PROMPT TO MODEL:")
         logger.info(prompt)
@@ -222,9 +188,83 @@ Teacher:"""
         logger.info(response)
         logger.info("=" * 80)
 
-        # TODO: Pre-generate quizzes when student chooses section
-        # For now, generate on-demand when quiz is requested
         return response
+
+    def _build_stage_prompt(self, session_id, stage, user_message):
+        """Build prompt for current lesson stage using templates.
+
+        Args:
+            session_id: User session identifier
+            stage: Current progress stage
+            user_message: User's message
+
+        Returns:
+            str: Formatted prompt for the stage
+        """
+        from src.prompts.templates import GRAMMAR_OVERVIEW, VOCAB_OVERVIEW
+
+        session = self.sessions[session_id]
+        lesson_number = session["lesson_number"]
+        lesson_data = self.lesson_cache[lesson_number]
+
+        # Route to appropriate template based on stage
+        if stage == "vocab_overview":
+            # Build vocab overview prompt
+            words_formatted = "\n".join(
+                [
+                    f"{i+1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
+                    for i, v in enumerate(lesson_data["vocabulary"])
+                ]
+            )
+            prompt_text = VOCAB_OVERVIEW.invoke(
+                {
+                    "lesson_number": lesson_number,
+                    "words_formatted": words_formatted,
+                    "batches_count": 1,  # 6 words = 1 batch
+                    "total_words": len(lesson_data["vocabulary"]),
+                }
+            ).text
+            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+        elif stage == "grammar_overview":
+            # Build grammar overview prompt
+            topics_list = "\n".join(
+                [
+                    f"{i+1}. {topic.replace('_', ' ').title()}"
+                    for i, topic in enumerate(lesson_data["grammar_points"])
+                ]
+            )
+            prompt_text = GRAMMAR_OVERVIEW.invoke(
+                {
+                    "lesson_number": lesson_number,
+                    "topics_count": len(lesson_data["grammar_points"]),
+                    "topics_list": topics_list,
+                }
+            ).text
+            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+        else:
+            # Default: minimal context for free conversation
+            vocab_list = "\n".join(
+                [
+                    f"{i+1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
+                    for i, v in enumerate(lesson_data["vocabulary"])
+                ]
+            )
+            grammar_topics = ", ".join(
+                [topic.replace("_", " ").title() for topic in lesson_data["grammar_points"]]
+            )
+
+            return f"""Lesson {lesson_number}: {lesson_data['lesson_name']}
+
+Vocabulary:
+{vocab_list}
+
+Grammar: {grammar_topics}
+
+Student: {user_message}
+
+Teacher:"""
 
     def _generate_vocab_batch_quiz(self, session_id, batch_number):
         """Pre-generate quiz for a vocabulary batch.
