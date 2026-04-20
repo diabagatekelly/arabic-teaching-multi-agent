@@ -78,18 +78,26 @@ class Orchestrator:
             }
         )
 
-        # Build lesson_start prompt using template
-        vocab_preview = ", ".join([v["arabic"] for v in lesson_data["vocabulary"][:3]])
-        if len(lesson_data["vocabulary"]) > 3:
-            vocab_preview += f" ... ({len(lesson_data['vocabulary']) - 3} more)"
+        # Build full vocabulary list for prompt
+        vocab_list = "\n".join(
+            [
+                f"{i+1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
+                for i, v in enumerate(lesson_data["vocabulary"])
+            ]
+        )
+
+        # Format grammar topics (replace underscores with spaces, title case)
+        grammar_topics_formatted = ", ".join(
+            [topic.replace("_", " ").title() for topic in lesson_data["grammar_points"]]
+        )
 
         prompt_text = LESSON_WELCOME.invoke(
             {
                 "lesson_number": lesson_number,
                 "total_words": len(lesson_data["vocabulary"]),
-                "topics_preview": vocab_preview,
+                "vocabulary_list": vocab_list,
                 "topics_count": len(lesson_data["grammar_points"]),
-                "grammar_topics": ", ".join(lesson_data["grammar_points"]),
+                "grammar_topics": grammar_topics_formatted,
             }
         ).text
 
@@ -134,8 +142,19 @@ class Orchestrator:
 
         lesson_data = self.lesson_cache[lesson_number]
 
-        # Build context from session state
-        learned_words = session.get("vocabulary", {}).get("words", [])[:6]  # Current batch
+        # Log session state
+        logger.info("=" * 80)
+        logger.info("[Orchestrator] SESSION STATE:")
+        logger.info(f"  Lesson: {lesson_number} - {lesson_data['lesson_name']}")
+        learned_words = session.get("vocabulary", {}).get("words", [])[:6]
+        logger.info(f"  Learned words: {len(learned_words)}")
+        logger.info(f"  Current progress: {session.get('current_progress')}")
+        logger.info("=" * 80)
+        logger.info("[Orchestrator] USER MESSAGE:")
+        logger.info(f"  {user_message}")
+        logger.info("=" * 80)
+
+        # Build minimal context
         vocab_list = "\n".join(
             [
                 f"{i+1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
@@ -145,28 +164,36 @@ class Orchestrator:
 
         grammar_topics = ", ".join(lesson_data.get("grammar_points", []))
 
-        # Build prompt with lesson context
-        prompt = f"""You are teaching Lesson {lesson_number}: {lesson_data['lesson_name']}.
+        # Minimal prompt - let model handle naturally
+        prompt = f"""Lesson {lesson_number}: {lesson_data['lesson_name']}
 
-Current vocabulary being taught:
+Vocabulary:
 {vocab_list}
 
-Grammar topics: {grammar_topics}
+Grammar: {grammar_topics}
 
-Student message: {user_message}
+Student: {user_message}
 
-Respond as their Arabic teacher. Keep responses focused on the current lesson content."""
+Teacher:"""
 
         # Store prompt for debugging
         self.sessions[session_id]["last_prompt"] = prompt
 
-        logger.info(f"[Orchestrator] Handling message for lesson {lesson_number}")
-        logger.debug(f"[Orchestrator] Prompt:\n{prompt}")
+        logger.info("[Orchestrator] PROMPT TO MODEL:")
+        logger.info(prompt)
+        logger.info("=" * 80)
 
         # Generate response using teaching agent
         teaching_agent = TeachingAgent(self.teaching_model_getter(), self.teaching_tokenizer)
-        response = teaching_agent.respond(prompt, max_new_tokens=256, temperature=0.7)
+        response = teaching_agent.respond(prompt, max_new_tokens=512, temperature=0.7)
 
-        logger.info(f"[Orchestrator] Response length: {len(response)} chars")
+        logger.info("=" * 80)
+        logger.info("[Orchestrator] MODEL RESPONSE:")
+        logger.info(response)
+        logger.info("=" * 80)
+
+        # Detect if model needs other agents
+        # For now, just return response - model handles everything
+        # Future: detect [CONTENT:...] or [GRADE:...] signals
 
         return response
