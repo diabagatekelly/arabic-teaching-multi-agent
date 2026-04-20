@@ -361,6 +361,10 @@ class GradingAgent:
         if missing := required_keys - input_data.keys():
             raise ValueError(f"Missing required keys: {missing}")
 
+        logger.info(f"[GradingAgent] Grading vocab - word: {input_data['word']}")
+        logger.info(f"[GradingAgent] Student answer: {input_data['student_answer']}")
+        logger.info(f"[GradingAgent] Correct answer: {input_data['correct_answer']}")
+
         prompt = GRADING_VOCAB.format(
             word=input_data["word"],
             student_answer=input_data["student_answer"],
@@ -368,6 +372,7 @@ class GradingAgent:
         )
 
         response = self.generate_response(prompt)
+        logger.info(f"[GradingAgent] Vocab grading result: {response}")
         return response
 
     def grade_grammar_quiz(self, input_data: dict) -> str:
@@ -391,6 +396,10 @@ class GradingAgent:
         if missing := required_keys - input_data.keys():
             raise ValueError(f"Missing required keys: {missing}")
 
+        logger.info(f"[GradingAgent] Grading grammar - question: {input_data['question']}")
+        logger.info(f"[GradingAgent] Student answer: {input_data['student_answer']}")
+        logger.info(f"[GradingAgent] Correct answer: {input_data['correct_answer']}")
+
         prompt = GRADING_GRAMMAR_QUIZ.format(
             question=input_data["question"],
             student_answer=input_data["student_answer"],
@@ -398,6 +407,7 @@ class GradingAgent:
         )
 
         response = self.generate_response(prompt)
+        logger.info(f"[GradingAgent] Grammar grading result: {response}")
         return response
 
     def grade_grammar_test(self, input_data: dict) -> str:

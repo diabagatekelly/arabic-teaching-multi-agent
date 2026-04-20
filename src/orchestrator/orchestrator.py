@@ -335,10 +335,13 @@ class Orchestrator:
 
                     from src.agents.grading_agent import GradingAgent
 
-                    logger.info("[Orchestrator] Processing quiz answer")
+                    logger.info("[Orchestrator] Processing vocab quiz answer")
                     quiz_state = session["vocabulary"]["quiz_state"]
                     current_q = quiz_state["current_question"]
                     current_word = quiz_state["words"][current_q]
+                    logger.info(
+                        f"[Orchestrator] Grading answer for question {current_q}: {current_word['arabic']} = {current_word['english']}"
+                    )
 
                     # Grade the answer using grading agent
                     grading_agent = GradingAgent(
@@ -433,6 +436,10 @@ class Orchestrator:
                     quiz_state = session["grammar"]["grammar_quiz_state"]
                     current_q = quiz_state["current_question"]
                     current_question = quiz_state["questions"][current_q]
+                    logger.info(
+                        f"[Orchestrator] Grading answer for question {current_q}: {current_question['question']}"
+                    )
+                    logger.info(f"[Orchestrator] Correct answer: {current_question['answer']}")
 
                     # Grade the answer using grading agent
                     grading_agent = GradingAgent(
@@ -736,6 +743,10 @@ class Orchestrator:
             quiz_state = session["vocabulary"]["quiz_state"]
             current_q = quiz_state["current_question"]
 
+            logger.info(
+                f"[Orchestrator] Vocab quiz state: current_q={current_q}, answers={len(quiz_state['answers'])}, total={quiz_state['total_questions']}"
+            )
+
             # Check if we just graded an answer (answers list has content)
             if quiz_state["answers"] and len(quiz_state["answers"]) == current_q:
                 # Show feedback for the last answer
@@ -743,7 +754,11 @@ class Orchestrator:
                 word = last_answer["word"]
                 is_correct = last_answer["correct"]
 
-                logger.info(f"[Orchestrator] Showing feedback - correct: {is_correct}")
+                logger.info(
+                    f"[Orchestrator] Showing vocab feedback for question {current_q - 1} - correct: {is_correct}"
+                )
+                logger.info(f"[Orchestrator] Word was: {word['arabic']} = {word['english']}")
+                logger.info(f"[Orchestrator] Student answered: {last_answer['student_answer']}")
 
                 # Calculate current score for feedback (current_q is already the number of questions answered)
                 current_score = f"{quiz_state['score']}/{len(quiz_state['answers'])}"
@@ -871,7 +886,9 @@ class Orchestrator:
 
             # Check if quiz_state still exists
             if "grammar_quiz_state" not in session.get("grammar", {}):
-                logger.warning("[Orchestrator] grammar_quiz_state not found - quiz already completed")
+                logger.warning(
+                    "[Orchestrator] grammar_quiz_state not found - quiz already completed"
+                )
                 return "Great job on completing the grammar quiz! What would you like to do next?"
 
             quiz_state = session["grammar"]["grammar_quiz_state"]
@@ -885,7 +902,11 @@ class Orchestrator:
                 if not ans["correct"]:
                     weak_areas_list.append(f"- {ans['question']['question']}")
 
-            weak_areas = "\n".join(weak_areas_list) if weak_areas_list else "None! You got everything right! 🎉"
+            weak_areas = (
+                "\n".join(weak_areas_list)
+                if weak_areas_list
+                else "None! You got everything right! 🎉"
+            )
 
             prompt_text = GRAMMAR_TOPIC_SUMMARY.invoke(
                 {
@@ -1058,6 +1079,10 @@ class Orchestrator:
             quiz_state = session["grammar"]["grammar_quiz_state"]
             current_q = quiz_state["current_question"]
 
+            logger.info(
+                f"[Orchestrator] Grammar quiz state: current_q={current_q}, answers={len(quiz_state['answers'])}, total={quiz_state['total_questions']}"
+            )
+
             # Check if we just graded an answer (answers list has content)
             if quiz_state["answers"] and len(quiz_state["answers"]) == current_q:
                 # Show feedback for the last answer
@@ -1065,7 +1090,11 @@ class Orchestrator:
                 question_data = quiz_state["questions"][current_q - 1]
                 is_correct = last_answer["correct"]
 
-                logger.info(f"[Orchestrator] Showing grammar feedback - correct: {is_correct}")
+                logger.info(
+                    f"[Orchestrator] Showing grammar feedback for question {current_q - 1} - correct: {is_correct}"
+                )
+                logger.info(f"[Orchestrator] Question was: {question_data['question']}")
+                logger.info(f"[Orchestrator] Student answered: {last_answer['student_answer']}")
 
                 # Calculate current score
                 current_score = f"{quiz_state['score']}/{len(quiz_state['answers'])}"
@@ -1113,7 +1142,9 @@ class Orchestrator:
             # Ask the current question (first question or continuing)
             question = quiz_state["questions"][current_q]
 
-            logger.info(f"[Orchestrator] Asking grammar question {current_q + 1}/{quiz_state['total_questions']}")
+            logger.info(
+                f"[Orchestrator] Asking grammar question {current_q + 1}/{quiz_state['total_questions']}"
+            )
 
             prompt_text = GRAMMAR_QUIZ_QUESTION.invoke(
                 {
