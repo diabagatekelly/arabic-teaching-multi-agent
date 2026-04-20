@@ -43,11 +43,11 @@ Grammar ({topics_count} topics):
 
 Greet the student warmly and present the lesson structure above.
 
-Offer numbered navigation at the end:
+MAKE SURE to ALWAYS offer numbered navigation at the end:
 1. Start with vocabulary
 2. Start with grammar
 
-After the student chooses 1 (vocabulary) or 2 (grammar), acknowledge their choice.
+After the student chooses 1 (vocabulary) or 2 (grammar), acknowledge their choice by saying something like "Great choice!" or "Let's dive into that topic."
 If they go off topic, gently guide them back or offer a break.""",
     input_variables=[
         "lesson_number",

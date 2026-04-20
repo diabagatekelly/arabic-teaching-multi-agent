@@ -86,19 +86,35 @@ print("===== RAG retriever initialized =====")
 @spaces.GPU(duration=60)
 def process_message(message, chat_history, session_id):
     """GPU-enabled message processing through orchestrator."""
+    logger.info("=" * 80)
+    logger.info("[App] USER INPUT CAPTURED")
+    logger.info(f"  Message: {message}")
+    logger.info(f"  Session ID: {session_id}")
+    logger.info(f"  Chat history length: {len(chat_history)}")
+
     # Check if lesson is active
     if session_id not in sessions or sessions[session_id].get("status") != "active":
+        logger.warning("[App] No active lesson - returning error message")
         error_msg = "Please start a lesson first using the 'Start Lesson' button."
         chat_history.append({"role": "user", "content": message})
         chat_history.append({"role": "assistant", "content": error_msg})
         return "", chat_history
 
+    logger.info("[App] Routing to orchestrator.handle_message()")
+
     # Route through orchestrator
     response = orchestrator.handle_message(session_id, message)
+
+    logger.info("[App] Received response from orchestrator")
+    logger.info(f"  Response length: {len(response)} chars")
+    logger.info(f"  Response preview: {response[:100]}...")
 
     # Update chat history
     chat_history.append({"role": "user", "content": message})
     chat_history.append({"role": "assistant", "content": response})
+
+    logger.info(f"[App] Updated chat history, new length: {len(chat_history)}")
+    logger.info("=" * 80)
 
     return "", chat_history
 
