@@ -91,6 +91,7 @@ class Orchestrator:
             [topic.replace("_", " ").title() for topic in lesson_data["grammar_points"]]
         )
 
+        logger.info("[Orchestrator] Using template: LESSON_WELCOME")
         prompt_text = LESSON_WELCOME.invoke(
             {
                 "lesson_number": lesson_number,
@@ -223,6 +224,7 @@ class Orchestrator:
 
         # Route to appropriate template based on stage
         if stage == "vocab_overview":
+            logger.info("[Orchestrator] Using template: VOCAB_OVERVIEW")
             # Build vocab overview prompt
             words_formatted = "\n".join(
                 [
@@ -245,6 +247,7 @@ class Orchestrator:
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
 
         elif stage == "grammar_overview":
+            logger.info("[Orchestrator] Using template: GRAMMAR_OVERVIEW")
             # Build grammar overview prompt
             topics_list = "\n".join(
                 [
@@ -262,6 +265,7 @@ class Orchestrator:
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
 
         else:
+            logger.info(f"[Orchestrator] Using default minimal prompt for stage: {stage}")
             # Default: minimal context for free conversation
             vocab_list = "\n".join(
                 [
