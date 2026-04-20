@@ -725,10 +725,13 @@ class Orchestrator:
                     }
                 ).text
 
+                # Include user's message so model can see if it's off-topic
+                full_prompt = f'{prompt_text}\n\nStudent said: "{user_message}"\n\nTeacher:'
+
                 teaching_agent = TeachingAgent(
                     self.teaching_model_getter(), self.teaching_tokenizer
                 )
-                return teaching_agent.respond(prompt_text, max_new_tokens=300, temperature=0.75)
+                return teaching_agent.respond(full_prompt, max_new_tokens=300, temperature=0.75)
 
         logger.info("[Orchestrator] ===== END STATE MACHINE =====")
 
