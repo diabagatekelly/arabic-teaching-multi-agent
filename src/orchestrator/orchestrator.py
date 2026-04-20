@@ -156,33 +156,191 @@ class Orchestrator:
         logger.info(f"  {user_message}")
         logger.info("=" * 80)
 
-        # Detect transitions from user message
+        # =====================================================================
+        # STATE MACHINE: Detect user intent and transition to next state
+        # =====================================================================
+
+        # State transition map: (current_state, user_intent) -> next_state
+        TRANSITIONS = {
+            "lesson_start": {
+                "vocab": "vocab_batch_intro",
+                "grammar": "grammar_explanation",
+            },
+            "vocab_batch_intro": {
+                "quiz": "vocab_quiz",
+                "next_batch": "vocab_batch_intro",  # increment batch
+                "grammar": "grammar_explanation",
+            },
+            "vocab_quiz": {
+                "next_batch": "vocab_batch_intro",
+                "grammar": "grammar_explanation",
+                "vocab": "vocab_batch_intro",
+            },
+            "grammar_explanation": {
+                "quiz": "grammar_quiz",
+                "review": "grammar_explanation",
+                "vocab": "vocab_batch_intro",
+            },
+            "grammar_quiz": {
+                "vocab": "vocab_batch_intro",
+                "review": "grammar_explanation",
+            },
+        }
+
         user_lower = user_message.lower()
+        logger.info("[Orchestrator] ===== STATE MACHINE =====")
+        logger.info(f"[Orchestrator] Current state: {current_progress}")
+        logger.info(f"[Orchestrator] User message: {user_message}")
 
-        # Check if transitioning to vocab or grammar
-        if current_progress == "lesson_start":
-            if "vocab" in user_lower or "1" in user_lower:
-                session["current_progress"] = "vocab_batch_intro"
-                current_progress = "vocab_batch_intro"
-                logger.info("[Orchestrator] Transitioning to vocab_batch_intro")
-            elif "grammar" in user_lower or "2" in user_lower:
-                session["current_progress"] = "grammar_explanation"
-                current_progress = "grammar_explanation"
-                logger.info("[Orchestrator] Transitioning to grammar_explanation")
+        # Detect user intent from message
+        detected_intent = None
 
-        # Check if starting vocab quiz (user chooses quiz from vocab_batch_intro)
-        elif current_progress == "vocab_batch_intro":
-            if "quiz" in user_lower or "1" in user_lower:
-                session["current_progress"] = "vocab_quiz"
-                current_progress = "vocab_quiz"
-                logger.info("[Orchestrator] Transitioning to vocab_quiz")
+        # Check for vocab intent
+        if "vocab" in user_lower or "vocabulary" in user_lower:
+            detected_intent = "vocab"
+            logger.info("[Orchestrator] Detected intent: vocab")
 
-        # Check if starting grammar quiz
-        elif current_progress == "grammar_overview":
-            if "quiz" in user_lower or "1" in user_lower:
-                session["current_progress"] = "grammar_quiz"
-                current_progress = "grammar_quiz"
-                logger.info("[Orchestrator] Transitioning to grammar_quiz")
+        # Check for grammar intent
+        elif "grammar" in user_lower:
+            detected_intent = "grammar"
+            logger.info("[Orchestrator] Detected intent: grammar")
+
+        # Check for quiz intent
+        elif "quiz" in user_lower or "test" in user_lower:
+            detected_intent = "quiz"
+            logger.info("[Orchestrator] Detected intent: quiz")
+
+        # Check for review intent
+        elif "review" in user_lower or "again" in user_lower:
+            detected_intent = "review"
+            logger.info("[Orchestrator] Detected intent: review")
+
+        # Check for next batch intent
+        elif "next" in user_lower or "batch" in user_lower:
+            detected_intent = "next_batch"
+            logger.info("[Orchestrator] Detected intent: next_batch")
+
+        # Fallback: check for numbered options
+        elif "1" in user_lower:
+            # Option 1 is usually the primary action (quiz or first topic)
+            if current_progress == "lesson_start":
+                detected_intent = "vocab"
+                logger.info("[Orchestrator] Detected intent from '1': vocab")
+            elif current_progress in ["vocab_batch_intro", "grammar_explanation"]:
+                detected_intent = "quiz"
+                logger.info("[Orchestrator] Detected intent from '1': quiz")
+        elif "2" in user_lower:
+            # Option 2 is usually the secondary action
+            if current_progress == "lesson_start":
+                detected_intent = "grammar"
+                logger.info("[Orchestrator] Detected intent from '2': grammar")
+            elif current_progress == "vocab_batch_intro":
+                detected_intent = "next_batch"
+                logger.info("[Orchestrator] Detected intent from '2': next_batch")
+            elif current_progress == "grammar_explanation":
+                detected_intent = "review"
+                logger.info("[Orchestrador] Detected intent from '2': review")
+
+        # Check for affirmative (default to primary action)
+        else:
+            affirmative_keywords = [
+                "yes",
+                "yeah",
+                "yep",
+                "ok",
+                "okay",
+                "sure",
+                "let's",
+                "go",
+                "start",
+            ]
+            is_affirmative = any(keyword in user_lower for keyword in affirmative_keywords)
+            if is_affirmative:
+                # Default to primary action based on current state
+                if current_progress in ["vocab_batch_intro", "grammar_explanation"]:
+                    detected_intent = "quiz"
+                    logger.info("[Orchestrator] Detected intent from affirmative: quiz")
+
+        logger.info(f"[Orchestrator] Final detected intent: {detected_intent}")
+
+        # Apply state transition if we have a valid intent
+        if detected_intent and current_progress in TRANSITIONS:
+            valid_intents = TRANSITIONS[current_progress]
+            logger.info(
+                f"[Orchestrator] Valid intents for state '{current_progress}': {list(valid_intents.keys())}"
+            )
+
+            if detected_intent in valid_intents:
+                new_state = valid_intents[detected_intent]
+                logger.info(f"[Orchestrator] Transitioning: {current_progress} -> {new_state}")
+
+                # Handle special actions before transition
+                if detected_intent == "next_batch":
+                    current_batch = session.get("vocabulary", {}).get("current_batch", 1)
+                    session["vocabulary"]["current_batch"] = current_batch + 1
+                    logger.info(f"[Orchestrator] Incremented batch to {current_batch + 1}")
+
+                # Update state
+                session["current_progress"] = new_state
+                current_progress = new_state
+                logger.info(f"[Orchestrator] State updated to: {current_progress}")
+            else:
+                logger.warning(
+                    f"[Orchestrator] Intent '{detected_intent}' not valid for state '{current_progress}'"
+                )
+        else:
+            logger.warning(
+                f"[Orchestrator] No valid transition - state: {current_progress}, intent: {detected_intent}"
+            )
+
+        logger.info("[Orchestrator] ===== END STATE MACHINE =====")
+
+        # =====================================================================
+        # OLD IF-ELSE LOGIC (COMMENTED OUT - REPLACED BY STATE MACHINE ABOVE)
+        # =====================================================================
+        # # Detect transitions from user message
+        # user_lower = user_message.lower()
+        #
+        # # Helper: detect affirmative responses
+        # affirmative_keywords = ["yes", "yeah", "yep", "ok", "okay", "sure", "let's", "go", "start"]
+        # is_affirmative = any(keyword in user_lower for keyword in affirmative_keywords)
+        #
+        # # Check if transitioning to vocab or grammar
+        # if current_progress == "lesson_start":
+        #     if "vocab" in user_lower or "1" in user_lower:
+        #         session["current_progress"] = "vocab_batch_intro"
+        #         current_progress = "vocab_batch_intro"
+        #         logger.info("[Orchestrator] Transitioning to vocab_batch_intro")
+        #     elif "grammar" in user_lower or "2" in user_lower:
+        #         session["current_progress"] = "grammar_explanation"
+        #         current_progress = "grammar_explanation"
+        #         logger.info("[Orchestrator] Transitioning to grammar_explanation")
+        #
+        # # Check if starting vocab quiz (user chooses quiz from vocab_batch_intro)
+        # elif current_progress == "vocab_batch_intro":
+        #     # Explicit quiz request or option 1 or affirmative for primary action
+        #     if "quiz" in user_lower or "test" in user_lower or "1" in user_lower or (is_affirmative and "2" not in user_lower):
+        #         session["current_progress"] = "vocab_quiz"
+        #         current_progress = "vocab_quiz"
+        #         logger.info("[Orchestrator] Transitioning to vocab_quiz")
+        #     # Next batch request or option 2
+        #     elif "next" in user_lower or "2" in user_lower or "batch" in user_lower:
+        #         # Move to next batch
+        #         current_batch = session.get("vocabulary", {}).get("current_batch", 1)
+        #         session["vocabulary"]["current_batch"] = current_batch + 1
+        #         logger.info(f"[Orchestrator] Moving to batch {current_batch + 1}")
+        #
+        # # Check if starting grammar quiz (from grammar_explanation)
+        # elif current_progress == "grammar_explanation":
+        #     # Explicit quiz request or option 1 or affirmative for primary action
+        #     if "quiz" in user_lower or "test" in user_lower or "1" in user_lower or (is_affirmative and "2" not in user_lower):
+        #         session["current_progress"] = "grammar_quiz"
+        #         current_progress = "grammar_quiz"
+        #         logger.info("[Orchestrator] Transitioning to grammar_quiz")
+        #     # Review request or option 2
+        #     elif "review" in user_lower or "2" in user_lower or "again" in user_lower:
+        #         # Stay in grammar_explanation, will re-explain
+        #         logger.info("[Orchestrator] User requested review, staying in grammar_explanation")
 
         # Build prompt based on current progress stage
         prompt = self._build_stage_prompt(session_id, current_progress, user_message)
