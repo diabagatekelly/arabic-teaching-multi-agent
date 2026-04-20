@@ -297,9 +297,10 @@ with gr.Blocks(
         align-items: center;
         justify-content: center;
         text-align: center;
-        background-color: #ffffff;
+        background-color: #f9f9f9;
         font-size: 2em;
         font-weight: 500;
+        margin-top: 0;
     }
     .main-title {
         text-align: center;
@@ -311,16 +312,16 @@ with gr.Blocks(
     .chatbot {
         overflow: hidden !important;
     }
-    /* Align column tops */
-    .gradio-row > .gradio-column {
-        align-items: flex-start !important;
+    /* Remove top margin from section headers */
+    h3 {
+        margin-top: 0 !important;
     }
     """,
 ) as demo:
     with gr.Row():
         # Left panel - Flashcards (1/4 width)
         with gr.Column(scale=1):
-            gr.Markdown("### 📚 Flashcards")
+            gr.Markdown("### 📚 Flashcards", elem_classes=["section-header"])
             flashcard_display = gr.Markdown(
                 "*Start a lesson to see flashcards*", visible=True, elem_classes=["flashcard"]
             )
