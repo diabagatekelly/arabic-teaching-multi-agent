@@ -363,8 +363,20 @@ class Orchestrator:
                 # Handle special actions before transition
                 if detected_intent == "next_batch":
                     current_batch = session.get("vocabulary", {}).get("current_batch", 1)
-                    session["vocabulary"]["current_batch"] = current_batch + 1
-                    logger.info(f"[Orchestrator] Incremented batch to {current_batch + 1}")
+                    all_vocab = lesson_data.get("vocabulary", [])
+                    total_batches = (len(all_vocab) + 2) // 3  # Ceiling division
+
+                    if current_batch >= total_batches:
+                        # Already at last batch - don't increment, redirect to grammar
+                        logger.info(
+                            f"[Orchestrator] Already at last batch ({current_batch}/{total_batches}), redirecting to grammar"
+                        )
+                        detected_intent = "grammar"
+                        new_state = "grammar_explanation"
+                    else:
+                        # Increment to next batch
+                        session["vocabulary"]["current_batch"] = current_batch + 1
+                        logger.info(f"[Orchestrator] Incremented batch to {current_batch + 1}")
 
                 # Handle answer intent in vocab_quiz
                 elif detected_intent == "answer" and current_progress == "vocab_quiz":
@@ -1595,6 +1607,12 @@ Teacher:"""
                     logger.info(
                         f"[Orchestrator] [Background] Generated {len(questions)} questions for {topic}"
                     )
+
+                    # Save sessions after each quiz generation (for ZeroGPU persistence)
+                    from app import save_sessions
+
+                    save_sessions(self.sessions)
+                    logger.info("[Orchestrator] [Background] Saved sessions to file")
 
                 except Exception as e:
                     logger.error(
