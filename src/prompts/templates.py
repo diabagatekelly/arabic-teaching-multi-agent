@@ -47,14 +47,21 @@ Example response format:
 
 Here's what we'll cover:
 
-**Vocabulary:** 6 essential words like book, school, pen, and more
+**Vocabulary:** 6 essential words
+- كِتَاب (kitāb) - book
+- مَدْرَسَة (madrasa) - school
+- قَلَم (qalam) - pen
+- بَيْت (bayt) - house
+- طَالِب (ṭālib) - student
+- مُعَلِّم (muʿallim) - teacher
+
 **Grammar:** Noun Gender - learning masculine and feminine nouns
 
 Which would you like to start with?
 1. Start with vocabulary
 2. Start with grammar"
 
-Now generate your response following this format exactly. Greet warmly, present the lesson overview, and end with those exact numbered options.""",
+Now generate your response following this format exactly. Greet warmly, list ALL vocabulary words with Arabic and English, present grammar topics, and end with those exact numbered options.""",
     input_variables=[
         "lesson_number",
         "total_words",
