@@ -225,6 +225,7 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 
     session_id = gr.State("")
 
+    @spaces.GPU(duration=60)
     def start_lesson_ui(sid):
         """Start lesson and initialize session."""
         import uuid
