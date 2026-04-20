@@ -660,20 +660,30 @@ class Orchestrator:
 
         # Build prompt based on current progress stage
         # Pass detected_intent to determine if user_message should be included
-        prompt = self._build_stage_prompt(
+        prompt_result = self._build_stage_prompt(
             session_id, current_progress, user_message, detected_intent
         )
 
-        # Store prompt for debugging
-        session["last_prompt"] = prompt
+        # Check if result is a dict with skip_model flag (direct response)
+        if isinstance(prompt_result, dict) and prompt_result.get("skip_model"):
+            logger.info("[Orchestrator] Skipping model - returning direct response")
+            response = prompt_result["response"]
+        else:
+            # Normal flow: use model to generate response
+            prompt = (
+                prompt_result if isinstance(prompt_result, str) else prompt_result.get("prompt", "")
+            )
 
-        logger.info("[Orchestrator] PROMPT TO MODEL:")
-        logger.info(prompt)
-        logger.info("=" * 80)
+            # Store prompt for debugging
+            session["last_prompt"] = prompt
 
-        # Generate response using teaching agent
-        teaching_agent = TeachingAgent(self.teaching_model_getter(), self.teaching_tokenizer)
-        response = teaching_agent.respond(prompt, max_new_tokens=512, temperature=0.7)
+            logger.info("[Orchestrator] PROMPT TO MODEL:")
+            logger.info(prompt)
+            logger.info("=" * 80)
+
+            # Generate response using teaching agent
+            teaching_agent = TeachingAgent(self.teaching_model_getter(), self.teaching_tokenizer)
+            response = teaching_agent.respond(prompt, max_new_tokens=512, temperature=0.7)
 
         logger.info("=" * 80)
         logger.info("[Orchestrator] MODEL RESPONSE:")
@@ -825,13 +835,21 @@ class Orchestrator:
                 # Mark that we showed feedback
                 quiz_state["feedback_shown"] = True
 
+                # Generate feedback text using teaching model
+                teaching_agent = TeachingAgent(
+                    self.teaching_model_getter(), self.teaching_tokenizer
+                )
+                feedback_response = teaching_agent.respond(
+                    f"{prompt_text}\n\nTeacher:", max_new_tokens=200, temperature=0.7
+                )
+
                 # Show feedback, then immediately show next question (don't wait for user)
                 if current_q < quiz_state["total_questions"]:
                     # Ask next question immediately after feedback
                     next_word = quiz_state["words"][current_q]
                     question_type = "arabic_to_english"
 
-                    next_question_text = VOCAB_QUIZ_QUESTION.invoke(
+                    next_question_prompt = VOCAB_QUIZ_QUESTION.invoke(
                         {
                             "question_type": question_type,
                             "word_arabic": next_word["arabic"],
@@ -841,11 +859,17 @@ class Orchestrator:
                         }
                     ).text
 
-                    # Combine feedback + next question in one response
-                    return f"{prompt_text}\n\n{next_question_text}\n\nTeacher:"
+                    # Generate next question using teaching model
+                    next_question_response = teaching_agent.respond(
+                        f"{next_question_prompt}\n\nTeacher:", max_new_tokens=100, temperature=0.3
+                    )
+
+                    # Combine feedback + next question as direct response (bypass model)
+                    combined_response = f"{feedback_response}\n\n{next_question_response}"
+                    return {"skip_model": True, "response": combined_response}
                 else:
-                    # No more questions, just show feedback (will transition to quiz_complete on next turn)
-                    return f"{prompt_text}\n\nTeacher:"
+                    # No more questions, just show feedback as direct response
+                    return {"skip_model": True, "response": feedback_response}
 
             # Ask the current question (first question or continuing after feedback)
             word = quiz_state["words"][current_q]
@@ -1239,12 +1263,20 @@ class Orchestrator:
                 # Mark that we showed feedback
                 quiz_state["feedback_shown"] = True
 
+                # Generate feedback text using teaching model
+                teaching_agent = TeachingAgent(
+                    self.teaching_model_getter(), self.teaching_tokenizer
+                )
+                feedback_response = teaching_agent.respond(
+                    f"{prompt_text}\n\nTeacher:", max_new_tokens=200, temperature=0.7
+                )
+
                 # Show feedback, then immediately show next question (don't wait for user)
                 if current_q < quiz_state["total_questions"]:
                     # Ask next question immediately after feedback
                     next_question = quiz_state["questions"][current_q]
 
-                    next_question_text = GRAMMAR_QUIZ_QUESTION.invoke(
+                    next_question_prompt = GRAMMAR_QUIZ_QUESTION.invoke(
                         {
                             "topic_name": quiz_state["topic"],
                             "question_number": current_q + 1,
@@ -1253,11 +1285,17 @@ class Orchestrator:
                         }
                     ).text
 
-                    # Combine feedback + next question in one response
-                    return f"{prompt_text}\n\n{next_question_text}\n\nTeacher:"
+                    # Generate next question using teaching model
+                    next_question_response = teaching_agent.respond(
+                        f"{next_question_prompt}\n\nTeacher:", max_new_tokens=100, temperature=0.3
+                    )
+
+                    # Combine feedback + next question as direct response (bypass model)
+                    combined_response = f"{feedback_response}\n\n{next_question_response}"
+                    return {"skip_model": True, "response": combined_response}
                 else:
-                    # No more questions, just show feedback (will transition to quiz_complete on next turn)
-                    return f"{prompt_text}\n\nTeacher:"
+                    # No more questions, just show feedback as direct response
+                    return {"skip_model": True, "response": feedback_response}
 
             # Ask the current question (first question or continuing after feedback)
             question = quiz_state["questions"][current_q]
