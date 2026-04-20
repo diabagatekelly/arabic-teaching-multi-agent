@@ -147,7 +147,38 @@ def process_message(message, chat_history, session_id):
 
         flashcard_update = str(time.time())
 
-    return "", chat_history, flashcard_update
+    # Update progress display
+    progress_text = _build_progress_display(session)
+
+    return "", chat_history, flashcard_update, progress_text
+
+
+def _build_progress_display(session):
+    """Build progress display from session state."""
+    if not session:
+        return "**Learned:** 0 words\n\n**Quizzes:** 0/0"
+
+    # Count completed quiz questions
+    vocab_quiz_state = session.get("vocabulary", {}).get("quiz_state", {})
+    quiz_answers = len(vocab_quiz_state.get("answers", []))
+    quiz_score = vocab_quiz_state.get("score", 0)
+
+    # Count words learned (batches taught)
+    batch_1_taught = session.get("vocabulary", {}).get("current_batch", 1) >= 1
+    batch_2_taught = session.get("vocabulary", {}).get("current_batch", 1) >= 2
+    words_learned = (3 if batch_1_taught else 0) + (3 if batch_2_taught else 0)
+
+    # Grammar progress
+    grammar_taught = session.get("grammar", {}).get("topics", {})
+    grammar_completed = sum(1 for topic in grammar_taught.values() if topic.get("taught", False))
+
+    progress_text = f"""**Learned:** {words_learned} words
+
+**Quiz Progress:** {quiz_score}/{quiz_answers} correct
+
+**Grammar:** {grammar_completed}/1 topics"""
+
+    return progress_text
 
 
 # Global lesson cache (loaded from JSON file)
@@ -487,10 +518,14 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 
     # Wire up chat functions
     submit_event = msg.submit(
-        process_message, [msg, chatbot, session_id], [msg, chatbot, flashcard_trigger]
+        process_message,
+        [msg, chatbot, session_id],
+        [msg, chatbot, flashcard_trigger, progress_display],
     )
     click_event = submit.click(
-        process_message, [msg, chatbot, session_id], [msg, chatbot, flashcard_trigger]
+        process_message,
+        [msg, chatbot, session_id],
+        [msg, chatbot, flashcard_trigger, progress_display],
     )
 
     # Stop button cancels ongoing inference
