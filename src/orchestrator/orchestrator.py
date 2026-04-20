@@ -1,6 +1,8 @@
 """Orchestrator for managing lesson flow and agent interactions."""
 
+import json
 import logging
+import threading
 
 from src.agents.teaching_agent import TeachingAgent
 from src.prompts.templates import (
@@ -131,6 +133,15 @@ class Orchestrator:
             f"[Orchestrator] Received response from teaching agent (length: {len(response)} chars)"
         )
         logger.debug(f"[Orchestrator] Response:\n{response}")
+
+        # Start background generation of grammar quizzes
+        if self.content_agent:
+            threading.Thread(
+                target=self._pregenerate_grammar_quizzes,
+                args=(session_id, lesson_number, lesson_data),
+                daemon=True,
+            ).start()
+            logger.info("[Orchestrator] Started background grammar quiz generation")
 
         return response
 
@@ -1483,3 +1494,74 @@ Teacher:"""
             session["grammar"]["quizzes"][topic] = quiz
 
         return quiz
+
+    def _pregenerate_grammar_quizzes(self, session_id, lesson_number, lesson_data):
+        """
+        Background thread: Pre-generate all grammar quizzes for this lesson.
+
+        Args:
+            session_id: Session identifier
+            lesson_number: Lesson number
+            lesson_data: Lesson data from cache
+        """
+        try:
+            logger.info(
+                f"[Orchestrator] [Background] Starting grammar quiz pre-generation for lesson {lesson_number}"
+            )
+
+            session = self.sessions.get(session_id)
+            if not session:
+                logger.warning("[Orchestrator] [Background] Session not found, aborting")
+                return
+
+            # Initialize quizzes storage
+            if "quizzes" not in session["grammar"]:
+                session["grammar"]["quizzes"] = {}
+
+            # Prepare learned vocabulary items
+            learned_items = [f"{v['arabic']} ({v['english']})" for v in lesson_data["vocabulary"]]
+
+            # Generate quiz for each grammar topic
+            for topic in lesson_data["grammar_points"]:
+                try:
+                    logger.info(f"[Orchestrator] [Background] Generating quiz for topic: {topic}")
+
+                    quiz_json = self.content_agent.generate_quiz(
+                        {
+                            "quiz_type": "grammar",
+                            "count": 3,
+                            "difficulty": "beginner",
+                            "learned_items": learned_items,
+                            "lesson_number": lesson_number,
+                        }
+                    )
+
+                    # Parse and store
+                    questions_raw = json.loads(quiz_json)
+                    questions = []
+                    for q in questions_raw[:3]:
+                        questions.append(
+                            {
+                                "question": q.get("question", ""),
+                                "answer": q.get("answer", q.get("correct", "")),
+                                "explanation": f"Grammar topic: {topic}",
+                            }
+                        )
+
+                    session["grammar"]["quizzes"][topic] = questions
+                    logger.info(
+                        f"[Orchestrator] [Background] Generated {len(questions)} questions for {topic}"
+                    )
+
+                except Exception as e:
+                    logger.error(
+                        f"[Orchestrator] [Background] Failed to generate quiz for {topic}: {e}"
+                    )
+                    # Continue with other topics
+
+            logger.info(
+                f"[Orchestrator] [Background] Completed grammar quiz pre-generation for lesson {lesson_number}"
+            )
+
+        except Exception as e:
+            logger.error(f"[Orchestrator] [Background] Pre-generation failed: {e}")

@@ -200,7 +200,11 @@ class ContentAgent:
         outputs = self.model.generate(
             **inputs,
             max_new_tokens=self.max_new_tokens,
-            do_sample=False,  # Deterministic for evaluation
+            do_sample=True,
+            temperature=0.3,  # Low temperature for focused reasoning
+            top_p=0.9,  # Nucleus sampling for quality
+            top_k=40,  # Limit vocabulary for coherence
+            repetition_penalty=1.1,  # Slight penalty to avoid repetition
             pad_token_id=self.tokenizer.eos_token_id,
         )
 
