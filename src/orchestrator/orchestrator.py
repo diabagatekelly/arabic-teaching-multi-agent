@@ -216,12 +216,16 @@ class Orchestrator:
                     for i, v in enumerate(lesson_data["vocabulary"])
                 ]
             )
+            # Calculate batches (3 words per batch)
+            total_words = len(lesson_data["vocabulary"])
+            batches_count = (total_words + 2) // 3  # Ceiling division
+
             prompt_text = VOCAB_OVERVIEW.invoke(
                 {
                     "lesson_number": lesson_number,
                     "words_formatted": words_formatted,
-                    "batches_count": 1,  # 6 words = 1 batch
-                    "total_words": len(lesson_data["vocabulary"]),
+                    "batches_count": batches_count,
+                    "total_words": total_words,
                 }
             ).text
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
@@ -276,9 +280,9 @@ Teacher:"""
         session = self.sessions[session_id]
         lesson_number = session["lesson_number"]
 
-        # Get words for this batch (batches of 6)
+        # Get words for this batch (batches of 3)
         all_vocab = session["vocabulary"]["words"]
-        batch_size = 6
+        batch_size = 3
         start_idx = (batch_number - 1) * batch_size
         end_idx = min(start_idx + batch_size, len(all_vocab))
         batch_words = all_vocab[start_idx:end_idx]

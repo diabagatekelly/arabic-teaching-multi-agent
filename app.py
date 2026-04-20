@@ -133,7 +133,18 @@ def process_message(message, chat_history, session_id):
     logger.info(f"[App] Updated chat history, new length: {len(chat_history)}")
     logger.info("=" * 80)
 
-    return "", chat_history
+    # Check if we need to update flashcards (user chose vocab)
+    session = sessions.get(session_id, {})
+    current_progress = session.get("current_progress", "")
+    flashcard_update = ""
+
+    if current_progress == "vocab_overview":
+        # Trigger flashcard update by changing the trigger value
+        import time
+
+        flashcard_update = str(time.time())
+
+    return "", chat_history, flashcard_update
 
 
 # Global lesson cache (loaded from JSON file)
@@ -222,9 +233,13 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         # Left panel - Flashcards (1/4 width)
         with gr.Column(scale=1):
             gr.Markdown("### 📚 Flashcards")
-            flashcard_display = gr.Markdown("Click 'Next Card' to start")
-            flashcard_progress = gr.Textbox(label="Progress", value="0/6", interactive=False)
-            next_card_btn = gr.Button("Next Card")
+            flashcard_display = gr.Markdown("*Start a lesson to see flashcards*", visible=True)
+            flashcard_progress = gr.Textbox(
+                label="Progress", value="0/0", interactive=False, visible=True
+            )
+            with gr.Row():
+                flip_card_btn = gr.Button("Flip Card", size="sm", visible=True)
+                next_card_btn = gr.Button("Next Card", size="sm", visible=True)
 
         # Center panel - Chat (1/2 width)
         with gr.Column(scale=2):
@@ -256,6 +271,74 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
             progress_display = gr.Markdown("**Learned:** 0 words\n\n**Quizzes:** 0/0")
 
     session_id = gr.State("")  # String type for session ID
+    flashcard_state = gr.State(
+        {"current_index": 0, "flipped": False, "cards": [], "visible": False}
+    )
+    flashcard_trigger = gr.Textbox(visible=False)  # Hidden trigger for flashcard updates
+
+    def flip_flashcard(state):
+        """Flip the current flashcard."""
+        if not state["cards"]:
+            return state, "*No flashcards available*"
+
+        state["flipped"] = not state["flipped"]
+        card = state["cards"][state["current_index"]]
+
+        if state["flipped"]:
+            # Show Arabic + transliteration
+            display = f"### {card['arabic']}\n\n*{card['transliteration']}*"
+        else:
+            # Show English
+            display = f"### {card['english']}"
+
+        return state, display
+
+    def next_flashcard(state):
+        """Move to next flashcard."""
+        if not state["cards"]:
+            return state, "*No flashcards available*", "0/0"
+
+        state["current_index"] = (state["current_index"] + 1) % len(state["cards"])
+        state["flipped"] = False
+
+        card = state["cards"][state["current_index"]]
+        display = f"### {card['english']}"
+        progress = f"{state['current_index'] + 1}/{len(state['cards'])}"
+
+        return state, display, progress
+
+    def update_flashcards(sid, state):
+        """Update flashcards based on current session vocabulary batch."""
+        sessions.clear()
+        sessions.update(load_sessions())
+
+        if sid not in sessions:
+            return state, "*Start a lesson to see flashcards*", "0/0"
+
+        session = sessions[sid]
+        current_batch = session.get("vocabulary", {}).get("current_batch", 1)
+        all_vocab = session.get("vocabulary", {}).get("words", [])
+
+        # Get words for current batch (3 per batch)
+        batch_size = 3
+        start_idx = (current_batch - 1) * batch_size
+        end_idx = min(start_idx + batch_size, len(all_vocab))
+        batch_words = all_vocab[start_idx:end_idx]
+
+        if not batch_words:
+            return state, "*No vocabulary in current batch*", "0/0"
+
+        # Update flashcard state
+        state["cards"] = batch_words
+        state["current_index"] = 0
+        state["flipped"] = False
+        state["visible"] = True
+
+        # Show first card (English side)
+        display = f"### {batch_words[0]['english']}"
+        progress = f"1/{len(batch_words)}"
+
+        return state, display, progress
 
     @spaces.GPU(duration=60)
     def start_lesson_ui(sid):
@@ -336,9 +419,26 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
         return lesson_info, progress
 
+    # Wire up flashcard functions
+    flip_card_btn.click(flip_flashcard, [flashcard_state], [flashcard_state, flashcard_display])
+    next_card_btn.click(
+        next_flashcard, [flashcard_state], [flashcard_state, flashcard_display, flashcard_progress]
+    )
+
+    # Auto-update flashcards when trigger changes
+    flashcard_trigger.change(
+        update_flashcards,
+        [session_id, flashcard_state],
+        [flashcard_state, flashcard_display, flashcard_progress],
+    )
+
     # Wire up chat functions
-    submit_event = msg.submit(process_message, [msg, chatbot, session_id], [msg, chatbot])
-    click_event = submit.click(process_message, [msg, chatbot, session_id], [msg, chatbot])
+    submit_event = msg.submit(
+        process_message, [msg, chatbot, session_id], [msg, chatbot, flashcard_trigger]
+    )
+    click_event = submit.click(
+        process_message, [msg, chatbot, session_id], [msg, chatbot, flashcard_trigger]
+    )
 
     # Stop button cancels ongoing inference
     stop.click(None, None, None, cancels=[submit_event, click_event])

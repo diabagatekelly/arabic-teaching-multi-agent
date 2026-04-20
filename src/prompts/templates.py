@@ -43,7 +43,7 @@ Grammar ({topics_count} topics):
 
 Greet the student warmly and present the lesson structure above.
 
-MAKE SURE to ALWAYS offer numbered navigation at the end:
+ALWAYS offer numbered navigation options at the end:
 1. Start with vocabulary
 2. Start with grammar
 
@@ -86,15 +86,18 @@ VOCAB_BATCH_INTRO = PromptTemplate(
 
 Lesson {lesson_number}, Batch {batch_number} of {total_batches}
 
-Words:
+Words (3 per batch):
 {words}
 
-Present these words with Arabic, transliteration, and English translation. Remind them flashcards are available for learning. Offer options:
-1. Take quiz on these words
-2. Go to next batch
-3. See all words
+Present these words with Arabic, transliteration, and English translation.
 
-Or tell me what you'd like to do.""",
+Direct the student to use the flashcards in the left panel to learn the words. When they feel ready, they can choose what to do next.
+
+ALWAYS offer numbered navigation options at the end:
+1. Take quick quiz on these words
+2. Move on to next batch
+
+If they go off topic, gently guide them back or offer a break.""",
     input_variables=["lesson_number", "batch_number", "total_batches", "words"],
 )
 
