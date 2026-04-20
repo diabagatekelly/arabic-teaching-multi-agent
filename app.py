@@ -122,6 +122,9 @@ def process_message(message, chat_history, session_id):
     # Route through orchestrator
     response = orchestrator.handle_message(session_id, message)
 
+    # Save sessions after orchestrator updates state
+    save_sessions(sessions)
+
     logger.info("[App] Received response from orchestrator")
     logger.info(f"  Response length: {len(response)} chars")
     logger.info(f"  Response preview: {response[:100]}...")

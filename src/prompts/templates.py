@@ -93,13 +93,19 @@ Words (3 per batch):
 
 Present these words with Arabic, transliteration, and English translation.
 
-ALWAYS direct the student to use the flashcards in the left panel to learn the words. When they feel ready, they can choose what to do next.
+**CRITICAL REQUIREMENTS (both are MANDATORY):**
 
-YOU MUST ALWAYS offer these numbered navigation options at the end:
+1. You MUST tell the student to use the flashcards in the left panel to practice these words.
+
+2. You MUST end your response with these EXACT numbered options:
+
+"What would you like to do?
 1. Take quick quiz on these words
-2. Move on to next batch
+2. Move on to next batch"
 
-After the student chooses 1 (vocabulary) or 2 (grammar), acknowledge their choice by saying something like "Great choice!" or "Let's dive into that topic."
+DO NOT end your response without mentioning flashcards AND showing these numbered options.
+
+After the student chooses an option, acknowledge their choice by saying something like "Great choice!" or "Let's dive into that topic."
 If they go off topic, gently guide them back or offer a break.""",
     input_variables=["lesson_number", "batch_number", "total_batches", "words"],
 )
