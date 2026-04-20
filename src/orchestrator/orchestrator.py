@@ -1272,13 +1272,11 @@ class Orchestrator:
 
                     logger.info("[Orchestrator] Using fallback grammar questions")
 
-                    # Separate vocab into masculine and feminine
+                    # Separate vocab into masculine and feminine (ة can appear anywhere in word with tanween)
                     masculine_words = [
-                        v for v in lesson_data["vocabulary"] if not v["arabic"].endswith("ة")
+                        v for v in lesson_data["vocabulary"] if "ة" not in v["arabic"]
                     ]
-                    feminine_words = [
-                        v for v in lesson_data["vocabulary"] if v["arabic"].endswith("ة")
-                    ]
+                    feminine_words = [v for v in lesson_data["vocabulary"] if "ة" in v["arabic"]]
 
                     # Build 3 unique questions with randomization
                     fallback_questions = []
@@ -1451,9 +1449,9 @@ class Orchestrator:
                 all_vocab = lesson_data["vocabulary"]
                 vocab_questions = random.sample(all_vocab, min(3, len(all_vocab)))
 
-                # Grammar questions (gender identification)
-                masculine_words = [v for v in all_vocab if not v["arabic"].endswith("ة")]
-                feminine_words = [v for v in all_vocab if v["arabic"].endswith("ة")]
+                # Grammar questions (gender identification - ة can appear anywhere in word with tanween)
+                masculine_words = [v for v in all_vocab if "ة" not in v["arabic"]]
+                feminine_words = [v for v in all_vocab if "ة" in v["arabic"]]
 
                 grammar_questions = []
                 used_words = set()
@@ -1774,12 +1772,12 @@ Teacher:"""
                     if topic == "masculine_feminine_nouns":
                         import random
 
-                        # Separate vocab by gender (ة ending = feminine)
+                        # Separate vocab by gender (ة anywhere in word = feminine, even with tanween)
                         masculine_words = [
-                            v for v in lesson_data["vocabulary"] if not v["arabic"].endswith("ة")
+                            v for v in lesson_data["vocabulary"] if "ة" not in v["arabic"]
                         ]
                         feminine_words = [
-                            v for v in lesson_data["vocabulary"] if v["arabic"].endswith("ة")
+                            v for v in lesson_data["vocabulary"] if "ة" in v["arabic"]
                         ]
 
                         questions = []

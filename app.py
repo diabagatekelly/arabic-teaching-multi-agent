@@ -294,7 +294,7 @@ with gr.Blocks(
     theme=gr.themes.Soft(),
     css="""
     .flashcard {
-        padding: 60px 20px;
+        padding: 95px 20px;
         min-height: 250px;
         width: 100%;
         display: flex;
