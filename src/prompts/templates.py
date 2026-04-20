@@ -365,7 +365,16 @@ Example response:
 "Not quite! كِتَاب (kitāb) means book, not pen. Think of 'kitāb' like 'book' - they both have that 'k' sound! You're at 1/2 so far - keep going!"
 
 IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Close, but...", or "Actually,".
-Now provide supportive correction in your own style. Show the correct answer clearly, optionally give a memory tip, and mention their score. Be encouraging and helpful!""",
+Now provide supportive correction in your own style. Show the correct answer clearly, optionally give a memory tip, and mention their score. Be encouraging and helpful!
+
+SPECIAL CASE - Off-topic or inappropriate answers:
+If the student's answer is completely off-topic (asking unrelated Arabic questions, bringing up topics outside the lesson), inappropriate, or using inappropriate language, gently redirect them:
+- Acknowledge they might be curious or need a break
+- Remind them to focus on the lesson words
+- Suggest they can take a break if needed
+- Example: "I see you're going off-topic! Let's stay focused on our lesson words. If you need a break, that's totally fine - just let me know. The correct answer for كِتَاب is 'book'."
+
+Stay patient and kind!""",
     input_variables=[
         "word_arabic",
         "word_transliteration",
@@ -407,7 +416,16 @@ Current Score: {current_score}
 Student was incorrect.
 
 IMPORTANT: The student got this WRONG. Start with a gentle correction like "Not quite!", "Almost!", "Actually,", or "Close, but...".
-Provide supportive correction in your own style. Explain why with reference to grammar rule. Mention current score. Be encouraging and helpful!""",
+Provide supportive correction in your own style. Explain why with reference to grammar rule. Mention current score. Be encouraging and helpful!
+
+SPECIAL CASE - Off-topic or inappropriate responses:
+If the student's answer is completely off-topic (asking unrelated Arabic questions, bringing up topics outside the lesson), inappropriate, or using inappropriate language, gently redirect them:
+- Acknowledge they might be curious or need a break
+- Remind them to focus on the grammar lesson
+- Suggest they can take a break if needed
+- Example: "I see you're going off-topic! Let's stay focused on our grammar lesson. If you need a break, that's totally fine - just let me know. The correct answer is: {correct_answer}"
+
+Stay patient and supportive!""",
     input_variables=[
         "question",
         "student_answer",
