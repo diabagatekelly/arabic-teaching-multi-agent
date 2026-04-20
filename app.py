@@ -13,6 +13,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from content_loader import load_lesson
+from src.orchestrator.orchestrator import Orchestrator
 
 # Load teaching model at module level (required for ZeroGPU)
 print("===== Loading Qwen 7B Teaching Model =====")
@@ -23,7 +24,9 @@ teaching_model = AutoModelForCausalLM.from_pretrained(
     torch_dtype=torch.float16,
     device_map="auto",
 )
-teaching_model.to("cuda")
+# Only move to cuda if available (for HuggingFace Spaces)
+if torch.cuda.is_available():
+    teaching_model.to("cuda")
 print("===== Model loaded =====")
 
 # TODO: Load LoRA adapter for teaching model when available
@@ -86,6 +89,10 @@ for lesson_num in range(1, 11):  # Lessons 1-10
         print(f"✗ Lesson {lesson_num} not found, skipping")
 print(f"===== {len(lesson_cache)} lessons cached =====")
 
+# Initialize orchestrator
+orchestrator = Orchestrator(lesson_cache, sessions, teaching_model, tokenizer)
+print("===== Orchestrator initialized =====")
+
 
 # Build Gradio interface with 3-column layout
 with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
@@ -139,26 +146,12 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         # Get lesson from cache
         lesson_number = 1
         if lesson_number not in lesson_cache:
-            return "**Status:** Error - Lesson not found", "**Learned:** 0 words", sid
+            return "**Status:** Error - Lesson not found", "**Learned:** 0 words", [], sid
+
+        # Call orchestrator to start lesson (updates session, generates welcome)
+        welcome_message = orchestrator.start_lesson(sid, lesson_number)
 
         lesson_data = lesson_cache[lesson_number]
-
-        # Initialize session with lesson data
-        if sid not in sessions:
-            sessions[sid] = {}
-
-        sessions[sid].update(
-            {
-                "lesson_number": lesson_number,
-                "lesson_name": lesson_data["lesson_name"],
-                "vocabulary": lesson_data["vocabulary"],
-                "grammar_sections": lesson_data["grammar_sections"],
-                "learned_words": [],
-                "quiz_scores": [],
-                "status": "active",
-            }
-        )
-
         lesson_info = f"""**Status:** Active
 
 **Lesson {lesson_number}:** {lesson_data['lesson_name']}
@@ -167,7 +160,11 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 **Grammar:** {', '.join(lesson_data['grammar_points'])}
 """
         progress = "**Learned:** 0 words\n\n**Quizzes:** 0/0"
-        return lesson_info, progress, sid
+
+        # Initialize chat with welcome message
+        chat_history = [{"role": "assistant", "content": welcome_message}]
+
+        return lesson_info, progress, chat_history, sid
 
     def end_lesson_ui(sid):
         """End lesson - session saved but marked inactive."""
@@ -205,7 +202,7 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
 
     # Wire up lesson control functions
     start_lesson_btn.click(
-        start_lesson_ui, [session_id], [lesson_info, progress_display, session_id]
+        start_lesson_ui, [session_id], [lesson_info, progress_display, chatbot, session_id]
     )
     end_lesson_btn.click(end_lesson_ui, [session_id], [lesson_info, progress_display])
     reset_lesson_btn.click(reset_lesson_ui, [session_id], [lesson_info, progress_display])
