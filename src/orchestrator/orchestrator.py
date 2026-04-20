@@ -4,10 +4,14 @@ import logging
 
 from src.agents.teaching_agent import TeachingAgent
 from src.prompts.templates import (
+    FEEDBACK_GRAMMAR_CORRECT,
+    FEEDBACK_GRAMMAR_INCORRECT,
     FEEDBACK_VOCAB_CORRECT,
     FEEDBACK_VOCAB_INCORRECT,
     GRAMMAR_EXPLANATION,
     GRAMMAR_OVERVIEW,
+    GRAMMAR_QUIZ_QUESTION,
+    GRAMMAR_TOPIC_SUMMARY,
     LESSON_WELCOME,
     VOCAB_BATCH_INTRO,
     VOCAB_BATCH_SUMMARY,
@@ -196,7 +200,13 @@ class Orchestrator:
                 "vocab": "vocab_batch_intro",
             },
             "grammar_quiz": {
+                "answer": "grammar_quiz",  # stay in quiz, process answer, show next question
                 "vocab": "vocab_batch_intro",
+                "review": "grammar_explanation",
+            },
+            "grammar_quiz_complete": {
+                "vocab": "vocab_batch_intro",
+                "grammar": "grammar_explanation",
                 "review": "grammar_explanation",
             },
         }
@@ -258,9 +268,9 @@ class Orchestrator:
         # Default intent based on current state
         else:
             # In quiz state, any message is an answer
-            if current_progress == "vocab_quiz":
+            if current_progress in ["vocab_quiz", "grammar_quiz"]:
                 detected_intent = "answer"
-                logger.info("[Orchestrator] Default intent in vocab_quiz: answer")
+                logger.info(f"[Orchestrator] Default intent in {current_progress}: answer")
             # Check for affirmative (default to primary action)
             else:
                 affirmative_keywords = [
@@ -399,6 +409,87 @@ class Orchestrator:
                             f"[Orchestrator] Moving to question {quiz_state['current_question'] + 1}"
                         )
                         new_state = "vocab_quiz"
+
+                # Handle answer intent in grammar_quiz
+                elif detected_intent == "answer" and current_progress == "grammar_quiz":
+                    import json
+
+                    from src.agents.grading_agent import GradingAgent
+
+                    logger.info("[Orchestrator] Processing grammar quiz answer")
+                    quiz_state = session["grammar"]["grammar_quiz_state"]
+                    current_q = quiz_state["current_question"]
+                    current_question = quiz_state["questions"][current_q]
+
+                    # Grade the answer using grading agent
+                    grading_agent = GradingAgent(
+                        model=self.teaching_model_getter(),
+                        tokenizer=self.teaching_tokenizer,
+                        max_new_tokens=50,
+                    )
+
+                    # Grade the answer (returns JSON string)
+                    grading_result = grading_agent.grade_grammar_quiz(
+                        {
+                            "question": current_question["question"],
+                            "student_answer": user_message,
+                            "correct_answer": current_question["answer"],
+                        }
+                    )
+
+                    logger.info(f"[Orchestrator] Grammar grading result (raw): {grading_result}")
+
+                    # Parse JSON response - extract just the JSON part
+                    import re
+
+                    try:
+                        json_match = re.search(
+                            r'\{[^}]*"correct"\s*:\s*(true|false)[^}]*\}', grading_result
+                        )
+                        if json_match:
+                            json_str = json_match.group(0)
+                            result_dict = json.loads(json_str)
+                            is_correct = result_dict.get("correct", False)
+                        else:
+                            logger.error(
+                                f"[Orchestrator] No JSON found in grading result: {grading_result}"
+                            )
+                            is_correct = False
+                    except json.JSONDecodeError:
+                        logger.error(
+                            f"[Orchestrator] Failed to parse grading result: {grading_result}"
+                        )
+                        is_correct = False
+
+                    logger.info(f"[Orchestrator] Grammar grading result (parsed): {is_correct}")
+
+                    # Update quiz state
+                    quiz_state["answers"].append(
+                        {
+                            "question": current_question,
+                            "student_answer": user_message,
+                            "correct": is_correct,
+                        }
+                    )
+
+                    if is_correct:
+                        quiz_state["score"] += 1
+
+                    # Move to next question or complete quiz
+                    quiz_state["current_question"] += 1
+
+                    if quiz_state["current_question"] >= quiz_state["total_questions"]:
+                        # Quiz complete
+                        logger.info(
+                            "[Orchestrator] Grammar quiz complete, transitioning to grammar_quiz_complete"
+                        )
+                        new_state = "grammar_quiz_complete"
+                    else:
+                        # Stay in quiz for next question
+                        logger.info(
+                            f"[Orchestrator] Moving to grammar question {quiz_state['current_question'] + 1}"
+                        )
+                        new_state = "grammar_quiz"
 
                 # Update state
                 session["current_progress"] = new_state
@@ -762,6 +853,42 @@ class Orchestrator:
 
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
 
+        elif stage == "grammar_quiz_complete":
+            logger.info("[Orchestrator] Using template: GRAMMAR_TOPIC_SUMMARY")
+
+            # Check if quiz_state still exists
+            if "grammar_quiz_state" not in session.get("grammar", {}):
+                logger.warning("[Orchestrator] grammar_quiz_state not found - quiz already completed")
+                return "Great job on completing the grammar quiz! What would you like to do next?"
+
+            quiz_state = session["grammar"]["grammar_quiz_state"]
+            topic_name = quiz_state["topic"]
+            score = f"{quiz_state['score']}/{quiz_state['total_questions']}"
+            pass_threshold = "2/3"  # Simple threshold
+
+            # Identify weak areas
+            weak_areas_list = []
+            for ans in quiz_state["answers"]:
+                if not ans["correct"]:
+                    weak_areas_list.append(f"- {ans['question']['question']}")
+
+            weak_areas = "\n".join(weak_areas_list) if weak_areas_list else "None! You got everything right! 🎉"
+
+            prompt_text = GRAMMAR_TOPIC_SUMMARY.invoke(
+                {
+                    "topic_name": topic_name,
+                    "score": score,
+                    "pass_threshold": pass_threshold,
+                    "weak_areas": weak_areas,
+                }
+            ).text
+
+            # Clear quiz state
+            if "grammar_quiz_state" in session["grammar"]:
+                del session["grammar"]["grammar_quiz_state"]
+
+            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
         elif stage == "grammar_overview":
             logger.info("[Orchestrator] Using template: GRAMMAR_OVERVIEW")
             # Build grammar overview prompt
@@ -826,6 +953,119 @@ class Orchestrator:
                 }
             ).text
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+
+        elif stage == "grammar_quiz":
+            logger.info("[Orchestrator] Using template: GRAMMAR_QUIZ (ContentAgent)")
+
+            # Generate quiz questions using ContentAgent if not already generated
+            if "grammar_quiz_state" not in session.get("grammar", {}):
+                logger.info("[Orchestrator] Generating grammar quiz questions via ContentAgent")
+
+                # Get the first grammar topic
+                grammar_topic = lesson_data["grammar_points"][0]
+                topic_name = grammar_topic.replace("_", " ").title()
+
+                # For now, generate simple questions based on vocabulary
+                # Later this can call ContentAgent properly
+                questions = [
+                    {
+                        "question": f"Is {lesson_data['vocabulary'][0]['arabic']} ({lesson_data['vocabulary'][0]['english']}) masculine or feminine?",
+                        "answer": "masculine",
+                        "explanation": "It doesn't end with ة (taa marbuta), so it's masculine"
+                    },
+                    {
+                        "question": f"Is {lesson_data['vocabulary'][4]['arabic']} ({lesson_data['vocabulary'][4]['english']}) masculine or feminine?",
+                        "answer": "feminine",
+                        "explanation": "It ends with ة (taa marbuta), so it's feminine"
+                    },
+                    {
+                        "question": f"Is {lesson_data['vocabulary'][1]['arabic']} ({lesson_data['vocabulary'][1]['english']}) masculine or feminine?",
+                        "answer": "masculine",
+                        "explanation": "It doesn't end with ة (taa marbuta), so it's masculine"
+                    },
+                ]
+
+                session["grammar"]["grammar_quiz_state"] = {
+                    "current_question": 0,
+                    "total_questions": len(questions),
+                    "questions": questions,
+                    "answers": [],
+                    "score": 0,
+                    "topic": topic_name,
+                }
+                logger.info(f"[Orchestrator] Generated {len(questions)} grammar quiz questions")
+
+            quiz_state = session["grammar"]["grammar_quiz_state"]
+            current_q = quiz_state["current_question"]
+
+            # Check if we just graded an answer (answers list has content)
+            if quiz_state["answers"] and len(quiz_state["answers"]) == current_q:
+                # Show feedback for the last answer
+                last_answer = quiz_state["answers"][-1]
+                question_data = quiz_state["questions"][current_q - 1]
+                is_correct = last_answer["correct"]
+
+                logger.info(f"[Orchestrator] Showing grammar feedback - correct: {is_correct}")
+
+                # Calculate current score
+                current_score = f"{quiz_state['score']}/{len(quiz_state['answers'])}"
+
+                if is_correct:
+                    prompt_text = FEEDBACK_GRAMMAR_CORRECT.invoke(
+                        {
+                            "question": question_data["question"],
+                            "student_answer": last_answer["student_answer"],
+                            "correct_answer": question_data["answer"],
+                            "explanation": question_data["explanation"],
+                            "current_score": current_score,
+                        }
+                    ).text
+                else:
+                    prompt_text = FEEDBACK_GRAMMAR_INCORRECT.invoke(
+                        {
+                            "question": question_data["question"],
+                            "student_answer": last_answer["student_answer"],
+                            "correct_answer": question_data["answer"],
+                            "explanation": question_data["explanation"],
+                            "current_score": current_score,
+                        }
+                    ).text
+
+                # Check if more questions remain
+                if current_q < quiz_state["total_questions"]:
+                    # Ask next question after feedback
+                    next_question = quiz_state["questions"][current_q]
+
+                    next_question_text = GRAMMAR_QUIZ_QUESTION.invoke(
+                        {
+                            "topic_name": quiz_state["topic"],
+                            "question_number": current_q + 1,
+                            "total_questions": quiz_state["total_questions"],
+                            "question": next_question["question"],
+                        }
+                    ).text
+
+                    return f"{prompt_text}\n\n{next_question_text}\n\nTeacher:"
+                else:
+                    # No more questions, just show feedback (will transition to quiz_complete)
+                    return f"{prompt_text}\n\nTeacher:"
+
+            # Ask the current question (first question or continuing)
+            question = quiz_state["questions"][current_q]
+
+            logger.info(f"[Orchestrator] Asking grammar question {current_q + 1}/{quiz_state['total_questions']}")
+
+            prompt_text = GRAMMAR_QUIZ_QUESTION.invoke(
+                {
+                    "topic_name": quiz_state["topic"],
+                    "question_number": current_q + 1,
+                    "total_questions": quiz_state["total_questions"],
+                    "question": question["question"],
+                }
+            ).text
+
+            # Don't include user_message in prompt for first question
+            return f"{prompt_text}\n\nTeacher:"
 
         else:
             logger.info(f"[Orchestrator] Using default minimal prompt for stage: {stage}")
