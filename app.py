@@ -674,4 +674,4 @@ with gr.Blocks(
 
 
 # Launch Gradio (standard for Spaces)
-demo.launch()
+demo.launch(share=True)
