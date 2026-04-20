@@ -138,7 +138,7 @@ def process_message(message, chat_history, session_id):
     current_progress = session.get("current_progress", "")
     flashcard_update = ""
 
-    if current_progress == "vocab_overview":
+    if current_progress == "vocab_batch_intro":
         # Trigger flashcard update by changing the trigger value
         import time
 
@@ -326,10 +326,9 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         current_progress = session.get("current_progress", "")
 
         # Determine visibility based on current progress
-        # Show: vocab_overview, vocab_batch_intro
+        # Show: vocab_batch_intro, grammar_overview, grammar_explanation
         # Hide: vocab_quiz, grammar_quiz, final_test
         show_flashcards = current_progress in [
-            "vocab_overview",
             "vocab_batch_intro",
             "grammar_overview",
             "grammar_explanation",

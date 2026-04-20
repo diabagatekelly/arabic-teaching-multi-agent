@@ -162,16 +162,16 @@ class Orchestrator:
         # Check if transitioning to vocab or grammar
         if current_progress == "lesson_start":
             if "vocab" in user_lower or "1" in user_lower:
-                session["current_progress"] = "vocab_overview"
-                current_progress = "vocab_overview"
-                logger.info("[Orchestrator] Transitioning to vocab_overview")
+                session["current_progress"] = "vocab_batch_intro"
+                current_progress = "vocab_batch_intro"
+                logger.info("[Orchestrator] Transitioning to vocab_batch_intro")
             elif "grammar" in user_lower or "2" in user_lower:
                 session["current_progress"] = "grammar_overview"
                 current_progress = "grammar_overview"
                 logger.info("[Orchestrator] Transitioning to grammar_overview")
 
-        # Check if starting vocab quiz (user chooses quiz from vocab_overview)
-        elif current_progress == "vocab_overview":
+        # Check if starting vocab quiz (user chooses quiz from vocab_batch_intro)
+        elif current_progress == "vocab_batch_intro":
             if "quiz" in user_lower or "1" in user_lower:
                 session["current_progress"] = "vocab_quiz"
                 current_progress = "vocab_quiz"
@@ -216,32 +216,42 @@ class Orchestrator:
         Returns:
             str: Formatted prompt for the stage
         """
-        from src.prompts.templates import GRAMMAR_OVERVIEW, VOCAB_OVERVIEW
+        from src.prompts.templates import GRAMMAR_OVERVIEW, VOCAB_BATCH_INTRO
 
         session = self.sessions[session_id]
         lesson_number = session["lesson_number"]
         lesson_data = self.lesson_cache[lesson_number]
 
         # Route to appropriate template based on stage
-        if stage == "vocab_overview":
-            logger.info("[Orchestrator] Using template: VOCAB_OVERVIEW")
-            # Build vocab overview prompt
+        if stage == "vocab_batch_intro":
+            logger.info("[Orchestrator] Using template: VOCAB_BATCH_INTRO")
+            # Get current batch
+            current_batch = session.get("vocabulary", {}).get("current_batch", 1)
+            all_vocab = lesson_data["vocabulary"]
+
+            # Get words for current batch (3 per batch)
+            batch_size = 3
+            start_idx = (current_batch - 1) * batch_size
+            end_idx = min(start_idx + batch_size, len(all_vocab))
+            batch_words = all_vocab[start_idx:end_idx]
+
+            # Calculate total batches
+            total_batches = (len(all_vocab) + 2) // 3  # Ceiling division
+
+            # Format words for this batch
             words_formatted = "\n".join(
                 [
-                    f"{i+1}. {v['arabic']} ({v['transliteration']}) - {v['english']}"
-                    for i, v in enumerate(lesson_data["vocabulary"])
+                    f"{i+1}. {w['arabic']} ({w['transliteration']}) - {w['english']}"
+                    for i, w in enumerate(batch_words)
                 ]
             )
-            # Calculate batches (3 words per batch)
-            total_words = len(lesson_data["vocabulary"])
-            batches_count = (total_words + 2) // 3  # Ceiling division
 
-            prompt_text = VOCAB_OVERVIEW.invoke(
+            prompt_text = VOCAB_BATCH_INTRO.invoke(
                 {
                     "lesson_number": lesson_number,
-                    "words_formatted": words_formatted,
-                    "batches_count": batches_count,
-                    "total_words": total_words,
+                    "batch_number": current_batch,
+                    "total_batches": total_batches,
+                    "words": words_formatted,
                 }
             ).text
             return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"

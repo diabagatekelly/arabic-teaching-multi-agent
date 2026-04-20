@@ -42,14 +42,15 @@ Grammar ({topics_count} topics):
 {grammar_topics}
 
 Greet the student warmly and present the lesson structure above.
-ALWAYS list out the vocabulary words and grammar topics clearly in a numbered format. Then ask the student which area they would like to start with.
 
-ALWAYS offer numbered navigation options at the end:
+**CRITICAL REQUIREMENT:**
+You MUST end your response with these EXACT numbered options (do not change the wording):
+
+"Which would you like to start with?
 1. Start with vocabulary
-2. Start with grammar
+2. Start with grammar"
 
-After the student chooses 1 (vocabulary) or 2 (grammar), acknowledge their choice by saying something like "Great choice!" or "Let's dive into that topic."
-If they go off topic, gently guide them back or offer a break.""",
+DO NOT end your response without these numbered options. They are MANDATORY.""",
     input_variables=[
         "lesson_number",
         "total_words",
@@ -94,7 +95,7 @@ Present these words with Arabic, transliteration, and English translation.
 
 ALWAYS direct the student to use the flashcards in the left panel to learn the words. When they feel ready, they can choose what to do next.
 
-YOU MUSTALWAYS offer these numbered navigation options at the end:
+YOU MUST ALWAYS offer these numbered navigation options at the end:
 1. Take quick quiz on these words
 2. Move on to next batch
 
