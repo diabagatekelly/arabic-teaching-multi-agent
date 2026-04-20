@@ -285,6 +285,7 @@ print("===== Orchestrator initialized =====")
 # Build Gradio interface with 3-column layout
 with gr.Blocks(
     title="Arabic Learning Companion",
+    theme=gr.themes.Soft(),
     css="""
     .flashcard {
         padding: 60px 20px;
@@ -317,12 +318,37 @@ with gr.Blocks(
     .gradio-column {
         align-self: flex-start !important;
     }
+    /* Custom loading spinner */
+    .gradio-spinner {
+        border-width: 3px !important;
+    }
     """,
 ) as demo:
+    # Add loading message that shows during startup
+    gr.HTML("""
+        <div id="startup-loading" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+             background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; text-align: center;">
+            <div style="font-size: 1.5em; margin-bottom: 20px;">🧞‍♂️ Waking up the Arabic tutor...</div>
+            <div style="font-size: 1em; color: #666;">Loading language models, this takes ~10 seconds</div>
+        </div>
+        <script>
+            // Show loading on first visit
+            if (sessionStorage.getItem('loaded') !== 'true') {
+                document.getElementById('startup-loading').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('startup-loading').style.display = 'none';
+                    sessionStorage.setItem('loaded', 'true');
+                }, 8000);
+            }
+        </script>
+    """)
+    # Title row - spans full width
+    gr.Markdown("# 🌟 Arabic Learning Companion", elem_classes=["main-title"])
+
     with gr.Row():
         # Left panel - Flashcards (1/4 width)
         with gr.Column(scale=1):
-            gr.Markdown("### 📚 Flashcards", elem_classes=["section-header"])
+            gr.Markdown("### 📚 Flashcards")
             flashcard_display = gr.Markdown(
                 "*Start a lesson to see flashcards*", visible=True, elem_classes=["flashcard"]
             )
@@ -335,7 +361,6 @@ with gr.Blocks(
 
         # Center panel - Chat (1/2 width)
         with gr.Column(scale=2):
-            gr.Markdown("# 🌟 Arabic Learning Companion", elem_classes=["main-title"])
             # type="messages" only works in Gradio 5.x (Spaces), not local 6.12
             try:
                 chatbot = gr.Chatbot(height=600, type="messages", elem_classes=["chatbot"])
@@ -363,7 +388,7 @@ with gr.Blocks(
 
             gr.Markdown("### 📊 Progress")
             progress_display = gr.Markdown(
-                "**Vocabulary:**\n○ No progress yet\n\n**Grammar:**\n○ No progress yet"
+                "**Vocabulary:**\n- ○ No progress yet\n\n**Grammar:**\n- ○ No progress yet"
             )
 
     session_id = gr.State("")  # String type for session ID
