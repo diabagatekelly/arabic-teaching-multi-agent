@@ -732,6 +732,7 @@ class Orchestrator:
                     "words": batch_words,
                     "answers": [],
                     "score": 0,
+                    "feedback_shown": False,
                 }
                 logger.info(f"[Orchestrator] Initialized quiz_state with {len(batch_words)} words")
 
@@ -778,29 +779,17 @@ class Orchestrator:
                         }
                     ).text
 
-                # Check if more questions remain
+                # Mark that we showed feedback so next turn will ask the question
+                quiz_state["feedback_shown"] = True
+
+                # Just show feedback, next question will be asked on next turn
                 if current_q < quiz_state["total_questions"]:
-                    # Ask next question after feedback
-                    next_word = quiz_state["words"][current_q]
-                    # Always use arabic_to_english for demo purposes
-                    question_type = "arabic_to_english"
-
-                    next_question_text = VOCAB_QUIZ_QUESTION.invoke(
-                        {
-                            "question_type": question_type,
-                            "word_arabic": next_word["arabic"],
-                            "word_english": next_word["english"],
-                            "question_number": current_q + 1,
-                            "total_questions": quiz_state["total_questions"],
-                        }
-                    ).text
-
-                    return f"{prompt_text}\n\n{next_question_text}\n\nTeacher:"
+                    return f"{prompt_text}\n\nTeacher:"
                 else:
                     # No more questions, just show feedback (will transition to quiz_complete)
                     return f"{prompt_text}\n\nTeacher:"
 
-            # Ask the current question (first question or continuing)
+            # Ask the current question (first question or continuing after feedback)
             word = quiz_state["words"][current_q]
             # Always use arabic_to_english for demo purposes
             question_type = "arabic_to_english"
@@ -818,6 +807,9 @@ class Orchestrator:
                     "total_questions": quiz_state["total_questions"],
                 }
             ).text
+
+            # Clear feedback flag since we're showing a question now
+            quiz_state["feedback_shown"] = False
 
             # Don't include user_message in prompt for first question (it's just navigation like "1")
             return f"{prompt_text}\n\nTeacher:"
@@ -1120,6 +1112,7 @@ class Orchestrator:
                     "answers": [],
                     "score": 0,
                     "topic": topic_name,
+                    "feedback_shown": False,
                 }
                 logger.info(f"[Orchestrator] Generated {len(questions)} grammar quiz questions")
 
@@ -1167,26 +1160,17 @@ class Orchestrator:
                         }
                     ).text
 
-                # Check if more questions remain
+                # Mark that we showed feedback so next turn will ask the question
+                quiz_state["feedback_shown"] = True
+
+                # Just show feedback, next question will be asked on next turn
                 if current_q < quiz_state["total_questions"]:
-                    # Ask next question after feedback
-                    next_question = quiz_state["questions"][current_q]
-
-                    next_question_text = GRAMMAR_QUIZ_QUESTION.invoke(
-                        {
-                            "topic_name": quiz_state["topic"],
-                            "question_number": current_q + 1,
-                            "total_questions": quiz_state["total_questions"],
-                            "question": next_question["question"],
-                        }
-                    ).text
-
-                    return f"{prompt_text}\n\n{next_question_text}\n\nTeacher:"
+                    return f"{prompt_text}\n\nTeacher:"
                 else:
                     # No more questions, just show feedback (will transition to quiz_complete)
                     return f"{prompt_text}\n\nTeacher:"
 
-            # Ask the current question (first question or continuing)
+            # Ask the current question (first question or continuing after feedback)
             question = quiz_state["questions"][current_q]
 
             logger.info(
@@ -1201,6 +1185,9 @@ class Orchestrator:
                     "question": question["question"],
                 }
             ).text
+
+            # Clear feedback flag since we're showing a question now
+            quiz_state["feedback_shown"] = False
 
             # Don't include user_message in prompt for first question
             return f"{prompt_text}\n\nTeacher:"
