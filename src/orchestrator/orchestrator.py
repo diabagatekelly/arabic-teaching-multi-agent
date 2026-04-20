@@ -1034,7 +1034,7 @@ class Orchestrator:
                 ans["word"]["english"] for ans in quiz_state["answers"] if ans["correct"]
             ]
             words_incorrect = [
-                f"{ans['word']['english']} ({ans['word']['arabic']} - {ans['word']['transliteration']})"
+                f"{ans['word']['arabic']} = {ans['word']['english']} (you said: {ans['student_answer']})"
                 for ans in quiz_state["answers"]
                 if not ans["correct"]
             ]
