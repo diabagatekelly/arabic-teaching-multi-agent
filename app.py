@@ -174,13 +174,16 @@ def _build_progress_display(session):
 
         if batch_num < current_batch:
             # Completed batch
-            progress_lines.append(f"✓ Batch {batch_num}: {len(batch_words)} words")
+            progress_lines.append(f"  ✓ Batch {batch_num}")
+            progress_lines.append(f"     {len(batch_words)} words")
         elif batch_num == current_batch:
             # Current batch
-            progress_lines.append(f"→ Batch {batch_num}: {len(batch_words)} words")
+            progress_lines.append(f"  → Batch {batch_num}")
+            progress_lines.append(f"     {len(batch_words)} words")
         else:
             # Not started
-            progress_lines.append(f"○ Batch {batch_num}: {len(batch_words)} words")
+            progress_lines.append(f"  ○ Batch {batch_num}")
+            progress_lines.append(f"     {len(batch_words)} words")
 
     # Grammar progress
     progress_lines.append("\n**Grammar:**")
@@ -190,14 +193,17 @@ def _build_progress_display(session):
     if lesson_number and lesson_number in lesson_cache:
         lesson_data = lesson_cache[lesson_number]
         for topic_name in lesson_data.get("grammar_points", []):
+            # Convert underscore keys to display names
+            topic_display = topic_name.replace("_", " ").title()
             topic_state = grammar_topics.get(topic_name, {})
             if topic_state.get("taught", False):
                 score = topic_state.get("quiz_score", "N/A")
-                progress_lines.append(f"✓ {topic_name} ({score})")
+                progress_lines.append(f"  ✓ {topic_display}")
+                progress_lines.append(f"     Score: {score}")
             else:
-                progress_lines.append(f"○ {topic_name}")
+                progress_lines.append(f"  ○ {topic_display}")
     else:
-        progress_lines.append("○ No topics available")
+        progress_lines.append("  ○ No topics available")
 
     return "\n".join(progress_lines)
 
@@ -285,25 +291,29 @@ with gr.Blocks(
     title="Arabic Learning Companion",
     css="""
     .flashcard {
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 40px 20px;
-        min-height: 200px;
+        padding: 60px 20px;
+        min-height: 250px;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
-        background-color: #f9f9f9;
-        font-size: 1.2em;
+        background-color: #ffffff;
+        font-size: 2em;
+        font-weight: 500;
     }
     .main-title {
         text-align: center;
         font-size: 2em;
         margin-bottom: 0.5em;
+        margin-top: 0;
     }
     /* Fix double scrollbar in chatbot */
     .chatbot {
         overflow: hidden !important;
+    }
+    /* Align column tops */
+    .gradio-row > .gradio-column {
+        align-items: flex-start !important;
     }
     """,
 ) as demo:
@@ -346,9 +356,13 @@ with gr.Blocks(
                 end_lesson_btn = gr.Button("⏹️ End Lesson", variant="secondary", scale=1)
                 reset_lesson_btn = gr.Button("🔄 Reset", variant="stop", scale=1)
 
-            gr.Markdown("### 📊 Progress")
+            gr.Markdown("### 📖 About")
             lesson_info = gr.Markdown("**Status:** Not started")
-            progress_display = gr.Markdown("**Learned:** 0 words\n\n**Quizzes:** 0/0")
+
+            gr.Markdown("### 📊 Progress")
+            progress_display = gr.Markdown(
+                "**Vocabulary:**\n○ No progress yet\n\n**Grammar:**\n○ No progress yet"
+            )
 
     session_id = gr.State("")  # String type for session ID
     flashcard_state = gr.State(
