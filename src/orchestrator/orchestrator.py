@@ -169,6 +169,20 @@ class Orchestrator:
                 current_progress = "grammar_overview"
                 logger.info("[Orchestrator] Transitioning to grammar_overview")
 
+        # Check if starting vocab quiz (user chooses quiz from vocab_overview)
+        elif current_progress == "vocab_overview":
+            if "quiz" in user_lower or "1" in user_lower:
+                session["current_progress"] = "vocab_quiz"
+                current_progress = "vocab_quiz"
+                logger.info("[Orchestrator] Transitioning to vocab_quiz")
+
+        # Check if starting grammar quiz
+        elif current_progress == "grammar_overview":
+            if "quiz" in user_lower or "1" in user_lower:
+                session["current_progress"] = "grammar_quiz"
+                current_progress = "grammar_quiz"
+                logger.info("[Orchestrator] Transitioning to grammar_quiz")
+
         # Build prompt based on current progress stage
         prompt = self._build_stage_prompt(session_id, current_progress, user_message)
 

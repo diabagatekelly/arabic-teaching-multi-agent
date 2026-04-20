@@ -308,14 +308,45 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         return state, display, progress
 
     def update_flashcards(sid, state):
-        """Update flashcards based on current session vocabulary batch."""
+        """Update flashcards based on current session vocabulary batch and visibility rules."""
         sessions.clear()
         sessions.update(load_sessions())
 
         if sid not in sessions:
-            return state, "*Start a lesson to see flashcards*", "0/0"
+            return (
+                state,
+                "*Start a lesson to see flashcards*",
+                "0/0",
+                gr.update(visible=False),
+                gr.update(visible=False),
+                gr.update(visible=False),
+            )
 
         session = sessions[sid]
+        current_progress = session.get("current_progress", "")
+
+        # Determine visibility based on current progress
+        # Show: vocab_overview, vocab_batch_intro
+        # Hide: vocab_quiz, grammar_quiz, final_test
+        show_flashcards = current_progress in [
+            "vocab_overview",
+            "vocab_batch_intro",
+            "grammar_overview",
+            "grammar_explanation",
+        ]
+
+        if not show_flashcards:
+            # Hide flashcards
+            return (
+                state,
+                "*Flashcards hidden during quiz*",
+                "0/0",
+                gr.update(visible=False),
+                gr.update(visible=False),
+                gr.update(visible=False),
+            )
+
+        # Show flashcards and update content
         current_batch = session.get("vocabulary", {}).get("current_batch", 1)
         all_vocab = session.get("vocabulary", {}).get("words", [])
 
@@ -326,19 +357,32 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         batch_words = all_vocab[start_idx:end_idx]
 
         if not batch_words:
-            return state, "*No vocabulary in current batch*", "0/0"
+            return (
+                state,
+                "*No vocabulary in current batch*",
+                "0/0",
+                gr.update(visible=True),
+                gr.update(visible=True),
+                gr.update(visible=True),
+            )
 
         # Update flashcard state
         state["cards"] = batch_words
         state["current_index"] = 0
         state["flipped"] = False
-        state["visible"] = True
 
         # Show first card (English side)
         display = f"### {batch_words[0]['english']}"
         progress = f"1/{len(batch_words)}"
 
-        return state, display, progress
+        return (
+            state,
+            display,
+            progress,
+            gr.update(visible=True),
+            gr.update(visible=True),
+            gr.update(visible=True),
+        )
 
     @spaces.GPU(duration=60)
     def start_lesson_ui(sid):
@@ -425,11 +469,18 @@ with gr.Blocks(title="Arabic Teacher - FastAPI Demo") as demo:
         next_flashcard, [flashcard_state], [flashcard_state, flashcard_display, flashcard_progress]
     )
 
-    # Auto-update flashcards when trigger changes
+    # Auto-update flashcards when trigger changes (includes visibility)
     flashcard_trigger.change(
         update_flashcards,
         [session_id, flashcard_state],
-        [flashcard_state, flashcard_display, flashcard_progress],
+        [
+            flashcard_state,
+            flashcard_display,
+            flashcard_progress,
+            flashcard_display,
+            flip_card_btn,
+            next_card_btn,
+        ],
     )
 
     # Wire up chat functions

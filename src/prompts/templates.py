@@ -94,7 +94,7 @@ Present these words with Arabic, transliteration, and English translation.
 
 ALWAYS direct the student to use the flashcards in the left panel to learn the words. When they feel ready, they can choose what to do next.
 
-ALWAYS offer these numbered navigation options at the end:
+YOU MUSTALWAYS offer these numbered navigation options at the end:
 1. Take quick quiz on these words
 2. Move on to next batch
 
