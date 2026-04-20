@@ -43,14 +43,13 @@ Grammar ({topics_count} topics):
 
 Greet the student warmly and present the lesson structure above.
 
-**CRITICAL REQUIREMENT:**
-You MUST end your response with these EXACT numbered options (do not change the wording):
+IMPORTANT: If student goes off-topic or says something inappropriate, gently guide them back to the lesson or offer a break.
 
-"Which would you like to start with?
+End your response with:
+
+Which would you like to start with?
 1. Start with vocabulary
-2. Start with grammar"
-
-DO NOT end your response without these numbered options. They are MANDATORY.""",
+2. Start with grammar""",
     input_variables=[
         "lesson_number",
         "total_words",
