@@ -641,8 +641,8 @@ class Orchestrator:
 
                 logger.info(f"[Orchestrator] Showing feedback - correct: {is_correct}")
 
-                # Calculate current score for feedback
-                current_score = f"{quiz_state['score']}/{current_q}"
+                # Calculate current score for feedback (current_q is already the number of questions answered)
+                current_score = f"{quiz_state['score']}/{len(quiz_state['answers'])}"
 
                 if is_correct:
                     prompt_text = FEEDBACK_VOCAB_CORRECT.invoke(
