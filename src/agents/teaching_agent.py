@@ -50,7 +50,14 @@ class TeachingAgent:
         generated_ids = self.model.generate(
             **model_inputs,
             max_new_tokens=max_new_tokens,
+            do_sample=True,
             temperature=temperature,
+            top_p=0.9,
+            top_k=50,
+            repetition_penalty=1.1,
+            num_beams=1,
+            use_cache=True,
+            pad_token_id=self.tokenizer.pad_token_id,
         )
 
         # Strip input tokens from output
