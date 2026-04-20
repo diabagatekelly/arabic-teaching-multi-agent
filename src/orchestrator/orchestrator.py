@@ -582,10 +582,10 @@ class Orchestrator:
                         }
                     ).text
 
-                    return f"{prompt_text}\n\n{next_question_text}\n\nStudent: {user_message}\n\nTeacher:"
+                    return f"{prompt_text}\n\n{next_question_text}\n\nTeacher:"
                 else:
                     # No more questions, just show feedback (will transition to quiz_complete)
-                    return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+                    return f"{prompt_text}\n\nTeacher:"
 
             # Ask the current question (first question or continuing)
             word = quiz_state["words"][current_q]
@@ -603,7 +603,8 @@ class Orchestrator:
                 }
             ).text
 
-            return f"{prompt_text}\n\nStudent: {user_message}\n\nTeacher:"
+            # Don't include user_message in prompt for first question (it's just navigation like "1")
+            return f"{prompt_text}\n\nTeacher:"
 
         elif stage == "vocab_quiz_complete":
             logger.info("[Orchestrator] Using template: VOCAB_BATCH_SUMMARY")
