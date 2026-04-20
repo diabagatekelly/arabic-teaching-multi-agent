@@ -74,13 +74,15 @@ class Orchestrator:
         if len(lesson_data["vocabulary"]) > 3:
             vocab_preview += f" ... ({len(lesson_data['vocabulary']) - 3} more)"
 
-        prompt_text = LESSON_WELCOME.format(
-            lesson_number=lesson_number,
-            total_words=len(lesson_data["vocabulary"]),
-            topics_preview=vocab_preview,
-            topics_count=len(lesson_data["grammar_points"]),
-            grammar_topics=", ".join(lesson_data["grammar_points"]),
-        )
+        prompt_text = LESSON_WELCOME.invoke(
+            {
+                "lesson_number": lesson_number,
+                "total_words": len(lesson_data["vocabulary"]),
+                "topics_preview": vocab_preview,
+                "topics_count": len(lesson_data["grammar_points"]),
+                "grammar_topics": ", ".join(lesson_data["grammar_points"]),
+            }
+        ).text
 
         # Store prompt for debugging
         self.sessions[session_id]["last_prompt"] = prompt_text
