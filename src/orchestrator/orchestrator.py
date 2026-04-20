@@ -350,35 +350,12 @@ class Orchestrator:
                         max_new_tokens=50,
                     )
 
-                    # Determine question type for this round
-                    question_type = (
-                        "arabic_to_english" if current_q % 2 == 0 else "english_to_arabic"
-                    )
+                    # All questions are arabic_to_english for demo purposes
+                    question_type = "arabic_to_english"
+                    word_display = current_word["arabic"]
+                    correct_answer = current_word["english"]
 
-                    # IMPORTANT: Grade based on the actual word being tested, not question_type
-                    # The fine-tuned model sometimes ignores the question_type instruction
-                    # So we always pass the word and both possible answers to the grading agent
-                    # For vocab grading, we need to check if student answered in English or Arabic
-
-                    # Try to detect what the student answered
-                    student_answer_is_arabic = any(
-                        ord(c) > 127 for c in user_message
-                    )  # Contains non-ASCII (likely Arabic)
-
-                    if student_answer_is_arabic:
-                        # Student gave Arabic answer, so question was english_to_arabic
-                        word_display = current_word["english"]
-                        correct_answer = current_word["arabic"]
-                        actual_question_type = "english_to_arabic"
-                    else:
-                        # Student gave English answer, so question was arabic_to_english
-                        word_display = current_word["arabic"]
-                        correct_answer = current_word["english"]
-                        actual_question_type = "arabic_to_english"
-
-                    logger.info(
-                        f"[Orchestrator] Detected actual question type: {actual_question_type} (planned: {question_type})"
-                    )
+                    logger.info(f"[Orchestrator] Question type: {question_type}")
 
                     # Grade the answer (returns JSON string)
                     grading_result = grading_agent.grade_vocab(
@@ -805,9 +782,8 @@ class Orchestrator:
                 if current_q < quiz_state["total_questions"]:
                     # Ask next question after feedback
                     next_word = quiz_state["words"][current_q]
-                    question_type = (
-                        "arabic_to_english" if current_q % 2 == 0 else "english_to_arabic"
-                    )
+                    # Always use arabic_to_english for demo purposes
+                    question_type = "arabic_to_english"
 
                     next_question_text = VOCAB_QUIZ_QUESTION.invoke(
                         {
@@ -826,7 +802,8 @@ class Orchestrator:
 
             # Ask the current question (first question or continuing)
             word = quiz_state["words"][current_q]
-            question_type = "arabic_to_english" if current_q % 2 == 0 else "english_to_arabic"
+            # Always use arabic_to_english for demo purposes
+            question_type = "arabic_to_english"
 
             logger.info(
                 f"[Orchestrator] Asking question {current_q + 1}/{quiz_state['total_questions']}"
