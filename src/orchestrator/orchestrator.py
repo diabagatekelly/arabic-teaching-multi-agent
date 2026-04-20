@@ -782,8 +782,12 @@ class Orchestrator:
                 f"[Orchestrator] Vocab quiz state: current_q={current_q}, answers={len(quiz_state['answers'])}, total={quiz_state['total_questions']}"
             )
 
-            # Check if we just graded an answer (answers list has content)
-            if quiz_state["answers"] and len(quiz_state["answers"]) == current_q:
+            # Check if we just graded an answer and haven't shown feedback yet
+            if (
+                quiz_state["answers"]
+                and len(quiz_state["answers"]) == current_q
+                and not quiz_state.get("feedback_shown", False)
+            ):
                 # Show feedback for the last answer
                 last_answer = quiz_state["answers"][-1]
                 word = last_answer["word"]
@@ -1176,8 +1180,12 @@ class Orchestrator:
                 f"[Orchestrator] Grammar quiz state: current_q={current_q}, answers={len(quiz_state['answers'])}, total={quiz_state['total_questions']}"
             )
 
-            # Check if we just graded an answer (answers list has content)
-            if quiz_state["answers"] and len(quiz_state["answers"]) == current_q:
+            # Check if we just graded an answer and haven't shown feedback yet
+            if (
+                quiz_state["answers"]
+                and len(quiz_state["answers"]) == current_q
+                and not quiz_state.get("feedback_shown", False)
+            ):
                 # Show feedback for the last answer
                 last_answer = quiz_state["answers"][-1]
                 question_data = quiz_state["questions"][current_q - 1]

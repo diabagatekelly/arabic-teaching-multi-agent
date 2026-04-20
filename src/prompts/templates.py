@@ -148,23 +148,14 @@ VOCAB_QUIZ_QUESTION = PromptTemplate(
     template="""Mode: teaching_vocab
 
 Question {question_number} of {total_questions}
-Question Type: {question_type}
 
-Example for arabic_to_english:
+Example response format:
+
 "Question 1 of 3
 
-What does كِتَاب mean?"
+What does {word_arabic} mean?"
 
-Example for english_to_arabic:
-"Question 2 of 3
-
-How do you say 'school' in Arabic?"
-
-Now generate your question following this format:
-- If arabic_to_english: Ask "What does {word_arabic} mean?" (DO NOT include transliteration or English)
-- If english_to_arabic: Ask "How do you say '{word_english}' in Arabic?" (DO NOT include the Arabic answer)
-
-Keep it simple and clear. Wait for the student's answer.""",
+Now generate your question following this exact format. Ask "What does {word_arabic} mean?" - DO NOT include the transliteration or English translation in your question. Keep it simple and wait for the student's answer.""",
     input_variables=[
         "question_type",
         "word_arabic",
