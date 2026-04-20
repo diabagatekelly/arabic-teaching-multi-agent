@@ -19,7 +19,7 @@ from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from src.agents.content_agent import ContentAgent
-from src.orchestrator.orchestrator import Orchestrator
+from src.orchestrator.orchestrator_contextual import ContextualOrchestrator
 from src.rag.pinecone_client import PineconeClient
 from src.rag.rag_retriever import RAGRetriever
 from src.rag.sentence_transformer_client import SentenceTransformerClient
@@ -218,14 +218,15 @@ content_agent.rag_retriever = rag_retriever  # Wire up RAG
 print("===== ContentAgent initialized =====")
 
 # Initialize orchestrator with all agents
-orchestrator = Orchestrator(
+# Using contextual orchestrator (experimental)
+orchestrator = ContextualOrchestrator(
     lesson_cache=lesson_cache,
     sessions=sessions,
     teaching_model_getter=get_teaching_model,
     teaching_tokenizer=teaching_tokenizer,
     content_agent=content_agent,
 )
-print("===== Orchestrator initialized =====")
+print("===== ContextualOrchestrator initialized =====")
 
 
 # Build Gradio interface with 3-column layout
